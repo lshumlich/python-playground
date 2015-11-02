@@ -1,12 +1,30 @@
 
 import subprocess
 from FetchData import *
+"""
 
+The royalty calculation class that actually calculates the royalties.
+This is a work in progress. Today it uses an Excel Worksheet that must
+be formated just so... to simulate a database. This is being done simpley 
+for agility purposes.
+
+Now all you real good programmers out there. This is written so we can
+show real smart people that are not programmers and have them verify our
+process. Please do not be to harsh when I have used some real procedural
+code rather than good OO code.
+
+The intent to to have test data that test 100% of the code as tested
+by code coverage.
+    
+"""
 class ProcessRoyalties(object):
 
     def __init__(self):
         None
 
+    """
+    The place where the calculations begin.
+    """
     def process(self, wsName):
 
         self.fetch = FetchData(wsName)
@@ -19,7 +37,7 @@ class ProcessRoyalties(object):
 
         for monthlyData in self.fetch.monthlyData():
             try:
-                crownRoyaltyRate = 0
+                crownRoyaltyRate = 0 # The goal of this is to calculate this number.
                 well = self.fetch.getWell(monthlyData.WellId)
                 royalty = self.fetch.getRoyaltyMaster(monthlyData.LeaseType, monthlyData.LeaseNumber)
                 lease = self.fetch.getLease(monthlyData.LeaseType, monthlyData.LeaseNumber)
@@ -52,15 +70,15 @@ class ProcessRoyalties(object):
     # 
     def saskOilRoyaltyRate(self, monthlyData, well, royalty, lease, pe):
         econOilData = self.fetch.getECONOilData(monthlyData.ProdYear, monthlyData.ProdMonth)
-        #
-        # Transform from internal datastructure names to ECON's variable names as defined in the "Crude Oil Royalty/Tax Formulas"
-        #
         mop = monthlyData.ProdVol
         crownRoyaltyRate = 0
         freeholdProdTaxRate = 0
+
         if well.TaxClassification == 'Fourth Tier Oil':
+
             if mop < 25:
                 crownRoyaltyRate = 0
+
             elif mop <= 136.2:
                 c = 0
                 d = 0
@@ -76,6 +94,7 @@ class ProcessRoyalties(object):
                 else:
                     raise AppError('Product Classification: ' + well.ProductClassification + ' not known. Royalty not calculated.')
                 crownRoyaltyRate = (c * mop) - d
+
             else:
                 if well.ProductClassification == 'Heavy':
                     k = econOilData.H4T_K
