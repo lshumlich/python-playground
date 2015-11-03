@@ -67,7 +67,12 @@ class ProcessRoyalties(object):
 
     #
     # Sask Oil Royalty Calculation... Finally we are here...
-    # 
+    #
+    # These calculations are fully document in two documents included in this project
+    # under the Sask Folder:
+    #   Factor Circulars.pdf
+    #   OilFactors.pdf
+    #
     def saskOilRoyaltyRate(self, monthlyData, well, royalty, lease, pe):
         econOilData = self.fetch.getECONOilData(monthlyData.ProdYear, monthlyData.ProdMonth)
         mop = monthlyData.ProdVol
@@ -80,8 +85,6 @@ class ProcessRoyalties(object):
                 crownRoyaltyRate = 0
 
             elif mop <= 136.2:
-                c = 0
-                d = 0
                 if well.ProductClassification == 'Heavy':
                     c = econOilData.H4T_C
                     d = econOilData.H4T_D
@@ -109,7 +112,48 @@ class ProcessRoyalties(object):
                     raise AppError('Product Classification: ' + well.ProductClassification + ' not known. Royalty not calculated.')
                 crownRoyaltyRate = k - (x / mop)
         else:
-            raise AppError('Tax Classification: ' + well.TaxClassification + ' not known. Royalty not calculated.')
+            if well.ProductClassification == 'Heavy':
+                if well.TaxClassification == 'Third Tier Oil':
+                    k = econOilData.H3T_K
+                    x = econOilData.H3T_X
+                elif well.TaxClassification == 'New Oil':
+                    k = econOilData.HNEW_K
+                    x = econOilData.HNEW_X
+                elif well.TaxClassification == 'Old Oil':
+                    k = econOilData.HNEW_K
+                    x = econOilData.HNEW_X
+                else:
+                    raise AppError('Tax Classification: ' + well.TaxClassification + ' not known. Royalty not calculated.')
+            elif well.ProductClassification == 'Southwest':
+                if well.TaxClassification == 'Third Tier Oil':
+                    k = econOilData.SW3T_K
+                    x = econOilData.SW3T_X
+                elif well.TaxClassification == 'New Oil':
+                    k = econOilData.SWNEW_K
+                    x = econOilData.SWNEW_X
+                elif well.TaxClassification == 'Old Oil':
+                    k = econOilData.SWNEW_K
+                    x = econOilData.SWNEW_X
+                else:
+                    raise AppError('Tax Classification: ' + well.TaxClassification + ' not known. Royalty not calculated.')
+            elif well.ProductClassification == 'Other':
+                if well.TaxClassification == 'Third Tier Oil':
+                    k = econOilData.O3T_K
+                    x = econOilData.O3T_X
+                elif well.TaxClassification == 'New Oil':
+                    k = econOilData.ONEW_K
+                    x = econOilData.ONEW_X
+                elif well.TaxClassification == 'Old Oil':
+                    k = econOilData.ONEW_K
+                    x = econOilData.ONEW_X
+                else:
+                    raise AppError('Tax Classification: ' + well.TaxClassification + ' not known. Royalty not calculated.')
+            else:
+                raise AppError('Product Classification: ' + well.ProductClassification + ' not known. Royalty not calculated.')
+
+            #TOTO Calculate src correctly
+            src = 1
+            crownRoyaltyRate = k - (x / mop) - src
 
         return crownRoyaltyRate
 
