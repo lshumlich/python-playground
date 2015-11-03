@@ -1,6 +1,8 @@
 
 import subprocess
+from datetime import date
 from FetchData import *
+
 """
 
 The royalty calculation class that actually calculates the royalties.
@@ -119,9 +121,6 @@ class ProcessRoyalties(object):
                 elif well.TaxClassification == 'New Oil':
                     k = econOilData.HNEW_K
                     x = econOilData.HNEW_X
-                elif well.TaxClassification == 'Old Oil':
-                    k = econOilData.HNEW_K
-                    x = econOilData.HNEW_X
                 else:
                     raise AppError('Tax Classification: ' + well.TaxClassification + ' not known. Royalty not calculated.')
             elif well.ProductClassification == 'Southwest':
@@ -129,9 +128,6 @@ class ProcessRoyalties(object):
                     k = econOilData.SW3T_K
                     x = econOilData.SW3T_X
                 elif well.TaxClassification == 'New Oil':
-                    k = econOilData.SWNEW_K
-                    x = econOilData.SWNEW_X
-                elif well.TaxClassification == 'Old Oil':
                     k = econOilData.SWNEW_K
                     x = econOilData.SWNEW_X
                 else:
@@ -144,19 +140,79 @@ class ProcessRoyalties(object):
                     k = econOilData.ONEW_K
                     x = econOilData.ONEW_X
                 elif well.TaxClassification == 'Old Oil':
-                    k = econOilData.ONEW_K
-                    x = econOilData.ONEW_X
+                    k = econOilData.OOLD_K
+                    x = econOilData.OOLD_X
                 else:
                     raise AppError('Tax Classification: ' + well.TaxClassification + ' not known. Royalty not calculated.')
             else:
                 raise AppError('Product Classification: ' + well.ProductClassification + ' not known. Royalty not calculated.')
 
-            #TOTO Calculate src correctly
+            #TODO Calculate src correctly
+            
             src = 1
             crownRoyaltyRate = k - (x / mop) - src
 
         return crownRoyaltyRate
 
+    def newProcess(self):
+        print('whatever')
+
+
+    """
+    Accourding to the Sask Factor Circulars:
+    2) SRC = Saskatchewan Resource Credit of:
+    (a) 2.5 percentage points for all oil produced prior to April 2013 from vertical oil
+        wells or gas wells drilled on or after February 9, 1998 and before October 1, 2002.
+        Also for all incremental oil produced prior to April 2013 from new or expanded
+        waterfloods implemented on or after February 9, 1998 and before October 1, 2002;
+    (b) 2.25 percentage points for all oil produced on or after April 1, 2013 from
+        vertical oil wells or gas wells drilled on or after February 9, 1998 and before
+        October 1, 2002. Also for all incremental oil produced on or after April 1, 2013
+        from new or expanded waterfloods implemented on or after February 9, 1998 and
+        before October 1, 2002;
+    (c) 1.0 percentage point for all other “old oil”, “new oil” and “third tier oil”
+        produced prior to April 2013; and
+    (d) 0.75 percentage points for all other “old oil”, “new oil” and “third tier oil”
+        produced after April 1, 2013.
+    """
+
+
+    def newProcess2(self):
+        print('whatever')
+
+    def saskOilSrcCalc(self, prodYear, prodMonth, verticalHorizontal, drillDate, wellType, taxClass ):
+        src = 0
+        prodYearMonth = (prodYear * 100) + prodMonth
+        if (prodYearMonth <= 201304 and wellType == 'Oil' and verticalHorizontal == 'V'):
+            src = 2.5
+        elif (wellType == 'Gas' and drillDate >= date(1998, 2, 9) and drillDate <= date(2002, 10, 1)):
+            src = 2.5
+        return src
+
+"""
+*******************************************************************
+    Test Code....
+
+"""
+from datetime import date
+
+class TestSaskRoyaltyCalc(unittest.TestCase):
+
+#        
+    def test_SaskSrc(self):
+        pr = ProcessRoyalties()
+        self.assertEqual(pr.saskOilSrcCalc(2013,4,'V',date(2001,1,1),'Oil','Forth Tier'),2.5)
+        self.assertEqual(pr.saskOilSrcCalc(2013,4,'H',date(2001,1,1),'Oil','Forth Tier'),0)
+        self.assertEqual(pr.saskOilSrcCalc(2013,5,'V',date(2001,1,1),'Oil','Forth Tier'),0)
+
+          
+
 pr = ProcessRoyalties()
 pr.process('database.xlsx')
 subprocess.call(['notepad.exe', 'log.txt'])
+
+"""
+if __name__ == '__main__':
+    unittest.main()
+
+"""
