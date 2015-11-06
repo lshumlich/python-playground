@@ -44,6 +44,7 @@ class ProcessRoyalties(object):
                 royalty = self.fetch.getRoyaltyMaster(monthlyData.LeaseType, monthlyData.LeaseNumber)
                 lease = self.fetch.getLease(monthlyData.LeaseType, monthlyData.LeaseNumber)
                 pe =  self.fetch.getProducingEntity(monthlyData.LeaseType, monthlyData.LeaseNumber)
+                royaltyCalc = self.fetch.getRoyaltyCalc(monthlyData.ProdYear,monthlyData.ProdMonth,monthlyData.WellId)
 
                 log.write('Processing: ' + str(monthlyData.RecordNumber) + ' ' + str(monthlyData.ProdYear) +
                           ' ' + str(monthlyData.ProdMonth) + ' ' + monthlyData.LeaseNumber + ' ' +
@@ -51,13 +52,14 @@ class ProcessRoyalties(object):
                           well.ProductClassification + ' ' + str(monthlyData.ProdVol) +
                           '\n')
 
-                if(lease.Prov == 'SK' and monthlyData.Product == 'Oil'):
-                    crownRoyaltyRate = self.saskOilRoyaltyRate(monthlyData, well, royalty, lease, pe)
+                if(lease.Prov == 'SK' and monthlyData.Product == 'Oil') and royalty.RoyaltyScheme == 'ProvCrownVar' :
+                    self.saskOilRoyaltyRate(monthlyData, well, royalty, lease, pe, royaltyCalc)
                 else:
                     raise AppError('Royalty Scheme not yet developed: ' + lease.Prov + ' ' + monthlyData.Product)
                 
-                crownRoyaltyRate = round(crownRoyaltyRate,6)
-                log.write ("   Royalty Rate calculated as: " + str(crownRoyaltyRate) + ".\n")
+                log.write('--- Royalty Calculated: {} {}/{:0>2} {} prod: {} Crown Rate: {} FH Tax Rate: {}\n'.format(monthlyData.Row, royaltyCalc.ProdYear, royaltyCalc.ProdMonth,
+                                                                                             royaltyCalc.WellId, monthlyData.ProdVol, royaltyCalc.RoyaltyRate, royaltyCalc.FreeholdTaxRate))
+                self.fetch.updateRoyaltyCalc(royaltyCalc)
 
             except AppError as e:
                 errorCount +=1
@@ -75,7 +77,7 @@ class ProcessRoyalties(object):
     #   Factor Circulars.pdf
     #   OilFactors.pdf
     #
-    def saskOilRoyaltyRate(self, monthlyData, well, royalty, lease, pe):
+    def saskOilRoyaltyRate(self, monthlyData, well, royalty, lease, pe, royaltyCalc):
         econOilData = self.fetch.getECONOilData(monthlyData.ProdYear, monthlyData.ProdMonth)
         mop = monthlyData.ProdVol
         crownRoyaltyRate = 0
@@ -98,7 +100,8 @@ class ProcessRoyalties(object):
                     d = econOilData.O4T_D
                 else:
                     raise AppError('Product Classification: ' + well.ProductClassification + ' not known. Royalty not calculated.')
-                crownRoyaltyRate = (c * mop) - d
+                royaltyCalc.RoyaltyRate = (c * mop) - d
+                print ("   Royalty Rate Forth Tier as: ", royaltyCalc.RoyaltyRate, c, mop, d)
 
             else:
                 if well.ProductClassification == 'Heavy':
@@ -112,7 +115,7 @@ class ProcessRoyalties(object):
                     x = econOilData.O4T_X
                 else:
                     raise AppError('Product Classification: ' + well.ProductClassification + ' not known. Royalty not calculated.')
-                crownRoyaltyRate = k - (x / mop)
+                royaltyCalc.RoyaltyRate = k - (x / mop)
         else:
             if well.ProductClassification == 'Heavy':
                 if well.TaxClassification == 'Third Tier Oil':
@@ -147,47 +150,15 @@ class ProcessRoyalties(object):
             else:
                 raise AppError('Product Classification: ' + well.ProductClassification + ' not known. Royalty not calculated.')
 
-            #TODO Calculate src correctly
+            royaltyCalc.RoyaltyRate = k - (x / mop) - well.SRC
             
-            src = 1
-            crownRoyaltyRate = k - (x / mop) - src
-
-        return crownRoyaltyRate
+        royaltyCalc.RoyaltyRate = round(royaltyCalc.RoyaltyRate,6)
+        royaltyCalc.FreeholdTaxRate = royaltyCalc.RoyaltyRate - well.PTF
+        return
 
     def newProcess(self):
         print('whatever')
 
-
-    """
-    Accourding to the Sask Factor Circulars:
-    2) SRC = Saskatchewan Resource Credit of:
-    (a) 2.5 percentage points for all oil produced prior to April 2013 from vertical oil
-        wells or gas wells drilled on or after February 9, 1998 and before October 1, 2002.
-        Also for all incremental oil produced prior to April 2013 from new or expanded
-        waterfloods implemented on or after February 9, 1998 and before October 1, 2002;
-    (b) 2.25 percentage points for all oil produced on or after April 1, 2013 from
-        vertical oil wells or gas wells drilled on or after February 9, 1998 and before
-        October 1, 2002. Also for all incremental oil produced on or after April 1, 2013
-        from new or expanded waterfloods implemented on or after February 9, 1998 and
-        before October 1, 2002;
-    (c) 1.0 percentage point for all other “old oil”, “new oil” and “third tier oil”
-        produced prior to April 2013; and
-    (d) 0.75 percentage points for all other “old oil”, “new oil” and “third tier oil”
-        produced after April 1, 2013.
-    """
-
-
-    def newProcess2(self):
-        print('whatever')
-
-    def saskOilSrcCalc(self, prodYear, prodMonth, verticalHorizontal, drillDate, wellType, taxClass ):
-        src = 0
-        prodYearMonth = (prodYear * 100) + prodMonth
-        if (prodYearMonth <= 201304 and wellType == 'Oil' and verticalHorizontal == 'V'):
-            src = 2.5
-        elif (wellType == 'Gas' and drillDate >= date(1998, 2, 9) and drillDate <= date(2002, 10, 1)):
-            src = 2.5
-        return src
 
 """
 *******************************************************************

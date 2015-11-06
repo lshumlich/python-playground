@@ -154,6 +154,21 @@ class FetchData(object):
             return self.econOilData[str(prodYear) + str(prodMonth)]
         except KeyError as e:
             raise AppError ('ECONOilData not found for: ' + str(prodYear) + ' ' + str(prodMonth))
+
+    #
+    # Royalty Calculation
+    #
+    def getRoyaltyCalc(self,year,month,wellId):
+        rc = DataStructure()
+        setattr(rc, 'ProdYear', year)
+        setattr(rc, 'ProdMonth', month)
+        setattr(rc, 'WellId', wellId)
+        setattr(rc, 'RoyaltyRate', 0)
+        return rc
+
+    def updateRoyaltyCalc(self, rc):
+        print('--- Royalty Calculated: {}/{:0>2} {} rate: {}'.format(rc.ProdYear, rc.ProdMonth, rc.WellId, rc.RoyaltyRate))
+              
     #
     # Generic load a tab into a data structure
     #
