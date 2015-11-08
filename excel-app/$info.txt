@@ -13,3 +13,5 @@ coverage run my_program arg1 arg2
 coverage report
 
 coverage html
+
+python -m pydoc CalcRoyalties

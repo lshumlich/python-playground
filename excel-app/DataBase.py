@@ -38,7 +38,7 @@ class AppError(Exception):
     This is to simulate a database but much much much easier to change
 """
 
-class FetchData(object):
+class DataBase(object):
     
     def __init__(self,worksheetName):
         try:
@@ -163,7 +163,19 @@ class FetchData(object):
         setattr(rc, 'ProdYear', year)
         setattr(rc, 'ProdMonth', month)
         setattr(rc, 'WellId', wellId)
+        setattr(rc, 'K', 0.0)
+        setattr(rc, 'X', 0.0)
+        setattr(rc, 'C', 0.0)
+        setattr(rc, 'D', 0.0)
         setattr(rc, 'RoyaltyRate', 0)
+        setattr(rc, 'RoyaltyTransportation', 0.0)
+        setattr(rc, 'RoyaltyProcessing', 0.0)
+        setattr(rc, 'RoyaltyVolume', 0.0)
+        setattr(rc, 'GrossRoyaltyValue', 0.0)
+        setattr(rc, 'GrossRoyaltyDeductions', 0.0)
+        setattr(rc, 'NetRoyaltyValue', 0.0)
+
+        
         return rc
 
     def updateRoyaltyCalc(self, rc):
@@ -212,32 +224,32 @@ class FetchData(object):
     For these test to work there must be an excel file named "sample.xlsx"
     with the correct tabs.
 """
-class TestFetchData(unittest.TestCase):
+class TestDataBase(unittest.TestCase):
     
     def setUp(self):
         self.validExcelFile = 'DataBase.xlsx'
         
     def test_getWorkSheetThatDoesNotExist(self):
-        self.assertRaises(AppError,FetchData,'no way this exists.xlsxx')
+        self.assertRaises(AppError,DataBase,'no way this exists.xlsxx')
         
     def test_excelLoadWsTable(self):
-        fd = FetchData(self.validExcelFile)
+        fd = DataBase(self.validExcelFile)
         fd.excelLoadWsTable()
         
     def test_excelLoadWsTable(self):
-        fd = FetchData(self.validExcelFile)
+        fd = DataBase(self.validExcelFile)
         fd.forceWorkBook(Workbook()) # force an emply workbook
         self.assertRaises(AppError,fd.excelLoadWsTable,'SomeTabName')
         
     def test_readingMonthlyData(self):
-        fd = FetchData(self.validExcelFile)
+        fd = DataBase(self.validExcelFile)
         
     def test_getRoyaltyMasterNotFound(self):
-        fd = FetchData(self.validExcelFile)
+        fd = DataBase(self.validExcelFile)
         self.assertRaises(AppError,fd.getRoyaltyMaster,'BadLease','BadLease')
 
     def test_somethingelse(self):
-        FetchData(self.validExcelFile)
+        DataBase(self.validExcelFile)
 
 
 
