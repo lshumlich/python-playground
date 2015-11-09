@@ -168,11 +168,11 @@ class DataBase(object):
         setattr(rc, 'C', 0.0)
         setattr(rc, 'D', 0.0)
         setattr(rc, 'RoyaltyRate', 0)
-        setattr(rc, 'RoyaltyTransportation', 0.0)
-        setattr(rc, 'RoyaltyProcessing', 0.0)
         setattr(rc, 'RoyaltyVolume', 0.0)
         setattr(rc, 'GrossRoyaltyValue', 0.0)
-        setattr(rc, 'GrossRoyaltyDeductions', 0.0)
+        setattr(rc, 'RoyaltyTransportation', 0.0)
+        setattr(rc, 'RoyaltyProcessing', 0.0)
+        setattr(rc, 'RoyaltyDeductions', 0.0)
         setattr(rc, 'NetRoyaltyValue', 0.0)
 
         

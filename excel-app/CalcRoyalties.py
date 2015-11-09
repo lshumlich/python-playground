@@ -65,10 +65,26 @@ class ProcessRoyalties(object):
 
                 if(lease.Prov == 'SK' and monthlyData.Product == 'Oil') and royalty.RoyaltyScheme == 'ProvCrownVar' :
                     self.saskOilRoyaltyRate(monthlyData, well, royalty, lease, pe, royaltyCalc)
-                    self.ws.saskOilRoyaltyRate(monthlyData, well, royalty, lease, pe, royaltyCalc)
                 else:
                     raise AppError('Royalty Scheme not yet developed: ' + lease.Prov + ' ' + monthlyData.Product)
+
+
+                # Note: If there is no sales. Use last months sales value... Not included in this code
+
+                royaltyCalc.RoyaltyVolume = round((royaltyCalc.RoyaltyRate / 100) * monthlyData.ProdVol,1)
+
+                royaltyCalc.GrossRoyaltyValue = royaltyCalc.RoyaltyVolume * monthlyData.SalesPrice
+                royaltyCalc.NetRoyaltyValue = royaltyCalc.GrossRoyaltyValue
+
+                print('** royaltyCalc.NetRoyaltyValue starts at', royaltyCalc.NetRoyaltyValue)
+
+                if (royalty.TransportationDeducted == 'Y'):
+                    royaltyCalc.RoyaltyTransportation = royaltyCalc.RoyaltyVolume * monthlyData.TransPrice
+                    royaltyCalc.RoyaltyDeductions += royaltyCalc.RoyaltyTransportation
+                    royaltyCalc.NetRoyaltyValue -= royaltyCalc.RoyaltyTransportation
+                    print('** royaltyCalc.NetRoyaltyValue ends at', royaltyCalc.NetRoyaltyValue)
                 
+                self.ws.saskOilRoyaltyRate(monthlyData, well, royalty, lease, pe, royaltyCalc)
                 log.write('--- Royalty Calculated: {} {}/{:0>2} {} prod: {} Crown Rate: {} FH Tax Rate: {}\n'.format(monthlyData.Row, royaltyCalc.ProdYear, royaltyCalc.ProdMonth,
                                                                                              royaltyCalc.WellId, monthlyData.ProdVol, royaltyCalc.RoyaltyRate, royaltyCalc.FreeholdTaxRate))
                 self.db.updateRoyaltyCalc(royaltyCalc)
@@ -184,8 +200,10 @@ class RoyaltyWorksheet(object):
         fs = '{:>45} : {}\n'
         self.ws.write (fs.format("Right", royalty.RightsGranted))
         self.ws.write (fs.format("Royalty Base:", royalty.RoyaltyScheme))
+        self.ws.write (fs.format("Crown Multiplier:", royalty.CrownMultiplier))
+        self.ws.write (fs.format("Well Interest:", well.WellInterest))
         self.ws.write (fs.format("SRC", well.SRC))
-        self.ws.write (fs.format("PTF", well.SRC))
+        self.ws.write (fs.format("PTF", well.PTF))
         self.ws.write (fs.format("Product Classification", well.ProductClassification))
         self.ws.write (fs.format("Tax Classification", well.TaxClassification))
         self.ws.write ('\n')
@@ -217,22 +235,22 @@ class RoyaltyWorksheet(object):
         fsh = '   {:>9}  {:>9}  {:>9}\n'
         fsd = '   {:>9,.6f} {:>10,.1f} {:>10,.2f}\n'
         self.ws.write (fsh.format('','','Gross'))
-        self.ws.write (fsh.format('Royalty','Royalty','Royaly'))
+        self.ws.write (fsh.format('Royalty','Royalty','Royalty'))
         self.ws.write (fsh.format('Rate','Volume','Value'))
         self.ws.write (fsd.format(royaltyCalc.RoyaltyRate, royaltyCalc.RoyaltyVolume,royaltyCalc.GrossRoyaltyValue))
 
         self.ws.write ('\n')
-        self.ws.write ('   Gross Royalty:                  {:>10,.2f}\n'.format(royaltyCalc.GrossRoyaltyValue))
-        self.ws.write ('      Less Transportation{:>10,.2f}\n'.format(royaltyCalc.RoyaltyTransportation))
-        self.ws.write ('      Less Processing    {:>10,.2f}\n'.format(royaltyCalc.RoyaltyProcessing))
-        self.ws.write ('   Royalty Payable:                {:>10,.2f}\n'.format(royaltyCalc.GrossRoyaltyValue))
+        if (royaltyCalc.GrossRoyaltyValue > 0 and
+            royaltyCalc.GrossRoyaltyValue != royaltyCalc.NetRoyaltyValue):
+            self.ws.write ('   Gross Royalty:                  {:>10,.2f}\n'.format(royaltyCalc.GrossRoyaltyValue))
+        if royaltyCalc.RoyaltyTransportation > 0:
+            self.ws.write ('      Less Transportation{:>10,.2f}\n'.format(royaltyCalc.RoyaltyTransportation))
+        if royaltyCalc.RoyaltyProcessing > 0:
+            self.ws.write ('      Less Processing    {:>10,.2f}\n'.format(royaltyCalc.RoyaltyProcessing))
+        if royaltyCalc.RoyaltyDeductions > 0:
+            self.ws.write ('      Total Deductions:  {:>10,.2f}\n'.format(royaltyCalc.RoyaltyDeductions))
+        self.ws.write ('   Royalty Payable:                {:>10,.2f}\n'.format(royaltyCalc.NetRoyaltyValue))
         self.ws.write ('\n')
-
-
-#        print ('Well: {:<30}\n'.format('12733W43611' ))
-#        print ('{:>30} \n'.format("Right" ))
-#        print ('{:>10.3f} \n'.format(12.34))
-        
 
     def __del__(self):
         self.ws.write ("*** That's it folks ***\n")
