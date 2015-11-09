@@ -10,22 +10,22 @@ Big Note: *************
           Let me repeat VERY BAD programming technique...
 
 BUT..... Now the justification.....
-         Because we are using this code to further our analysis and design we are
+         Because we are using this code to further our analysis and design, we are
          moving and changing our variable names. It is way easier to work in one file
          for now. Please keep the classes the right size...
 
 
-The royalty calculation class that actually calculates the royalties.
-This is a work in progress. Today it uses an Excel Worksheet that must
-be formated just so... to simulate a database. This is being done simpley 
+This is the royalty calculation class that actually calculates the royalties.
+It is a work in progress. Today it uses an Excel Worksheet that must
+be formated just so... to simulate a database. This is being done simply 
 for agility purposes.
 
-Now all you real good programmers out there. This is written so we can
-show real smart people that are not programmers and have them verify our
-process. Please do not be to harsh when I have used some real procedural
+Now all you real good programmers out there...This is written so we can
+show real smart people who are not programmers and have them verify our
+process. Please do not be too harsh when I have used some real procedural
 code rather than good OO code.
 
-The intent to to have test data that test 100% of the code as tested
+The intent is to have test data that tests 100% of the code as tested
 by code coverage.
     
 """
@@ -50,7 +50,6 @@ class ProcessRoyalties(object):
 
         for monthlyData in self.db.monthlyData():
             try:
-                crownRoyaltyRate = 0 # The goal of this is to calculate this number.
                 well = self.db.getWell(monthlyData.WellId)
                 royalty = self.db.getRoyaltyMaster(monthlyData.LeaseType, monthlyData.LeaseNumber)
                 lease = self.db.getLease(monthlyData.LeaseType, monthlyData.LeaseNumber)
@@ -76,13 +75,10 @@ class ProcessRoyalties(object):
                 royaltyCalc.GrossRoyaltyValue = royaltyCalc.RoyaltyVolume * monthlyData.SalesPrice
                 royaltyCalc.NetRoyaltyValue = royaltyCalc.GrossRoyaltyValue
 
-                print('** royaltyCalc.NetRoyaltyValue starts at', royaltyCalc.NetRoyaltyValue)
-
                 if (royalty.TransportationDeducted == 'Y'):
                     royaltyCalc.RoyaltyTransportation = royaltyCalc.RoyaltyVolume * monthlyData.TransPrice
                     royaltyCalc.RoyaltyDeductions += royaltyCalc.RoyaltyTransportation
                     royaltyCalc.NetRoyaltyValue -= royaltyCalc.RoyaltyTransportation
-                    print('** royaltyCalc.NetRoyaltyValue ends at', royaltyCalc.NetRoyaltyValue)
                 
                 self.ws.saskOilRoyaltyRate(monthlyData, well, royalty, lease, pe, royaltyCalc)
                 log.write('--- Royalty Calculated: {} {}/{:0>2} {} prod: {} Crown Rate: {} FH Tax Rate: {}\n'.format(monthlyData.Row, royaltyCalc.ProdYear, royaltyCalc.ProdMonth,
@@ -183,10 +179,6 @@ class ProcessRoyalties(object):
         royaltyCalc.RoyaltyRate = round(royaltyCalc.RoyaltyRate,6)
         royaltyCalc.FreeholdTaxRate = royaltyCalc.RoyaltyRate - well.PTF
         return
-
-    def newProcess(self):
-        print('whatever')
-
 
 class RoyaltyWorksheet(object):
 
