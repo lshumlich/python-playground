@@ -48,7 +48,7 @@ class DataBase(object):
             self.royaltyMasterTabName = 'RoyaltyMaster'
             self.leaseTabName = 'Lease'
             self.monthlyTabName = 'Monthly'
-            self.producingEntityTabName = 'Monthly'
+            self.producingEntityTabName = 'ProducingEntity'
             self.monthlyRecordId = 0
             self.productClausesTabName = 'ProductClauses'
             self.econOilDataTabName = 'ECONData'
@@ -69,13 +69,13 @@ class DataBase(object):
         stack = self.excelLoadWsTable(self.royaltyMasterTabName)
         self.royaltyMaster = dict()
         for ds in stack:
-            self.royaltyMaster[str(ds.LeaseType) + str(ds.LeaseNumber)] = ds
+            self.royaltyMaster[ds.Lease] = ds
     
-    def getRoyaltyMaster(self, leaseType, leaseNumber):
+    def getRoyaltyMaster(self, lease):
         try:
-            return self.royaltyMaster[str(leaseType) + str(leaseNumber)]
+            return self.royaltyMaster[lease]
         except KeyError as e:
-            raise AppError ('Royalty Master not found for LeaseType: ' + leaseType + ' LeaseNumber: ' + leaseNumber)
+            raise AppError ('Royalty Master not found for Lease: ' + lease)
         
     #
     # Lease
@@ -84,13 +84,13 @@ class DataBase(object):
         stack = self.excelLoadWsTable(self.leaseTabName)
         self.lease = dict()
         for ds in stack:
-            self.lease[ds.LeaseType + ds.LeaseNumber] = ds
+            self.lease[ds.Lease] = ds
         
-    def getLease(self, leaseType, leaseNumber):
+    def getLease(self, lease):
         try:
-            return self.lease[str(leaseType) + str(leaseNumber)]
+            return self.lease[lease]
         except KeyError as e:
-            raise AppError ('Lease not found for LeaseType: ' + leaseType + ' LeaseNumber: ' + leaseNumber)
+            raise AppError ('Lease not found for Lease: ' + lease)
     #
     # Well
     #
@@ -112,13 +112,13 @@ class DataBase(object):
         stack = self.excelLoadWsTable(self.producingEntityTabName)
         self.producingEntity = dict()
         for ds in stack:
-            self.producingEntity[ds.LeaseType + ds.LeaseNumber] = ds
+            self.producingEntity[ds.PEID] = ds
         
-    def getProducingEntity(self, leaseType, leaseNumber):
+    def getProducingEntity(self, lease):
         try:
-            return self.producingEntity[str(leaseType) + str(leaseNumber)]
+            return self.producingEntity[lease]
         except KeyError as e:
-            raise AppError ('Producing Entity not found for LeaseType: ' + leaseType + ' LeaseNumber: ' + leaseNumber)
+            raise AppError ('Producing Entity not found for Lease: ' + lease)
     #
     # Product Clauses
     #
@@ -126,7 +126,7 @@ class DataBase(object):
         stack = self.excelLoadWsTable(self.productClausesTabName)
         self.productClauses = dict()
         for ds in stack:
-            self.royaltyMaster[ds.LeaseType + ds.LeaseNumber] = ds
+            self.royaltyMaster[ds.Lease] = ds
 
     #
     # Monthly Data 
@@ -147,20 +147,19 @@ class DataBase(object):
         stack = self.excelLoadWsTable(self.econOilDataTabName)
         self.econOilData = dict()
         for ds in stack:
-            self.econOilData[str(ds.Year) + str(ds.Month)] = ds
+            self.econOilData[ds.ProdMonth] = ds
         
-    def getECONOilData(self, prodYear, prodMonth):
+    def getECONOilData(self, prodMonth):
         try:
-            return self.econOilData[str(prodYear) + str(prodMonth)]
+            return self.econOilData[prodMonth]
         except KeyError as e:
-            raise AppError ('ECONOilData not found for: ' + str(prodYear) + ' ' + str(prodMonth))
+            raise AppError ('ECONOilData not found for: ' + str(prodMonth))
 
     #
     # Royalty Calculation
     #
-    def getRoyaltyCalc(self,year,month,wellId):
+    def getRoyaltyCalc(self,month,wellId):
         rc = DataStructure()
-        setattr(rc, 'ProdYear', year)
         setattr(rc, 'ProdMonth', month)
         setattr(rc, 'WellId', wellId)
         setattr(rc, 'K', 0.0)
@@ -179,7 +178,7 @@ class DataBase(object):
         return rc
 
     def updateRoyaltyCalc(self, rc):
-        print('--- Royalty Calculated: {}/{:0>2} {} rate: {}'.format(rc.ProdYear, rc.ProdMonth, rc.WellId, rc.RoyaltyRate))
+        print('--- Royalty Calculated: {} {} rate: {}'.format(rc.ProdMonth, rc.WellId, rc.RoyaltyRate))
               
     #
     # Generic load a tab into a data structure
@@ -246,7 +245,7 @@ class TestDataBase(unittest.TestCase):
         
     def test_getRoyaltyMasterNotFound(self):
         fd = DataBase(self.validExcelFile)
-        self.assertRaises(AppError,fd.getRoyaltyMaster,'BadLease','BadLease')
+        self.assertRaises(AppError,fd.getRoyaltyMaster,'BadLease')
 
     def test_somethingelse(self):
         DataBase(self.validExcelFile)

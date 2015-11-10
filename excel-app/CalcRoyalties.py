@@ -51,19 +51,19 @@ class ProcessRoyalties(object):
         for monthlyData in self.db.monthlyData():
             try:
                 well = self.db.getWell(monthlyData.WellId)
-                royalty = self.db.getRoyaltyMaster(monthlyData.LeaseType, monthlyData.LeaseNumber)
-                lease = self.db.getLease(monthlyData.LeaseType, monthlyData.LeaseNumber)
-                pe =  self.db.getProducingEntity(monthlyData.LeaseType, monthlyData.LeaseNumber)
-                royaltyCalc = self.db.getRoyaltyCalc(monthlyData.ProdYear,monthlyData.ProdMonth,monthlyData.WellId)
+                royalty = self.db.getRoyaltyMaster(well.Lease)
+                lease = self.db.getLease(well.Lease)
+                #pe =  self.db.getProducingEntity(well.Lease)
+                royaltyCalc = self.db.getRoyaltyCalc(monthlyData.ProdMonth,monthlyData.WellId)
 
-                log.write('Processing: ' + str(monthlyData.RecordNumber) + ' ' + str(monthlyData.ProdYear) +
-                          ' ' + str(monthlyData.ProdMonth) + ' ' + monthlyData.LeaseNumber + ' ' +
+                log.write('Processing: ' + str(monthlyData.RecordNumber) + 
+                          ' ' + str(monthlyData.ProdMonth) + ' ' +
                           monthlyData.Product + ' ' + well.TaxClassification + ' ' +
                           well.ProductClassification + ' ' + str(monthlyData.ProdVol) +
                           '\n')
 
                 if(lease.Prov == 'SK' and monthlyData.Product == 'Oil') and royalty.RoyaltyScheme == 'ProvCrownVar' :
-                    self.saskOilRoyaltyRate(monthlyData, well, royalty, lease, pe, royaltyCalc)
+                    self.saskOilRoyaltyRate(monthlyData, well, royalty, lease, royaltyCalc)
                 else:
                     raise AppError('Royalty Scheme not yet developed: ' + lease.Prov + ' ' + monthlyData.Product)
 
@@ -80,8 +80,8 @@ class ProcessRoyalties(object):
                     royaltyCalc.RoyaltyDeductions += royaltyCalc.RoyaltyTransportation
                     royaltyCalc.NetRoyaltyValue -= royaltyCalc.RoyaltyTransportation
                 
-                self.ws.saskOilRoyaltyRate(monthlyData, well, royalty, lease, pe, royaltyCalc)
-                log.write('--- Royalty Calculated: {} {}/{:0>2} {} prod: {} Crown Rate: {} FH Tax Rate: {}\n'.format(monthlyData.Row, royaltyCalc.ProdYear, royaltyCalc.ProdMonth,
+                self.ws.saskOilRoyaltyRate(monthlyData, well, royalty, lease, royaltyCalc)
+                log.write('--- Royalty Calculated: {} {} {} prod: {} Crown Rate: {} FH Tax Rate: {}\n'.format(monthlyData.Row, royaltyCalc.ProdMonth,
                                                                                              royaltyCalc.WellId, monthlyData.ProdVol, royaltyCalc.RoyaltyRate, royaltyCalc.FreeholdTaxRate))
                 self.db.updateRoyaltyCalc(royaltyCalc)
 
@@ -102,8 +102,8 @@ class ProcessRoyalties(object):
     #   Factor Circulars.pdf
     #   OilFactors.pdf
     #
-    def saskOilRoyaltyRate(self, monthlyData, well, royalty, lease, pe, royaltyCalc):
-        econOilData = self.db.getECONOilData(monthlyData.ProdYear, monthlyData.ProdMonth)
+    def saskOilRoyaltyRate(self, monthlyData, well, royalty, lease, royaltyCalc):
+        econOilData = self.db.getECONOilData(monthlyData.ProdMonth)
         mop = monthlyData.ProdVol
         crownRoyaltyRate = 0
         freeholdProdTaxRate = 0
@@ -186,14 +186,15 @@ class RoyaltyWorksheet(object):
         self.ws = open('Royalty Worksheet.txt','w')
         self.ws.write ("Hello World - Royalty Worksheet.\n")
 
-    def saskOilRoyaltyRate(self, monthlyData, well, royalty, lease, pe, royaltyCalc):
+    def saskOilRoyaltyRate(self, monthlyData, well, royalty, lease, royaltyCalc):
         self.ws.write ('\n')
-        self.ws.write ('Well: {:<3} {:<29} Lease : {}-{}\n'.format(well.WellId,well.UWI,lease.LeaseType,lease.LeaseNumber ))
+        self.ws.write ('Well: {:<3} {:<29} Lease : {}\n'.format(well.WellId,well.UWI,lease.Lease))
         fs = '{:>45} : {}\n'
         self.ws.write (fs.format("Right", royalty.RightsGranted))
+        self.ws.write (fs.format("Province", lease.Prov))
         self.ws.write (fs.format("Royalty Base:", royalty.RoyaltyScheme))
         self.ws.write (fs.format("Crown Multiplier:", royalty.CrownMultiplier))
-        self.ws.write (fs.format("Well Interest:", well.WellInterest))
+        self.ws.write (fs.format("Indian Interest:", well.IndianInterest))
         self.ws.write (fs.format("SRC", well.SRC))
         self.ws.write (fs.format("PTF", well.PTF))
         self.ws.write (fs.format("Product Classification", well.ProductClassification))
@@ -201,10 +202,10 @@ class RoyaltyWorksheet(object):
         self.ws.write ('\n')
 
         fsh = '   {:^7} {:^7} {:>8}  {:>8}  {:>6}  {:>6}\n'
-        fsd = '   {}-{:0>2}   {:3}  {:>9,.1f} {:>9,.1f} {:>7,.2f} {:>7,.2f}\n'
+        fsd = '   {}   {:3}  {:>9,.1f} {:>9,.1f} {:>7,.2f} {:>7,.2f}\n'
         self.ws.write (fsh.format('Prod','Product','Prod','Sales','Sales','Trans'))
         self.ws.write (fsh.format('Month','','Vol','Vol','Price','Price'))
-        self.ws.write (fsd.format(monthlyData.ProdYear,monthlyData.ProdMonth,
+        self.ws.write (fsd.format(self.fmProdMonth(monthlyData.ProdMonth),
                                   monthlyData.Product,monthlyData.ProdVol,
                                   monthlyData.SalesVol,monthlyData.SalesPrice,
                                   monthlyData.TransPrice))
@@ -243,6 +244,10 @@ class RoyaltyWorksheet(object):
             self.ws.write ('      Total Deductions:  {:>10,.2f}\n'.format(royaltyCalc.RoyaltyDeductions))
         self.ws.write ('   Royalty Payable:                {:>10,.2f}\n'.format(royaltyCalc.NetRoyaltyValue))
         self.ws.write ('\n')
+        
+    def fmProdMonth(self,i):
+        return str(i)[0:4]+'-'+str(i)[4:6]
+
 
     def __del__(self):
         self.ws.write ("*** That's it folks ***\n")
