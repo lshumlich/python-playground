@@ -52,7 +52,7 @@ class DataBase(object):
             self.monthlyRecordId = 0
             self.productClausesTabName = 'ProductClauses'
             self.econOilDataTabName = 'ECONData'
-        except FileNotFoundError as e:
+        except FileNotFoundError:
             raise AppError('The excel worksheet ' + worksheetName + ' is not found')
         self.loadWellFromExcel()
         self.loadRoyaltyMasterFromExcel()
@@ -74,7 +74,7 @@ class DataBase(object):
     def getRoyaltyMaster(self, lease):
         try:
             return self.royaltyMaster[lease]
-        except KeyError as e:
+        except KeyError:
             raise AppError ('Royalty Master not found for Lease: ' + lease)
         
     #
@@ -89,7 +89,7 @@ class DataBase(object):
     def getLease(self, lease):
         try:
             return self.lease[lease]
-        except KeyError as e:
+        except KeyError:
             raise AppError ('Lease not found for Lease: ' + lease)
     #
     # Well
@@ -103,7 +103,7 @@ class DataBase(object):
     def getWell(self, wellId):
         try:
             return self.well[wellId]
-        except KeyError as e:
+        except KeyError:
             raise AppError ('Well not found for WellId: ' + str(wellId))
     #
     # Producing Entity 
@@ -117,7 +117,7 @@ class DataBase(object):
     def getProducingEntity(self, lease):
         try:
             return self.producingEntity[lease]
-        except KeyError as e:
+        except KeyError:
             raise AppError ('Producing Entity not found for Lease: ' + lease)
     #
     # Product Clauses
@@ -152,7 +152,7 @@ class DataBase(object):
     def getECONOilData(self, prodMonth):
         try:
             return self.econOilData[prodMonth]
-        except KeyError as e:
+        except KeyError:
             raise AppError ('ECONOilData not found for: ' + str(prodMonth))
 
     #
@@ -166,20 +166,21 @@ class DataBase(object):
         setattr(rc, 'X', 0.0)
         setattr(rc, 'C', 0.0)
         setattr(rc, 'D', 0.0)
-        setattr(rc, 'RoyaltyRate', 0)
+        setattr(rc, 'RoyaltyRate', 0.0)
+        setattr(rc, 'CalcRoyaltyRate', 0.0)
+        setattr(rc, 'RoyaltyPrice', 0.0)
         setattr(rc, 'RoyaltyVolume', 0.0)
-        setattr(rc, 'GrossRoyaltyValue', 0.0)
+        setattr(rc, 'RoyaltyValuePreDeductions', 0.0)
         setattr(rc, 'RoyaltyTransportation', 0.0)
         setattr(rc, 'RoyaltyProcessing', 0.0)
         setattr(rc, 'RoyaltyDeductions', 0.0)
-        setattr(rc, 'NetRoyaltyValue', 0.0)
+        setattr(rc, 'RoyaltyValue', 0.0)
 
         
         return rc
 
     def updateRoyaltyCalc(self, rc):
-        print('--- Royalty Calculated: {} {} rate: {}'.format(rc.ProdMonth, rc.WellId, rc.RoyaltyRate))
-              
+        None
     #
     # Generic load a tab into a data structure
     #
@@ -201,7 +202,7 @@ class DataBase(object):
                         setattr(ds, cell.value, row[i].value)
                         i = i + 1
                     setattr(ds, 'RecordNumber', recordNo)
-        except KeyError as e:
+        except KeyError:
             raise AppError('The excel worksheet ' + self.worksheetName + ' does not have tab: ' + tabName)
             
         return stack
@@ -235,13 +236,13 @@ class TestDataBase(unittest.TestCase):
         fd = DataBase(self.validExcelFile)
         fd.excelLoadWsTable()
         
-    def test_excelLoadWsTable(self):
+    def test_excelLoadWsTableTabFales(self):
         fd = DataBase(self.validExcelFile)
         fd.forceWorkBook(Workbook()) # force an emply workbook
         self.assertRaises(AppError,fd.excelLoadWsTable,'SomeTabName')
         
     def test_readingMonthlyData(self):
-        fd = DataBase(self.validExcelFile)
+        DataBase(self.validExcelFile)
         
     def test_getRoyaltyMasterNotFound(self):
         fd = DataBase(self.validExcelFile)
