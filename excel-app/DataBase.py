@@ -8,6 +8,7 @@ the rows are the data.
 import unittest
 from openpyxl import load_workbook
 from openpyxl import Workbook
+import AppError
 
 class DataStructure(object):
     
@@ -24,14 +25,6 @@ class DataStructure(object):
     def data(self):
         d = vars(self)
         return list(d.values())
-
-class AppError(Exception):
-    
-    def __init__(self, msg):
-        self.msg = msg
-        
-    def __str__(self):
-        return repr(self.msg)
 
 """
     Generic class for fetching data.
@@ -132,13 +125,17 @@ class DataBase(object):
     # Monthly Data 
     #
     def loadMonthlyFromExcel(self):
-        self.monthly = iter(self.excelLoadWsTable(self.monthlyTabName))
+        self.monthlyTable = self.excelLoadWsTable(self.monthlyTabName)
+        self.monthly = iter(self.monthlyTable)
     
     def monthlyDataNextRow(self):
         return next(self.monthly)
 
     def monthlyData(self):
         return self.monthly
+    
+    def getMonthlyData(self):
+        return self.monthlyTable[0]
 
     #
     # ECON Monthly Oil Factors Data
@@ -175,6 +172,8 @@ class DataBase(object):
         setattr(rc, 'RoyaltyProcessing', 0.0)
         setattr(rc, 'RoyaltyDeductions', 0.0)
         setattr(rc, 'RoyaltyValue', 0.0)
+        setattr(rc, 'CommencementPeriod', None)
+        
 
         
         return rc
@@ -204,6 +203,11 @@ class DataBase(object):
                     setattr(ds, 'RecordNumber', recordNo)
         except KeyError:
             raise AppError('The excel worksheet ' + self.worksheetName + ' does not have tab: ' + tabName)
+        except TypeError as e:
+            print('Error Loading tab:',tabName,' column:',i,'Record:',recordNo,'Error:',e)
+            print('   headerRow:',headerRow)
+            print('         row:',row)
+            raise e
             
         return stack
     
@@ -251,6 +255,9 @@ class TestDataBase(unittest.TestCase):
     def test_somethingelse(self):
         DataBase(self.validExcelFile)
 
+    def getDataBase(self):
+        """ for test purposes get a database instance """
+        return DataBase(self.validExcelFile)
 
 
 #print ('Looking for ID 3 - ', self.royaltyMaster[3])
