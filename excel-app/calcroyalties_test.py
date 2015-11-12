@@ -1,7 +1,9 @@
+#!/bin/env python3
+
 import unittest
 from datetime import date
 from datetime import datetime
-from AppError import AppError
+from apperror import AppError
 
 
 from TestHelper import TestHelper

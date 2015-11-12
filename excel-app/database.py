@@ -1,3 +1,4 @@
+#!/bin/env python3
 
 """
 The next step is to write a generic worksheet loader that will load any
@@ -8,7 +9,7 @@ the rows are the data.
 import unittest
 from openpyxl import load_workbook
 from openpyxl import Workbook
-import AppError
+import apperror
 
 class DataStructure(object):
     

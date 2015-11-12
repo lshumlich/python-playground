@@ -1,5 +1,6 @@
+#!/bin/env python3
 
-from DataBase import DataBase
+from database import DataBase
 import copy
 
 class TestHelper(object):

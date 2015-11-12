@@ -1,10 +1,12 @@
+#!/bin/env python3
 
 import subprocess
-from AppError import AppError
-from DataBase import DataBase
+from apperror import AppError
+from database import DataBase
 from datetime import date
 from datetime import datetime
 import unittest
+import os
 
 """
 
@@ -449,8 +451,9 @@ class TestSaskRoyaltyCalc(unittest.TestCase):
 if __name__ == '__main__':
     pr = ProcessRoyalties()
     pr.process('database.xlsx')
-    subprocess.call(['notepad.exe', 'Royalty Worksheet.txt'])
-    subprocess.call(['notepad.exe', 'log.txt'])
+    if os.name != "posix":
+        subprocess.call(['notepad.exe', 'Royalty Worksheet.txt'])
+        subprocess.call(['notepad.exe', 'log.txt'])
 
 """
 if __name__ == '__main__':
