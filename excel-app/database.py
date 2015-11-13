@@ -89,9 +89,9 @@ class DataBase(object):
     # Well
     #
     def loadWellFromExcel(self):
-        stack = self.excelLoadWsTable(self.wellTabName)
+        self.wellList = self.excelLoadWsTable(self.wellTabName)
         self.well = dict()
-        for ds in stack:
+        for ds in self.wellList:
             self.well[ds.WellId] = ds
         
     def getWell(self, wellId):
@@ -99,6 +99,13 @@ class DataBase(object):
             return self.well[wellId]
         except KeyError:
             raise AppError ('Well not found for WellId: ' + str(wellId))
+        
+    def getWellbyLease(self, lease):
+        wl = []
+        for w in self.wellList:
+            if w.Lease == lease:
+                wl.append(w)
+        return wl
     #
     # Producing Entity 
     #
