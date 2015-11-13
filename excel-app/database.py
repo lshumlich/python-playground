@@ -9,7 +9,7 @@ the rows are the data.
 import unittest
 from openpyxl import load_workbook
 from openpyxl import Workbook
-import apperror
+from apperror import AppError
 
 class DataStructure(object):
     
@@ -232,7 +232,7 @@ class DataBase(object):
 class TestDataBase(unittest.TestCase):
     
     def setUp(self):
-        self.validExcelFile = 'DataBase.xlsx'
+        self.validExcelFile = 'database.xlsx'
         
     def test_getWorkSheetThatDoesNotExist(self):
         self.assertRaises(AppError,DataBase,'no way this exists.xlsxx')

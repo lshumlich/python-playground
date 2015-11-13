@@ -6,8 +6,8 @@ from datetime import datetime
 from apperror import AppError
 
 
-from TestHelper import TestHelper
-from CalcRoyalties import ProcessRoyalties
+from testhelper import TestHelper
+from calcroyalties import ProcessRoyalties
 #from DataBase import DataBase,AppError,DataStructure,TestDataBase
 
 class TestSaskRoyaltyCalc(unittest.TestCase):
