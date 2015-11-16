@@ -37,6 +37,7 @@ class DataBase(object):
     def __init__(self,worksheetName):
         try:
             self.worksheetName = worksheetName
+            self.newWorksheetName = '$new_' + worksheetName
             self.wb = load_workbook(worksheetName)
             self.wellTabName = 'Well'
             self.royaltyMasterTabName = 'RoyaltyMaster'
@@ -71,6 +72,9 @@ class DataBase(object):
         except KeyError:
             raise AppError ('Royalty Master not found for Lease: ' + lease)
         
+    def updateRoyaltyMaster(self,royaltyMaster):
+        self.whatChanged(royaltyMaster)
+        
     #
     # Lease
     #
@@ -85,6 +89,9 @@ class DataBase(object):
             return self.lease[lease]
         except KeyError:
             raise AppError ('Lease not found for Lease: ' + lease)
+
+    def updateLease(self,lease):
+        self.whatChanged(lease)
     #
     # Well
     #
@@ -106,6 +113,8 @@ class DataBase(object):
             if w.Lease == lease:
                 wl.append(w)
         return wl
+    def updateWell(self,well):
+        self.whatChanged(well)
     #
     # Producing Entity 
     #
@@ -209,6 +218,8 @@ class DataBase(object):
                         setattr(ds, cell.value, row[i].value)
                         i = i + 1
                     setattr(ds, 'RecordNumber', recordNo)
+                    setattr(ds, 'ExcelRow', row)
+                    setattr(ds, 'HeaderRow', headerRow)
         except KeyError:
             raise AppError('The excel worksheet ' + self.worksheetName + ' does not have tab: ' + tabName)
         except TypeError as e:
@@ -219,6 +230,18 @@ class DataBase(object):
             
         return stack
     
+    def whatChanged(self,ds):
+        i = 0
+        for cell in ds.HeaderRow:
+            vOrig = ds.ExcelRow[i].value # What was in the excel row
+            vNew  = getattr(ds, cell.value)
+            if vOrig != vNew:
+                print(cell.value,'was',vOrig,'is',vNew)
+                ds.ExcelRow[i].value = vNew
+            i = i + 1
+    # Note... We can change this to the same name once we are confident 
+    def commit(self):
+        self.wb.save(self.newWorksheetName)
     #
     # Used for testing
     #
@@ -240,13 +263,14 @@ class TestDataBase(unittest.TestCase):
     
     def setUp(self):
         self.validExcelFile = 'database.xlsx'
+        self.validExcelTab = 'Well'
         
     def test_getWorkSheetThatDoesNotExist(self):
         self.assertRaises(AppError,DataBase,'no way this exists.xlsxx')
         
     def test_excelLoadWsTable(self):
         fd = DataBase(self.validExcelFile)
-        fd.excelLoadWsTable()
+        fd.excelLoadWsTable(self.validExcelTab)
         
     def test_excelLoadWsTableTabFales(self):
         fd = DataBase(self.validExcelFile)
@@ -260,8 +284,75 @@ class TestDataBase(unittest.TestCase):
         fd = DataBase(self.validExcelFile)
         self.assertRaises(AppError,fd.getRoyaltyMaster,'BadLease')
 
-    def test_somethingelse(self):
-        DataBase(self.validExcelFile)
+    def test_wellUpdate(self):
+        wellId = 3000
+        newUWI = 'Changed'
+        newProv = 'Ch'
+        NewReferencePrice = 10101.010101
+        
+        db = DataBase(self.validExcelFile)
+        well = db.getWell(wellId)
+        # Make sure we are not testing an already updated well
+        self.assertNotEqual(well.UWI,newUWI) # If this fails we are testing with an already updated file
+        
+        well.UWI = newUWI
+        well.Prov = newProv
+        well.ReferencePrice = NewReferencePrice
+        db.updateWell(well)
+        db.commit()
+
+        # New look into the new database and make sure the changes are made
+        newDb = DataBase(db.newWorksheetName)
+        newWell = newDb.getWell(wellId)
+        self.assertEqual(newWell.UWI,newUWI)
+        self.assertEqual(newWell.Prov,newProv)
+        self.assertEqual(newWell.ReferencePrice,NewReferencePrice)
+
+    def test_UpdateRoyaltyMaster(self):
+        lease = 'OL-3000'
+        newRoyaltyScheme = 'Changed'
+        newProcessingDeducted = 'WhatEver'
+        NewCrownMultiplier = 10101.010101
+        
+        db = DataBase(self.validExcelFile)
+        rm = db.getRoyaltyMaster(lease)
+        # Make sure we are not testing an already updated royalty master
+        self.assertNotEqual(rm.RoyaltyScheme,newRoyaltyScheme) # If this fails we are testing with an already updated file
+        
+        rm.RoyaltyScheme = newRoyaltyScheme
+        rm.ProcessingDeducted = newProcessingDeducted
+        rm.CrownMultiplier = NewCrownMultiplier
+        db.updateRoyaltyMaster(rm)
+        db.commit()
+        
+        # New look into the new database and make sure the changes are made
+        newDb = DataBase(db.newWorksheetName)
+        newRM = newDb.getRoyaltyMaster(lease)
+        self.assertEqual(newRM.RoyaltyScheme,newRoyaltyScheme)
+        self.assertEqual(newRM.ProcessingDeducted,newProcessingDeducted)
+        self.assertEqual(newRM.CrownMultiplier,NewCrownMultiplier)
+
+    def test_UpdateLease(self):
+        leaseId = 'OL-3000'
+        newProv = 'Changed'
+        newLessor = 'WhatEver'
+        
+        db = DataBase(self.validExcelFile)
+        lease = db.getLease(leaseId)
+        # Make sure we are not testing an already updated royalty master
+        self.assertNotEqual(lease.Prov,newProv) # If this fails we are testing with an already updated file
+        
+        lease.Prov = newProv
+        lease.Lessor = newLessor
+        db.updateLease(lease)
+        db.commit()
+
+        # New look into the new database and make sure the changes are made
+        newDb = DataBase(db.newWorksheetName)
+        newLease = newDb.getLease(leaseId)
+        self.assertEqual(newLease.Prov,newProv)
+        self.assertEqual(newLease.Lessor,newLessor)
+        
 
     def getDataBase(self):
         """ for test purposes get a database instance """
@@ -281,8 +372,9 @@ produce a report.
 
 """
 
-if __name__ == '__main__':
-    unittest.main()
+# if __name__ == '__main__':
+#     unittest.main()
+
 
 ##d = {1:0, 2:0, 3:0}
 ##print(d.keys())
