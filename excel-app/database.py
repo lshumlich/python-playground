@@ -85,6 +85,16 @@ class DataBase(object):
             return self.lease[lease]
         except KeyError:
             raise AppError ('Lease not found for Lease: ' + lease)
+            
+    def getAllLeases(self):
+        al = []
+        try:
+            for l in self.lease:
+                al.append(self.lease[l].Lease)
+            al.sort()
+            return al
+        except KeyError:
+            raise AppError ('No leases found')        
     #
     # Well
     #

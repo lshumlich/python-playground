@@ -1,0 +1,13 @@
+<doctype html>
+<title>Wells</title>
+<script src={{url_for("static", filename="jquery-2.1.4.min.js")}}></script>
+<script src={{url_for("static", filename="bootstrap.min.js")}}></script>
+<link type="text/css" rel="stylesheet" href={{url_for("static", filename="bootstrap.min.css")}}>
+    
+<h3>Wells</h3>
+
+<ul>
+{% for w in wells %}
+    <li>{{ w.UWI }}, {{ w.RoyaltyClassification }}</li>
+{% endfor %}
+</ul>

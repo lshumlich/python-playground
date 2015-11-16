@@ -1,0 +1,13 @@
+<doctype html>
+<title>Leases</title>
+<script src={{url_for("static", filename="jquery-2.1.4.min.js")}}></script>
+<script src={{url_for("static", filename="bootstrap.min.js")}}></script>
+<link type="text/css" rel="stylesheet" href={{url_for("static", filename="bootstrap.min.css")}}>
+    
+<h3>Leases</h3>
+
+<ul>
+{% for l in leases %}
+    <li><a href="/lease/{{ l }}">{{ l }}</a></li>
+{% endfor %}
+</ul>
