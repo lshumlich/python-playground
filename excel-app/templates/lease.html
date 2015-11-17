@@ -4,11 +4,40 @@
 <script src={{url_for("static", filename="bootstrap.min.js")}}></script>
 <link type="text/css" rel="stylesheet" href={{url_for("static", filename="bootstrap.min.css")}}>
     
+<div id="main" class="col-md-3">
+    
 <h3>Lease {{ lease.Lease }}</h3>
-<p>Lease province: {{ lease.Prov }}</p>
-<p>Lessor: {{ lease.Lessor }}</p>
 
-<h3>Wells for lease {{ lease.Lease }}</h3>
+<form>
+    <div class="form-group">
+        <label for="Lease">Lease</label>
+        <input type="text" class="form-control" id="Lease" value={{ lease.Lease }}>
+    </div>
+    
+    <div class="form-group">
+        <label for="Province">Province</label>
+        <input type="text" class="form-control" id="Prov" value={{ lease.Prov }}>
+    </div>
+    
+    <div class="form-group">
+        <label for="FNReserve">FNReserve</label>
+        <input type="text" class="form-control" id="FNReserve" value={{ lease.FNReserve }}>
+    </div>
+    
+    <div class="form-group">
+        <label for="Lessor">Lessor</label>
+        <input type="text" class="form-control" id="Lessor" value={{ lease.Lessor }}>
+    </div>
+    
+    <div class="form-group">
+        <label for="Notes">Notes</label>
+        <input type="text" class="form-control" id="Notes" value={{ lease.Notes }}>
+    </div>
+    
+    <button type="submit" class="btn btn-default">Save</button>
+</form>
+
+<h3>Associated wells:</h3>
 
 <ul>
 {% if leaseWells %}
@@ -19,3 +48,5 @@
     <p>Sorry, no wells for this lease</p>
 {% endif %}
 </ul>
+    
+</div>
