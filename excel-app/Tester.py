@@ -11,4 +11,5 @@ db = DataBase("database.xlsx")
 #for w in db.getWellbyLease(lease):
 #    print (w.UWI, w.Lease)
 
-print (db.getAllLeases())
+for w in db.well:
+    print (db.well[w].WellId)

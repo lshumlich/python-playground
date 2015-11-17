@@ -1,17 +1,13 @@
 <doctype html>
-<title>Wells</title>
+<title>Well</title>
 <script src={{url_for("static", filename="jquery-2.1.4.min.js")}}></script>
 <script src={{url_for("static", filename="bootstrap.min.js")}}></script>
 <link type="text/css" rel="stylesheet" href={{url_for("static", filename="bootstrap.min.css")}}>
     
-<h3>Wells</h3>
+<h3>Well</h3>
 
-<ul>
-{% if wells %}
-    {% for w in wells %}
-        <li>{{ w.UWI }}, {{ w.RoyaltyClassification }}</li>
-    {% endfor %}
+{% if well %}
+    <p>{{ well.UWI }}</p>
 {% else %}
-    <p>Sorry, no wells for this lease</p>
+    <p>No information about this well</p>
 {% endif %}
-</ul>

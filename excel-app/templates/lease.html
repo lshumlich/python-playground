@@ -1,13 +1,21 @@
 <doctype html>
-<title>Leases</title>
+<title>Lease {{ lease.Lease }}</title>
 <script src={{url_for("static", filename="jquery-2.1.4.min.js")}}></script>
 <script src={{url_for("static", filename="bootstrap.min.js")}}></script>
 <link type="text/css" rel="stylesheet" href={{url_for("static", filename="bootstrap.min.css")}}>
     
-<h3>Leases</h3>
+<h3>Lease {{ lease.Lease }}</h3>
+<p>Lease province: {{ lease.Prov }}</p>
+<p>Lessor: {{ lease.Lessor }}</p>
+
+<h3>Wells for lease {{ lease.Lease }}</h3>
 
 <ul>
-{% for l in leases %}
-    <li><a href="/lease/{{ l }}">{{ l }}</a></li>
-{% endfor %}
+{% if leaseWells %}
+    {% for w in leaseWells %}
+    <li><a href="/well/{{ w.WellId }}">{{ w.UWI }}, {{ w.RoyaltyClassification }}</a></li>
+    {% endfor %}
+{% else %}
+    <p>Sorry, no wells for this lease</p>
+{% endif %}
 </ul>

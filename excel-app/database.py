@@ -116,6 +116,15 @@ class DataBase(object):
             return self.well[wellId]
         except KeyError:
             raise AppError ('Well not found for WellId: ' + str(wellId))
+    
+    def getAllWells(self):
+        try:
+            wl = []
+            for w in self.well:
+                wl.append(self.well[w])
+            return wl
+        except:
+            raise AppError ("Wells not found")
         
     def getWellbyLease(self, lease):
         wl = []
