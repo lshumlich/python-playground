@@ -127,7 +127,7 @@ class ProcessRoyalties(object):
                     royaltyCalc.C = econOilData.O4T_C
                     royaltyCalc.D = econOilData.O4T_D
                 else:
-                    raise AppError('Classification: ' + well.Classification + ' not known. Royalty not calculated.')
+                    raise AppError('Royalty Classification: ' + well.RoyaltyClassification + ' not known for ' + well.Classification + ' Royalty not calculated.')
                 royaltyCalc.CalcRoyaltyRate = (royaltyCalc.C * mop) - royaltyCalc.D
 
             else:
@@ -141,7 +141,7 @@ class ProcessRoyalties(object):
                     royaltyCalc.K = econOilData.O4T_K
                     royaltyCalc.X = econOilData.O4T_X
                 else:
-                    raise AppError('Classification: ' + well.Classification + 'Not known. Royalty not calculated.')
+                    raise AppError('Royalty Classification: ' + well.RoyaltyClassification + ' not known for ' + well.Classification + ' Royalty not calculated.')
                 royaltyCalc.CalcRoyaltyRate = royaltyCalc.K - (royaltyCalc.X / mop)
         else:
             if well.Classification == 'Heavy':
@@ -152,7 +152,7 @@ class ProcessRoyalties(object):
                     royaltyCalc.K = econOilData.HNEW_K
                     royaltyCalc.X = econOilData.HNEW_X
                 else:
-                    raise AppError('Royalty Classification: ' + well.RoyaltyClassification + ' not known. Royalty not calculated.')
+                    raise AppError('Royalty Classification: ' + well.RoyaltyClassification + ' not known for ' + well.Classification + ' Royalty not calculated.')
             elif well.Classification == 'Southwest':
                 if well.RoyaltyClassification == 'Third Tier Oil':
                     royaltyCalc.K = econOilData.SW3T_K
@@ -161,7 +161,7 @@ class ProcessRoyalties(object):
                     royaltyCalc.K = econOilData.SWNEW_K
                     royaltyCalc.X = econOilData.SWNEW_X
                 else:
-                    raise AppError('Royalty Classification: ' + well.RoyaltyClassification + ' not known. Royalty not calculated.')
+                    raise AppError('Royalty Classification: ' + well.RoyaltyClassification + ' not known for ' + well.Classification + ' Royalty not calculated.')
             elif well.Classification == 'Other':
                 if well.RoyaltyClassification == 'Third Tier Oil':
                     royaltyCalc.K = econOilData.O3T_K
@@ -173,20 +173,23 @@ class ProcessRoyalties(object):
                     royaltyCalc.K = econOilData.OOLD_K
                     royaltyCalc.X = econOilData.OOLD_X
                 else:
-                    raise AppError('Royalty Classification: ' + well.RoyaltyClassification + ' not known. Royalty not calculated.')
+                    raise AppError('Royalty Classification: ' + well.RoyaltyClassification + ' not known for ' + well.Classification + ' Royalty not calculated.')
             else:
                 raise AppError('Product Classification: ' + well.Classification + ' not known. Royalty not calculated.')
 
             royaltyCalc.CalcRoyaltyRate = royaltyCalc.K - (royaltyCalc.X / mop) - well.SRC
             
         royaltyCalc.CalcRoyaltyRate = round(royaltyCalc.CalcRoyaltyRate, 6)
-
-
+        
         # Note: If there is no sales. Use last months sales value... Not included in this code
 
         royaltyCalc.RoyaltyPrice = self.determineRoyaltyprice(royalty.ValuationMethod, monthlyData)
 
         royaltyCalc.RoyaltyRate = royaltyCalc.CalcRoyaltyRate
+        
+        if royaltyCalc.CalcRoyaltyRate < 0:
+            royaltyCalc.RoyaltyRate = 0
+            
         if royalty.MinRoyalty != None:
             if royalty.MinRoyalty > royaltyCalc.CalcRoyaltyRate:
                 royaltyCalc.RoyaltyRate = royalty.MinRoyalty
@@ -313,7 +316,7 @@ class RoyaltyWorksheet(object):
     def printSaskOilRoyaltyRate(self, monthlyData, well, royalty, lease, royaltyCalc):
         self.count += 1
         self.ws.write ('\n')
-        self.ws.write ('Well: {:<4} {:<28} Lease: {}\n'.format(well.WellId,well.UWI,lease.Lease))
+        self.ws.write ('Well: {:<33} Lease: {}\n'.format(well.WellId,lease.Lease))
         fs = '{:>45}: {}\n'
         self.ws.write (fs.format("Right", royalty.RightsGranted))
         self.ws.write (fs.format("Province", well.Prov))
@@ -450,6 +453,7 @@ class TestSaskRoyaltyCalc(unittest.TestCase):
           
 if __name__ == '__main__':
     pr = ProcessRoyalties()
+#     pr.process('iogcdatabase.xlsx')
     pr.process('database.xlsx')
     if os.name != "posix":
         subprocess.call(['notepad.exe', 'Royalty Worksheet.txt'])

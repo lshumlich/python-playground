@@ -26,6 +26,9 @@ class DataStructure(object):
     def data(self):
         d = vars(self)
         return list(d.values())
+    @property
+    def Lease(self):
+        return '{}-{:04d}'.format(self.LeaseType,self.LeaseID)
 
 """
     Generic class for fetching data.
@@ -82,6 +85,7 @@ class DataBase(object):
         stack = self.excelLoadWsTable(self.leaseTabName)
         self.lease = dict()
         for ds in stack:
+#             print(ds)
             self.lease[ds.Lease] = ds
         
     def getLease(self, lease):
@@ -241,6 +245,12 @@ class DataBase(object):
                     setattr(ds, 'HeaderRow', headerRow)
         except KeyError:
             raise AppError('The excel worksheet ' + self.worksheetName + ' does not have tab: ' + tabName)
+        except AttributeError as e:
+            print('Error Loading tab:',tabName,' column:',i,'Record:',recordNo,'Error:',e)
+            print('   cell.value:',cell.value)
+            print('   headerRow:',headerRow)
+            print('         row:',row)
+            raise e
         except TypeError as e:
             print('Error Loading tab:',tabName,' column:',i,'Record:',recordNo,'Error:',e)
             print('   headerRow:',headerRow)
@@ -371,7 +381,14 @@ class TestDataBase(unittest.TestCase):
         newLease = newDb.getLease(leaseId)
         self.assertEqual(newLease.Prov,newProv)
         self.assertEqual(newLease.Lessor,newLessor)
-        
+
+    def test_leaseGetter(self):
+        ds = DataStructure()
+        ds.LeaseType = 'OL'
+        ds.LeaseID = 1
+        self.assertEqual('OL-0001',ds.Lease)
+        ds.LeaseID = 2
+        self.assertEqual('OL-0002',ds.Lease)
 
     def getDataBase(self):
         """ for test purposes get a database instance """
