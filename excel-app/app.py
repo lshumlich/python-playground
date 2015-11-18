@@ -20,18 +20,32 @@ def mainpage():
 
 @app.route("/lease/<lease>")
 def returnLease(lease = None):
+    leaseHeaders = []
+    for c in db.lease[lease].HeaderRow:
+        leaseHeaders.append(c.value)
+
+    printLease = {}
+    for lh in leaseHeaders:
+        printLease[lh] = getattr(db.getLease(lease), lh)
+
     leaseWells = db.getWellbyLease(lease)
-    newlease = db.getLease(lease)
-    return render_template("lease.html", leaseWells = leaseWells, lease = newlease)
+
+    helpref = {"Lease": "Name of lease<br>Alphanumeric",
+               "Province": "Province of lease<br>Alphanumeric"
+              }
+    
+    return render_template("lease.html", leaseWells = leaseWells, lease = printLease, helpref = helpref)
 
 @app.route("/well/<well>")
 def returnWell(well = None):
-    try: 
-        newwell = db.getWell(int(well))
-        return render_template("well.html", well = newwell)
+    wellHeaders = []
+    try:
+        for c in db.well[int(well)].HeaderRow:
+            wellHeaders.append(c.value)
     except:
-        raise
-        #return "Something awful has occured"
+        raise 
+    newwell = db.getWell(int(well))
+    return render_template("well.html", well = newwell, wellHeaders = wellHeaders)
         
 
 if __name__ == "__main__":
