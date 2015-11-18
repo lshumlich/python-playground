@@ -23,29 +23,31 @@ def returnLease(lease = None):
     leaseHeaders = []
     for c in db.lease[lease].HeaderRow:
         leaseHeaders.append(c.value)
-
-    printLease = {}
+        
+#    printLease = {}
+#    for lh in leaseHeaders:
+#        printLease[lh] = getattr(db.getLease(lease), lh)
+    printLease = []
     for lh in leaseHeaders:
-        printLease[lh] = getattr(db.getLease(lease), lh)
-
+        printLease.append((lh, getattr(db.getLease(lease), lh)))
+        
     leaseWells = db.getWellbyLease(lease)
 
-    helpref = {"Lease": "Name of lease<br>Alphanumeric",
-               "Province": "Province of lease<br>Alphanumeric"
+    helpref = {"Lease": "Name of lease.",
+               "Prov": "Province of lease.",
+               "LeaseType": "Type of lease.",
+               "LeaseID": "Lease ID number.",
+               "FNReserve": "FN reserve number.",
+               "Lessor": "Name of lessor.",
+               "Notes" :"Miscellaneous notes."
               }
     
-    return render_template("lease.html", leaseWells = leaseWells, lease = printLease, helpref = helpref)
+    return render_template("lease.html", leaseWells = leaseWells, lease = lease, printLease = printLease, helpref = helpref)
 
 @app.route("/well/<well>")
 def returnWell(well = None):
-    wellHeaders = []
-    try:
-        for c in db.well[int(well)].HeaderRow:
-            wellHeaders.append(c.value)
-    except:
-        raise 
-    newwell = db.getWell(int(well))
-    return render_template("well.html", well = newwell, wellHeaders = wellHeaders)
+    printWell = db.getWell(int(well))
+    return render_template("well.html", well = printWell)
         
 
 if __name__ == "__main__":
