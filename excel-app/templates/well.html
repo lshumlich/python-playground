@@ -1,8 +1,6 @@
-<doctype html>
-<title>Well {{ well.WellId }}</title>
-<script src={{url_for("static", filename="jquery-2.1.4.min.js")}}></script>
-<script src={{url_for("static", filename="bootstrap.min.js")}}></script>
-<link type="text/css" rel="stylesheet" href={{url_for("static", filename="bootstrap.min.css")}}>
+{% extends "layout.html" %}
+{% block title %}Well {{ well.WellId }}{% endblock %}
+{% block body %}
     
 <div id="main" class="col-md-3">
     
@@ -15,3 +13,5 @@
 {% endif %}
     
 </div>
+
+{% endblock %}
