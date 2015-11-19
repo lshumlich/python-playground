@@ -29,11 +29,11 @@ table.print-friendly tr td, table.print-friendly tr th {
 """
 headerLease = """
 <h1>Directory List by Lease</h1>
-<p><strong>Note:</strong> Press {Ctrl}f to find a specific lease. <a href="$IndexByArea.html">By Area</a></p>
+<p><strong>Note:</strong>Does not work with IE. <b>Hint:</b> Press {Ctrl}f to find a specific lease. <a href="$IndexByArea.html">By Area</a></p>
 """
 headerArea = """
 <h1>Directory List by Area</h1>
-<p><strong>Note:</strong> Press {Ctrl}f to find a specific lease. <a href="$IndexByLease.html">By Lease</a></p>
+<p><strong>Note:</strong>Does not work with IE. <b>Hint:</b> Press {Ctrl}f to find a specific lease. <a href="$IndexByLease.html">By Lease</a></p>
 """
 header3 = """
 <div class="newspaper">
@@ -87,7 +87,7 @@ def outputHtmlByLease(fileName,dirList):
     html.write(header3)
     html.write('<ul>\n')
     for o in dirList:
-        html.write('<li><a href="file:\\\\' + req.pathname2url(o.pathName + '\\' + o.fileName) + '"  title="' + o.area + '" target="_blank">' + o.lease + ' </a></li>\n')
+        html.write('<li><a href="file:' + req.pathname2url(o.pathName + '\\' + o.fileName) + '"  title="' + o.area + '" target="_blank">' + o.lease + ' </a></li>\n')
     html.write('</ul>\n')
     html.write(footer1)
     html.close()
@@ -110,7 +110,7 @@ def outputHtmlByArea(fileName,dirList):
             html.write('<tr><td><b>'+area.replace('_',' ')+'</b></td></tr>\n')
             html.write('<tr><td>\n')
             html.write('<ul>\n')
-        html.write('<li><a href="file:\\\\' + req.pathname2url(o.pathName+'\\' + o.fileName) + '"  title="' + o.area + '" target="_blank">' + o.lease + ' </a></li>\n')
+        html.write('<li><a href="file:' + req.pathname2url(o.pathName+'\\' + o.fileName) + '"  title="' + o.area + '" target="_blank">' + o.lease + ' </a></li>\n')
     html.write('</ul>\n')
     html.write('</td></tr>\n')
     html.write('</table>\n')
