@@ -65,9 +65,9 @@ class ProcessRoyalties(object):
 #                           well.Classification + ' ' + str(monthlyData.ProdVol) +
 #                           '\n')
 
-                if monthlyData.Product == 'Oil' and royalty.RoyaltyScheme == 'SKProvCrownVar' :
+                if monthlyData.Product == 'Oil' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
                     self.calcSaskOilRoyaltyRate(monthlyData, well, royalty, lease, royaltyCalc)
-                elif monthlyData.Product == 'Oil' and royalty.RoyaltyScheme == 'Regulation1995' :
+                elif monthlyData.Product == 'Oil' and 'Regulation1995' in royalty.RoyaltyScheme:
                     self.calcSaskOilRegulation1995(monthlyData, well, royalty, lease, royaltyCalc)
                 else:
                     raise AppError('Royalty Scheme not yet developed: ' + lease.Prov + ' ' + monthlyData.Product)
@@ -299,6 +299,50 @@ class ProcessRoyalties(object):
         prodDate = date(year,month,1)
         diff = prodDate - cd
         return round(diff.days/365,2)
+    
+    def calcGorrPercent(self,vol,hours,gorr):
+        """ expects a string with   """
+        words = gorr.split(",")
+        gorrPercent = 0.0
+        gorrMaxVol = 0.0
+        lastGorrMaxVol = 0.0
+        gorrExplain = ''
+        
+        i = 0
+        evalVol = 0
+        
+        for s in words:
+            i += 1
+            if i == 1:
+                if s == 'dprod':
+                    evalVol = vol / hours
+                    gorrExplain = 'dprod = ' + str(evalVol) + ' = ' + str(vol) + ' / ' + str(hours)
+                elif s == 'mprod':
+                    evalVol = vol
+                    gorrExplain = 'mprod = ' + str(evalVol)
+                elif s == 'fixed':
+                    gorrExplain = 'fixed'
+                else:
+                    raise AppError('GORR Base is not known: ' + s)
+#                 print (s,evalVol)
+            elif i % 2 == 0:
+                lastGorrMaxVol = gorrMaxVol
+                gorrMaxVol = float(s)
+#                 print('gorrMaxVol:', gorrMaxVol)
+            else:
+                gorrPercent = float(s)
+#                 print('gorrPercent:', gorrPercent)
+                if evalVol == 0:
+                    gorrExplain += ' for a RR of ' + str(gorrPercent) +'%' 
+                    return gorrPercent, gorrExplain
+                elif gorrMaxVol == 0:
+                    gorrExplain += ' is greater than ' + str(lastGorrMaxVol) + ' for a RR of ' + str(gorrPercent) +'%' 
+                    return gorrPercent, gorrExplain
+                elif evalVol <= gorrMaxVol:
+                    gorrExplain += ' is between ' + str(lastGorrMaxVol) + ' - ' + str(gorrMaxVol) + ' for a RR of ' + str(gorrPercent) +'%' 
+                    return gorrPercent, gorrExplain
+        
+        raise AppError('GORR Logic Error. We should never ever get here: ')
 
     def ensureDate(self,d):
         if isinstance(d,datetime):
@@ -450,7 +494,23 @@ class TestSaskRoyaltyCalc(unittest.TestCase):
         self.assertEqual(pr.saskOilSrcCalc(2013,4,'H',date(2001,1,1),'Oil','Forth Tier'),0)
         self.assertEqual(pr.saskOilSrcCalc(2013,5,'V',date(2001,1,1),'Oil','Forth Tier'),0)
 
-          
+    def test_gorr(self):
+        """ expects a string with   """
+        pr = ProcessRoyalties()
+        self.assertEqual((2.0, 'mprod = 100 is between 0.0 - 250.0 for a RR of 2.0%'),pr.calcGorrPercent(100,100,'mprod,250,2,300,3,400,4,500,5,0,6'))
+        self.assertEqual((2.0, 'mprod = 100 is between 0.0 - 250.0 for a RR of 2.0%'),pr.calcGorrPercent(100,100,'mprod,250,2,300,3,400,4,500,5,0,6'))
+        self.assertEqual((2.0, 'mprod = 250 is between 0.0 - 250.0 for a RR of 2.0%'),pr.calcGorrPercent(250,100,'mprod,250,2,300,3,400,4,500,5,0,6'))
+        self.assertEqual((3.0, 'mprod = 300 is between 250.0 - 300.0 for a RR of 3.0%'),pr.calcGorrPercent(300,100,'mprod,250,2,300,3,400,4,500,5,0,6'))
+        self.assertEqual((4.0, 'mprod = 400 is between 300.0 - 400.0 for a RR of 4.0%'),pr.calcGorrPercent(400,100,'mprod,250,2,300,3,400,4,500,5,0,6'))
+        self.assertEqual((5.0, 'mprod = 500 is between 400.0 - 500.0 for a RR of 5.0%'),pr.calcGorrPercent(500,100,'mprod,250,2,300,3,400,4,500,5,0,6'))
+        self.assertEqual((6.0, 'mprod = 600 is greater than 500.0 for a RR of 6.0%'),pr.calcGorrPercent(600,100,'mprod,250,2,300,3,400,4,500,5,0,6'))
+        self.assertEqual((2.0, 'dprod = 1.0 = 100 / 100 is between 0.0 - 250.0 for a RR of 2.0%'),pr.calcGorrPercent(100,100,'dprod,250,2,300,3,400,4,500,5,0,6'))
+        self.assertEqual((2.0, 'fixed for a RR of 2.0%'),pr.calcGorrPercent(100,100,'fixed,0,2'))
+        
+    def test_other_stuff(self):
+        print('as' in 'asdf asdf asdf')
+            
+        
 if __name__ == '__main__':
     pr = ProcessRoyalties()
 #     pr.process('iogcdatabase.xlsx')
