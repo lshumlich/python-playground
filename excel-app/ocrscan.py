@@ -18,7 +18,9 @@ def lookForString (sToLookIn,pattern,result,sToAppend):
 
 leasenoCol=0 # A
 royschemCol=13 # N
-gorrCol=46 # N
+gorrCol=46 # AU
+leaseRightsCol=12 # M
+appBDetailCol=39 # AN
 
 regulationP = re.compile('regulation royalty rate',re.I)
 crownVar1P = re.compile('multiples of provincial',re.I)
@@ -27,7 +29,7 @@ gorrP = re.compile('gorr',re.I)
 percentP = re.compile('[0-9.]+%')
 
 
-leaseWorksheetName = "Lease Analysis.xlsx"
+leaseWorksheetName ="C://Temp/SK Lease Data - All.xlsx"
 
 leasewb = load_workbook(leaseWorksheetName)
 ws = leasewb.active
@@ -39,9 +41,22 @@ for row in ws.rows:
     i += 1
     if headerRow == None:
         headerRow = row
-#         print('---Col:', row[gorrCol].value)
+        print('---Col:', row[leaseRightsCol].value)
+        print('---Col:', row[appBDetailCol].value)
     else:
-        leaseId = row[leasenoCol].value
+        lease = row[leasenoCol].value
+        leaseType = lease [0:2]
+        leaseID = int (lease [3:9])
+        leaseRights =  row[leaseRightsCol].value
+        appBDetail = row[appBDetailCol].value
+        rightsGranted = "*** Research Required ***"
+        if leaseRights == "Oil & Gas [Excluding Crude Bitumen]":
+           rightsGranted = "O+G-Cbit"
+        if leaseRights == "GasOnlyOilOnly":
+           rightsGranted = "O+G-Cbit"
+           
+           
+
         
         s = row[royschemCol].value
         royaltyScheme = lookForString(s,regulationP,'','Regulation1995')
@@ -56,5 +71,5 @@ for row in ws.rows:
             s = row[gorrCol].value
             gorrStuff = percentP.findall(s)
         
-        print(i,leaseId,royaltyScheme,gorrStuff)
+        print(i,lease, leaseType, leaseID, leaseRights, rightsGranted, royaltyScheme,appBDetail, gorrStuff)
         
