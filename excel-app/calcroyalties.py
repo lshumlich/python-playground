@@ -1,6 +1,8 @@
 #!/bin/env python3
 
 import subprocess
+import traceback
+import sys
 from apperror import AppError
 from database import DataBase
 from datetime import date
@@ -9,6 +11,12 @@ import unittest
 import os
 
 """
+ToDo:
+
+1) Calculate GORR and put in Worksheet
+2) Save the calculated results in the spreadhseet
+3) Split the worksheet into it's own file
+4) Document and write good unit tests
 
 Big Note: *************
           Putting all this code in one module is very bad programming technique.
@@ -66,14 +74,26 @@ class ProcessRoyalties(object):
 #                           '\n')
 
                 if monthlyData.Product == 'Oil' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
-                    self.calcSaskOilRoyaltyRate(monthlyData, well, royalty, lease, royaltyCalc)
-                elif monthlyData.Product == 'Oil' and 'Regulation1995' in royalty.RoyaltyScheme:
-                    self.calcSaskOilRegulation1995(monthlyData, well, royalty, lease, royaltyCalc)
+                    self.calcSaskOilProvCrown(monthlyData, well, royalty, lease, royaltyCalc)
+                elif monthlyData.Product == 'Oil' and 'IOGR1995' in royalty.RoyaltyScheme:
+                    self.calcSaskOilIOGR1995(monthlyData, well, royalty, lease, royaltyCalc)
                 else:
                     raise AppError('Royalty Scheme not yet developed: ' + lease.Prov + ' ' + monthlyData.Product)
 
 
+                if monthlyData.Product == 'Oil' and 'GORR' in royalty.RoyaltyScheme:
+                    royaltyCalc.GorrRoyaltyRate, royaltyCalc.GorrMessage = self.calcGorrPercent(monthlyData.ProdVol,monthlyData.ProdHours,royalty.Gorr)
+                    royaltyCalc.GorrRoyaltyValue = monthlyData.ProdVol * well.IndianInterest * royaltyCalc.GorrRoyaltyRate / 100.0 * royaltyCalc.RoyaltyPrice
+                    royaltyCalc.GorrRoyaltyVolume = monthlyData.ProdVol * well.IndianInterest * royaltyCalc.GorrRoyaltyRate / 100.0
+
+                royaltyCalc.RoyaltyValuePreDeductions = (royaltyCalc.ProvCrownRoyaltyValue +
+                                                        royaltyCalc.IOGR1995RoyaltyValue +
+                                                        royaltyCalc.GorrRoyaltyValue)
                 royaltyCalc.RoyaltyValue = royaltyCalc.RoyaltyValuePreDeductions
+                
+                royaltyCalc.RoyaltyVolume = (royaltyCalc.ProvCrownRoyaltyVolume +
+                                                        royaltyCalc.IOGR1995RoyaltyVolume +
+                                                        royaltyCalc.GorrRoyaltyVolume)
 
                 if (royalty.TruckingDeducted == 'Y'):
                     royaltyCalc.RoyaltyTransportation = royaltyCalc.RoyaltyVolume * monthlyData.TransRate
@@ -93,6 +113,16 @@ class ProcessRoyalties(object):
             except AppError as e:
                 errorCount +=1
                 log.write ('Record #: ' + str(monthlyData.RecordNumber) + ' ' + str(e) + '\n')
+            except Exception as e:
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                errorCount +=1
+                print('-'*10)
+                print ('Record #: ' + str(monthlyData.RecordNumber) + ' ' + str(e))
+                print(repr(traceback.extract_tb(exc_traceback)))
+                traceback.print_exc()
+                print('-'*10)
+                log.write ('Record #: ' + str(monthlyData.RecordNumber) + ' ' + str(e) + '\n')
+                
 
         log.write ("*** That's it folks " + str(errorCount) + ' errors \n')
         log.close()
@@ -102,19 +132,21 @@ class ProcessRoyalties(object):
     #
     # Sask Oil Royalty Calculation... Finally we are here...
     #
-    # These calculations are fully document in two documents included in this project
+    # These calculations are fully documented in two documents included in this project
     # under the Sask Folder:
     #   Factor Circulars.pdf
     #   OilFactors.pdf
     #
-    def calcSaskOilRoyaltyRate(self, monthlyData, well, royalty, lease, royaltyCalc):
+    def calcSaskOilProvCrown(self, monthlyData, well, royalty, lease, royaltyCalc):
+        
         econOilData = self.db.getECONOilData(monthlyData.ProdMonth)
         mop = monthlyData.ProdVol
 
         if well.RoyaltyClassification == 'Fourth Tier Oil':
 
             if mop < 25:
-                royaltyCalc.CalcRoyaltyRate = 0
+                royaltyCalc.ProvCrownRoyaltyRate = 0
+                royaltyCalc.Message = 'MOP < 25 - RR = 0.' # Needed for worksheet so we can explain why royalty not calculated. Spent a few hours on this one
 
             elif mop <= 136.2:
                 if well.Classification == 'Heavy':
@@ -128,7 +160,7 @@ class ProcessRoyalties(object):
                     royaltyCalc.D = econOilData.O4T_D
                 else:
                     raise AppError('Royalty Classification: ' + well.RoyaltyClassification + ' not known for ' + well.Classification + ' Royalty not calculated.')
-                royaltyCalc.CalcRoyaltyRate = (royaltyCalc.C * mop) - royaltyCalc.D
+                royaltyCalc.ProvCrownRoyaltyRate = (royaltyCalc.C * mop) - royaltyCalc.D
 
             else:
                 if well.Classification == 'Heavy':
@@ -142,7 +174,7 @@ class ProcessRoyalties(object):
                     royaltyCalc.X = econOilData.O4T_X
                 else:
                     raise AppError('Royalty Classification: ' + well.RoyaltyClassification + ' not known for ' + well.Classification + ' Royalty not calculated.')
-                royaltyCalc.CalcRoyaltyRate = royaltyCalc.K - (royaltyCalc.X / mop)
+                royaltyCalc.ProvCrownRoyaltyRate = royaltyCalc.K - (royaltyCalc.X / mop)
         else:
             if well.Classification == 'Heavy':
                 if well.RoyaltyClassification == 'Third Tier Oil':
@@ -177,39 +209,39 @@ class ProcessRoyalties(object):
             else:
                 raise AppError('Product Classification: ' + well.Classification + ' not known. Royalty not calculated.')
 
-            royaltyCalc.CalcRoyaltyRate = royaltyCalc.K - (royaltyCalc.X / mop) - well.SRC
+            royaltyCalc.ProvCrownRoyaltyRate = royaltyCalc.K - (royaltyCalc.X / mop) - well.SRC
             
-        royaltyCalc.CalcRoyaltyRate = round(royaltyCalc.CalcRoyaltyRate, 6)
+        royaltyCalc.ProvCrownRoyaltyRate = round(royaltyCalc.ProvCrownRoyaltyRate, 6)
         
         # Note: If there is no sales. Use last months sales value... Not included in this code
 
         royaltyCalc.RoyaltyPrice = self.determineRoyaltyprice(royalty.ValuationMethod, monthlyData)
 
-        royaltyCalc.RoyaltyRate = royaltyCalc.CalcRoyaltyRate
+        royaltyCalc.ProvCrownUsedRoyaltyRate = royaltyCalc.ProvCrownRoyaltyRate
         
-        if royaltyCalc.CalcRoyaltyRate < 0:
-            royaltyCalc.RoyaltyRate = 0
+        if royaltyCalc.ProvCrownUsedRoyaltyRate < 0:
+            royaltyCalc.ProvCrownUsedRoyaltyRate = 0
             
         if royalty.MinRoyalty != None:
-            if royalty.MinRoyalty > royaltyCalc.CalcRoyaltyRate:
-                royaltyCalc.RoyaltyRate = royalty.MinRoyalty
+            if royalty.MinRoyalty > royaltyCalc.ProvCrownUsedRoyaltyRate:
+                royaltyCalc.ProvCrownUsedRoyaltyRate = royalty.MinRoyalty
         #
         # This was done this way so precision was not lost.
         #
-        royaltyCalc.RoyaltyVolume = ((royaltyCalc.RoyaltyRate / 100) * 
+        royaltyCalc.ProvCrownRoyaltyVolume = ((royaltyCalc.ProvCrownUsedRoyaltyRate / 100) * 
                                                       royalty.CrownMultiplier * 
                                                       monthlyData.ProdVol * 
                                                       well.IndianInterest)
 
-        royaltyCalc.RoyaltyValuePreDeductions = round((royaltyCalc.RoyaltyRate / 100) * 
-                                                      royalty.CrownMultiplier * 
-                                                      monthlyData.ProdVol * 
-                                                      well.IndianInterest * 
-                                                      royaltyCalc.RoyaltyPrice , 2)
+        royaltyCalc.ProvCrownRoyaltyValue = round((royaltyCalc.ProvCrownUsedRoyaltyRate / 100) * 
+                                               royalty.CrownMultiplier * 
+                                               monthlyData.ProdVol * 
+                                               well.IndianInterest * 
+                                               royaltyCalc.RoyaltyPrice , 2)
         
-        return
+        return 
 
-    def calcSaskOilRegulation1995(self, monthlyData, well, royalty, lease, royaltyCalc):
+    def calcSaskOilIOGR1995(self, monthlyData, well, royalty, lease, royaltyCalc):
         """
         Calculated Based on regulations described: http://laws-lois.justice.gc.ca/eng/regulations/SOR-94-753/page-16.html#h-35
 
@@ -217,15 +249,15 @@ class ProcessRoyalties(object):
         # Calculate the Comensment Date
         royaltyCalc.CommencementPeriod = self.determineCommencementPeriod(monthlyData.ProdMonth,well.CommencementDate)
         if royaltyCalc.CommencementPeriod < 5:
-            royaltyCalc.RoyaltyVolume = self.calcSaskOilRegulationSubsection2(monthlyData.ProdVol)
+            royaltyCalc.IOGR1995RoyaltyVolume = self.calcSaskOilRegulationSubsection2(monthlyData.ProdVol)
         else:
-            royaltyCalc.RoyaltyVolume = self.calcSaskOilRegulationSubsection3(monthlyData.ProdVol)
+            royaltyCalc.IOGR1995RoyaltyVolume = self.calcSaskOilRegulationSubsection3(monthlyData.ProdVol)
         
 
         royaltyCalc.RoyaltyPrice = self.determineRoyaltyprice(royalty.ValuationMethod, monthlyData)
         
-        royaltyCalc.RoyaltyValuePreDeductions = round(royalty.CrownMultiplier * 
-                                                      royaltyCalc.RoyaltyVolume * 
+        royaltyCalc.IOGR1995RoyaltyValue = round(royalty.CrownMultiplier * 
+                                                      royaltyCalc.IOGR1995RoyaltyVolume * 
                                                       well.IndianInterest * 
                                                       royaltyCalc.RoyaltyPrice , 2)
         
@@ -301,7 +333,7 @@ class ProcessRoyalties(object):
         return round(diff.days/365,2)
     
     def calcGorrPercent(self,vol,hours,gorr):
-        """ expects a string with   """
+        """ returns the rr% and an explination string  """
         words = gorr.split(",")
         gorrPercent = 0.0
         gorrMaxVol = 0.0
@@ -316,7 +348,7 @@ class ProcessRoyalties(object):
             if i == 1:
                 if s == 'dprod':
                     evalVol = vol / hours
-                    gorrExplain = 'dprod = ' + str(evalVol) + ' = ' + str(vol) + ' / ' + str(hours)
+                    gorrExplain = 'dprod = ' + '{:.6f}'.format(evalVol) + ' = ' + str(vol) + ' / ' + str(hours)
                 elif s == 'mprod':
                     evalVol = vol
                     gorrExplain = 'mprod = ' + str(evalVol)
@@ -358,6 +390,7 @@ class RoyaltyWorksheet(object):
         self.count = 0
 
     def printSaskOilRoyaltyRate(self, monthlyData, well, royalty, lease, royaltyCalc):
+#         print('Well:',well.WellId,lease.Lease,royaltyCalc)
         self.count += 1
         self.ws.write ('\n')
         self.ws.write ('Well: {:<33} Lease: {}\n'.format(well.WellId,lease.Lease))
@@ -365,6 +398,8 @@ class RoyaltyWorksheet(object):
         self.ws.write (fs.format("Right", royalty.RightsGranted))
         self.ws.write (fs.format("Province", well.Prov))
         self.ws.write (fs.format("Royalty Base:", royalty.RoyaltyScheme))
+        if royalty.Gorr != None:
+            self.ws.write (fs.format("GORR", royalty.Gorr))
         self.ws.write (fs.format("Crown Multiplier", '{:.2f}'.format(royalty.CrownMultiplier/1)))
         self.ws.write (fs.format("Indian Interest", '{:.2f}'.format(well.IndianInterest/1)))
         if royalty.MinRoyalty != None:
@@ -405,61 +440,84 @@ class RoyaltyWorksheet(object):
         self.ws.write ('   {*** Note: Replace Well Head Price with Petrinex detail when available***}\n')
         self.ws.write ('   {*** Note: Replace Trucking Price with Petrinex detail when available***}\n')
         self.ws.write ('   {*** Note: Replace Processing Price with Petrinex detail when available***}\n')
-        self.ws.write ('\n')
         
         #if well.RoyaltyClassification == 'Fourth Tier Oil':
         if royaltyCalc.X > 0:
             self.ws.write('\n')
             self.ws.write('           x            |             {}\n'.format(royaltyCalc.X))
-            self.ws.write('   (K - ------ ) - SRC  |  ({} - -------- )  - {} = {:>10,.6f}\n'.format(royaltyCalc.K, well.SRC, royaltyCalc.CalcRoyaltyRate))
+            self.ws.write('   (K - ------ ) - SRC  |  ({} - -------- )  - {} = {:>10,.6f}%\n'.format(royaltyCalc.K, well.SRC, royaltyCalc.ProvCrownRoyaltyRate))
             self.ws.write('          MOP           |             {}\n'.format(monthlyData.ProdVol))
-            self.ws.write('\n')
 
         if royaltyCalc.C > 0: # Do not make this an else. Leave this as an if. If for some strange reason bot X and C > 0 this will show it.
             self.ws.write('\n')
-            self.ws.write('   (C * MOP) - D   |  ({} * {}) - {} = {}\n'.format(royaltyCalc.C,monthlyData.ProdVol,royaltyCalc.D,royaltyCalc.CalcRoyaltyRate))
+            self.ws.write('   (C * MOP) - D   |  ({} * {}) - {} = {:>10,.6f}%\n'.format(royaltyCalc.C,monthlyData.ProdVol,royaltyCalc.D,royaltyCalc.ProvCrownRoyaltyRate))
+
+        if royaltyCalc.Message != None:
             self.ws.write('\n')
+            self.ws.write('   ' + royaltyCalc.Message + '\n')
+
+
             
         if royaltyCalc.CommencementPeriod != None:
-            volDisplay = '      {:,.2f} = {:,.2f}  '.format(monthlyData.ProdVol, royaltyCalc.RoyaltyVolume)
-            if monthlyData.ProdVol < 80:
-                self.ws.write(volDisplay + '|  mop < 80      ->  RoyVol = 10% * mop\n')
-            elif monthlyData.ProdVol < 160:
-                self.ws.write(volDisplay + '|     mop 80 to 160 ->  RoyVol = 8 + 20% * (mop - 80)\n')
-                self.ws.write(volDisplay + '|  {0:10,.2f} 80 to 160 ->  {1:,.2f} = 8 + 20% * ({0:,.2f} - 80)\n'.format(monthlyData.ProdVol,royaltyCalc.RoyaltyVolume))
-            elif royaltyCalc.CommencementPeriod < 5:
-                self.ws.write(volDisplay + '|  mop > 160     ->  RoyVol = 24 + 26% * (mop - 160)\n')
-            elif monthlyData.ProdVol < 795:
-                self.ws.write(volDisplay + '|  mop 160 to 795 -> RoyVol = 24 + 26% * (mop - 160)\n')  
+            self.ws.write('\n')
+            if royaltyCalc.CommencementPeriod < 5:
+                self.ws.write('   IOGR1995 - Commencement Period < 5 Years: {}:\n'.format(royaltyCalc.CommencementPeriod))
             else:
-                self.ws.write(volDisplay + '|  mop > 795      -> RoyVol = 189 + 40% * (mop - 795)\n')
+                self.ws.write('   IOGR1995 - Commencement Period >= 5 Years: {}:\n'.format(royaltyCalc.CommencementPeriod))
+                
+            volDisplay = ' = {:,.2f}\n'.format(royaltyCalc.IOGR1995RoyaltyVolume)
+            if monthlyData.ProdVol < 80:
+                self.ws.write('      MOP < 80    ->  RVol = 10% * MOP' + volDisplay)
+            elif monthlyData.ProdVol < 160:
+                self.ws.write('      MOP 80 to 160 ->  RVol = 8 + 20% * (MOP - 80)' + volDisplay)
+            elif royaltyCalc.CommencementPeriod < 5:
+                self.ws.write('      MOP > 160   ->  RVol = 24 + 26% * (MOP - 160)' + volDisplay)
+            elif monthlyData.ProdVol < 795:
+                self.ws.write('      MOP 160 to 795 -> RVol = 24 + 26% * (mop - 160)' + volDisplay)
+            else:
+                self.ws.write('      MOP > 795   -> RVol = 189 + 40% * (mop - 795)' + volDisplay)
             self.ws.write ('\n')
             
-        if monthlyData.Product == 'Oil' and royalty.RoyaltyScheme == 'SKProvCrownVar':                            
+        if monthlyData.Product == 'Oil' and 'SKProvCrownVar' in royalty.RoyaltyScheme:                            
             self.ws.write ('\n')
-            self.ws.write ('      CR%    * CMult *   Prod    *   II  *      Val   =     R$\n')
-            self.ws.write ('  {:>10,.6f} * {:>5,.2f} * {:>9,.2f} * {:>5.2} * {:>10,.6f} = {:>10,.2f} \n'.format(royaltyCalc.RoyaltyRate, royalty.CrownMultiplier,monthlyData.ProdVol,
-                                                                              well.IndianInterest/1, royaltyCalc.RoyaltyPrice, royaltyCalc.RoyaltyValuePreDeductions))
+            self.ws.write ('      CR%    * CMult *   Prod    *   II  *      Val   =     R$     =     Rvol\n')
+            self.ws.write ('  {:>10,.6f} * {:>5,.2f} * {:>9,.2f} * {:>5.2} * {:>10,.6f} = {:>10,.2f} = {:>10,.3f}\n'.format(royaltyCalc.ProvCrownUsedRoyaltyRate, royalty.CrownMultiplier,monthlyData.ProdVol,
+                                                                              well.IndianInterest/1, royaltyCalc.RoyaltyPrice, royaltyCalc.ProvCrownRoyaltyValue, royaltyCalc.ProvCrownRoyaltyVolume))
             self.ws.write ('\n')
 
-        if monthlyData.Product == 'Oil' and royalty.RoyaltyScheme == 'Regulation1995':
+        if monthlyData.Product == 'Oil' and 'IOGR1995' in royalty.RoyaltyScheme:
             self.ws.write ('\n')
-            self.ws.write ('      CMult *    RoyVol  *    II  *      Val   =     R$\n')
-            self.ws.write ('      {:>5,.2f}  * {:>9,.2f} * {:>5.2} * {:>10,.6f} = {:>10,.2f} \n'.format(royalty.CrownMultiplier,royaltyCalc.RoyaltyVolume,
-                                                                              well.IndianInterest/1, royaltyCalc.RoyaltyPrice, royaltyCalc.RoyaltyValuePreDeductions))
+            self.ws.write ('       CMult *   RoyVol  *    II *      Val   =     R$     =     Rvol\n')
+            self.ws.write ('      {:>5,.2f}  * {:>9,.2f} * {:>5.2} * {:>10,.6f} = {:>10,.2f} = {:>10,.3f}\n'.format(royalty.CrownMultiplier,royaltyCalc.IOGR1995RoyaltyVolume,
+                                                                              well.IndianInterest/1, royaltyCalc.RoyaltyPrice, royaltyCalc.IOGR1995RoyaltyValue, royaltyCalc.IOGR1995RoyaltyVolume))
         
+            
+        if 'GORR' in royalty.RoyaltyScheme:
+            self.ws.write('\n')
+            self.ws.write('   GORR: ' + royaltyCalc.GorrMessage + '\n')
+            self.ws.write ('         GORR%    *   Prod    *   II  *      Val   =     R$     =     Rvol\n')
+            self.ws.write('      {:>10,.2f}  * {:>9,.2f} * {:>5.2f} * {:>10,.6f} = {:>10,.2f} = {:>10,.3f}\n'.format(
+                          royaltyCalc.GorrRoyaltyRate,
+                          monthlyData.ProdVol,
+                          well.IndianInterest,
+                          royaltyCalc.RoyaltyPrice,
+                          royaltyCalc.GorrRoyaltyValue,
+                          royaltyCalc.GorrRoyaltyVolume))
+
+        self.ws.write ('\n')
         self.ws.write ('   {***Note: Handle Incentives}\n')
             
         self.ws.write ('\n')
         if royaltyCalc.RoyaltyValuePreDeductions != royaltyCalc.RoyaltyValue:
-            self.ws.write ('   Royalty Pre Deductions:             {:>10,.2f}\n'.format(royaltyCalc.RoyaltyValuePreDeductions))
+            self.ws.write ('   Royalty Pre Deductions:                                      {:>10,.2f}\n'.format(royaltyCalc.RoyaltyValuePreDeductions))
         if royaltyCalc.RoyaltyTransportation > 0:
-            self.ws.write ('      Less Transportation{:>10,.2f}\n'.format(royaltyCalc.RoyaltyTransportation))
+            self.ws.write ('      Less Transportation {:>9,.3f} * {:>10,.6f} = {:>10,.2f}\n'.format(royaltyCalc.RoyaltyVolume,monthlyData.TransRate,royaltyCalc.RoyaltyTransportation))
         if royaltyCalc.RoyaltyProcessing > 0:
-            self.ws.write ('      Less Processing    {:>10,.2f}\n'.format(royaltyCalc.RoyaltyProcessing))
+            self.ws.write ('      Less Processing     {:>9,.3f} * {:>10,.6f} = {:>10,.2f}\n'.format(royaltyCalc.RoyaltyVolume,monthlyData.ProcessingRate,royaltyCalc.RoyaltyProcessing))
         if royaltyCalc.RoyaltyDeductions > 0:
-            self.ws.write ('      Total Deductions:  {:>10,.2f}\n'.format(royaltyCalc.RoyaltyDeductions))
-        self.ws.write ('   Royalty Amount:                     {:>10,.2f}\n'.format(royaltyCalc.RoyaltyValue))
+            self.ws.write ('      Total Deductions:                            {:>10,.2f}\n'.format(royaltyCalc.RoyaltyDeductions))
+        self.ws.write ('   Royalty Amount:                                              {:>10,.2f}\n'.format(royaltyCalc.RoyaltyValue))
+        self.ws.write ('\n')
         self.ws.write ('   {***Note: Handle Previous Paid Amount?}\n')
         self.ws.write ('\n')
         self.ws.write ('\n')

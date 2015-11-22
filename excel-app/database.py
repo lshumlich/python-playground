@@ -199,22 +199,37 @@ class DataBase(object):
         rc = DataStructure()
         setattr(rc, 'ProdMonth', month)
         setattr(rc, 'WellId', wellId)
+
         setattr(rc, 'K', 0.0)
         setattr(rc, 'X', 0.0)
         setattr(rc, 'C', 0.0)
         setattr(rc, 'D', 0.0)
-        setattr(rc, 'RoyaltyRate', 0.0)
-        setattr(rc, 'CalcRoyaltyRate', 0.0)
+
         setattr(rc, 'RoyaltyPrice', 0.0)
         setattr(rc, 'RoyaltyVolume', 0.0)
+
+        setattr(rc, 'ProvCrownRoyaltyRate', 0.0)
+        setattr(rc, 'ProvCrownUsedRoyaltyRate', 0.0)
+        setattr(rc, 'IOGR1995RoyaltyRate', 0.0)
+        setattr(rc, 'GorrRoyaltyRate', 0.0)
+        
+        setattr(rc, 'ProvCrownRoyaltyVolume', 0.0)
+        setattr(rc, 'GorrRoyaltyVolume', 0.0)
+        setattr(rc, 'IOGR1995RoyaltyVolume', 0.0)
+        
+        setattr(rc, 'ProvCrownRoyaltyValue', 0.0)
+        setattr(rc, 'IOGR1995RoyaltyValue', 0.0)
+        setattr(rc, 'GorrRoyaltyValue', 0.0)
+        
         setattr(rc, 'RoyaltyValuePreDeductions', 0.0)
         setattr(rc, 'RoyaltyTransportation', 0.0)
         setattr(rc, 'RoyaltyProcessing', 0.0)
         setattr(rc, 'RoyaltyDeductions', 0.0)
         setattr(rc, 'RoyaltyValue', 0.0)
-        setattr(rc, 'CommencementPeriod', None)
         
-
+        setattr(rc, 'CommencementPeriod', None)
+        setattr(rc, 'Message', None)
+        setattr(rc, 'GorrMessage', None)
         
         return rc
 
