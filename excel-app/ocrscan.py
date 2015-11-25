@@ -25,9 +25,13 @@ class ParseLease(object):
         leaseRights = self.getCellValue('Lsrights')
         rightsGranted = "*** Research Required ***"
         if leaseRights == "Oil & Gas [Excluding Crude Bitumen]":
-            rightsGranted = "O+G-Cbit"
+            rightsGranted = "O+G-CBit"
         if leaseRights == "GasOnlyOilOnly":
-            rightsGranted = "O+G-Cbit"
+            rightsGranted = "O+G-CBit"
+        if leaseRights == "All Rights [O&G including Bitumen]":
+            rightsGranted = "All+Bit"
+        if leaseRights == "Oil & Gas [Excluding Crude Bitumen] + Disposal":
+            rightsGranted = "O+G-CBit-Disp"    
         return rightsGranted
     
     def oilMultiplier(self):
@@ -131,10 +135,10 @@ class SingeLeaseWS(object):
 #
 # Sample of running with the Multi Line WS        
 #
-multiLine = MultiLineWS()
-multiLine.process(r"D:\code\info\Lease Analysis - Sask Only.xlsx")
+# multiLine = MultiLineWS()
+# multiLine.process(r"D:\code\info\Lease Analysis - Sask Only.xlsx")
 #
 # Sample of running with Single Lease WS
 #
 singleLease = SingeLeaseWS()
-singleLease.process(r"D:\code\info\book2.xlsx")
+singleLease.process(r"OL-0001.xlsx")
