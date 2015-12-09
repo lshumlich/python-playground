@@ -13,10 +13,12 @@ import os
 """
 ToDo:
 
-1) Calculate GORR and put in Worksheet
+1) Calculate GORR and put in Worksheet (Done)
 2) Save the calculated results in the spreadhseet
-3) Split the worksheet into it's own file
-4) Document and write good unit tests
+    Delete the old results from the calculated results
+3) Calucate suplimental royalties
+4) Split the worksheet into it's own file
+5) Document and write good unit tests
 
 Big Note: *************
           Putting all this code in one module is very bad programming technique.
@@ -124,6 +126,7 @@ class ProcessRoyalties(object):
                 log.write ('Record #: ' + str(monthlyData.RecordNumber) + ' ' + str(e) + '\n')
                 
 
+        self.db.commit()
         log.write ("*** That's it folks " + str(errorCount) + ' errors \n')
         log.close()
 

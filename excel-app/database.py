@@ -46,6 +46,7 @@ class DataBase(object):
             self.royaltyMasterTabName = 'RoyaltyMaster'
             self.leaseTabName = 'Lease'
             self.monthlyTabName = 'Monthly'
+            self.calcTabName = 'Calc'
             self.producingEntityTabName = 'ProducingEntity'
             self.monthlyRecordId = 0
             self.productClausesTabName = 'ProductClauses'
@@ -234,7 +235,25 @@ class DataBase(object):
         return rc
 
     def updateRoyaltyCalc(self, rc):
-        None
+        try: 
+            ws = self.wb[self.calcTabName]
+            headerRow = ws.rows[0]
+            tab = []
+            for cell in headerRow:
+                print(cell.value,getattr(rc,cell.value))
+                tab.append(getattr(rc,cell.value))
+            ws.append(tab)
+                
+            print(headerRow)
+        except KeyError as e:
+            raise AppError('The excel worksheet ' + self.worksheetName + " does not have tab: '" + self.calcTabName + "'")
+            raise e
+        except AttributeError as e:
+            raise AppError("Royalty Calc Object has no value for attribute: '" + cell.value + "' correct worksheet header and continue.")
+            raise e
+
+        except Exception as e:
+            raise e
     #
     # Generic load a tab into a data structure
     #
@@ -285,7 +304,9 @@ class DataBase(object):
             i = i + 1
     # Note... We can change this to the same name once we are confident 
     def commit(self):
+        print("*** Should be saving ***",self.newWorksheetName)
         self.wb.save(self.newWorksheetName)
+        print("*** Should have saved ***")
     #
     # Used for testing
     #
