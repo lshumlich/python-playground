@@ -9,7 +9,7 @@ the rows are the data.
 import unittest
 from openpyxl import load_workbook
 from openpyxl import Workbook
-from apperror import AppError
+from database.apperror import AppError
 
 class DataStructure(object):
     

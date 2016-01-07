@@ -1,0 +1,16 @@
+Hello World.
+Record #: 10 'Royalty Scheme not yet developed: SK Gas'
+Record #: 11 'Royalty Scheme not yet developed: SK But'
+Record #: 12 'Royalty Scheme not yet developed: SK Pen'
+Record #: 20 'Classification: bad one not known. Royalty not calculated.'
+Record #: 24 'Classification: bad oneNot known. Royalty not calculated.'
+Record #: 29 'Product Classification: bad one not known. Royalty not calculated.'
+Record #: 33 'Product Classification: bad one not known. Royalty not calculated.'
+Record #: 34 'Royalty Classification: Old Oil not known. Royalty not calculated.'
+Record #: 35 'Royalty Classification: Old Oil not known. Royalty not calculated.'
+Record #: 37 'Product Classification: bad one not known. Royalty not calculated.'
+Record #: 38 'Royalty Classification: Bad One not known. Royalty not calculated.'
+Record #: 39 'Royalty Classification: Bad One not known. Royalty not calculated.'
+Record #: 40 'Royalty Classification: Bad One not known. Royalty not calculated.'
+Record #: 41 'Product Classification: bad one not known. Royalty not calculated.'
+*** That's it folks 14 errors 
