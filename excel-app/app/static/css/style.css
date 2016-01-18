@@ -1,3 +1,9 @@
+@media (min-width: 1200px) {
+    .container{
+        max-width: 970px;
+    }
+}
+
 @media (min-width: 768px) {
   .navbar-collapse {
     height: auto;
@@ -24,8 +30,13 @@
 	margin-left: 0;
 }	
 
+.tss-input
+{ min-width:200px;
+}
+
 body {
 	padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .navbar-nav,

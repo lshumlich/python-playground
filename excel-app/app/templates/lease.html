@@ -1,0 +1,173 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<script>
+	var li = document.getElementById('lease');
+	li.className += " active";
+</script>
+
+<div class="row">
+	<div class="col-sm-6">
+		<h2>Lease {{ lease.Lease }}</h2>
+	</div>
+	<div class="col-sm-6">
+		</br>
+		<p style="text-align:right">Effective to: 9999-99</p>
+		</br>
+	</div>
+</div>
+<br>
+<form class="form-horizontal">
+	<div class="form-group row">
+		<div class="col-sm-2">
+			<label for="leaseTypeInput" class="control-label">Type</label>
+		</div>
+		<div class="col-sm-4">
+			<input type="text" class="form-control" id="leaseTypeInput" value={{ lease.LeaseType }}>
+		</div>
+		<div class="col-sm-2">
+			<label for="leaseLessorInput" class="control-label">Lessor</label>
+		</div>
+		<div class="col-sm-4">
+			<input type="text" class="form-control" id="leaseLessorInput" value={{ lease.Lessor }}>
+		</div>
+	</div>
+	<div class="form-group row">
+		<div class="col-sm-2">
+			<label for="leaseIDInput" class="control-label">ID</label>
+		</div>
+		<div class="col-sm-4">
+			<input type="text" class="form-control" id="leaseIDInput" value={{ lease.LeaseID }}>
+		</div>
+		<div class="col-sm-2">
+			<label for="leaseProvinceInput" class="control-label">Province</label>
+		</div>
+		<div class="col-sm-4">
+			<input type="text" class="form-control" id="leaseProvinceInput" value={{ lease.Prov }}>
+		</div>
+	</div>	
+	<div class="form-group row">
+		<div class="col-sm-offset-6 col-sm-2">
+			<label for="leaseFNReserveInput" class="control-label">FN Reserve</label>
+		</div>
+		<div class="col-sm-4">
+			<input type="text" class="form-control" id="leaseFNReserveInput" value={{ lease.FNReserve }}>
+		</div>
+	</div>	
+
+<hr>
+
+	<div class="form-group row">
+		<div class="col-sm-3">
+			<label for="leaseIDInput" class="control-label">Rights granted</label>
+		</div>
+		<div class="col-sm-4">
+			<select class="form-control" id="leaseIDInput">
+				<option>1</option>
+				<option>2</option>
+				<option>3</option>
+			</select>
+		</div>
+		<div class="col-sm-5 checkbox">
+			<label><input type="checkbox" value="">Trucking deducted</label>
+		</div>
+	</div>	
+
+	<div class="form-group row">
+		<div class="col-sm-3">
+			<label for="leaseIDInput" class="control-label">Min. royalty</label>
+		</div>
+		<div class="col-sm-4">
+			<input type="text" class="form-control" id="wellIndianInput">
+		</div>
+		<div class="col-sm-5 checkbox">
+			<label><input type="checkbox" value="">Processing deducted</label>
+		</div>
+	</div>		
+
+	<div class="form-group row">
+		<div class="col-sm-3">
+			<label for="leaseIDInput" class="control-label">Valuation method</label>
+		</div>
+		<div class="col-sm-4">
+			<input type="text" class="form-control" id="wellIndianInput">
+		</div>
+		<div class="col-sm-5">
+			<a href="" class="btn btn-info btn-block disabled">Wells</a>
+		</div>
+	</div>		
+
+<hr>
+
+	<div class="form-group row">
+		<div class="col-sm-5 checkbox">
+			<label><input type="checkbox" value="" />SKProvCrownVar</label>
+		</div>
+		<div class="col-sm-3">
+			<label for="leaseIDInput" class="control-label">Crown Multiplier</label>
+		</div>
+		<div class="col-sm-4">
+			<select class="form-control" id="leaseIDInput">
+				<option>1</option>
+				<option>2</option>
+				<option>3</option>
+			</select>
+		</div>
+	</div>	
+
+
+<hr>	
+
+	<div class="form-group row">
+		<div class="col-sm-5 checkbox">
+			<label><input type="checkbox" value="" />IOGR1995</label>
+		</div>
+	</div>	
+
+
+<hr>	
+
+	<div class="form-group row">
+		<div class="col-sm-5 checkbox">
+			<label><input type="checkbox" value="" />GORR</label>
+		</div>
+		<div class="col-sm-7">
+			<div class="radio">
+			  <label><input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>Daily production</label>
+			</div>
+			<div class="radio">
+			  <label><input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">Monthly production</label>
+			</div>
+		</div>
+	</div>	
+
+	<table class="table">
+		<tr>
+			<th>From</th>
+			<th>To</th>
+			<th>Percent</th>
+		</tr>
+		<tr>
+			<td>0</td>
+			<td>100</td>
+			<td>2%</td>
+		</tr>
+		<tr>
+			<td>100</td>
+			<td>200</td>
+			<td>3%</td>
+		</tr>
+		<tr>
+			<td>200</td>
+			<td>400</td>
+			<td>4%</td>
+		</tr>
+		<tr>
+			<td>400</td>
+			<td>0</td>
+			<td>5%</td>
+		</tr>						
+	</table>
+
+
+{% endblock %}

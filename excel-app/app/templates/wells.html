@@ -1,8 +1,34 @@
 {% extends "layout.html" %}
 {% block body %}
-<p> Wells will be here</p>
+
 <script>
 	var li = document.getElementById('wells');
 	li.className += " active";
 </script>
+
+<div class="row">
+	<h2>Well search results</h2>
+</div>
+
+<br>
+
+<div class="row">
+	<table class="table">
+		<tr>
+			<th>Well ID</th>
+			<th>Canadian Well Identifier</th>
+			<th>Type</th>
+			<th>Province</th>
+		</tr>
+		{% for w in wells %}
+		<tr>
+			<td><a href={{ url_for('well', wellid=w.WellId) }}>{{ w.WellId }}</a></td>
+			<td>{{ w.UWI }}</td>
+			<td>{{ w.WellType }}</td>
+			<td>{{ w.Prov }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>
+
 {% endblock %}

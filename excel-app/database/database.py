@@ -99,8 +99,8 @@ class DataBase(object):
         al = []
         try:
             for l in self.lease:
-                al.append(self.lease[l].Lease)
-            al.sort()
+                al.append(self.lease[l])
+#            al.sort()
             return al
         except KeyError:
             raise AppError ('No leases found')        

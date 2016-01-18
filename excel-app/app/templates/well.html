@@ -1,0 +1,151 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<script>
+	var li = document.getElementById('wells');
+	li.className += " active";
+</script>
+
+<div class="row">
+	<div class="col-sm-6">
+		<h2>Well {{ well.WellId }}</h2>
+	</div>
+	<div class="col-sm-6">
+		</br>
+		<p style="text-align:right">Effective to: 9999-99</p>
+		</br>
+	</div>
+</div>
+<br>
+<form class="form-horizontal">
+	<div class="form-group row">
+		<div class="col-sm-2">
+			<label for="wellIDInput" class="control-label">ID</label>
+		</div>
+		<div class="col-sm-4">
+			<input type="text" class="form-control" id="wellIDInput" value={{ well.WellId }}>
+		</div>
+		<div class="col-sm-2">
+			<label for="wellTypeInput" class="control-label">Type</label>
+		</div>
+		<div class="col-sm-4">
+			<input type="text" class="form-control" id="wellTypeInput" value={{ well.WellType }}>
+		</div>
+	</div>
+	<div class="form-group row">
+		<div class="col-sm-2">
+			<label for="wellCWIInput" class="control-label">CWI</label>
+		</div>
+		<div class="col-sm-4">
+			<input type="text" class="form-control" id="wellCWIInput" value={{ well.UWI }}>
+		</div>
+		<div class="col-sm-2">
+			<label for="wellProvinceInput" class="control-label">Province</label>
+		</div>
+		<div class="col-sm-4">
+			<input type="text" class="form-control" id="wellProvinceInput" value={{ well.Prov }}>
+		</div>
+	</div>	
+	<div class="form-group row">
+		<div class="col-sm-3">
+			<label for="wellCommencementInput" class="control-label">Commencement date</label>
+		</div>
+		<div class="col-sm-9">
+			<input type="text" class="form-control" id="wellCommencementInput" value={{ well.CommencementDate }}>
+		</div>
+	</div>	
+	<div class="form-group row">
+		<div class="col-sm-3">
+			<label for="wellRoyaltyClassInput" class="control-label">Royalty classification</label>
+		</div>
+		<div class="col-sm-9">
+			<input type="text" class="form-control" id="wellRoyaltyClassInput" value={{ well.RoyaltyClassification }}>
+		</div>
+	</div>
+	<div class="form-group row">
+		<div class="col-sm-3">
+			<label for="wellClassInput" class="control-label">Classification</label>
+		</div>
+		<div class="col-sm-9">
+			<input type="text" class="form-control" id="wellClassInput" value={{ well.Classification }}>
+		</div>
+	</div>	
+	<div class="form-group row">
+		<div class="col-sm-3">
+			<label for="wellSRCInput" class="control-label">SRC</label>
+		</div>
+		<div class="col-sm-9">
+			<input type="text" class="form-control" id="wellSRCInput" value={{ well.SRC }}>
+		</div>
+	</div>
+	<div class="form-group row">
+		<div class="col-sm-3">
+			<label for="wellIndianInput" class="control-label">Indian Interest</label>
+		</div>
+		<div class="col-sm-9">
+			<input type="text" class="form-control" id="wellIndianInput" value={{ well.IndianInterest }}>
+		</div>
+	</div>
+	<div class="form-group row">
+		<div class="col-sm-offset-8 col-sm-2">
+			<a href="" class="btn btn-info btn-block disabled">Leases</a>
+		</div>
+		<div class="col-sm-2">
+			<button type="submit" class="btn btn-primary btn-block">Save</button>
+		</div>	
+	</div>			
+</form>
+
+<hr>
+
+<div class="row">
+	<div class="col-sm-6">
+		<h2>Monthly Data</h2>
+	</div>
+	<div class="col-sm-6">
+		<p style="text-align:right">Production date: 2016-01</p>
+		<p style="text-align:right">Effective date: 2016-01</p>
+		<p style="text-align:right">Amendment No: 01</p>
+	</div>
+</div>
+<br>
+
+<div class="row">
+<table class="table">
+	<tr>
+		<th>Product</th>
+		<th>Production</th>
+		<th>Well Head Price</th>
+		<th>Trucking Price</th>
+		<th>Processing Price</th>
+	</tr>
+	<tr>
+		<td>OIL</td>
+		<td>100.0</td>
+		<td>221.123456</td>
+		<td>2.123455</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>GAS</td>
+		<td>1000.0</td>
+		<td>120.000000</td>
+		<td></td>
+		<td>0.123455</td>
+	</tr>
+</table>
+</div>
+
+<div class="row">
+	<div class="col-sm-offset-10 col-sm-2">
+		<a href="" class="btn btn-danger btn-block disabled">Override</a>
+	</div>
+</div>
+
+<hr>
+
+<div class="row">
+	<a href="" class="btn btn-primary btn-block disabled">Calculated Worksheet</a>
+</div>
+
+{% endblock %}

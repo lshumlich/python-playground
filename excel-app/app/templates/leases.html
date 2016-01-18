@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<script>
+	var li = document.getElementById('leases');
+	li.className += " active";
+</script>
+
+<div class="row">
+	<h2>Search results</h2>
+</div>
+
+<br>
+
+<div class="row">
+	<table class="table">
+		<tr>
+			<th>Lease ID</th>
+			<th>Province</th>
+		</tr>
+		{% for l in leases %}
+		<tr>
+			<td><a href={{ url_for('lease', leaseid=l.Lease) }}>{{ l.Lease }}</a></td>
+			<td>{{ l.Prov }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>
+
+{% endblock %}
