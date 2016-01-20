@@ -5,7 +5,6 @@ from flask import render_template, request, redirect, url_for, flash
 from database import database
 
 db = database.DataBase('database/database.xlsx')
-dbh = 4
 
 @app.route('/')
 def index():
