@@ -58,6 +58,10 @@ target/
 
 # Temp files:
 *~
+~*
 *.swp
 *.swo
 /excel-app/log.txt
+
+# Our own temp files
+log.txt
