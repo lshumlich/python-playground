@@ -43,5 +43,18 @@ db = DataBase("database.xlsx")
 # else:
 # 	print("not equal")
 
-leases = db.getAllLeases()
-print(leases)
+# leases = db.getAllLeases()
+# print(leases)
+
+# lease="OL-0004"
+# rm = db.getRoyaltyMaster(lease)
+# print(rm)
+
+
+a = 5
+b = 2
+
+def multiply(x, y):
+	return x*y
+
+assert multiply(a,b) == 10
