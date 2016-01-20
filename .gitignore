@@ -61,8 +61,5 @@ target/
 ~*
 *.swp
 *.swo
-/excel-app/log.txt
-
-# Our own temp files
-log.txt
-/excel-app/.idea/
+excel-app/log.txt
+excel-app/.idea/
