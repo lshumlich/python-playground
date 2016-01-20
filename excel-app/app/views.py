@@ -20,7 +20,7 @@ def well(wellid):
 		well=db.getWell(int(wellid))
 		return render_template('well.html', well=well)
 
-@app.route('/leases/')
+@app.route('/leases')
 def leases():
 	all_leases = db.getAllLeases()
 	return_leases = []
@@ -44,9 +44,10 @@ def leases():
 def lease(leaseid):
 	if leaseid:
 		lease=db.getLease(leaseid)
-		return render_template('lease.html', lease=lease)
+		rm=db.getRoyaltyMaster(leaseid)
+		return render_template('lease.html', lease=lease, rm=rm)
 
-@app.route('/wells/')
+@app.route('/wells')
 def wells():
 	all_wells = db.getAllWells()
 	return_wells = []
