@@ -1,8 +1,11 @@
 #!/bin/env python3
 
 from database import DataBase
+from calcroyalties import ProcessRoyalties, RoyaltyWorksheet
 
 db = DataBase("database.xlsx")
+pr = ProcessRoyalties()
+rw = RoyaltyWorksheet()
 
 #lease = "xxx"
 #    
@@ -50,11 +53,15 @@ db = DataBase("database.xlsx")
 # rm = db.getRoyaltyMaster(lease)
 # print(rm)
 
+###
+#print(db.getMonthlyByWell(6))
 
-a = 5
-b = 2
+md = db.getMonthlyByWell(6)
+# well = db.getWell(monthlyData.WellId)
+# royalty = db.getRoyaltyMaster(well.Lease)
+# lease = db.getLease(well.Lease)
+# royaltyCalc=db.getRoyaltyCalc(monthlyData.ProdMonth,monthlyData.WellId)
 
-def multiply(x, y):
-	return x*y
-
-assert multiply(a,b) == 10
+#printSaskOilRoyaltyRate(self, monthlyData, well, royalty, lease, royaltyCalc)
+pr.process('database.xlsx', md)
+#rw.printSaskOilRoyaltyRate(monthlyData, well, royalty, lease, royaltyCalc)
