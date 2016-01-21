@@ -63,3 +63,4 @@ target/
 *.swo
 log.txt
 .idea/
+/excel-app/database/log.txt
