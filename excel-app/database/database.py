@@ -9,7 +9,7 @@ the rows are the data.
 import unittest
 from openpyxl import load_workbook
 from openpyxl import Workbook
-from database.apperror import AppError
+from apperror import AppError
 
 class DataStructure(object):
     
@@ -51,6 +51,7 @@ class DataBase(object):
             self.monthlyRecordId = 0
             self.productClausesTabName = 'ProductClauses'
             self.econOilDataTabName = 'ECONData'
+            self.calcDataTabName = 'Calc'
         except FileNotFoundError:
             raise AppError('The excel worksheet ' + worksheetName + ' is not found')
         self.loadWellFromExcel()
@@ -60,6 +61,7 @@ class DataBase(object):
         self.loadMonthlyFromExcel()
         self.loadProducingEntityFromExcel()
         self.loadECONOilDataFromExcel()
+        self.loadCalcDataFromExcel()
         
     #
     # Royalty Master
@@ -184,6 +186,13 @@ class DataBase(object):
     
     def getMonthlyData(self):
         return self.monthlyTable[0]
+    
+    def getMonthlyDataByWellProdMonthProduct(self,wellId,prodMonth,product):
+        for md in self.monthlyData():
+            if md.WellId == wellId and md.ProdMonth == prodMonth and md.Product == product:
+#             if (md.WellId == wellId and md.ProdMonth == prodMonth and md.Product = product):
+                return md
+        raise AppError ('Monthly Data not found for: ' + str(wellId) + ' ' + str(prodMonth) + ' ' + product)
 
     #
     # ECON Monthly Oil Factors Data
@@ -261,6 +270,17 @@ class DataBase(object):
 
         except Exception as e:
             raise e
+        
+    def loadCalcDataFromExcel(self):
+        self.calc = self.excelLoadWsTable(self.calcDataTabName)
+
+    
+    def getCalcDataByWellProdMonthProduct(self,wellId,prodMonth,product):
+        for md in self.calc:
+            if md.WellId == wellId and md.ProdMonth == prodMonth:
+#             if (md.WellId == wellId and md.ProdMonth == prodMonth and md.Product = product):
+                return md
+        raise AppError ('Calc Data not found for: ' + str(wellId) + ' ' + str(prodMonth) + ' ' + product)
     #
     # Generic load a tab into a data structure
     #
