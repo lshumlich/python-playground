@@ -58,6 +58,8 @@ target/
 
 # Temp files:
 *~
+~*
 *.swp
 *.swo
-/excel-app/log.txt
+log.txt
+.idea/
