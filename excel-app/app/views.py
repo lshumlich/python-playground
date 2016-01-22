@@ -3,8 +3,11 @@
 from app import app
 from flask import render_template, request, redirect, url_for, flash
 from database import database
+from database import calcroyalties
 
 db = database.DataBase('database/database.xlsx')
+pr = calcroyalties.ProcessRoyalties()
+rw = calcroyalties.RoyaltyWorksheet()
 
 @app.route('/')
 def index():
@@ -71,6 +74,15 @@ def wells():
 def searchleases():
 	return render_template('searchleases.html')
 
+@app.route('/worksheet')
+def worksheet():
+	if request.args:
+		md = db.getMonthlyByWell(int(request.args["WellId"]))
+	pr.process('database/database.xlsx', md)
+	with open("Royalty Worksheet.txt", 'r') as f:
+		ws = f.read()
+		return render_template('worksheet.html', ws=ws)
+
 @app.errorhandler(404)
 def not_found(error):
-    return render_template('404.html')  	
+    return render_template('404.html')

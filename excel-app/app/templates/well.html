@@ -145,7 +145,7 @@
 <hr>
 
 <div class="row">
-	<a href="" class="btn btn-primary btn-block disabled">Calculated Worksheet</a>
+	<a href={{ url_for('worksheet', WellId=well.WellId) }} class="btn btn-primary btn-block">Calculated Worksheet</a>
 </div>
 
 {% endblock %}

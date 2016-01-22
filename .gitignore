@@ -63,4 +63,5 @@ target/
 *.swo
 log.txt
 .idea/
-/excel-app/database/log.txt
+Royalty\ Worksheet.txt
+$new_database.xlsx
