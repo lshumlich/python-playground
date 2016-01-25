@@ -3,13 +3,15 @@ import sys
 import datetime
 import sqlite3
 from sqlite3 import OperationalError
+from flask import Flask, render_template, url_for, request
 
 from openpyxl import load_workbook
 from openpyxl import Workbook
+from sqlalchemy.sql.base import ColumnSet
+
 
 class Loader(object):
 
-        
     def connect(self,dbName):
         self.conn = sqlite3.connect(dbName)
         self.cursor = self.conn.cursor()
@@ -57,26 +59,6 @@ class Loader(object):
         except Exception as e:
             raise e
                 
-#                     ds = DataStructure()
-#                     stack.append(ds)
-#                     i = 0
-#                     for cell in headerRow:
-#                         setattr(ds, cell.value, row[i].value)
-#                         i = i + 1
-#         except KeyError:
-#             raise AppError('The excel worksheet ' + self.worksheetName + ' does not have tab: ' + tabName)
-#         except AttributeError as e:
-#             print('Error Loading tab:',tabName,' column:',i,'Record:',recordNo,'Error:',e)
-#             print('   cell.value:',cell.value)
-#             print('   headerRow:',headerRow)
-#             print('         row:',row)
-#             raise e
-#         except TypeError as e:
-#             print('Error Loading tab:',tabName,' column:',i,'Record:',recordNo,'Error:',e)
-#             print('   headerRow:',headerRow)
-#             print('         row:',row)
-#             raise e
-        
     def createTable(self,tableName,headerRow, dataRow):
 
         self.deleteTable(tableName)
@@ -144,54 +126,195 @@ class Loader(object):
         data = data.replace(',)', ')')
         
         insert = insert + data
-    
-        
+            
         print(insert)
         self.execute(insert)
         
-    def showTable(self,tableName):
+            
+class Shower(object):
+    
+    def __init__(self):
+        print('Shower.__init__', self)
+
+    def connect(self,dbName):
+        print('Shower opening connection to:', dbName)
+        self.conn = sqlite3.connect(dbName)
+        self.cursor = self.conn.cursor()
+        
+    def execute(self,statement):
+        return self.cursor.execute(statement)
+
+    def close(self):
+        self.conn.close()
+
+    def showTable(self,tableName,attr=None,key=None):
         stmt = 'select * from ' + tableName
+        if key:
+            type = self.columnType(tableName, attr)
+            where = ''
+            if type == 'int':
+                where = attr + "=" + key
+            elif type =='text':
+                where = attr + "='" + key + "'"
+            else:
+                print('***** Type not delt with:', type,tableName,attr)
+            
+            stmt = stmt + " where " + where
+        elif attr:
+            stmt = stmt + " order by " + attr
+        print('SQL=', stmt)
         values = self.execute(stmt)
-        for row in values:
-            print(row)
+        return values;
         
     def showTables(self):
         stmt = 'select tbl_name from sqlite_master'
         values = self.execute(stmt)
+        tables = []
         for row in values:
-            print(row)
+            tables.append(row[0])
+        return(tables)
 
     def showColumns(self,tableName):
         stmt = 'pragma table_info(' + tableName + ')'
         values = self.execute(stmt)
+        columns = []
         for row in values:
+            columns.append(row[1])
             print(row)
+        return(columns)
+    
+    def columnType(self,table,column):
+        stmt = 'pragma table_info(' + table + ')'
+        values = self.execute(stmt)
+        for row in values:
+            if row[1] == column:
+                return row[2]
+        return(None)
         
-
-print('Hello World from ' + sys.argv[0])
-loader = Loader()
-loader.connect('testload.db')
-loader.openExcel(r'd:/$temp/Onion Lake SK wells.xlsx')
-loader.loadAllSheets()
-# loader.loadExcel("database.xlsx")
-# loader.LoadWorksheet('Well')
-# loader.showTables()
-# loader.showTable('well')
-# loader.showTables()
-# loader.showColumns('well')
-
-
-print('as df  a s d f'.replace(' ',''))
-
-
-loader.close()
-
-print("*** Done ***")
-
-"""
-        self.cursor.execute('''CREATE TABLE stocks
-                     (date text, trans text, symbol text, qty real, price real)''')
+    
+            
+class AppServer(object):
+    
+    print('we are running a class level in AppServer')
+    app = Flask(__name__) 
+#     app.debug = True
+    shower = Shower()
+    
+    def __init__(self):
+#         AppServer.app = Flask(__name__)
+        print("in init of AppServer")
         
-        # Insert a row of data
-        self.cursor.execute("INSERT INTO stocks VALUES ('2006-01-05','BUY','RHAT',100,35.14)")
-"""
+    @staticmethod
+    @app.route("/")
+    def hello():
+        print('should be at root')
+        return "hello World! v4"
+    
+    @staticmethod
+    @app.route("/hello/<username>")
+    def helloab(username):
+        print('should be at /ab/')
+        return "hello World/hello/" + username
+    
+    @staticmethod
+    @app.route("/data/")
+    def data():
+        try:
+            table=request.args.get('table')
+            attr=request.args.get('attr')
+            key=request.args.get('key')
+            links = {}
+            links['BAid'] = '?table=BAInfo&attr=BAid&key=' 
+            links['WellEvent'] = '?table=WellInfo&attr=Well&key='
+            
+            tables = AppServer.shower.showTables()
+            header = None
+            rows = None
+            print('Table:',table)
+            if table:
+                header = AppServer.shower.showColumns(table)
+                rows = AppServer.shower.showTable(table,attr,key)
+            html = render_template('data.html',table=table,tables=tables,header=header,rows=rows,links=links)
+        except Exception as e:
+            print('AppServer.data: ***Error:',e)
+
+        return html 
+
+    @staticmethod
+    def run(dbName):
+        print("Starting AppServer.run")
+        AppServer.shower.connect(dbName)
+        print('starting the run method of AppServer')
+#         AppServer.app.secret_key = 'secret'
+        AppServer.app.run()
+        print('after the run in run in AppServer')
+
+database = 'testload.db'
+def helloMsg():
+    print('Hello World from ' + sys.argv[0])
+    
+
+def loadExcelToDb():
+    loader = Loader()
+    loader.connect(database)
+    loader.openExcel(r'd:/$temp/Onion Lake SK wells.xlsx')
+    loader.loadAllSheets()
+    loader.loadExcel("database.xlsx")
+    loader.close()
+    
+def showStuff():
+    loader = Loader()
+    loader.LoadWorksheet('Well')
+    loader.showTables()
+    loader.showTable('well')
+    loader.showTables()
+    loader.showColumns('well')
+    loader.close()
+
+def goodbyMsg():
+    print("*** Done ***")
+
+def sampleCode():
+    print('we are in sample code')
+    print('what do we do now')
+    
+def appServer2():
+    app = Flask(__name__)
+    
+    @app.route("/")
+    def hello():
+        return "hello World!"
+    
+    @app.route("/ab/")
+    def helloab():
+        return "hello World!ab"
+
+    app.secret_key = 'secret'
+    app.run()
+
+def appServer():
+#     app = AppServer()
+#     app.run()
+    AppServer.run(database)
+
+def showTables(dbName):
+    shower = Shower()
+    shower.connect(dbName)
+    value = shower.showTables()
+    print(type(value))
+    print(value)
+
+def showTable(dbName, tableName):
+    shower = Shower()
+    shower.connect(dbName)
+    header = shower.showColumns(tableName)
+    print(header)
+    rows = shower.showTable(tableName,'Prov','SK')
+    for row in rows:
+        print(row)
+
+helloMsg()
+print('v2')
+appServer()
+# showTable(database,'well')
+goodbyMsg()
