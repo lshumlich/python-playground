@@ -20,7 +20,7 @@
     	<table border="1">
     	<tr>
         {% for h in header %}
-        	<td> <a href=?table={{table}}&attr={{ h }}> {{ h }} </a> {% if h in links %} ? {% endif %}</td>
+        	<td> <a href=?table={{table}}&attr={{ h }}> {{ h }} </a> {% if h in links %} - {% else %} <a onclick="openLink('{{table}}',''{{h}}')">+</a> {% endif %}</td>
         {% endfor %}
     	</tr>
 	    {% if rows %} 
@@ -28,8 +28,7 @@
 	        {% for r in rows %}
 		    	<tr>
 	        	{% for c in r %}
-	        		<td> {{ c }} {% if header[loop.index0] in links %} <a href="{{links[header[loop.index0]]}}{{c}} ">?</a> {% endif %}</td>
-	        		
+	        		<td> {{ c }} {% if header[loop.index0] in links %} <a href="{{links[header[loop.index0]]}}{{c}} ">-</a>  {% endif %}</td>
 		        {% endfor %}
 		    	</tr>
 	        {% endfor %}
@@ -38,6 +37,11 @@
     {% endif %}
     <p>
     {{ table }}
-</div>    
+</div>
+<script>
+function openLink(table) {
+    window.open("/link?tablename=" + table + "&attrname=" + attr + ", "_blank", "toolbar=yes, scrollbars=yes, resizable=yes, top=500, left=500, width=400, height=400");
+}
+</script>    
 </body>
 </html>

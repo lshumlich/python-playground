@@ -1,9 +1,10 @@
 import os
 import sys
 import datetime
+import traceback
 import sqlite3
 from sqlite3 import OperationalError
-from flask import Flask, render_template, url_for, request
+from flask import Flask, render_template, url_for, request, flash
 
 from openpyxl import load_workbook
 from openpyxl import Workbook
@@ -141,8 +142,16 @@ class Shower(object):
         self.conn = sqlite3.connect(dbName)
         self.cursor = self.conn.cursor()
         
+    def insertLink(self,tab,att,lnk):
+        stmt = 'insert into linktab values("' + tab + '", "' + att + '", "' + lnk + '")'
+        self.cursor.execute(stmt)
+        self.conn.commit()
+        
     def execute(self,statement):
         return self.cursor.execute(statement)
+    
+    def commit(self):
+        self.conn.commit()
 
     def close(self):
         self.conn.close()
@@ -238,16 +247,65 @@ class AppServer(object):
         except Exception as e:
             print('AppServer.data: ***Error:',e)
 
-        return html 
+        return html
+    
+    @staticmethod
+    @app.route("/link/",methods=['GET','POST']) 
+    def link():
+        tablename = None
+        attrname = None
+        linkname = None
+        try:
+            print('AppServer.link running')
+            if request.method == 'POST':
+                tablename = request.form['tablename']
+                attrname = request.form['attrname']
+                linkname = request.form['linkname']
+            
+                error = False
+                if tablename == '':
+                    error = True
+                    flash('Table name must be entered.')
+                if attrname == '':
+                    error = True
+                    flash('Attribute name must be entered.')
+                if linkname == '':
+                    error = True
+                    flash('Link name must be entered.')
+                    
+                if not error:
+                    AppServer.shower.insertLink(tablename, attrname, linkname)
+                    return render_template('closeme.html')
+            else:   
+                tablename = AppServer.reqorblank('tablename')
+                attrname = AppServer.reqorblank('attrname')
+                linkname = AppServer.reqorblank('linkname')
+            
+            html = render_template('link.html',tablename=tablename,attrname=attrname,linkname=linkname)
+            
+        except Exception as e:
+            print('AppServer.link: ***Error:',e)
+        return html
+    
+    @staticmethod
+    def reqorblank(reqname):
+        a = request.args.get(reqname)
+        print('value of a:',a)
+        if a:
+            return a
+        else:
+            return ''
 
     @staticmethod
     def run(dbName):
         print("Starting AppServer.run")
         AppServer.shower.connect(dbName)
         print('starting the run method of AppServer')
-#         AppServer.app.secret_key = 'secret'
+        AppServer.app.secret_key = 'secret'
         AppServer.app.run()
         print('after the run in run in AppServer')
+
+    
 
 database = 'testload.db'
 def helloMsg():

@@ -425,6 +425,7 @@ if __name__ == '__main__':
     pr = ProcessRoyalties()
 #     pr.process('iogcdatabase.xlsx')
     pr.process('database.xlsx')
+    print('os name is:',os.name)
     if os.name != "posix":
         subprocess.call(['notepad.exe', 'Royalty Worksheet.txt'])
         subprocess.call(['notepad.exe', 'log.txt'])

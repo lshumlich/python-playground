@@ -1,0 +1,30 @@
+<html lang="en">
+<head>
+<title>Table Display</title>
+<link type="text/css" rel="stylesheet" href={{url_for("static", filename="style.css")}}>
+</head>
+
+<body style="margin:30">
+
+<form action="" method='POST'>
+
+<p><input type="text" name=tablename value={{tablename}}>
+<p><input type="text" name=attrname value={{attrname}}>
+<p><input type="text" name=linkname value={{linkname}}>
+<p><input type="submit" value="Submit">
+
+</form>
+
+{% with messages = get_flashed_messages() %}
+	{% if messages %}
+		<ul class='flasses'>
+		{% for message in messages %}
+			<li>{{ message }}</li>
+		{% endfor %}
+		</ul>
+	{% endif %}
+{% endwith %}
+		
+
+</body>
+</html>
