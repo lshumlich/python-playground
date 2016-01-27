@@ -14,4 +14,6 @@ coverage report
 
 coverage html
 
+(The code coverage report goes into a directory called 'htmlcov' at the same level that you run at)
+
 python -m pydoc CalcRoyalties

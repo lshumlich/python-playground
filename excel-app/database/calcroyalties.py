@@ -135,6 +135,9 @@ class ProcessRoyalties(object):
 
         del self.ws
 
+# Adrienne - Write this method...
+    def calcSaskOilProvCrownRoyaltyRate(self,econOilData,royclass,mop):
+        return 0.0
     #
     # Sask Oil Royalty Calculation... Finally we are here...
     #
