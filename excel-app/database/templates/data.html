@@ -20,7 +20,7 @@
     	<table border="1">
     	<tr>
         {% for h in header %}
-        	<td> <a href=?table={{table}}&attr={{ h }}> {{ h }} </a> {% if h in links %} - {% else %} <a onclick="openLink('{{table}}',''{{h}}')">+</a> {% endif %}</td>
+        	<td> <a href=?table={{table}}&attr={{ h }}> {{ h }} </a> {% if h in links %} - {% else %} <a onclick="openLink('{{table}}','{{h}}')">+</a> {% endif %}</td>
         {% endfor %}
     	</tr>
 	    {% if rows %} 
@@ -37,10 +37,38 @@
     {% endif %}
     <p>
     {{ table }}
+    <p>v6
 </div>
+
+<p id="demo"></p>
+
+
+<a onclick="document.getElementById('openModal').innerHTML='<object type='text/html' data='/link' ></object>'">
+Open Modal 2</a>
+
+<p>
+
+<a href="#openModal">Open Modal</a>
+
+<div id="openModal" class="modalDialog">
+	<div>
+		<a href="#close" title="Close" class="close">Xxx</a>
+		<h2>Modal Box</h2>
+		<p>This is a sample modal box that can be created using the powers of CSS3.</p>
+		<p>You could do a lot of things here like have a pop-up ad that shows when your website loads, or create a login/register form for users.</p>
+	</div>
+</div>
+
+
 <script>
-function openLink(table) {
-    window.open("/link?tablename=" + table + "&attrname=" + attr + ", "_blank", "toolbar=yes, scrollbars=yes, resizable=yes, top=500, left=500, width=400, height=400");
+function openLink(table,attrname) {
+	document.getElementById("demo").innerHTML = table + '-Joining type text-' + attrname
+	link = "/link?tablename=" + table + "&attrname=" + attrname
+	document.getElementById("demo").innerHTML = link
+	window.open(link,'',' scrollbars=yes,menubar=no,top=100,left=100,width=300, height=300 resizable=yes,toolbar=no,location=no,status=no,address=no')
+//	window.open('/link','',' scrollbars=yes,menubar=no,top=100,left=100,width=300, height=300 resizable=yes,toolbar=no,location=no,status=no,address=no')
+// <a style="cursor: pointer" onclick=" window.open('/link','',' scrollbars=yes,menubar=no,width=300, height=300 resizable=yes,toolbar=no,location=no,status=no,location=no')">Next 1</a>
+// <a onclick=" window.open('/link','',' scrollbars=yes,menubar=no,width=300, height=300 resizable=yes,toolbar=no,location=no,status=no,address=no')">Next 2</a>
 }
 </script>    
 </body>

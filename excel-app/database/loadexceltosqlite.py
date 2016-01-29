@@ -171,7 +171,7 @@ class Shower(object):
             stmt = stmt + " where " + where
         elif attr:
             stmt = stmt + " order by " + attr
-        print('SQL=', stmt)
+        print('SQL:', stmt)
         values = self.execute(stmt)
         return values;
         
@@ -189,7 +189,6 @@ class Shower(object):
         columns = []
         for row in values:
             columns.append(row[1])
-            print(row)
         return(columns)
     
     def columnType(self,table,column):
