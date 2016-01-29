@@ -3,11 +3,11 @@
 import unittest
 from datetime import date
 from datetime import datetime
-from database.apperror import AppError
+from database import AppError, DataStructure
 
 
-from database.testhelper import TestHelper
-from database.calcroyalties import ProcessRoyalties
+from testhelper import TestHelper
+from calcroyalties import ProcessRoyalties
 #from DataBase import DataBase,AppError,DataStructure,TestDataBase
 
 class DataObj(object):
@@ -72,8 +72,9 @@ CharMonth,ProdMonth,HOP,SOP,NOP,H4T_C,H4T_D,H4T_K,H4T_X,H3T_K,H3T_X,HNEW_K,HNEW_
 Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,25.85,1939,31.57,729,38.54,890,0.1209,3.02,29.91,2243,36.08,833,40.79,941,52.61,1214
 """
         # All this work so we don't need to read from the database. It's a way better test.
-        econOilData = DataObj()
+        econOilData = DataStructure()
         th = TestHelper()
+        royaltyCalc = DataStructure()
         th.loadObjectCSVStyle(econOilData, econStringData)
         print('ProdMonth:',econOilData.ProdMonth)
         print('H3T_X:',econOilData.H3T_X)
@@ -83,7 +84,15 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         pr = ProcessRoyalties()
         
         
-        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyRate(econOilData, 'Old Oil', 1.23),123.0)
+        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyRate(royaltyCalc,econOilData,'Fourth Tier Oil', 'Heavy', 24), 0)
+        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyRate(royaltyCalc,econOilData,'Fourth Tier Oil', 'Heavy', 100), 6.31)
+        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyRate(royaltyCalc,econOilData,'Fourth Tier Oil', 'Southwest', 100), 7.84)
+        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyRate(royaltyCalc,econOilData,'Fourth Tier Oil', 'Other', 130), 12.697)
+        self.assertRaises(AppError, pr.calcSaskOilProvCrownRoyaltyRate, royaltyCalc, econOilData, 'Fourth Tier Oil', 'fas', 120)
+
+        #self.assertEqual(pr.calcSaskOilProvCrownRoyaltyRate(econOilData, 'Old Oil', 'Heavy', 1.23),123.0)
 
         return
-    
+
+if __name__ == '__main__':
+    unittest.main()

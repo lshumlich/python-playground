@@ -1,5 +1,5 @@
 import unittest
-from database.testhelper import TestHelper
+from testhelper import TestHelper
 
 class DataObj(object):
     None

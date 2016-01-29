@@ -6,9 +6,9 @@ import subprocess
 import traceback
 import sys
 
-from database.apperror import AppError
-from database.database import DataBase
-from database.royaltyworksheet import RoyaltyWorksheet
+from apperror import AppError
+from database import DataBase, DataStructure
+from royaltyworksheet import RoyaltyWorksheet
 import unittest
 import os
 
@@ -136,8 +136,34 @@ class ProcessRoyalties(object):
         del self.ws
 
 # Adrienne - Write this method...
-    def calcSaskOilProvCrownRoyaltyRate(self,econOilData,royclass,mop):
-        return 0.0
+    def calcSaskOilProvCrownRoyaltyRate(self,royaltyCalc,econOilData,royclass,wellclass,mop):
+
+         well = DataStructure()
+         well.RoyaltyClassification = royclass
+         well.Classification = wellclass
+
+         if well.RoyaltyClassification == 'Fourth Tier Oil':
+
+            if mop < 25:
+                royaltyCalc.ProvCrownRoyaltyRate = 0
+                royaltyCalc.Message = 'MOP < 25 - RR = 0.' # Needed for worksheet so we can explain why royalty not calculated. Spent a few hours on this one
+
+            elif mop <= 136.2:
+                if well.Classification == 'Heavy':
+                    royaltyCalc.C = econOilData.H4T_C
+                    royaltyCalc.D = econOilData.H4T_D
+                elif well.Classification == 'Southwest':
+                    royaltyCalc.C = econOilData.SW4T_C
+                    royaltyCalc.D = econOilData.SW4T_D
+                elif well.Classification == 'Other':
+                    royaltyCalc.C = econOilData.O4T_C
+                    royaltyCalc.D = econOilData.O4T_D
+                else:
+                    raise AppError('Royalty Classification: ' + well.RoyaltyClassification + ' not known for ' + well.Classification + ' Royalty not calculated.')
+                royaltyCalc.ProvCrownRoyaltyRate = (royaltyCalc.C * mop) - royaltyCalc.D
+
+         return round(royaltyCalc.ProvCrownRoyaltyRate, 6)
+
     #
     # Sask Oil Royalty Calculation... Finally we are here...
     #
