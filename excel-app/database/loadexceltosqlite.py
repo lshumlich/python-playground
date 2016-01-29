@@ -303,7 +303,6 @@ class AppServer(object):
         AppServer.app.secret_key = 'secret'
         AppServer.app.run()
         print('after the run in run in AppServer')
-
     
 
 database = 'testload.db'
@@ -335,20 +334,6 @@ def sampleCode():
     print('we are in sample code')
     print('what do we do now')
     
-def appServer2():
-    app = Flask(__name__)
-    
-    @app.route("/")
-    def hello():
-        return "hello World!"
-    
-    @app.route("/ab/")
-    def helloab():
-        return "hello World!ab"
-
-    app.secret_key = 'secret'
-    app.run()
-
 def appServer():
 #     app = AppServer()
 #     app.run()

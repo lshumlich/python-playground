@@ -70,15 +70,16 @@ for p in people:
 #
 print('--- dictionary ')
 
-peps = dict()
+peeps = dict()
 
-peps['KL'] = Person(k,30)
-peps['AS'] = Person(a,30)
-peps['LS'] = Person(n1,30)
+peeps['KL'] = Person(k,30)
+peeps['AS'] = Person(a,30)
+peeps['LS'] = Person(n1,30)
 
-print("peps['KL']",peps['KL'])
-for p in people:
+print("peeps['KL']",peeps['KL'])
+for p in peeps:
     print('dict:',p)
+    print('dict.p:',peeps[p])
 
 #
 # Ranges
