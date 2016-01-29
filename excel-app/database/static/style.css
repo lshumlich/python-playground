@@ -97,3 +97,39 @@ body
 	background: -webkit-linear-gradient(#fff, #999);
 	background: -o-linear-gradient(#fff, #999);
 }
+.lfsKeep {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+//	position: static|absolute|fixed|relative|initial|inherit;
+}
+
+.lfsDialog {
+	position: inherit;
+	font-family: Arial, Helvetica, sans-serif;
+	background: rgba(0,0,0,0.8);
+	z-index: 99999;
+	opacity:0;
+	-webkit-transition: opacity 400ms ease-in;
+	-moz-transition: opacity 400ms ease-in;
+	transition: opacity 400ms ease-in;
+	pointer-events: none;
+}
+.lfsDialog:target {
+	opacity:1;
+	pointer-events: auto;
+}
+
+.lfsDialog > div {
+	width: 300px;
+	position: relative;
+	margin: 10% auto;
+	padding: 5px 2px 13px 3px;
+	border-radius: 10px;
+	background: #fff;
+	background: -moz-linear-gradient(#fff, #999);
+	background: -webkit-linear-gradient(#fff, #999);
+	background: -o-linear-gradient(#fff, #999);
+}
