@@ -19,7 +19,7 @@ if __name__ == "__main__":
 #    import sys;sys.argv = ['', 'Test.testName']
 #    unittest.main() # This works for testing the current file
  #   unittest.main(module='batch') # works
-    unittest.main(module='database.testhelper_test')
+  #  unittest.main(module='database.testhelper_test')
     unittest.main(module='database.calcroyalties_test')
    # tst = TestSaskRoyaltyCalc()
    # tst.test_calcSaskOilProvCrownRoyaltyRate()

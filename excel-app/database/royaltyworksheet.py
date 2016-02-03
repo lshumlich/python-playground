@@ -1,6 +1,6 @@
 from datetime import date
 from datetime import datetime
-from database import DataBase
+from database.database import DataBase
 
 class RoyaltyWorksheet(object):
 

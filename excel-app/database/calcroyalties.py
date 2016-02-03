@@ -6,9 +6,9 @@ import subprocess
 import traceback
 import sys
 
-from apperror import AppError
-from database import DataBase, DataStructure
-from royaltyworksheet import RoyaltyWorksheet
+from database.apperror import AppError
+from database.database import DataBase, DataStructure
+from database.royaltyworksheet import RoyaltyWorksheet
 import unittest
 import os
 
@@ -136,33 +136,117 @@ class ProcessRoyalties(object):
         del self.ws
 
 # Adrienne - Write this method...
-    def calcSaskOilProvCrownRoyaltyRate(self,royaltyCalc,econOilData,royclass,wellclass,mop):
+    def calcSaskOilProvCrownRoyaltyRate(self,royaltyCalc,econOilData,
+                wellRoyaltyClassification,wellClassification,mop,src):
 
-         well = DataStructure()
-         well.RoyaltyClassification = royclass
-         well.Classification = wellclass
+     #   econOilData = self.db.getECONOilData(monthlyData.ProdMonth)
+     #   mop = monthlyData.ProdVol
 
-         if well.RoyaltyClassification == 'Fourth Tier Oil':
+        if wellRoyaltyClassification == 'Fourth Tier Oil':
 
             if mop < 25:
                 royaltyCalc.ProvCrownRoyaltyRate = 0
                 royaltyCalc.Message = 'MOP < 25 - RR = 0.' # Needed for worksheet so we can explain why royalty not calculated. Spent a few hours on this one
 
             elif mop <= 136.2:
-                if well.Classification == 'Heavy':
+                if wellClassification == 'Heavy':
                     royaltyCalc.C = econOilData.H4T_C
                     royaltyCalc.D = econOilData.H4T_D
-                elif well.Classification == 'Southwest':
+                elif wellClassification == 'Southwest':
                     royaltyCalc.C = econOilData.SW4T_C
                     royaltyCalc.D = econOilData.SW4T_D
-                elif well.Classification == 'Other':
+                elif wellClassification == 'Other':
                     royaltyCalc.C = econOilData.O4T_C
                     royaltyCalc.D = econOilData.O4T_D
                 else:
-                    raise AppError('Royalty Classification: ' + well.RoyaltyClassification + ' not known for ' + well.Classification + ' Royalty not calculated.')
+                    raise AppError('Royalty Classification: ' + wellRoyaltyClassification + ' not known for ' + wellClassification + ' Royalty not calculated.')
                 royaltyCalc.ProvCrownRoyaltyRate = (royaltyCalc.C * mop) - royaltyCalc.D
 
-         return round(royaltyCalc.ProvCrownRoyaltyRate, 6)
+            else:
+                if wellClassification == 'Heavy':
+                    royaltyCalc.K = econOilData.H4T_K
+                    royaltyCalc.X = econOilData.H4T_X
+                elif wellClassification == 'Southwest':
+                    royaltyCalc.K = econOilData.SW4T_K
+                    royaltyCalc.X = econOilData.SW4T_X
+                elif wellClassification == 'Other':
+                    royaltyCalc.K = econOilData.O4T_K
+                    royaltyCalc.X = econOilData.O4T_X
+                else:
+                    raise AppError('Royalty Classification: ' + wellRoyaltyClassification + ' not known for ' + wellClassification + ' Royalty not calculated.')
+                royaltyCalc.ProvCrownRoyaltyRate = royaltyCalc.K - (royaltyCalc.X / mop)
+        else:
+            if wellClassification == 'Heavy':
+                if wellRoyaltyClassification == 'Third Tier Oil':
+                    royaltyCalc.K = econOilData.H3T_K
+                    royaltyCalc.X = econOilData.H3T_X
+                elif wellRoyaltyClassification == 'New Oil':
+                    royaltyCalc.K = econOilData.HNEW_K
+                    royaltyCalc.X = econOilData.HNEW_X
+                else:
+                    raise AppError('Royalty Classification: ' + wellRoyaltyClassification + ' not known for ' + wellClassification + ' Royalty not calculated.')
+            elif wellClassification == 'Southwest':
+                if wellRoyaltyClassification == 'Third Tier Oil':
+                    royaltyCalc.K = econOilData.SW3T_K
+                    royaltyCalc.X = econOilData.SW3T_X
+                elif wellRoyaltyClassification == 'New Oil':
+                    royaltyCalc.K = econOilData.SWNEW_K
+                    royaltyCalc.X = econOilData.SWNEW_X
+                else:
+                    raise AppError('Royalty Classification: ' + wellRoyaltyClassification + ' not known for ' + wellClassification + ' Royalty not calculated.')
+            elif wellClassification == 'Other':
+                if wellRoyaltyClassification == 'Third Tier Oil':
+                    royaltyCalc.K = econOilData.O3T_K
+                    royaltyCalc.X = econOilData.O3T_X
+                elif wellRoyaltyClassification == 'New Oil':
+                    royaltyCalc.K = econOilData.ONEW_K
+                    royaltyCalc.X = econOilData.ONEW_X
+                elif wellRoyaltyClassification == 'Old Oil':
+                    royaltyCalc.K = econOilData.OOLD_K
+                    royaltyCalc.X = econOilData.OOLD_X
+                else:
+                    raise AppError('Royalty Classification: ' + wellRoyaltyClassification + ' not known for ' + wellClassification + ' Royalty not calculated.')
+            else:
+                raise AppError('Product Classification: ' + wellClassification + ' not known. Royalty not calculated.')
+
+            #added if statement because of division by zero error
+            if mop == 0:
+                royaltyCalc.ProvCrownRoyaltyRate = 0
+            else:
+                royaltyCalc.ProvCrownRoyaltyRate = royaltyCalc.K - (royaltyCalc.X / mop) - src
+
+        royaltyCalc.ProvCrownRoyaltyRate = round(royaltyCalc.ProvCrownRoyaltyRate, 6)
+
+        return royaltyCalc.ProvCrownRoyaltyRate
+
+
+    def CalcSaskOilProvCrownRoyaltyVolumeValue(self, royaltyCalc, mop, indianInterest, minRoyalty, crownMultiplier):
+        # Note: If there is no sales. Use last months sales value... Not included in this code
+
+        #royaltyCalc.RoyaltyPrice = self.determineRoyaltyprice(royalty.ValuationMethod, econOilData)
+
+        royaltyCalc.ProvCrownUsedRoyaltyRate = royaltyCalc.ProvCrownRoyaltyRate
+
+        if royaltyCalc.ProvCrownUsedRoyaltyRate < 0:
+            royaltyCalc.ProvCrownUsedRoyaltyRate = 0
+
+        if minRoyalty != None:
+            if minRoyalty > royaltyCalc.ProvCrownUsedRoyaltyRate:
+                royaltyCalc.ProvCrownUsedRoyaltyRate = royaltyCalc.MinRoyalty
+        #
+        # This was done this way so precision was not lost.
+        #
+        royaltyCalc.ProvCrownRoyaltyVolume = ((royaltyCalc.ProvCrownUsedRoyaltyRate / 100) *
+                                                      crownMultiplier *
+                                                      mop * indianInterest)
+
+        royaltyCalc.ProvCrownRoyaltyValue = round((royaltyCalc.ProvCrownUsedRoyaltyRate / 100) *
+                                               crownMultiplier *
+                                               mop * indianInterest *
+                                               royaltyCalc.RoyaltyPrice , 2)
+
+        return
+
 
     #
     # Sask Oil Royalty Calculation... Finally we are here...
@@ -171,7 +255,10 @@ class ProcessRoyalties(object):
     # under the Sask Folder:
     #   Factor Circulars.pdf
     #   OilFactors.pdf
-    #
+
+
+
+# Where is lease used in this method?
     def calcSaskOilProvCrown(self, monthlyData, well, royalty, lease, royaltyCalc):
         
         econOilData = self.db.getECONOilData(monthlyData.ProdMonth)
@@ -274,7 +361,8 @@ class ProcessRoyalties(object):
                                                well.IndianInterest * 
                                                royaltyCalc.RoyaltyPrice , 2)
         
-        return 
+        return
+
 
     def calcSaskOilIOGR1995(self, monthlyData, well, royalty, lease, royaltyCalc):
         """

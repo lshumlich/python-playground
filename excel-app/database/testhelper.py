@@ -1,7 +1,7 @@
 #!/bin/env python3
 
-from database import DataBase
-from apperror import AppError
+from database.database import DataBase
+from database.apperror import AppError
 import copy
 import io
 
