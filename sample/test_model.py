@@ -45,7 +45,7 @@ class SampleStringFunctionsTest(unittest.TestCase):
         ssf = model.SampleStringFunctions('hello', 'test', 5)
         self.assertFalse(ssf.string_compare())
 
-    def test_string_compare_ints(self):
+#    def test_string_compare_ints(self):
 #        ssf = model.SampleStringFunctions(1, 2, 3)
 #        self.assertFalse(ssf.string_compare())  
 
