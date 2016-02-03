@@ -4,7 +4,7 @@ This is a sample Python testing module.
 """
 
 import unittest
-from model import model
+import model
 
 
 class SampleMathFunctionsTest(unittest.TestCase):
