@@ -6,7 +6,7 @@ from datetime import datetime
 from database.database import AppError, DataStructure
 
 
-from testhelper import TestHelper
+from database.testhelper import TestHelper
 from database.calcroyalties import ProcessRoyalties
 #from DataBase import DataBase,AppError,DataStructure,TestDataBase
 
