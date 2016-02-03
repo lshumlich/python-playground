@@ -44,8 +44,10 @@ class SampleStringFunctions(object):
 
     def __init__(self, string1,
                  string2, num):
-        self.string1 = str(string1)
-        self.string2 = str(string2)
+        self.string1 = string1
+        self.string2 = string2
+        if (type(self.string1) is not str) or (type(self.string2) is not str):
+            raise TypeError('Expected strings, got something else')
         self.num = int(num)
 
     def string_multiply(self, which):
