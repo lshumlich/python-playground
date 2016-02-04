@@ -5,3 +5,8 @@ python:
 install: "pip install -r excel-app/requirements.txt"
 # command to run tests
 script: py.test
+
+before_install:
+  - pip install codecov
+after_success:
+  - codecov
