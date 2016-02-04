@@ -9,4 +9,5 @@ script: py.test
 before_install:
   - pip install codecov
 after_success:
+  - coverage run excel-app/batch.py
   - codecov
