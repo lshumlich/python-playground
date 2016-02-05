@@ -57,11 +57,11 @@ docs/_build/
 target/
 
 # Temp files:
-*~
-~*
+*~*
 *.swp
 *.swo
 log.txt
 .idea/
 Royalty\ Worksheet.txt
 $new_database.xlsx
+venv

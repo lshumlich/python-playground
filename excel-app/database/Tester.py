@@ -1,7 +1,7 @@
 #!/bin/env python3
 
-from database import DataBase
-from calcroyalties import ProcessRoyalties, RoyaltyWorksheet
+from database.database import DataBase
+from database.calcroyalties import ProcessRoyalties, RoyaltyWorksheet
 
 db = DataBase("database.xlsx")
 pr = ProcessRoyalties()
@@ -63,5 +63,5 @@ md = db.getMonthlyByWell(6)
 # royaltyCalc=db.getRoyaltyCalc(monthlyData.ProdMonth,monthlyData.WellId)
 
 #printSaskOilRoyaltyRate(self, monthlyData, well, royalty, lease, royaltyCalc)
-pr.process('database.xlsx', md)
+pr.process('database.xlsx')
 #rw.printSaskOilRoyaltyRate(monthlyData, well, royalty, lease, royaltyCalc)

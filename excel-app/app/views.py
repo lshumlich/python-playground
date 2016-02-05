@@ -5,7 +5,7 @@ from flask import render_template, request, redirect, url_for, flash
 from database import database
 from database import calcroyalties
 
-db = database.DataBase('database/database.xlsx')
+db = database.DataBase('database.xlsx')
 pr = calcroyalties.ProcessRoyalties()
 rw = calcroyalties.RoyaltyWorksheet()
 
