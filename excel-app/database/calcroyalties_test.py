@@ -84,6 +84,9 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual(pr.calcSaskOilProvCrownRoyaltyRate(royaltyCalc,econOilData,'Fourth Tier Oil', 'Heavy', 100, 0), 6.31)
         self.assertEqual(pr.calcSaskOilProvCrownRoyaltyRate(royaltyCalc,econOilData,'Fourth Tier Oil', 'Southwest', 100, 0), 7.84)
         self.assertEqual(pr.calcSaskOilProvCrownRoyaltyRate(royaltyCalc,econOilData,'Fourth Tier Oil', 'Other', 130, 0), 12.697)
+        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyRate(royaltyCalc,econOilData,'Fourth Tier Oil', 'Heavy', 140, 0), 9.66)
+        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyRate(royaltyCalc,econOilData,'Fourth Tier Oil', 'Southwest', 136.3, 0), 11.624028)
+        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyRate(royaltyCalc,econOilData,'Fourth Tier Oil', 'Other', 150, 0), 14.956667)
         self.assertEqual(pr.calcSaskOilProvCrownRoyaltyRate(royaltyCalc,econOilData,'Fourth Tier Oil', 'Other', 0, 0), 0)
         self.assertRaises(AppError, pr.calcSaskOilProvCrownRoyaltyRate, royaltyCalc, econOilData, 'Fourth Tier Oil', 'BadString', 120, 0)
 
@@ -128,11 +131,11 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, IndianInterest, MinRoyalty, RoyaltyPr
 
         pr = ProcessRoyalties()
 
-
+    """
     def test_calcSaskOilProvCrownRoyaltyVolumeValue(self):
         self.assertEqual(calcSaskOilProvCrownRoyaltyVolumeValue(royaltyCalc,100,1,20, 1), 100)
 
         return
-    """
+
 if __name__ == '__main__':
     unittest.main()

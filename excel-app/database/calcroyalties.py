@@ -258,11 +258,16 @@ class ProcessRoyalties(object):
 
 
 
-# Where is lease used in this method?
+# Where is lease used in this method? - Adrienne
     def calcSaskOilProvCrown(self, monthlyData, well, royalty, lease, royaltyCalc):
         
         econOilData = self.db.getECONOilData(monthlyData.ProdMonth)
-        mop = monthlyData.ProdVol
+        # mop = monthlyData.ProdVol
+
+        self.calcSaskOilProvCrownRoyaltyRate(royaltyCalc,econOilData, well.RoyaltyClassification, well.Classification, monthlyData.ProdVol, well.src)
+
+
+        """
 
         if well.RoyaltyClassification == 'Fourth Tier Oil':
 
@@ -334,7 +339,9 @@ class ProcessRoyalties(object):
             royaltyCalc.ProvCrownRoyaltyRate = royaltyCalc.K - (royaltyCalc.X / mop) - well.SRC
             
         royaltyCalc.ProvCrownRoyaltyRate = round(royaltyCalc.ProvCrownRoyaltyRate, 6)
-        
+
+        """
+
         # Note: If there is no sales. Use last months sales value... Not included in this code
 
         royaltyCalc.RoyaltyPrice = self.determineRoyaltyprice(royalty.ValuationMethod, monthlyData)
