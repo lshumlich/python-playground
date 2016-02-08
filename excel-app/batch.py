@@ -15,15 +15,29 @@ from database.calcroyalties_test import TestSaskRoyaltyCalc
 # figure it out please send me a note.... Thanks Larry.
 #
 
-if __name__ == "__main__":
-   # """This runs all the tests in the module"""
+def runRoyaltiesAndWorksheet():
+    pr = ProcessRoyalties()
+#     pr.process('database.xlsx')
+    pr.process('d:/$temp/sample.xlsx')
+    print('os name is:',os.name)
+    if os.name != "posix":
+        subprocess.call(['notepad.exe', 'log.txt'])
+        subprocess.call(['notepad.exe', 'Royalty Worksheet.txt'])
+
+def runTestModule():
+    unittest.main(module='database.calcroyalties_test')
+
+runRoyaltiesAndWorksheet()
+
+# if __name__ == "__main__":
+#     """This runs all the tests in the module"""
 #    import sys;sys.argv = ['', 'Test.testName']
 #    unittest.main() # This works for testing the current file
- #   unittest.main(module='batch') # works
-  #  unittest.main(module='database.testhelper_test')
-    unittest.main(module='database.calcroyalties_test')
-   # tst = TestSaskRoyaltyCalc()
-   # tst.test_calcSaskOilProvCrownRoyaltyRate()
+#     unittest.main(module='batch') # works
+#     unittest.main(module='database.testhelper_test')
+#     unittest.main(module='database.calcroyalties_test')
+#     tst = TestSaskRoyaltyCalc()
+#     tst.test_calcSaskOilProvCrownRoyaltyRate()
 
 
 

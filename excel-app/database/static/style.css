@@ -107,15 +107,16 @@ body
 }
 
 .lfsDialog {
-	position: inherit;
-	font-family: Arial, Helvetica, sans-serif;
-	background: rgba(0,0,0,0.8);
-	z-index: 99999;
+	position: relative;
+	
+//	font-family: Arial, Helvetica, sans-serif;
+//	background: rgba(0,0,0,0.8);
+//	z-index: 99999;
 	opacity:0;
 	-webkit-transition: opacity 400ms ease-in;
 	-moz-transition: opacity 400ms ease-in;
-	transition: opacity 400ms ease-in;
-	pointer-events: none;
+//	transition: opacity 400ms ease-in;
+//	pointer-events: none;
 }
 .lfsDialog:target {
 	opacity:1;

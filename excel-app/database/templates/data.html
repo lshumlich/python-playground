@@ -7,7 +7,7 @@
 <link type="text/css" rel="stylesheet" href={{url_for("static", filename="style.css")}}>
 </head>
 
-<body style="margin:30">
+<body>
 
 	<ul class="topnav">
     {% for item in tables %}
@@ -70,7 +70,14 @@ Open Modal 2</a>
 		<p>You could do a lot of things here like have a pop-up ad that shows when your website loads, or create a login/register form for users.</p>
 	</div>
 </div>
-
+<ul>
+<li><a id="lfsConsAppend" href="#">Append</a></li>
+<li><a id="lfsConsClear" href="#lfstst">Clear</a></li>
+<li><a id="lfsAJAX" href="#lfstst">AJAX</a></li>
+</ul>
+<div id="lfsconcole">
+Some Text in lfsconcol
+</div>
 
 <script>
 function openLink(table,attrname) {
@@ -82,6 +89,33 @@ function openLink(table,attrname) {
 // <a style="cursor: pointer" onclick=" window.open('/link','',' scrollbars=yes,menubar=no,width=300, height=300 resizable=yes,toolbar=no,location=no,status=no,location=no')">Next 1</a>
 // <a onclick=" window.open('/link','',' scrollbars=yes,menubar=no,width=300, height=300 resizable=yes,toolbar=no,location=no,status=no,address=no')">Next 2</a>
 }
+
+function lfsConsAppend(e){
+	el = document.getElementById('lfsconcole')
+	el.innerHTML = el.innerHTML + ' We just run lfsHrefFunc()<br>'
+}
+function lfsConsClear(e){
+	el = document.getElementById('lfsconcole')
+	el.innerHTML = ""
+}
+function lfsAJAX(e){
+	el = document.getElementById('lfsconcole');
+	el.innerHTML = "Calling the AJAX one.";
+	xhr = new XMLHttpRequest();
+	xhr.onload = function() {
+		el = document.getElementById('lfsconcole')
+		el.innerHTML = xhr.status;
+		if (xhr.status == 200) {
+			el.innerHTML = xhr.responseText;
+		}
+	}
+	xhr.open('GET','/',true);
+	xhr.send(null);
+}
+
+document.getElementById('lfsConsAppend').addEventListener('click', lfsConsAppend,false)
+document.getElementById('lfsConsClear').addEventListener('click', lfsConsClear,false)
+document.getElementById('lfsAJAX').addEventListener('click', lfsAJAX,false)
 </script>    
 </body>
 </html>

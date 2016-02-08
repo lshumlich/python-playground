@@ -40,7 +40,7 @@ class DataBase(object):
     def __init__(self,worksheetName):
         try:
             self.worksheetName = worksheetName
-            self.newWorksheetName = '$new_' + worksheetName
+            self.newWorksheetName = worksheetName + '-2'
             self.wb = load_workbook(worksheetName)
             self.wellTabName = 'Well'
             self.royaltyMasterTabName = 'RoyaltyMaster'
@@ -57,9 +57,9 @@ class DataBase(object):
         self.loadWellFromExcel()
         self.loadRoyaltyMasterFromExcel()
         self.loadLeaseFromExcel()
-        self.loadProductClausesFromExcel()
+#        self.loadProductClausesFromExcel()
         self.loadMonthlyFromExcel()
-        self.loadProducingEntityFromExcel()
+#        self.loadProducingEntityFromExcel()
         self.loadECONOilDataFromExcel()
         self.loadCalcDataFromExcel()
         
