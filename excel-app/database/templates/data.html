@@ -7,7 +7,7 @@
 <link type="text/css" rel="stylesheet" href={{url_for("static", filename="style.css")}}>
 </head>
 
-<body>
+<body id="body">
 
 	<ul class="topnav">
     {% for item in tables %}
@@ -59,17 +59,17 @@ Open Modal 2</a>
 	</div>
 </div>
 
-
-<a href="#lfsModal">Open lfs Modal</a>
-
 <div id="lfsModal" class="lfsDialog">
-	<div>
+	<div id="lfsInner">
 		<a href="#close" title="Close" class="close">Xxx</a>
 		<h2>Modal lfs Box</h2>
 		<p>Larry is just playing with this.</p>
 		<p>You could do a lot of things here like have a pop-up ad that shows when your website loads, or create a login/register form for users.</p>
 	</div>
 </div>
+
+<a href="#lfsModal">Open lfs Modal</a>
+
 <ul>
 <li><a id="lfsConsAppend" href="#">Append</a></li>
 <li><a id="lfsConsClear" href="#lfstst">Clear</a></li>
@@ -112,6 +112,44 @@ function lfsAJAX(e){
 	xhr.open('GET','/',true);
 	xhr.send(null);
 }
+function showLfsDialog(event) {
+	
+	var el = document.getElementById('lfsModal');
+	
+	if (el.style.opacity == 0) {
+		var elloc = document.getElementById('lfsInner');
+		elloc.style.top = event.clientY + 'px';
+		elloc.style.left = event.clientX + 'px';
+		el.style.opacity = 1;
+	} else {
+		el.style.opacity = 0;
+	}
+	var msg = " you clicked boy: "
+		msg += ' sx=' + event.clientY + 'px';                    // Update element with screenX
+	  	msg += ' sy=' + event.clientX + 'px';                    // Update element with screenY
+//		  px.value = event.pageX;                      // Update element with pageX
+//		  py.value = event.pageY;                      // Update element with pageY
+//		  cx.value = event.clientX;                    // Update element with clientX
+//		  cy.value = event.clientY;                    // Update element with clientY
+		el = document.getElementById('lfsconcole');
+		el.innerHTML = msg;
+}
+
+function showPosition(event) {                 // Declare function
+	var msg = ""
+	msg += ' sx=' + event.screenX;                    // Update element with screenX
+  	msg += ' sy=' + event.screenY;                    // Update element with screenY
+//	  px.value = event.pageX;                      // Update element with pageX
+//	  py.value = event.pageY;                      // Update element with pageY
+//	  cx.value = event.clientX;                    // Update element with clientX
+//	  cy.value = event.clientY;                    // Update element with clientY
+	el = document.getElementById('lfsconcole');
+	el.innerHTML = msg;
+	}
+
+var el = document.getElementById('body');      // Get body Element
+//el.addEventListener('mousemove', showPosition, false); // Move updates position
+el.addEventListener('click', showLfsDialog, false); // Move updates position
 
 document.getElementById('lfsConsAppend').addEventListener('click', lfsConsAppend,false)
 document.getElementById('lfsConsClear').addEventListener('click', lfsConsClear,false)

@@ -76,9 +76,9 @@ def searchleases():
 
 @app.route('/worksheet')
 def worksheet():
-	if request.args:
-		md = db.getMonthlyByWell(int(request.args["WellId"]))
-	pr.process('database/database.xlsx', md)
+#	if request.args:
+#		md = db.getMonthlyByWell(int(request.args["WellId"]))
+#	pr.process('database/database.xlsx')
 	with open("Royalty Worksheet.txt", 'r') as f:
 		ws = f.read()
 		return render_template('worksheet.html', ws=ws)

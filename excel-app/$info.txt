@@ -1,12 +1,12 @@
 1. accessing individual modules (e.g. calcroyalties.py):
-python3 -m database.calcroyalties
+python3 -m database.calcroyalties from root directory
 
 2. virtualenv for self-contained virtual environment.
 after environment is created, install all dependencies with "pip install -r requirements.txt"
 
 3. testing
 install pytest (probably makes sense to install systemwide, not in virtualenv) with "pip install pytest"
-run with "py.test" at the root directory of the project, pytest will start auto test discovery
+run with "py.test" at the root directory of the project, pytest will start auto test discovery (default pattern: *_test.py)
 run tests for individual files with "py.test database/calcroyalties.py" from root directory
 you can even run "py.test calcroyalties.py" from "database" directory, it will still work
 adding "--cov" will generate a coverage report, like so "py.test --cov" 
