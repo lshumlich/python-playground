@@ -1,0 +1,40 @@
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+a:hover.topnav {
+  color:#6E9A06;
+}
+
+a.active {
+  color:green;
+}
+
+a.topnav {
+  color:white;
+}
+
+ul.topnav {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+    position: relative;
+    top: 0;
+#	bottom: 0;
+    width: 100%;
+}
+
+li.topnav {
+    float: left;
+}
+
+
+li.topnav a {
+    text-align: center;
+    padding: 1px 10px;
+    text-decoration: none;
+}
+
