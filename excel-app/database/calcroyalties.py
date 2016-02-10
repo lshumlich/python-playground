@@ -218,35 +218,35 @@ class ProcessRoyalties(object):
         royaltyCalc.ProvCrownRoyaltyRate = round(royaltyCalc.ProvCrownRoyaltyRate, 6)
 
         return royaltyCalc.ProvCrownRoyaltyRate
-    """
 
-    def CalcSaskOilProvCrownRoyaltyVolumeValue(self, royaltyCalc, mop, indianInterest, minRoyalty, crownMultiplier):
+
+    def calcSaskOilProvCrownRoyaltyVolumeValue(self, ProvCrownUsedRoyaltyRate, mop, indianInterest, MinRoyalty, crownMultiplier, RoyaltyPrice):
         # Note: If there is no sales. Use last months sales value... Not included in this code
 
         #royaltyCalc.RoyaltyPrice = self.determineRoyaltyprice(royalty.ValuationMethod, econOilData)
 
-        royaltyCalc.ProvCrownUsedRoyaltyRate = royaltyCalc.ProvCrownRoyaltyRate
+  #      ProvCrownUsedRoyaltyRate = royaltyCalc.ProvCrownRoyaltyRate
 
-        if royaltyCalc.ProvCrownUsedRoyaltyRate < 0:
-            royaltyCalc.ProvCrownUsedRoyaltyRate = 0
+        if ProvCrownUsedRoyaltyRate < 0:
+            ProvCrownUsedRoyaltyRate = 0
 
-        if minRoyalty != None:
-            if minRoyalty > royaltyCalc.ProvCrownUsedRoyaltyRate:
-                royaltyCalc.ProvCrownUsedRoyaltyRate = royaltyCalc.MinRoyalty
+        if MinRoyalty != None:
+            if MinRoyalty > ProvCrownUsedRoyaltyRate:
+                ProvCrownUsedRoyaltyRate = MinRoyalty
         #
         # This was done this way so precision was not lost.
         #
-        royaltyCalc.ProvCrownRoyaltyVolume = ((royaltyCalc.ProvCrownUsedRoyaltyRate / 100) *
+        ProvCrownRoyaltyVolume = ((ProvCrownUsedRoyaltyRate / 100) *
                                                       crownMultiplier *
                                                       mop * indianInterest)
 
-        royaltyCalc.ProvCrownRoyaltyValue = round((royaltyCalc.ProvCrownUsedRoyaltyRate / 100) *
+        ProvCrownRoyaltyValue = round((ProvCrownUsedRoyaltyRate / 100) *
                                                crownMultiplier *
                                                mop * indianInterest *
-                                               royaltyCalc.RoyaltyPrice , 2)
+                                               RoyaltyPrice , 2)
 
-        return
-    """
+        return ProvCrownRoyaltyVolume, ProvCrownRoyaltyValue
+
 
     #
     # Sask Oil Royalty Calculation... Finally we are here...
