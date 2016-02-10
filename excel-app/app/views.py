@@ -90,6 +90,7 @@ def adriennews():
 		wellId = request.args["WellId"]
 		well=db.getWell(int(wellId))
 		lease=db.getLease(well.Lease)
+		#monthlyLots=db.getMonthlyData(well.Lease)
 		rm=db.getRoyaltyMaster(well.Lease)
 
 
