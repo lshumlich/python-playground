@@ -218,7 +218,7 @@ class ProcessRoyalties(object):
         royaltyCalc.ProvCrownRoyaltyRate = round(royaltyCalc.ProvCrownRoyaltyRate, 6)
 
         return royaltyCalc.ProvCrownRoyaltyRate
-
+    """
 
     def CalcSaskOilProvCrownRoyaltyVolumeValue(self, royaltyCalc, mop, indianInterest, minRoyalty, crownMultiplier):
         # Note: If there is no sales. Use last months sales value... Not included in this code
@@ -246,7 +246,7 @@ class ProcessRoyalties(object):
                                                royaltyCalc.RoyaltyPrice , 2)
 
         return
-
+    """
 
     #
     # Sask Oil Royalty Calculation... Finally we are here...

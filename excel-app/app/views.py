@@ -83,6 +83,21 @@ def worksheet():
 		ws = f.read()
 		return render_template('worksheet.html', ws=ws)
 
+
+@app.route('/adriennews')
+def adriennews():
+	if request.args:
+		wellId = request.args["WellId"]
+		well=db.getWell(int(wellId))
+		lease=db.getLease(well.Lease)
+		rm=db.getRoyaltyMaster(well.Lease)
+
+
+	return render_template('worksheetas.html', well=well, lease=lease, rm=rm)
+#	return "from adriennes well is" + wellId + "and the well is " + str(well.headers()) + str(well.data())
+
+
+
 @app.errorhandler(404)
 def not_found(error):
     return render_template('404.html')
