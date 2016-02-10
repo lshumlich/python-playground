@@ -1,8 +1,3 @@
-<h1>This is from worksheetas</h1>
-<h2>Well {{ well.WellId }}</h2>
-<h3>The UWI is {{ well.UWI }}</h3>
-<h4>The Royalty Scheme is {{ rm.RoyaltyScheme }}</h4>
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -19,53 +14,98 @@ p1  {
 </style>
 </head>
 
-<h1 align="center">Well: {{ well.WellId }} SWI1103029492</h1>
+<h1 align="center">Well: {{ well.WellId }}<br>
+	UWI: {{ well.UWI }}</h1>
 <hr></hr>
 <p1>
 
 
 <TABLE align="center">
+	<col width="50%">
+	<col width="50%">
    <TR>
       <TD align=right>Lease:</TD>
-      <TD align="left">OL-2000 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  </TD>
+      <TD align="left">{{ well.LeaseType }}-{{ well.LeaseID }} </TD>
    </TR>
    <TR>
       <TD align=right>Right:</TD>
-      <TD align="left">All</TD>
+      <TD align="left">{{ rm.RightsGranted }}</TD>
    </TR>
    <TR>
       <TD align=right>Province:</TD>
-      <TD align="left">SK</TD></TR>
+      <TD align="left">{{ well.Prov }}</TD></TR>
    </TR>
        <TR>
       <TD align=right>Royalty Base:</TD>
-      <TD align="left">OL-2000</TD>
+      <TD align="left">{{ rm.RoyaltyScheme }}</TD>
    </TR>
    <TR>
       <TD align=right>Crown Multiplier:</TD>
-      <TD align="left">All</TD>
+      <TD align="left">{{ rm.CrownMultiplier }}</TD>
    </TR>
    <TR>
       <TD align=right>Indian Interest:</TD>
-      <TD align="left">SK</TD></TR>
+      <TD align="left">{{ well.IndianInterest }}</TD></TR>
    </TR>
        <TR>
       <TD align=right>SRC:</TD>
-      <TD align="left">SK</TD></TR>
+      <TD align="left">{{ well.SRC }}</TD></TR>
    </TR>
        <TR>
       <TD align=right>Classification:</TD>
-      <TD align="left">OL-2000</TD>
+      <TD align="left">{{ well.Classification }}</TD>
    </TR>
    <TR>
       <TD align=right>Royalty Classification:</TD>
-      <TD align="left">All</TD>
+      <TD align="left">{{ well.RoyaltyClassification }}</TD>
    </TR>
    <TR>
       <TD align=right>Valuation Method:</TD>
-      <TD align="left">SK</TD></TR>
+      <TD align="left">{{ rm.ValuationMethod }}</TD></TR>
+   </TR>
+</TABLE><br>
+
+
+<head>
+<style>
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 5px;
+    text-align: left;
+}
+</style>
+</head>
+<body>
+
+<TABLE style="width:100%">
+
+	<th colspan="8" align="center">Monthly Sask Def of</th>
+	<col width="12.5%">
+	<col width="12.5%">
+	<col width="12.5%">
+	<col width="12.5%">
+	<col width="12.5%">
+	<col width="12.5%">
+	<col width="12.5%">
+	<col width="12.5%">
+
+   <TR align="left">
+      <TD>Extract Date</TD>
+      <TD>Prod. Month</TD>
+	   <TD>Amend No.</TD>
+	   <TD>Prod.</TD>
+	   <TD>Prod. Vol.</TD>
+	   <TD>Well Head Price</TD>
+	   <TD>Trucking Price</TD>
+	   <TD>Processing Price</TD>
+
+
    </TR>
 </TABLE>
+
 </p1>
 </html>
 </body>
