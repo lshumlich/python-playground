@@ -5,7 +5,6 @@ Testing loading an Excel spreadsheet into an sqlite3 database.
 
 import unittest
 import os
-#from database.loadexceltosqlite import Loader, Shower
 import database.loadexceltosqlite
 
 
