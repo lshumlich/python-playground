@@ -90,11 +90,11 @@ def adriennews():
 		wellId = request.args["WellId"]
 		well=db.getWell(int(wellId))
 		lease=db.getLease(well.Lease)
-		#monthlyLots=db.getMonthlyData(well.Lease)
+		monthly=db.getMonthlyByWell(wellId)
 		rm=db.getRoyaltyMaster(well.Lease)
 
 
-	return render_template('worksheetas.html', well=well, lease=lease, rm=rm)
+	return render_template('worksheetas.html', well=well, lease=lease, rm=rm, monthly=monthly)
 #	return "from adriennes well is" + wellId + "and the well is " + str(well.headers()) + str(well.data())
 
 

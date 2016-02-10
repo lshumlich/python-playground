@@ -20,7 +20,7 @@ p1  {
 <p1>
 
 
-<TABLE align="center">
+<TABLE align="center" border="0">
 	<col width="50%">
 	<col width="50%">
    <TR>
@@ -69,7 +69,6 @@ p1  {
 <head>
 <style>
 table, th, td {
-    border: 1px solid black;
     border-collapse: collapse;
 }
 th, td {
@@ -79,9 +78,9 @@ th, td {
 </head>
 <body>
 
-<TABLE align="right" style="width:100%">
+<TABLE align="right" style="width:100%" border="1">
 
-	<th colspan="8" align="center">Monthly Sask Def of</th>
+	<caption><b>Monthly Sask Def of</b></caption>
 	<col width="12.5%">
 	<col width="12.5%">
 	<col width="12.5%">
@@ -103,7 +102,7 @@ th, td {
    </TR>
 
 	<TR>
-      <TD>2015-09-29</TD>
+      <TD>{{ monthly.ExtractMonth }}</TD>
       <TD>2015-01</TD>
 	   <TD>2</TD>
 	   <TD>Oil</TD>
