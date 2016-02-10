@@ -19,6 +19,7 @@ class Loader(object):
         
     def execute(self,statement):
         # Create table
+        print(statement)
         return self.cursor.execute(statement)
 
     def commit(self):
@@ -64,11 +65,12 @@ class Loader(object):
 
         self.deleteTable(tableName)
        
-        tableCreate = 'CREATE TABLE ' + tableName + '('
+        tableCreate = 'CREATE TABLE ' + tableName + ' ('
         cols = ""
         i = 0
         for cell in headerRow:
             name = cell.value.replace('#','')
+            name = '"' + name + '"'
             if type(dataRow[i].value) is str:
                 cols = cols + name + ' text, '
             elif type(dataRow[i].value) is int:
@@ -173,7 +175,10 @@ class Shower(object):
             stmt = stmt + " order by " + attr
         print('SQL:', stmt)
         values = self.execute(stmt)
-        return values;
+        table_rows = []
+        for row in values:
+            table_rows.append(row)
+        return table_rows
         
     def showTables(self):
         stmt = 'select tbl_name from sqlite_master'
@@ -355,8 +360,9 @@ def showTable(dbName, tableName):
     for row in rows:
         print(row)
 
-helloMsg()
-print('v2')
-appServer()
-# showTable(database,'well')
-goodbyMsg()
+if __name__ == '__main__':
+    helloMsg()
+    print('v2')
+    appServer()
+    # showTable(database,'well')
+    goodbyMsg()
