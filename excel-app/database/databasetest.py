@@ -1,7 +1,28 @@
 
 import unittest
 
-from apperror import AppError
+"""
+Testing
+
+Well ---
+
+clear table
+load known record using insert
+check rows are there
+get by id and check
+get by any selection like prov check that you got the records
+do an update then a read and make sure it got updated
+check that audit has been create
+  add
+  update
+  delete
+
+ 
+
+
+"""
+
+from database.apperror import AppError
 from database.database import DataBase
 
 class DataBaseTest(unittest.TestCase):

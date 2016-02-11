@@ -1,6 +1,22 @@
 #!/bin/env python3
 """
 Testing loading an Excel spreadsheet into an sqlite3 database.
+
+Test that the worksheet has x number of tabs
+Test that each tab has x number of columns
+Test that each tab has x number of rows
+
+test that we have an empty database
+load database
+
+test that we have x number of tables
+test that each table has x number of columns
+test that each table has x number of row
+
+cleanup
+test that the database is empty
+
+
 """
 
 import unittest
