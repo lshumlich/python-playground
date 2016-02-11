@@ -14,7 +14,7 @@ from database.calcroyalties_test import TestSaskRoyaltyCalc
 # Using this technique I do not know how to run just one of the methods in the class. If you can 
 # figure it out please send me a note.... Thanks Larry.
 #
-
+"""
 def runRoyaltiesAndWorksheet():
     pr = ProcessRoyalties()
 #     pr.process('database.xlsx')
@@ -28,14 +28,14 @@ def runTestModule():
     unittest.main(module='database.calcroyalties_test')
 
 runRoyaltiesAndWorksheet()
-
-# if __name__ == "__main__":
+"""
+if __name__ == "__main__":
 #     """This runs all the tests in the module"""
 #    import sys;sys.argv = ['', 'Test.testName']
 #    unittest.main() # This works for testing the current file
 #     unittest.main(module='batch') # works
 #     unittest.main(module='database.testhelper_test')
-#     unittest.main(module='database.calcroyalties_test')
+     unittest.main(module='database.calcroyalties_test')
 #     tst = TestSaskRoyaltyCalc()
 #     tst.test_calcSaskOilProvCrownRoyaltyRate()
 

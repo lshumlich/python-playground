@@ -15,6 +15,7 @@ class DataObj(object):
 
 class TestSaskRoyaltyCalc(unittest.TestCase):
 
+
 #     def xtest_determineRoyaltyPrice (self):
 #         
 #         pr = ProcessRoyalties()
@@ -134,12 +135,15 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, IndianInterest, MinRoyalty, RoyaltyPr
         print(vars(royOilData).values())
 
         pr = ProcessRoyalties()
-
+"""
 
     def test_calcSaskOilProvCrownRoyaltyVolumeValue(self):
-#        self.assertEqual(calcSaskOilProvCrownRoyaltyVolumeValue(royaltyCalc,100,1,20, 1), 100)
-
+        pr = ProcessRoyalties()
+        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(2, 100, 1, 20, 1,100), (20.0, 2000.0))
+        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(-1, 100 ,1 ,20, 1, 100), (20.0, 2000.0))
+        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(2, 100 ,1, 5, 1,100), (5, 500.0))
+        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(2, 100 ,1, 0, 1,100), (2.0, 200.0))
         return
-    """
+
 if __name__ == '__main__':
     unittest.main()

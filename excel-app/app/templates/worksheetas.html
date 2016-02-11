@@ -1,5 +1,121 @@
-<h1>This is from worksheetas</h1>
-<h2>Well {{ well.WellId }}</h2>
-<h3>The UWI is {{ well.UWI }}</h3>
-<h4>The Royalty Scheme is {{ rm.RoyaltyScheme }}</h4>
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+h1 {
+    font-family: arial;
+    font-size: 130%;
 
+}
+p1  {
+    font-family: arial;
+    font-size: 80%;
+}
+</style>
+</head>
+
+<h1 align="center">Well: {{ well.WellId }}<br>
+	UWI: {{ well.UWI }}</h1>
+<hr></hr>
+<p1>
+
+
+<TABLE align="center" border="0">
+	<col width="50%">
+	<col width="50%">
+   <TR>
+      <TD align=right>Lease:</TD>
+      <TD align="left">{{ well.LeaseType }}-{{ well.LeaseID }} </TD>
+   </TR>
+   <TR>
+      <TD align=right>Right:</TD>
+      <TD align="left">{{ rm.RightsGranted }}</TD>
+   </TR>
+   <TR>
+      <TD align=right>Province:</TD>
+      <TD align="left">{{ well.Prov }}</TD></TR>
+   </TR>
+       <TR>
+      <TD align=right>Royalty Base:</TD>
+      <TD align="left">{{ rm.RoyaltyScheme }}</TD>
+   </TR>
+   <TR>
+      <TD align=right>Crown Multiplier:</TD>
+      <TD align="left">{{ rm.CrownMultiplier }}</TD>
+   </TR>
+   <TR>
+      <TD align=right>Indian Interest:</TD>
+      <TD align="left">{{ well.IndianInterest }}</TD></TR>
+   </TR>
+       <TR>
+      <TD align=right>SRC:</TD>
+      <TD align="left">{{ well.SRC }}</TD></TR>
+   </TR>
+       <TR>
+      <TD align=right>Classification:</TD>
+      <TD align="left">{{ well.Classification }}</TD>
+   </TR>
+   <TR>
+      <TD align=right>Royalty Classification:</TD>
+      <TD align="left">{{ well.RoyaltyClassification }}</TD>
+   </TR>
+   <TR>
+      <TD align=right>Valuation Method:</TD>
+      <TD align="left">{{ rm.ValuationMethod }}</TD></TR>
+   </TR>
+</TABLE><br>
+
+
+<head>
+<style>
+table, th, td {
+    border-collapse: collapse;
+}
+th, td {
+    padding: 5px;
+}
+</style>
+</head>
+<body>
+
+<TABLE align="right" style="width:100%" border="1">
+
+	<caption><b>Monthly Sask Def of</b></caption>
+	<col width="12.5%">
+	<col width="12.5%">
+	<col width="12.5%">
+	<col width="12.5%">
+	<col width="12.5%">
+	<col width="12.5%">
+	<col width="12.5%">
+	<col width="12.5%">
+
+   <TR>
+      <TD>Extract Date</TD>
+      <TD>Prod. Month</TD>
+	   <TD>Amend No.</TD>
+	   <TD>Prod.</TD>
+	   <TD>Prod. Vol.</TD>
+	   <TD>Well Head Price</TD>
+	   <TD>Trucking Price</TD>
+	   <TD>Processing Price</TD>
+   </TR>
+
+	<TR>
+      <TD>2015-09-29</TD>
+      <TD>2015-01</TD>
+	   <TD>2</TD>
+	   <TD>Oil</TD>
+	   <TD>100.00</TD>
+	   <TD>221.123</TD>
+	   <TD>2.1234</TD>
+	   <TD>0.1234</TD>
+   </TR>
+</TABLE>
+
+{*** Note: Replace Well Head Price with Petrinex detail when available ***}<br>
+{*** Note: Replace Trucking Price with Petrinex detail when available ***}<br>
+{*** Note: Replace Processing Price with Petrinex detail when available ***}<br>
+</p1>
+</html>
+</body>
