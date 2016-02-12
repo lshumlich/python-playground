@@ -11,7 +11,7 @@ from openpyxl import load_workbook
 from openpyxl import Workbook
 
 from database.apperror import AppError
-import appinfo
+import config
 
 class DataStructure(object):
     
@@ -356,7 +356,7 @@ class DataBase(object):
 class TestDataBase(unittest.TestCase):
     
     def setUp(self):
-        self.validExcelFile = appinfo.getFileDir() + 'database.xlsx'
+        self.validExcelFile = config.getFileDir() + 'database.xlsx'
         self.validExcelTab = 'Well'
         
     def test_getWorkSheetThatDoesNotExist(self):

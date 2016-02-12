@@ -3,12 +3,15 @@
 import os
 import datetime
 import sqlite3
-
 from openpyxl import load_workbook
+
+import config
 from database.apperror import AppError
 
 
 class Loader(object):
+
+    EXCLUDE_SHEETS = ['Roy Module Construct']
 
     def connect(self,dbName):
         self.conn = sqlite3.connect(dbName)
@@ -40,8 +43,8 @@ class Loader(object):
     def loadAllSheets(self):
         sheets = self.wb.get_sheet_names()
         for sheet in sheets:
-#             print ('loading:', sheet)
-            self.LoadWorksheet(sheet)
+            if sheet not in self.EXCLUDE_SHEETS:
+                self.LoadWorksheet(sheet)
 
     def LoadWorksheet(self,tabName):
         try:
@@ -141,9 +144,10 @@ class Loader(object):
 
 
 if __name__ == '__main__':
-    database = 'testload.db'
+    database = config.getFileDir() + 'test_database.db'
+    worksheet = config.getFileDir() + 'database.xlsx'
     loader = Loader()
     loader.connect(database)
-    loader.openExcel(r'test_database.xlsx')
+    loader.openExcel(worksheet)
     loader.loadAllSheets()
     loader.close()

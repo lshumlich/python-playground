@@ -11,7 +11,7 @@ import os
 from database.apperror import AppError
 from database.database import DataBase, DataStructure
 from database.royaltyworksheet import RoyaltyWorksheet
-import appinfo
+import config
 
 """
 ToDo:

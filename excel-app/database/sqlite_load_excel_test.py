@@ -2,15 +2,16 @@
 
 import os
 import unittest
+
+import config
 import database.sqlite_load_excel
 import database.sqlite_show
 
-import appinfo
 
 class TestLoader(unittest.TestCase):
 
-    TEST_DATABASE = appinfo.getFileDir() + 'test_database.db'
-    TEST_SPREADSHEET = appinfo.getFileDir() + 'test_database.xlsx'
+    TEST_DATABASE = config.getFileDir() + 'test_database.db'
+    TEST_SPREADSHEET = config.getFileDir() + 'test_database.xlsx'
 
     def test_run(self):
         #Testing loading an Excel spreadsheet into an sqlite3 database.
@@ -26,7 +27,7 @@ class TestLoader(unittest.TestCase):
         self.assertEqual(len(loader.wb.get_sheet_names()), 2)
 
         #Test that each tab has x number of columns
-        self.assertEqual(len(loader.wb['Well'].columns), 9)
+        self.assertEqual(len(loader.wb['Well'].columns), 11)
         self.assertEqual(len(loader.wb['Royalty Master'].columns), 10)
 
         #Test that each tab has x number of rows
@@ -45,7 +46,7 @@ class TestLoader(unittest.TestCase):
         self.assertEqual(len(shower.showTable('RoyaltyMaster')), 10)
 
         #test that each table has x number of row
-        self.assertEqual(len(shower.showColumns('Well')), 9)
+        self.assertEqual(len(shower.showColumns('Well')), 11)
         self.assertEqual(len(shower.showColumns('RoyaltyMaster')), 10)
 
         #test column type

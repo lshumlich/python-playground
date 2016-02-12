@@ -1,7 +1,7 @@
 from datetime import date
 from datetime import datetime
 from database.database import DataBase
-import appinfo
+import config
 
 class RoyaltyWorksheet(object):
 
