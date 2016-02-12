@@ -66,3 +66,7 @@ Royalty\ Worksheet.txt
 $new_database.xlsx
 venv
 .venv
+/excel-app/.pydevproject
+/excel-app/.project
+/sample/.pydevproject
+/sample/.project
