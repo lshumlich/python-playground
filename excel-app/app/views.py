@@ -1,11 +1,13 @@
 #!/bin/env python3
 
-from app import app
 from flask import render_template, request, redirect, url_for, flash
+
+from app import app
 from database import database
 from database import calcroyalties
+import appinfo
 
-db = database.DataBase('database.xlsx')
+db = database.DataBase(appinfo.getFileDir() + 'database.xlsx')
 pr = calcroyalties.ProcessRoyalties()
 rw = calcroyalties.RoyaltyWorksheet()
 

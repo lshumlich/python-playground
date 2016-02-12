@@ -512,40 +512,7 @@ class ProcessRoyalties(object):
             return date(d.year, d.month, d.day)
         return d
  
-
-"""
-*******************************************************************
-    Test Code....
-
-"""
-from datetime import date
-
-class TestSaskRoyaltyCalc(unittest.TestCase):
-
-#        
-    def test_SaskSrc(self):
-        pr = ProcessRoyalties()
-        self.assertEqual(pr.saskOilSrcCalc(2013,4,'V',date(2001,1,1),'Oil','Forth Tier'),2.5)
-        self.assertEqual(pr.saskOilSrcCalc(2013,4,'H',date(2001,1,1),'Oil','Forth Tier'),0)
-        self.assertEqual(pr.saskOilSrcCalc(2013,5,'V',date(2001,1,1),'Oil','Forth Tier'),0)
-
-    def test_gorr(self):
-        """ expects a string with   """
-        pr = ProcessRoyalties()
-        self.assertEqual((2.0, 'mprod = 100 is between 0.0 - 250.0 for a RR of 2.0%'),pr.calcGorrPercent(100,100,'mprod,250,2,300,3,400,4,500,5,0,6'))
-        self.assertEqual((2.0, 'mprod = 100 is between 0.0 - 250.0 for a RR of 2.0%'),pr.calcGorrPercent(100,100,'mprod,250,2,300,3,400,4,500,5,0,6'))
-        self.assertEqual((2.0, 'mprod = 250 is between 0.0 - 250.0 for a RR of 2.0%'),pr.calcGorrPercent(250,100,'mprod,250,2,300,3,400,4,500,5,0,6'))
-        self.assertEqual((3.0, 'mprod = 300 is between 250.0 - 300.0 for a RR of 3.0%'),pr.calcGorrPercent(300,100,'mprod,250,2,300,3,400,4,500,5,0,6'))
-        self.assertEqual((4.0, 'mprod = 400 is between 300.0 - 400.0 for a RR of 4.0%'),pr.calcGorrPercent(400,100,'mprod,250,2,300,3,400,4,500,5,0,6'))
-        self.assertEqual((5.0, 'mprod = 500 is between 400.0 - 500.0 for a RR of 5.0%'),pr.calcGorrPercent(500,100,'mprod,250,2,300,3,400,4,500,5,0,6'))
-        self.assertEqual((6.0, 'mprod = 600 is greater than 500.0 for a RR of 6.0%'),pr.calcGorrPercent(600,100,'mprod,250,2,300,3,400,4,500,5,0,6'))
-        self.assertEqual((2.0, 'dprod = 1.0 = 100 / 100 is between 0.0 - 250.0 for a RR of 2.0%'),pr.calcGorrPercent(100,100,'dprod,250,2,300,3,400,4,500,5,0,6'))
-        self.assertEqual((2.0, 'fixed for a RR of 2.0%'),pr.calcGorrPercent(100,100,'fixed,0,2'))
-        
-    def test_other_stuff(self):
-        print('as' in 'asdf asdf asdf')
-            
-        
+     
 if __name__ == '__main__':
     pr = ProcessRoyalties()
 #     pr.process('iogcdatabase.xlsx')

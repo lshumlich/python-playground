@@ -1,7 +1,7 @@
 
 import unittest
 
-from royaltyworksheet import RoyaltyWorksheet
+from database.royaltyworksheet import RoyaltyWorksheet
 
 class RoyaltyWorksheetTest(unittest.TestCase):
     

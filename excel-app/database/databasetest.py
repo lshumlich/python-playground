@@ -24,11 +24,12 @@ check that audit has been create
 
 from database.apperror import AppError
 from database.database import DataBase
+import appinfo
 
 class DataBaseTest(unittest.TestCase):
 #    Major Hack must be fixed.    
     def test_getMonthlyDataByWellProdMonthProduct(self):
-        db = DataBase('database.xlsx')
+        db = DataBase(appinfo.getFileDir() + 'database.xlsx')
         md = db.getMonthlyDataByWellProdMonthProduct(6,201501,'Oil')
         self.assertRaises(AppError,db.getMonthlyDataByWellProdMonthProduct,99999,201512,'Oil')
         print(md)

@@ -117,15 +117,16 @@ def outputHtmlByArea(fileName,dirList):
     html.write(footer1)
     html.close()
 
-dirList = []
-loadDir('dir - CR-O&G AGREEMENTS.txt',dirList)
-loadDir("dir - PDF's - Scanned to Update Missing Leases.txt",dirList)
-loadDir("dir - PDF's - Newly Scanned.txt",dirList)
-
-   
-dirList = sorted(dirList, key=lambda o: o.lease)
-outputHtmlByLease('$IndexByLease.html',dirList)
-
-dirList = sorted(dirList, key=lambda o: o.area)
-outputHtmlByArea('$IndexByArea.html',dirList)
-
+if __name__ == '__main__':
+    dirList = []
+    loadDir('dir - CR-O&G AGREEMENTS.txt',dirList)
+    loadDir("dir - PDF's - Scanned to Update Missing Leases.txt",dirList)
+    loadDir("dir - PDF's - Newly Scanned.txt",dirList)
+    
+       
+    dirList = sorted(dirList, key=lambda o: o.lease)
+    outputHtmlByLease('$IndexByLease.html',dirList)
+    
+    dirList = sorted(dirList, key=lambda o: o.area)
+    outputHtmlByArea('$IndexByArea.html',dirList)
+    

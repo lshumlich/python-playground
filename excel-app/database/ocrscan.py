@@ -140,5 +140,6 @@ class SingeLeaseWS(object):
 #
 # Sample of running with Single Lease WS
 #
-singleLease = SingeLeaseWS()
-singleLease.process(r"OL-0001.xlsx")
+if __name__ == '__main__':
+    singleLease = SingeLeaseWS()
+    singleLease.process(r"OL-0001.xlsx")

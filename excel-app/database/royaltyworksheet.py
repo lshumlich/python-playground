@@ -1,6 +1,7 @@
 from datetime import date
 from datetime import datetime
 from database.database import DataBase
+import appinfo
 
 class RoyaltyWorksheet(object):
 
@@ -10,7 +11,7 @@ class RoyaltyWorksheet(object):
         self.count = 0
         
     def printWithWellProdDate(self,wellId,prodDate,product):
-        db = DataBase('database/database.xlsx')
+        db = DataBase(appinfo.getFileDir() + 'database.xlsx')
         md = db.getMonthlyDataByWellProdMonthProduct(wellId,prodDate,product)
         print(md)
         well = db.getWell(wellId)

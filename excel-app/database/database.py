@@ -9,7 +9,9 @@ the rows are the data.
 import unittest
 from openpyxl import load_workbook
 from openpyxl import Workbook
+
 from database.apperror import AppError
+import appinfo
 
 class DataStructure(object):
     
@@ -40,7 +42,7 @@ class DataBase(object):
     def __init__(self,worksheetName):
         try:
             self.worksheetName = worksheetName
-            self.newWorksheetName = worksheetName + '-2'
+            self.newWorksheetName = worksheetName[:len(worksheetName) - 5] + ' new.xlsx'
             self.wb = load_workbook(worksheetName)
             self.wellTabName = 'Well'
             self.royaltyMasterTabName = 'RoyaltyMaster'
@@ -354,7 +356,7 @@ class DataBase(object):
 class TestDataBase(unittest.TestCase):
     
     def setUp(self):
-        self.validExcelFile = 'database.xlsx'
+        self.validExcelFile = appinfo.getFileDir() + 'database.xlsx'
         self.validExcelTab = 'Well'
         
     def test_getWorkSheetThatDoesNotExist(self):

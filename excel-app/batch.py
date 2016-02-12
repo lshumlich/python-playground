@@ -37,6 +37,14 @@ def sqliteLoadExcel():
     loader.openExcel(excelSheet)
     loader.loadAllSheets()
     loader.close()
+
+print('-- Runing Batch')
+if __name__ == "__main__":
+    ws1 = appinfo.getFileDir() + 'database.xlsx'
+    ws2 = ws1[:len(ws1) - 5] + ' new.xlsx'
+    print ('ws2:',ws2)
+    
+
     
 # runRoyaltiesAndWorksheet()
 # runTestModule()
