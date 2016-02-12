@@ -9,11 +9,11 @@ class AppServer(object):
     
     print('we are running a class level in AppServer')
     app = Flask(__name__) 
-#     app.debug = True
+#     appinfo.debug = True
     shower = Shower()
     
     def __init__(self):
-#         AppServer.app = Flask(__name__)
+#         AppServer.appinfo = Flask(__name__)
         print("in init of AppServer")
         
     @staticmethod
@@ -139,8 +139,8 @@ def sampleCode():
     print('what do we do now')
     
 def appServer():
-#     app = AppServer()
-#     app.run()
+#     appinfo = AppServer()
+#     appinfo.run()
     AppServer.run(database)
 
 if __name__ == '__main__':

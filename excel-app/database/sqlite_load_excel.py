@@ -4,7 +4,8 @@ import os
 import datetime
 import sqlite3
 
-from openpyxl import Workbook, load_workbook
+from openpyxl import load_workbook
+from database.apperror import AppError
 
 
 class Loader(object):
@@ -15,7 +16,7 @@ class Loader(object):
         
     def execute(self,statement):
         # Create table
-        print(statement)
+#         print(statement)
         return self.cursor.execute(statement)
 
     def commit(self):
@@ -39,7 +40,7 @@ class Loader(object):
     def loadAllSheets(self):
         sheets = self.wb.get_sheet_names()
         for sheet in sheets:
-            print ('loading:', sheet)
+#             print ('loading:', sheet)
             self.LoadWorksheet(sheet)
 
     def LoadWorksheet(self,tabName):
@@ -57,14 +58,18 @@ class Loader(object):
                         recordNo = recordNo +1
                         self.insertData(tableName,row, headerRow)
                 self.commit()
-            else:
-                print('*** No data to load for tab:', tabName)
+#             else:
+#                 print('*** No data to load for tab:', tabName)
         except Exception as e:
             raise e
                 
     def createTable(self,tableName,headerRow, dataRow):
 
-        self.deleteTable(tableName)
+        try:
+            self.deleteTable(tableName)
+        except AppError:
+            None  # Just means the table does not exist
+        
        
         tableCreate = 'CREATE TABLE ' + tableName + ' ('
         cols = ""
@@ -82,7 +87,7 @@ class Loader(object):
                 cols = cols + str(name) + ' date, '
             else:
                 cols = cols + name + ' text, '
-                print('*** Null first line so defaulting to str',cell.value,type(dataRow[i].value))
+#                 print('*** Null first line so defaulting to str',cell.value,type(dataRow[i].value))
             i += 1
             
         cols = cols + ')'
@@ -91,7 +96,7 @@ class Loader(object):
         tableCreate = tableCreate + cols
     
         
-        print(tableCreate)
+#         print(tableCreate)
         self.execute(tableCreate)
         self.commit()
 
@@ -100,7 +105,7 @@ class Loader(object):
         try:
             self.execute('drop table ' + tableName)
         except sqlite3.OperationalError:
-            print("Table did not exist so not deleted:", tableName)
+            raise AppError("Table did not exist so not deleted: " + tableName)
 
         
     def insertData(self,tableName,row, headerRow):
@@ -122,7 +127,7 @@ class Loader(object):
             elif cell.value is None:
                 data = data +  " Null,"
             else:
-                print('*** Not Loaded',cell.value, type(cell.value))
+                raise AppError('*** Not Loaded',cell.value, type(cell.value))
             i += 1
 
             

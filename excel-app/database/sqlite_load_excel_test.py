@@ -2,19 +2,19 @@
 
 import os
 import unittest
-import openpyxl
 import database.sqlite_load_excel
 import database.sqlite_show
 
+import appinfo
 
 class TestLoader(unittest.TestCase):
 
-    TEST_DATABASE = 'test_database.db'
-    TEST_SPREADSHEET = 'test_database.xlsx'
+    TEST_DATABASE = appinfo.getFileDir() + 'test_database.db'
+    TEST_SPREADSHEET = appinfo.getFileDir() + 'test_database.xlsx'
 
     def test_run(self):
-    	#Testing loading an Excel spreadsheet into an sqlite3 database.
-        print ("Creating temporary database %s" % self.TEST_DATABASE)
+        #Testing loading an Excel spreadsheet into an sqlite3 database.
+#         print ("Creating temporary database %s" % self.TEST_DATABASE)
         loader = database.sqlite_load_excel.Loader()
         loader.delete_database(self.TEST_DATABASE)
         loader.connect(self.TEST_DATABASE)

@@ -5,12 +5,13 @@ from datetime import datetime
 import subprocess
 import traceback
 import sys
+import unittest
+import os
 
 from database.apperror import AppError
 from database.database import DataBase, DataStructure
 from database.royaltyworksheet import RoyaltyWorksheet
-import unittest
-import os
+import appinfo
 
 """
 ToDo:
@@ -60,7 +61,7 @@ class ProcessRoyalties(object):
         self.ws = RoyaltyWorksheet()
 
         errorCount = 0
-        log = open('log.txt','w')
+        log = open(appinfo.getFileDir() + 'log.txt','w')
         log.write ("Hello World.\n")
 
         for monthlyData in self.db.monthlyData():
