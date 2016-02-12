@@ -78,7 +78,10 @@ th, td {
 </head>
 <body>
 
-<TABLE align="right" style="width:100%" border="1">
+
+<h4>Monthly data for this well is available for these production dates:</h4>
+{% if m %}
+    <TABLE align="right" style="width:100%" border="1">
 
 	<caption><b>Monthly Sask Def of</b></caption>
 	<col width="12.5%">
@@ -102,20 +105,117 @@ th, td {
    </TR>
 
 	<TR>
-      <TD>2015-09-29</TD>
-      <TD>2015-01</TD>
-	   <TD>2</TD>
-	   <TD>Oil</TD>
-	   <TD>100.00</TD>
-	   <TD>221.123</TD>
+      <TD>{{ m.ExtractMonth }}</TD>
+      <TD>{{ m.ProdMonth }}</TD>
+	   <TD>{{ m.AmendNo }}</TD>
+	   <TD>{{ m.Product }}</TD>
+	   <TD>{{ m.ProdVol }}</TD>
+	   <TD>{{ m.WellHeadPrice }}</TD>
 	   <TD>2.1234</TD>
 	   <TD>0.1234</TD>
-   </TR>
+    </TR>
+
 </TABLE>
 
-{*** Note: Replace Well Head Price with Petrinex detail when available ***}<br>
-{*** Note: Replace Trucking Price with Petrinex detail when available ***}<br>
-{*** Note: Replace Processing Price with Petrinex detail when available ***}<br>
-</p1>
-</html>
+
+    &nbsp
+
+    <div>
+    {% if well.RoyaltyClassification == "Fourth Tier Oil" %}
+        {% if m.ProdVol < 25 %}
+        0
+        {% endif %}
+        {% if m.ProdVol <= 136.2 %}
+            (C * MOP) - D  |
+            {% if well.Classification == "Heavy" %}
+                ({{ econData.H4T_C }} * {{ m.ProdVol }}) - {{ econData.H4T_D }}
+                <br>
+            {% endif %}
+            {% if well.Classification == "Southwest" %}
+                ({{ econData.SW4T_C }} * {{ m.ProdVol }}) - {{ econData.SW4T_D }}
+                <br>
+            {% endif %}
+            {% if well.Classification == "Other" %}
+                ({{ econData.O4T_C }} * {{ m.ProdVol }}) - {{ econData.O4T_D }}
+                <br>
+            {% endif %}
+            <!--{% if well.Classification != "Heavy" or well.Classification != "Southwest" or well.Classification != "Other" %}-->
+                <!--Royalty Classification Not Found-->
+                <!--<br>-->
+            <!--{% endif %}-->
+        {% else %}
+        (K - (X / MOP)) - D  |
+            {% if well.Classification == "Heavy" %}
+                ({{ econData.H4T_K }} - ({{ econData.H4T_X }} / {{ m.ProdVol }})) - {{ econData.H4T_D }}
+                <br>
+            {% endif %}
+            {% if well.Classification == "Southwest" %}
+                ({{ econData.SW4T_K }} - ({{ econData.SW4T_X }} / {{ m.ProdVol }})) - {{ econData.SW4T_D }}
+                <br>
+            {% endif %}
+            {% if well.Classification == "Other" %}
+                ({{ econData.O4T_K }} - ({{ econData.O4T_X }} / {{ m.ProdVol }})) - {{ econData.O4T_D }}
+                <br>
+            {% endif %}
+        {% endif %}
+
+    {% else %}
+        {% if well.Classification == "Heavy" %}
+            {% if well.RoyaltyClassification == "Third Tier Oil" %}
+            Heavy Third Tier Oil
+            {% endif %}
+            {% if well.RoyaltyClassification == "New Oil" %}
+            Heavy New Oil
+            {% endif %}
+        {% endif %}
+        {% if well.Classification == "Southwest" %}
+            {% if well.RoyaltyClassification == "Third Tier Oil" %}
+            Southwest Third Tier Oil
+            {% endif %}
+            {% if well.RoyaltyClassification == "New Oil" %}
+            Southwest New Oil
+            {% endif %}
+        {% endif %}
+        {% if well.Classification == "Other" %}
+            {% if well.RoyaltyClassification == "Third Tier Oil" %}
+            Other Third Tier Oil
+            {% endif %}
+            {% if well.RoyaltyClassification == "New Oil" %}
+            Other New Oil
+            {% endif %}
+            {% if well.RoyaltyClassification == "Old Oil" %}
+            Other Old Oil
+            {% endif %}
+        {% endif %}
+        {% endif %}
+
+        <!--{% if well.Classification != "Heavy" or well.Classification != "Southwest" %}-->
+            <!--well classification not found-->
+    <!--{% endif %}-->
+
+    <!--{% if well.RoyaltyClassification != "Fourth Tier Oil" %}-->
+        <!--not Fourth tier-->
+    <!--{% endif %}-->
+        <!--<br>-->
+
+    <!--{% if m.ProdVol == 0 %}-->
+        <!--0-->
+        <!--{% endif %}-->
+
+    <!--{% if m.ProdVol >= 25.1 and m.ProdVol <= 136.2 %}-->
+        <!--25.1=< ProdVol <=136.2-->
+    <!--{% endif %}-->
+
+        <!--{% if m.ProdVol > 136.2 %}-->
+        <!--ProdVol > 136.2-->
+    <!--{% endif %}-->
+    <!--</div>-->
+{% else %}
+<h2>Sorry, no monthly data for this well</h2>
+{% endif %}
+<!--{*** Note: Replace Well Head Price with Petrinex detail when available ***}<br>-->
+<!--{*** Note: Replace Trucking Price with Petrinex detail when available ***}<br>-->
+<!--{*** Note: Replace Processing Price with Petrinex detail when available ***}<br>-->
+
 </body>
+</html>

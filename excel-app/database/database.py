@@ -179,13 +179,14 @@ class DataBase(object):
     def monthlyData(self):
         return self.monthly
 
+
     def getMonthlyByWell(self, wellId):
         wellResults = []
         for row in self.monthlyTable:
             if row.WellId == wellId:
                 wellResults.append(row)
         return wellResults
-    
+
     def getMonthlyData(self):
         return self.monthlyTable[0]
     

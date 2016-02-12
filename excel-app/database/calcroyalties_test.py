@@ -142,7 +142,9 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, IndianInterest, MinRoyalty, RoyaltyPr
         self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(2, 100, 1, 20, 1,100), (20.0, 2000.0))
         self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(-1, 100 ,1 ,20, 1, 100), (20.0, 2000.0))
         self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(2, 100 ,1, 5, 1,100), (5, 500.0))
-        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(2, 100 ,1, 0, 1,100), (2.0, 200.0))
+        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(2, 100 ,1, None, 1,100), (2.0, 200.0))
+        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(10, 120 ,1, 2, 1,120), (12, 1440.0))
+
         return
 
 if __name__ == '__main__':

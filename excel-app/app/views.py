@@ -90,13 +90,23 @@ def worksheet():
 def adriennews():
 	if request.args:
 		wellId = request.args["WellId"]
+		#prodMonth = request.args["ProdMonth"]
 		well=db.getWell(int(wellId))
 		lease=db.getLease(well.Lease)
-		monthly=db.getMonthlyByWell(wellId)
+		monthly=db.getMonthlyByWell(int(wellId))
+		if monthly:
+			monthly = monthly[0]
+			print(monthly)
+			econData = db.getECONOilData(monthly.ProdMonth)
+		else:
+			print("No monthly data for this well")
+			econData = 0
 		rm=db.getRoyaltyMaster(well.Lease)
 
 
-	return render_template('worksheetas.html', well=well, lease=lease, rm=rm, monthly=monthly)
+
+
+	return render_template('worksheetas.html', well=well, lease=lease, rm=rm, m=monthly, econData = econData)
 #	return "from adriennes well is" + wellId + "and the well is " + str(well.headers()) + str(well.data())
 
 
