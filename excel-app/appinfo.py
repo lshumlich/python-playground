@@ -12,5 +12,4 @@ def wheresAreYou():
     print('From appinfo:',BASE_DIR)
     
 def getFileDir():
-    return os.path.dirname(__file__) +  "\\files\\"
-
+    return os.path.join(os.path.dirname(__file__), "files/")
