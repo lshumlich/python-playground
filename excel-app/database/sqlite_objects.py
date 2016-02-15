@@ -85,12 +85,8 @@ class DataObject(object):
             raise AppError('Table %s is not in the database' % table)
         print(statement)
 
-        values = self.execute(statement)
-        results = []
-        for v in values:
-            results.append(v)
-        return results
-
+        self.execute(statement)
+        return self.cursor.fetchall()
 
 
 class DataWell(DataObject):
@@ -138,9 +134,3 @@ class DataLease(DataObject):
         except:
             raise AppError('Lease with ID %s not found' % str(lease_id))
 
-
-if __name__ == '__main__':
-    do = DataObject()
-    db = config.getFileDir() + 'test_database.db'
-    do.connect(db)
-    print(do.universal_select('Well', RoyaltyClassification2='Old Oil'))
