@@ -14,10 +14,12 @@ class DataStructure(object):
 
 
 class DataObject(object):
+
+    WELL_TAB_NAME = 'Well'
+    LEASE_TAB_NAME = 'Lease'
+
     def __init__(self):
         """ Nothing here for now"""
-        self.WELL_TAB_NAME = 'Well'
-        self.LEASE_TAB_NAME = 'Lease'
 
     def connect(self, db_name):
         self.conn = sqlite3.connect(db_name)
@@ -29,13 +31,22 @@ class DataObject(object):
     def close(self):
         self.conn.close()
 
-    def table_headers(self,table_name):
+    def table_headers(self, table_name):
         statement = 'PRAGMA table_info(' + table_name + ')'
         values = self.execute(statement)
         columns = []
         for row in values:
             columns.append(row[1])
-        return(columns)     
+        return(columns)
+
+    def get_tables(self):
+        statement = 'SELECT tbl_name FROM sqlite_master'
+        values = self.execute(statement)
+        result = []
+        for x in values:
+            for y in x:
+                result.append(y)
+        return result
 
     def load_sqlite_table(self, table_name):
         header_row = self.table_headers(table_name)
@@ -54,7 +65,32 @@ class DataObject(object):
             setattr(ds, 'RecordNumber', record_no)
             setattr(ds, 'SQLRow', row)
             setattr(ds, 'HeaderRow', header_row)
-        return stack        
+        return stack
+
+    def universal_select(self, table, **kwargs):
+        """ Not used anywhere right now, just an idea. """
+        statement = "SELECT * FROM %s " % table
+        if table in self.get_tables():
+            i = len(kwargs)
+            for arg in kwargs:
+                statement += "WHERE" if i == len(kwargs) else None
+                if arg in self.table_headers(table):
+                    statement += ' "%s" = "%s" ' % (arg, str(kwargs[arg]))
+                    i -= 1
+                    if i > 0:
+                        statement += ' AND '
+                else:
+                    raise AppError('No column "%s" in table "%s"' % (arg, table))
+        else:
+            raise AppError('Table %s is not in the database' % table)
+        print(statement)
+
+        values = self.execute(statement)
+        results = []
+        for v in values:
+            results.append(v)
+        return results
+
 
 
 class DataWell(DataObject):
@@ -96,8 +132,15 @@ class DataLease(DataObject):
     def get_all_leases(self):
         return self.lease_list
 
-    def get_lease(self,lease_id):
+    def get_lease(self, lease_id):
         try:
             return self.leases[lease_id]
         except:
             raise AppError('Lease with ID %s not found' % str(lease_id))
+
+
+if __name__ == '__main__':
+    do = DataObject()
+    db = config.getFileDir() + 'test_database.db'
+    do.connect(db)
+    print(do.universal_select('Well', RoyaltyClassification2='Old Oil'))

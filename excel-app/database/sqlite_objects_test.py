@@ -41,6 +41,16 @@ class Test(unittest.TestCase):
 	    self.assertRaises(database.apperror.AppError, dl.get_lease, 99)
 	    dl.close()
 
+	    #Testing the universal sql select
+	    dw.connect(db)
+	    self.assertEqual(len(dw.universal_select('Well', RoyaltyClassification='Old Oil')), 5)
+	    self.assertEqual(len(dw.universal_select('Well')), 33)
+	    self.assertRaises(database.apperror.AppError, dw.universal_select, 'Well', DoesNotExist=5)
+	    self.assertEqual(len(dw.universal_select('Lease')), 10)
+	    self.assertEqual(len(dw.universal_select('Lease', Prov='SK')), 5)
+	    self.assertRaises(database.apperror.AppError, dw.universal_select, 'WrongTable')
+	    dw.close
+
 	    #Cleaning up
 	    loader.delete_database(db)
 
