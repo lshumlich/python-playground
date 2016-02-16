@@ -43,14 +43,15 @@ class DataObject(object):
         """ Not used anywhere right now, just an idea. """
         statement = "SELECT * FROM %s " % table
         if table in self.dbi.get_table_names():
+            if kwargs:
+                statement += "Where"
             i = len(kwargs)
             for arg in kwargs:
-                statement += "WHERE" if i == len(kwargs) else None
                 if arg in self.get_table_headers(table):
                     statement += ' "%s" = "%s" ' % (arg, str(kwargs[arg]))
                     i -= 1
                     if i > 0:
-                        statement += ' AND '
+                        statement += 'AND'
                 else:
                     raise AppError('No column "%s" in table "%s"' % (arg, table))
         else:
@@ -62,12 +63,13 @@ class DataObject(object):
 
     # Wells
     def get_all_wells(self):
-        try:
-            statement = 'SELECT * FROM Well'
-            self.dbi.execute(statement)
-            result = self.dbi.cursor.fetchall()
-            return self.sql_to_object('Well', result)
-        except KeyError:
+        statement = 'SELECT * FROM Well'
+        self.dbi.execute(statement)
+        result = self.dbi.cursor.fetchall()
+        result = self.sql_to_object('Well', result)
+        if result:
+            return result
+        else:
             raise AppError('Wells could not be loaded')
 
     def get_well_by_id(self, well_id):
@@ -93,12 +95,13 @@ class DataObject(object):
 
     # Leases
     def get_all_leases(self):
-        try:
-            statement = 'SELECT * FROM Lease'
-            self.dbi.execute(statement)
-            result = self.dbi.cursor.fetchall()
-            return self.sql_to_object('Lease', result)
-        except KeyError:
+        statement = 'SELECT * FROM Lease'
+        self.dbi.execute(statement)
+        result = self.dbi.cursor.fetchall()
+        result = self.sql_to_object('Lease', result)
+        if result:
+            return result
+        else:
             raise AppError('Leases could not be loaded')
 
     def get_lease_by_id(self, lease_id):

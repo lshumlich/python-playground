@@ -47,6 +47,7 @@ class Test(unittest.TestCase):
 
         #Testing the universal sql select
         self.assertEqual(len(do.universal_select('Well', RoyaltyClassification='Old Oil')), 1)
+        self.assertEqual(len(do.universal_select('Well', Prov='SK', Classification='Other')), 2)
         self.assertEqual(len(do.universal_select('Well')), 4)
         self.assertRaises(database.apperror.AppError, do.universal_select, 'Well', DoesNotExist=5)
         self.assertEqual(len(do.universal_select('Lease')), 4)
