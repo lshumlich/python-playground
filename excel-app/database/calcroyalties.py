@@ -61,7 +61,7 @@ class ProcessRoyalties(object):
         self.ws = RoyaltyWorksheet()
 
         errorCount = 0
-        log = open(appinfo.getFileDir() + 'log.txt','w')
+        log = open(config.get_temp_dir() + 'log.txt','w')
         log.write ("Hello World.\n")
 
         for monthlyData in self.db.monthlyData():
@@ -265,7 +265,7 @@ class ProcessRoyalties(object):
         econOilData = self.db.getECONOilData(monthlyData.ProdMonth)
         # mop = monthlyData.ProdVol
 
-        self.calcSaskOilProvCrownRoyaltyRate(royaltyCalc,econOilData, well.RoyaltyClassification, well.Classification, monthlyData.ProdVol, well.src)
+        self.calcSaskOilProvCrownRoyaltyRate(royaltyCalc,econOilData, well.RoyaltyClassification, well.Classification, monthlyData.ProdVol, well.SRC)
 
 
         """

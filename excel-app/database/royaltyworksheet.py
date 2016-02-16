@@ -6,12 +6,12 @@ import config
 class RoyaltyWorksheet(object):
 
     def __init__(self):
-        self.ws = open('Royalty Worksheet.txt','w')
+        self.ws = open(config.get_temp_dir() + 'Royalty Worksheet.txt','w')
         self.ws.write ("Hello World - Royalty Worksheet.\n")
         self.count = 0
         
     def printWithWellProdDate(self,wellId,prodDate,product):
-        db = DataBase(config.get_file_dir() + 'database.xlsx')
+        db = DataBase(config.get_temp_dir() + 'database.xlsx')
         md = db.getMonthlyDataByWellProdMonthProduct(wellId,prodDate,product)
         print(md)
         well = db.getWell(wellId)

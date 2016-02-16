@@ -16,14 +16,15 @@ import config
 # figure it out please send me a note.... Thanks Larry.
 #
 
-def runRoyaltiesAndWorksheet():
+def run_royalties_and_worksheet():
     pr = ProcessRoyalties()
     pr.process(config.get_file_dir() + 'database.xlsx')
-    pr.process('d:/$temp/sample.xlsx')
+#     pr.process('d:/$temp/sample.xlsx')
+#     pr.process('d:/$temp/sample.xlsx')
     print('os name is:',os.name)
     if os.name != "posix":
-        subprocess.call(['notepad.exe', config.get_file_dir() + 'log.txt'])
-        subprocess.call(['notepad.exe', config.get_file_dir() + 'Royalty Worksheet.txt'])
+        subprocess.call(['notepad.exe', config.get_temp_dir() + 'log.txt'])
+        subprocess.call(['notepad.exe', config.get_temp_dir() + 'Royalty Worksheet.txt'])
 
 def runTestModule():
 #     unittest.main(module='database.calcroyalties_test')
@@ -45,7 +46,8 @@ def browser_app():
 print('-- Runing Batch')
 if __name__ == "__main__":
 #     sqliteLoadExcel()
-    browser_app()
+#     browser_app()
+    run_royalties_and_worksheet()
 
     
 # runRoyaltiesAndWorksheet()
