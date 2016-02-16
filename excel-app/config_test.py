@@ -8,7 +8,6 @@ import unittest
 import os
 
 import config
-from config import DatabaseInstance
 from database.apperror import AppError
 
 
@@ -23,29 +22,21 @@ class Test(unittest.TestCase):
     def test_get_temp_dir(self):
         self.assertTrue(os.path.isdir(config.get_temp_dir()),'File directory must exist: ' + config.get_temp_dir())
         
-    # Note*** This test could cause a problem if it's not the first one to run.
-    def test_only_one_instance_of_database_instance(self):
-        DatabaseInstance('dummy.db');
-        self.assertRaises(AppError, DatabaseInstance, 'dummy.db')
-    
-    def test_get_Database_gives_same_instance(self):
-        db1 = config.get_database()
-        db2 = config.get_database()
-        self.assertEqual(db1, db2, 'Only one instance of database is allowed.')
+    def test_get_database_instance_gives_same_instance(self):
+        dbi1 = config.get_database_instance()
+        dbi2 = config.get_database_instance()
+        self.assertEqual(dbi1, dbi2, 'All instances must be the same.')
         
-    def test_set_database_must_be_called_before_get_database(self):
-        config.get_database()
-        self.assertRaises(AppError, config.set_database_name, 'my_db.db')
+    def test_get_database_instance_with_a_name_gives_new_instance(self):
+        dbi1 = config.get_database_instance()
+        dbi2 = config.get_database_instance('mydb.db')
+        self.assertNotEqual(dbi1, dbi2, 'These instances should not be the same.')
+        dbi3 = config.get_database_instance()
+        self.assertEqual(dbi2, dbi3, 'These should be the same.')
         
-    def test_get_database_name(self):
-        config.get_database_name()
-        
-    def test_get_database_instance(self):
-        config.get_database_instance()
-        
-    def test_get_database(self):
-        config.get_database()
-        
-    def test_set_database_name(self):
-        config.set_database_name("whatever.db")
+    def test_database_reset(self):
+        dbi1 = config.get_database_instance()
+        config.database_reset()
+        dbi2 = config.get_database_instance()
+        self.assertNotEqual(dbi1, dbi2, 'These instances should not be the same.')
         
