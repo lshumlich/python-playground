@@ -14,39 +14,26 @@ class Loader(object):
     EXCLUDE_SHEETS = ['Roy Module Construct']
 
     def connect(self,dbName):
-        self.conn = sqlite3.connect(dbName)
-        self.cursor = self.conn.cursor()
+        self.dbi = config.get_database_instance(dbName)
         
-    def execute(self,statement):
-        # Create table
-#         print(statement)
-        return self.cursor.execute(statement)
-
-    def commit(self):
-        # Save (commit) the changes
-        self.conn.commit()
-        
-        # We can also close the connection if we are done with it.
-        # Just be sure any changes have been committed or they will be lost.
-    def close(self):
-        self.conn.close()
-
     def delete_database(self, database):
         try:
+            print('delete_database:', database)
             os.remove(database)
         except OSError:
+            print('could not delete_database:', database)
             pass
 
-    def openExcel(self, workbookName):
+    def open_excel(self, workbookName):
         self.wb = load_workbook(workbookName)
         
-    def loadAllSheets(self):
+    def load_all_sheets(self):
         sheets = self.wb.get_sheet_names()
         for sheet in sheets:
             if sheet not in self.EXCLUDE_SHEETS:
-                self.LoadWorksheet(sheet)
+                self.load_worksheet(sheet)
 
-    def LoadWorksheet(self,tabName):
+    def load_worksheet(self,tabName):
         try:
             ws = self.wb[tabName]
             tableName = tabName.replace(' ', '')
@@ -56,20 +43,20 @@ class Loader(object):
                 for row in ws.rows:
                     if not headerRow:
                         headerRow = row
-                        self.createTable(tableName,headerRow, ws.rows[1])
+                        self.create_table(tableName,headerRow, ws.rows[1])
                     else:
                         recordNo = recordNo +1
-                        self.insertData(tableName,row, headerRow)
-                self.commit()
+                        self.insert_data(tableName,row, headerRow)
+                self.dbi.commit()
 #             else:
 #                 print('*** No data to load for tab:', tabName)
         except Exception as e:
             raise e
                 
-    def createTable(self,tableName,headerRow, dataRow):
+    def create_table(self,tableName,headerRow, dataRow):
 
         try:
-            self.deleteTable(tableName)
+            self.delete_table(tableName)
         except AppError:
             None  # Just means the table does not exist
         
@@ -100,18 +87,18 @@ class Loader(object):
     
         
 #         print(tableCreate)
-        self.execute(tableCreate)
-        self.commit()
+        self.dbi.execute(tableCreate)
+        self.dbi.commit()
 
-    def deleteTable(self,tableName):
+    def delete_table(self,tableName):
         
         try:
-            self.execute('drop table ' + tableName)
+            self.dbi.execute('drop table ' + tableName)
         except sqlite3.OperationalError:
             raise AppError("Table did not exist so not deleted: " + tableName)
 
         
-    def insertData(self,tableName,row, headerRow):
+    def insert_data(self,tableName,row, headerRow):
         insert = 'INSERT INTO ' + tableName + ' VALUES ('
         data = ""
         i = 0
@@ -140,14 +127,20 @@ class Loader(object):
         insert = insert + data
             
         print(insert)
-        self.execute(insert)
+        self.dbi.execute(insert)
+        
+    def commit (self):
+        self.dbi.commit()
+        
+    def close(self):
+        self.dbi.close()
 
 
 if __name__ == '__main__':
-    database = config.getFileDir() + 'test_database.db'
-    worksheet = config.getFileDir() + 'database.xlsx'
+    database = config.get_temp_dir() + 'test_database.db'
+    worksheet = config.get_file_dir() + 'database.xlsx'
     loader = Loader()
     loader.connect(database)
-    loader.openExcel(worksheet)
-    loader.loadAllSheets()
+    loader.open_excel(worksheet)
+    loader.load_all_sheets()
     loader.close()

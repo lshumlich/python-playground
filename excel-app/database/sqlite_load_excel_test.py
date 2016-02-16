@@ -10,8 +10,8 @@ import database.sqlite_show
 
 class TestLoader(unittest.TestCase):
 
-    TEST_DATABASE = config.getFileDir() + 'test_database.db'
-    TEST_SPREADSHEET = config.getFileDir() + 'test_database.xlsx'
+    TEST_DATABASE = config.get_temp_dir() + 'test_database.db'
+    TEST_SPREADSHEET = config.get_file_dir() + 'test_database.xlsx'
 
     def test_run(self):
         #Testing loading an Excel spreadsheet into an sqlite3 database.
@@ -19,7 +19,7 @@ class TestLoader(unittest.TestCase):
         loader = database.sqlite_load_excel.Loader()
         loader.delete_database(self.TEST_DATABASE)
         loader.connect(self.TEST_DATABASE)
-        loader.openExcel(self.TEST_SPREADSHEET)
+        loader.open_excel(self.TEST_SPREADSHEET)
         shower = database.sqlite_show.Shower()
         shower.connect(self.TEST_DATABASE)
 
@@ -35,26 +35,27 @@ class TestLoader(unittest.TestCase):
         self.assertEqual(len(loader.wb['Royalty Master'].rows), 11)
 
         #Test that we have an empty database
-        self.assertEqual(len(shower.showTables()), 0)
+        self.assertEqual(len(shower.show_tables()), 0)
 
         #Test that we have x number of tables
-        loader.loadAllSheets()
-        self.assertEqual(len(shower.showTables()), 2)
+        loader.load_all_sheets()
+        self.assertEqual(len(shower.show_tables()), 2)
 
         #test that each table has x number of columns
-        self.assertEqual(len(shower.showTable('Well')), 8)
-        self.assertEqual(len(shower.showTable('RoyaltyMaster')), 10)
+        self.assertEqual(len(shower.show_table('Well')), 8)
+        self.assertEqual(len(shower.show_table('RoyaltyMaster')), 10)
 
         #test that each table has x number of row
-        self.assertEqual(len(shower.showColumns('Well')), 11)
-        self.assertEqual(len(shower.showColumns('RoyaltyMaster')), 10)
+        self.assertEqual(len(shower.show_columns('Well')), 11)
+        self.assertEqual(len(shower.show_columns('RoyaltyMaster')), 10)
 
         #test column type
-        self.assertEqual(shower.columnType('Well', 'WellId'), 'int')
+        self.assertEqual(shower.column_type('Well', 'WellId'), 'int')
         #!!!really odd: removing the following print will make deleteTable fail
-        print(shower.showTables())
-        loader.deleteTable('Well')
-        self.assertNotIn('Well', shower.showTables()) 
+        print(shower.show_tables())
+        loader.commit()
+        loader.delete_table('Well')
+        self.assertNotIn('Well', shower.show_tables()) 
 
         #clean up
         loader.close()
