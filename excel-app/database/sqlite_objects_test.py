@@ -11,13 +11,13 @@ class Test(unittest.TestCase):
 
     def test_sqlite_objects(self):
         #Preparing the database
-        db = config.getFileDir() + 'test_database.db'
-        worksheet = config.getFileDir() + 'database.xlsx'
+        db = config.get_file_dir() + 'test_database.db'
+        worksheet = config.get_file_dir() + 'database.xlsx'
         loader = database.sqlite_load_excel.Loader()
         loader.delete_database(db)
         loader.connect(db)
-        loader.openExcel(worksheet)
-        loader.loadAllSheets()
+        loader.open_excel(worksheet)
+        loader.load_all_sheets()
         loader.close()
 
         #Testing the wells

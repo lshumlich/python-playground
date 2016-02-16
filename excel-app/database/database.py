@@ -357,7 +357,7 @@ class DataBase(object):
 class TestDataBase(unittest.TestCase):
     
     def setUp(self):
-        self.validExcelFile = config.getFileDir() + 'database.xlsx'
+        self.validExcelFile = config.get_file_dir() + 'database.xlsx'
         self.validExcelTab = 'Well'
         
     def test_getWorkSheetThatDoesNotExist(self):

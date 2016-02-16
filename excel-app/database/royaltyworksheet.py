@@ -11,7 +11,7 @@ class RoyaltyWorksheet(object):
         self.count = 0
         
     def printWithWellProdDate(self,wellId,prodDate,product):
-        db = DataBase(appinfo.getFileDir() + 'database.xlsx')
+        db = DataBase(config.get_file_dir() + 'database.xlsx')
         md = db.getMonthlyDataByWellProdMonthProduct(wellId,prodDate,product)
         print(md)
         well = db.getWell(wellId)
