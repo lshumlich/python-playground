@@ -137,10 +137,5 @@ class Loader(object):
 
 
 if __name__ == '__main__':
-    database = config.get_temp_dir() + 'test_database.db'
-    worksheet = config.get_file_dir() + 'database.xlsx'
-    loader = Loader()
-    loader.connect(database)
-    loader.open_excel(worksheet)
-    loader.load_all_sheets()
-    loader.close()
+    None
+    # run from batch.py

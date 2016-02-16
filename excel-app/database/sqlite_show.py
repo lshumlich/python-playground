@@ -1,8 +1,5 @@
 #!/bin/env python3
 
-import sqlite3
-from openpyxl import Workbook, load_workbook
-
 import config
 
 class Shower(object):
@@ -24,11 +21,11 @@ class Shower(object):
     def show_table(self,tableName,attr=None,key=None):
         stmt = 'select * from ' + tableName
         if key:
-            type = self.columnType(tableName, attr)
+            ctype = self.columnType(tableName, attr)
             where = ''
-            if type == 'int':
+            if ctype == 'int':
                 where = attr + "=" + key
-            elif type =='text':
+            elif ctype =='text':
                 where = attr + "='" + key + "'"
             else:
                 print('***** Type not delt with:', type,tableName,attr)

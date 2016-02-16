@@ -1,3 +1,4 @@
+#!/bin/env python3
 class AppError(Exception):
     
     def __init__(self, msg):

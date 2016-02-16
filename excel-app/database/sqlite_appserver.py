@@ -1,9 +1,11 @@
 #!/bin/env python3
 
 import sys
-from flask import Flask, render_template, url_for, request, flash
+from flask import Flask, render_template, request, flash
 
 from database.sqlite_show import Shower
+import config
+
 
 class AppServer(object):
     
@@ -39,13 +41,13 @@ class AppServer(object):
             links['BAid'] = '?table=BAInfo&attr=BAid&key=' 
             links['WellEvent'] = '?table=WellInfo&attr=Well&key='
             
-            tables = AppServer.shower.showTables()
+            tables = AppServer.shower.show_tables()
             header = None
             rows = None
             print('Table:',table)
             if table:
-                header = AppServer.shower.showColumns(table)
-                rows = AppServer.shower.showTable(table,attr,key)
+                header = AppServer.shower.show_columns(table)
+                rows = AppServer.shower.show_table(table,attr,key)
             html = render_template('data.html',table=table,tables=tables,header=header,rows=rows,links=links)
         except Exception as e:
             print('AppServer.data: ***Error:',e)
@@ -108,29 +110,9 @@ class AppServer(object):
         AppServer.app.run()
         print('after the run in run in AppServer')
     
-
-database = 'testload.db'
 def helloMsg():
     print('Hello World from ' + sys.argv[0])
     
-
-def loadExcelToDb():
-    loader = Loader()
-    loader.connect(database)
-    loader.openExcel(r'd:/$temp/Onion Lake SK wells.xlsx')
-    loader.loadAllSheets()
-    loader.loadExcel("database.xlsx")
-    loader.close()
-    
-def showStuff():
-    loader = Loader()
-    loader.LoadWorksheet('Well')
-    loader.showTables()
-    loader.showTable('well')
-    loader.showTables()
-    loader.showColumns('well')
-    loader.close()
-
 def goodbyMsg():
     print("*** Done ***")
 
@@ -141,7 +123,7 @@ def sampleCode():
 def appServer():
 #     appinfo = AppServer()
 #     appinfo.run()
-    AppServer.run(database)
+    AppServer.run(config.get_temp_dir() + 'browser.db')
 
 if __name__ == '__main__':
     helloMsg()
