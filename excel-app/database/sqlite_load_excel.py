@@ -138,4 +138,10 @@ class Loader(object):
 
 if __name__ == '__main__':
     None
-    # run from batch.py
+    worksheet = config.get_file_dir() + 'database.xlsx'
+    database = config.get_temp_dir() + 'unittest.db'
+    loader = Loader()
+    loader.connect(database)
+    loader.open_excel(worksheet)
+    loader.load_all_sheets()
+    loader.close()

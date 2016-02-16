@@ -15,66 +15,38 @@ class DataStructure(object):
 
 class DataObject(object):
 
-    WELL_TAB_NAME = 'Well'
-    LEASE_TAB_NAME = 'Lease'
-
     def __init__(self):
-        """ Nothing here for now"""
+        self.dbi = config.get_database_instance()
 
-    def connect(self, db_name):
-        self.conn = sqlite3.connect(db_name)
-        self.cursor = self.conn.cursor()
-
-    def execute(self, statement):
-        return self.cursor.execute(statement)
-
-    def close(self):
-        self.conn.close()
-
-    def table_headers(self, table_name):
+    # Shared
+    def get_table_headers(self, table_name):
         statement = 'PRAGMA table_info(' + table_name + ')'
-        values = self.execute(statement)
+        values = self.dbi.execute(statement)
         columns = []
         for row in values:
             columns.append(row[1])
         return(columns)
 
-    def get_tables(self):
-        statement = 'SELECT tbl_name FROM sqlite_master'
-        values = self.execute(statement)
+    def sql_to_object(self, table_name, input):
+        header_row = self.get_table_headers(table_name)
         result = []
-        for x in values:
-            for y in x:
-                result.append(y)
-        return result
-
-    def load_sqlite_table(self, table_name):
-        header_row = self.table_headers(table_name)
-        statement = 'SELECT * FROM ' + table_name
-        values = self.execute(statement)
-        stack = []
-        record_no = 0
-        for row in values:
-            record_no += 1
+        for row in input:
             ds = DataStructure()
-            stack.append(ds)
+            result.append(ds)
             i = 0
             for cell in header_row:
                 setattr(ds, cell, row[i])
                 i += 1
-            setattr(ds, 'RecordNumber', record_no)
-            setattr(ds, 'SQLRow', row)
-            setattr(ds, 'HeaderRow', header_row)
-        return stack
+        return result
 
     def universal_select(self, table, **kwargs):
         """ Not used anywhere right now, just an idea. """
         statement = "SELECT * FROM %s " % table
-        if table in self.get_tables():
+        if table in self.dbi.get_table_names():
             i = len(kwargs)
             for arg in kwargs:
                 statement += "WHERE" if i == len(kwargs) else None
-                if arg in self.table_headers(table):
+                if arg in self.get_table_headers(table):
                     statement += ' "%s" = "%s" ' % (arg, str(kwargs[arg]))
                     i -= 1
                     if i > 0:
@@ -83,54 +55,58 @@ class DataObject(object):
                     raise AppError('No column "%s" in table "%s"' % (arg, table))
         else:
             raise AppError('Table %s is not in the database' % table)
-        print(statement)
 
-        self.execute(statement)
-        return self.cursor.fetchall()
+        self.dbi.execute(statement)
+        return self.dbi.cursor.fetchall()
 
 
-class DataWell(DataObject):
-
-    def load_wells_from_sqlite(self):
-        self.well_list = self.load_sqlite_table(self.WELL_TAB_NAME)
-        self.wells = {}
-        for w in self.well_list:
-            self.wells[w.WellId] = w
-
+    # Wells
     def get_all_wells(self):
-        return self.well_list
-
-    def get_well(self, well_id):
         try:
-            return self.wells[well_id]
+            statement = 'SELECT * FROM Well'
+            self.dbi.execute(statement)
+            result = self.dbi.cursor.fetchall()
+            return self.sql_to_object('Well', result)
         except KeyError:
-            raise AppError('Well with ID %s not found' % str(well_id))
+            raise AppError('Wells could not be loaded')
+
+    def get_well_by_id(self, well_id):
+        statement = 'SELECT * FROM Well WHERE WellId = %i' % well_id
+        self.dbi.execute(statement)
+        result = self.dbi.cursor.fetchall()
+        result = self.sql_to_object('Well', result)
+        if result:
+            return result
+        else:
+            raise AppError('Well with ID %i not found' % well_id)
 
     def get_wells_by_lease(self, lease_id):
-        wells_by_lease = []
-        for w in self.well_list:
-            if w.LeaseID == lease_id:
-                wells_by_lease.append(w)
-        if wells_by_lease:
-            return wells_by_lease
+        statement = 'SELECT * FROM Well WHERE LeaseID = %i' % lease_id
+        self.dbi.execute(statement)
+        result = self.dbi.cursor.fetchall()
+        result = self.sql_to_object('Well', result)
+        if result:
+            return result
         else:
-            raise AppError('Well with lease %s not found' % lease_id)
+            raise AppError('Well with lease %i not found' % lease_id)
 
 
-class DataLease(DataObject):
-
-    def load_leases_from_sqlite(self):
-        self.lease_list = self.load_sqlite_table(self.LEASE_TAB_NAME)
-        self.leases = {}
-        for l in self.lease_list:
-            self.leases[l.LeaseID] = l
-
+    # Leases
     def get_all_leases(self):
-        return self.lease_list
-
-    def get_lease(self, lease_id):
         try:
-            return self.leases[lease_id]
-        except:
-            raise AppError('Lease with ID %s not found' % str(lease_id))
+            statement = 'SELECT * FROM Lease'
+            self.dbi.execute(statement)
+            result = self.dbi.cursor.fetchall()
+            return self.sql_to_object('Lease', result)
+        except KeyError:
+            raise AppError('Leases could not be loaded')
 
+    def get_lease_by_id(self, lease_id):
+        statement = 'SELECT * FROM Lease WHERE LeaseID = %i' % lease_id
+        self.dbi.execute(statement)
+        result = self.dbi.cursor.fetchall()
+        result = self.sql_to_object('Lease', result)
+        if result:
+            return result
+        else:
+            raise AppError('Lease with ID %i not found' % lease_id)

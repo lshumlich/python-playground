@@ -19,7 +19,7 @@ class SqliteInstance(object):
         return self.cursor.execute(stmt)
         
     def get_table_names(self):
-        stmt = 'select tbl_name from sqlite_master'
+        stmt = 'SELECT tbl_name FROM sqlite_master'
         values = self.execute(stmt)
         tables = []
         if values:
