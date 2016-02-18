@@ -7,7 +7,7 @@ from database import database
 from database import calcroyalties
 import config
 
-db = database.DataBase(config.get_file_dir() + 'database.xlsx')
+db = database.DataBase(config.get_file_dir() + 'database new.xlsx')
 pr = calcroyalties.ProcessRoyalties()
 rw = calcroyalties.RoyaltyWorksheet()
 
@@ -89,24 +89,28 @@ def worksheet():
 @app.route('/adriennews')
 def adriennews():
     if request.args:
-        wellId = request.args["WellId"]
-        #prodMonth = request.args["ProdMonth"]
-        well=db.getWell(int(wellId))
+        print("i am here")
+        wellIds = request.args["WellId"]
+        wellId = int(wellIds)
+        print("looking for well", wellId)
+        prodMonth = 201501
+        product = "Oil"
+        print("about to get well")
+        well=db.getWell(wellId)
+        print("should have found the well")
         lease=db.getLease(well.Lease)
-        monthly=db.getMonthlyByWell(int(wellId))
-        if monthly:
-            monthly = monthly[0]
-            print(monthly)
-            econData = db.getECONOilData(monthly.ProdMonth)
-        else:
-            print("No monthly data for this well")
-            econData = 0
-        rm=db.getRoyaltyMaster(well.Lease)
+        royalty = db.getRoyaltyMaster(well.Lease)
+        #calc = db.getCalcDataByWellProdMonthProduct(wellId,prodMonth,product)
+        royaltyCalc= db.getCalcDataByWellProdMonthProduct(wellId,prodMonth,product)
+        print(royaltyCalc)
+        monthlydata = db.getMonthlyDataByWellProdMonthProduct(wellId,prodMonth,product)
+        print(monthlydata)
+    else:
+        print("No monthly data for this well")
 
 
 
-
-    return render_template('worksheetas.html', well=well, lease=lease, rm=rm, m=monthly, econData = econData)
+    return render_template('worksheetas.html', well=well, rm=royalty, m=monthlydata, product=product, lease=lease, royaltyCalc=royaltyCalc)
 #    return "from adriennes well is" + wellId + "and the well is " + str(well.headers()) + str(well.data())
 
 

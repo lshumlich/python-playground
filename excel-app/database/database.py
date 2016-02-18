@@ -191,7 +191,7 @@ class DataBase(object):
         return self.monthlyTable[0]
     
     def getMonthlyDataByWellProdMonthProduct(self,wellId,prodMonth,product):
-        for md in self.monthlyData():
+        for md in self.monthlyTable:
             if md.WellId == wellId and md.ProdMonth == prodMonth and md.Product == product:
 #             if (md.WellId == wellId and md.ProdMonth == prodMonth and md.Product = product):
                 return md

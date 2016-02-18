@@ -33,7 +33,7 @@ p1  {
    </TR>
    <TR>
       <TD align=right>Province:</TD>
-      <TD align="left">{{ well.Prov }}</TD></TR>
+      <TD align="left">{{ well.Prov }}</TD>
    </TR>
        <TR>
       <TD align=right>Royalty Base:</TD>
@@ -45,25 +45,59 @@ p1  {
    </TR>
    <TR>
       <TD align=right>Indian Interest:</TD>
-      <TD align="left">{{ well.IndianInterest }}</TD></TR>
+      <TD align="left">{{ well.IndianInterest }}</TD>
    </TR>
-       <TR>
-      <TD align=right>SRC:</TD>
-      <TD align="left">{{ well.SRC }}</TD></TR>
+    <TR>
+   {% if rm.MinRoyalty != None %}
+       <TD align=right>Min Royalty: </TD>
+       <TD align="left">{{ rm.MinRoyalty }}</TD>
+    </TR>
+    {% endif %}
+   <TR>
+    {% if well.SRC != None %}
+       <TD align=right>SRC: </TD>
+       <TD align="left">{{ well.SRC }}</TD>
    </TR>
-       <TR>
+    {% endif %}
+   <TR>
+   {% if well.Classification != None %}
       <TD align=right>Classification:</TD>
       <TD align="left">{{ well.Classification }}</TD>
+   {% endif %}
    </TR>
    <TR>
+   {% if well.RoyaltyClassification != None %}
       <TD align=right>Royalty Classification:</TD>
       <TD align="left">{{ well.RoyaltyClassification }}</TD>
    </TR>
+   {% endif %}
    <TR>
       <TD align=right>Valuation Method:</TD>
-      <TD align="left">{{ rm.ValuationMethod }}</TD></TR>
+      <TD align="left">{{ rm.ValuationMethod }}</TD>
    </TR>
+   <TR>
+   {% if well.CommencementDate != None %}
+      <TD align=right>Commencement Date:</TD>
+      <TD align="left">{{ well.CommencementDate }}</TD>
+   </TR>
+   {% endif %}
+   <TR>
+   {% if royaltyCalc.CommencementPeriod != None %}
+      <TD align=right>Commencement Period:</TD>
+      <TD align="left">{{ royaltyCalc.CommencementPeriod }}</TD>
+   </TR>
+   {% endif %}
+
+
 </TABLE><br>
+
+
+<TR>
+   {% if rm.TruckingDeducted == 'Y' %}
+      <TD align=right>Classification:</TD>
+      <TD align="left">{{ well.Classification }}</TD>
+   {% endif %}
+</TR>
 
 
 <head>
@@ -79,8 +113,6 @@ th, td {
 <body>
 
 
-<h4>Monthly data for this well is available for these production dates:</h4>
-{% if m %}
     <TABLE align="right" style="width:100%" border="1">
 
 	<caption><b>Monthly Sask Def of</b></caption>
@@ -106,9 +138,9 @@ th, td {
 
 	<TR>
       <TD>{{ m.ExtractMonth }}</TD>
-      <TD>{{ m.ProdMonth }}</TD>
+      <TD>{{ prodMonth }}</TD>
 	   <TD>{{ m.AmendNo }}</TD>
-	   <TD>{{ m.Product }}</TD>
+	   <TD>{{ product }}</TD>
 	   <TD>{{ m.ProdVol }}</TD>
 	   <TD>{{ m.WellHeadPrice }}</TD>
 	   <TD>2.1234</TD>
@@ -116,106 +148,38 @@ th, td {
     </TR>
 
 </TABLE>
+</body>
+<body>
+
+<br>
 
 
-    &nbsp
-
-    <div>
-    {% if well.RoyaltyClassification == "Fourth Tier Oil" %}
-        {% if m.ProdVol < 25 %}
-        0
-        {% endif %}
-        {% if m.ProdVol <= 136.2 %}
-            (C * MOP) - D  |
-            {% if well.Classification == "Heavy" %}
-                ({{ econData.H4T_C }} * {{ m.ProdVol }}) - {{ econData.H4T_D }}
-                <br>
-            {% endif %}
-            {% if well.Classification == "Southwest" %}
-                ({{ econData.SW4T_C }} * {{ m.ProdVol }}) - {{ econData.SW4T_D }}
-                <br>
-            {% endif %}
-            {% if well.Classification == "Other" %}
-                ({{ econData.O4T_C }} * {{ m.ProdVol }}) - {{ econData.O4T_D }}
-                <br>
-            {% endif %}
-            <!--{% if well.Classification != "Heavy" or well.Classification != "Southwest" or well.Classification != "Other" %}-->
-                <!--Royalty Classification Not Found-->
-                <!--<br>-->
-            <!--{% endif %}-->
-        {% else %}
-        (K - (X / MOP)) - D  |
-            {% if well.Classification == "Heavy" %}
-                ({{ econData.H4T_K }} - ({{ econData.H4T_X }} / {{ m.ProdVol }})) - {{ econData.H4T_D }}
-                <br>
-            {% endif %}
-            {% if well.Classification == "Southwest" %}
-                ({{ econData.SW4T_K }} - ({{ econData.SW4T_X }} / {{ m.ProdVol }})) - {{ econData.SW4T_D }}
-                <br>
-            {% endif %}
-            {% if well.Classification == "Other" %}
-                ({{ econData.O4T_K }} - ({{ econData.O4T_X }} / {{ m.ProdVol }})) - {{ econData.O4T_D }}
-                <br>
-            {% endif %}
-        {% endif %}
-
-    {% else %}
-        {% if well.Classification == "Heavy" %}
-            {% if well.RoyaltyClassification == "Third Tier Oil" %}
-            Heavy Third Tier Oil
-            {% endif %}
-            {% if well.RoyaltyClassification == "New Oil" %}
-            Heavy New Oil
-            {% endif %}
-        {% endif %}
-        {% if well.Classification == "Southwest" %}
-            {% if well.RoyaltyClassification == "Third Tier Oil" %}
-            Southwest Third Tier Oil
-            {% endif %}
-            {% if well.RoyaltyClassification == "New Oil" %}
-            Southwest New Oil
-            {% endif %}
-        {% endif %}
-        {% if well.Classification == "Other" %}
-            {% if well.RoyaltyClassification == "Third Tier Oil" %}
-            Other Third Tier Oil
-            {% endif %}
-            {% if well.RoyaltyClassification == "New Oil" %}
-            Other New Oil
-            {% endif %}
-            {% if well.RoyaltyClassification == "Old Oil" %}
-            Other Old Oil
-            {% endif %}
-        {% endif %}
-        {% endif %}
-
-        <!--{% if well.Classification != "Heavy" or well.Classification != "Southwest" %}-->
-            <!--well classification not found-->
-    <!--{% endif %}-->
-
-    <!--{% if well.RoyaltyClassification != "Fourth Tier Oil" %}-->
-        <!--not Fourth tier-->
-    <!--{% endif %}-->
-        <!--<br>-->
-
-    <!--{% if m.ProdVol == 0 %}-->
-        <!--0-->
-        <!--{% endif %}-->
-
-    <!--{% if m.ProdVol >= 25.1 and m.ProdVol <= 136.2 %}-->
-        <!--25.1=< ProdVol <=136.2-->
-    <!--{% endif %}-->
-
-        <!--{% if m.ProdVol > 136.2 %}-->
-        <!--ProdVol > 136.2-->
-    <!--{% endif %}-->
-    <!--</div>-->
-{% else %}
-<h2>Sorry, no monthly data for this well</h2>
+{*** Note: Replace Well Head Price with Petrinex detail when available ***}<br>
+{*** Note: Replace Trucking Price with Petrinex detail when available ***}<br>
+{*** Note: Replace Processing Price with Petrinex detail when available ***}<br>
+<pre>
+{% if royaltyCalc.X > 0 %}
+         x                 | {{ royaltyCalc.X }} 
+(K - --------- ) - SRC     | {{ royaltyCalc.K, well.SRC, royaltyCalc.ProvCrownRoyaltyRate }} 
+        MOP                | {{ m.ProdVol }}
 {% endif %}
-<!--{*** Note: Replace Well Head Price with Petrinex detail when available ***}<br>-->
-<!--{*** Note: Replace Trucking Price with Petrinex detail when available ***}<br>-->
-<!--{*** Note: Replace Processing Price with Petrinex detail when available ***}<br>-->
+
+{% if royaltyCalc.C > 0 %}
+    (C * MOP) - D | {{royaltyCalc.C, m.ProdVol, royaltyCalc.D, royaltyCalc.ProvCrownRoyaltyRate}}
+    {% endif %}
+
+{% if royaltyCalc.Message != None %}
+{{ royaltyCalc.Message }}
+{% endif %}
+</pre>
+
+{% if royaltyCalc.CommencementPeriod != None %}
+    {% if royaltyCalc.CommencementPeriod < 5 %}
+    IOGR 1995 - Commencement Period < 5 Years: {{ royaltyCalc.CommencementPeriod }}
+    {% else %}
+    IOGR 1995 - Commencement Period >= 5 Years: {{royaltyCalc.CommencementPeriod }}
+    {% endif %}
+{% endif %}
 
 </body>
 </html>
