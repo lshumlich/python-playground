@@ -4,21 +4,21 @@
 <style>
 h1 {
     font-family: arial;
-    font-size: 130%;
-
+    font-size: 130%
 }
 p1  {
     font-family: arial;
     font-size: 80%;
+    padding: 3px
 }
 </style>
 </head>
 
-<h1 align="center">Well: {{ well.WellId }}<br>
+<h1 align="center" style="background-color:lightgrey;">Well: {{ well.WellId }}<br>
 	UWI: {{ well.UWI }}</h1>
-<hr></hr>
-<p1>
+<hr> </hr>
 
+<p1>
 
 <TABLE align="center" border="0">
 	<col width="50%">
@@ -94,9 +94,12 @@ p1  {
 
 <TR>
    {% if rm.TruckingDeducted == 'Y' %}
-      <TD align=right>Classification:</TD>
-      <TD align="left">{{ well.Classification }}</TD>
+      <TD align=right>Deductions = Trucking</TD>
    {% endif %}
+   {% if rm.ProcessingDeducted == 'Y' %}
+      <TD align=right>Deductions = Processing</TD>
+   {% endif %}
+
 </TR>
 
 
@@ -106,7 +109,7 @@ table, th, td {
     border-collapse: collapse;
 }
 th, td {
-    padding: 5px;
+    padding: 3px;
 }
 </style>
 </head>
@@ -148,30 +151,45 @@ th, td {
     </TR>
 
 </TABLE>
-</body>
-<body>
+
 
 <br>
 
 
-{*** Note: Replace Well Head Price with Petrinex detail when available ***}<br>
-{*** Note: Replace Trucking Price with Petrinex detail when available ***}<br>
+<td>{*** Note: Replace Well Head Price with Petrinex detail when available ***}<br></td>
+<td>{*** Note: Replace Trucking Price with Petrinex detail when available ***}<br></td>
 {*** Note: Replace Processing Price with Petrinex detail when available ***}<br>
-<pre>
+
+    <TABLE  align="center" style="width:50%" cellpadding="0">
+
+	<col width="10%">
+	<col width="10%">
+	<col width="10%">
+	<col width="10%">
+    <col width="10%">
+	<col width="10%">
+	<col width="10%">
+	<col width="10%">
+
+
+
+    <br>
 {% if royaltyCalc.X > 0 %}
-         x                 | {{ royaltyCalc.X }} 
-(K - --------- ) - SRC     | {{ royaltyCalc.K, well.SRC, royaltyCalc.ProvCrownRoyaltyRate }} 
-        MOP                | {{ m.ProdVol }}
+<TR><TD align="center"> x</TD> <TD align="center"> |</TD> <TD align="center">{{ royaltyCalc.X }}</TD></TR> <hr> </hr>
+<TR><TD align="center">&nbsp &nbsp &nbsp(K - ------------ ) - SRC</TD>     <TD align="center">|</TD> <TD align="center">{{ royaltyCalc.K, well.SRC, royaltyCalc.ProvCrownRoyaltyRate }}</TD></TR> <br>
+        MOP                | {{ m.ProdVol }} <br>
 {% endif %}
 
 {% if royaltyCalc.C > 0 %}
     (C * MOP) - D | {{royaltyCalc.C, m.ProdVol, royaltyCalc.D, royaltyCalc.ProvCrownRoyaltyRate}}
     {% endif %}
+</Table>
+
 
 {% if royaltyCalc.Message != None %}
 {{ royaltyCalc.Message }}
 {% endif %}
-</pre>
+<br>
 
 {% if royaltyCalc.CommencementPeriod != None %}
     {% if royaltyCalc.CommencementPeriod < 5 %}
@@ -180,6 +198,73 @@ th, td {
     IOGR 1995 - Commencement Period >= 5 Years: {{royaltyCalc.CommencementPeriod }}
     {% endif %}
 {% endif %}
+
+<br>
+
+{% if m.ProdVol < 80 %}
+    MOP < 80  -> RVol = 10% * MOP + {{ royaltyCalc.IOGR1995RoyaltyVolume }}
+{% elif m.ProdVol < 160 %}
+    MOP 80 to 160  -> RVol = 8 + 20% * (MOP - 80) + {{ royaltyCalc.IOGR1995RoyaltyVolume }}
+{% elif royaltyCalc.CommencementPeriod < 5 %}
+    MOP > 160  -> RVol = 24 + 26% * (MOP - 160) + {{ royaltyCalc.IOGR1995RoyaltyVolume }}
+{% elif m.ProdVol < 795 %}
+    MOP 160 to 795 -> RVol = 24 + 26% * (MOP - 160) + {{ royaltyCalc.IOGR1995RoyaltyVolume }}
+{% else %}
+    MOP > 795 -> RVol = 189 + 40% * (MOP - 795) + + {{ royaltyCalc.IOGR1995RoyaltyVolume }}
+{% endif %}
+
+<br>
+
+{% if m.Product == 'Oil' and 'SKProvCrownVar' in rm.RoyaltyScheme %}
+CR%    * CMult *   Prod    *   II  *      Val   =     R$     =     Rvol
+<br>
+{{ royaltyCalc.ProvCrownUsedRoyaltyRate, rm.CrownMultiplier, m.ProdVol,
+well.IndianInterest,royaltyCalc.RoyaltyPrice, royaltyCalc.ProvCrownRoyaltyValue, royaltyCalc.ProvCrownRoyaltyVolume }}
+{% endif %}
+
+{% if m.Product == 'Oil' and 'IOGR1995' in rm.RoyaltyScheme %}
+CMult *   RoyVol  *    II *      Val   =     R$     =     Rvol
+<br>
+{{ rm.CrownMultiplier,royaltyCalc.IOGR1995RoyaltyVolume,well.IndianInterest/1,
+royaltyCalc.RoyaltyPrice, royaltyCalc.IOGR1995RoyaltyValue, royaltyCalc.IOGR1995RoyaltyVolume }}
+{% endif %}
+
+<br>
+
+{% if 'GORR' in rm.RoyaltyScheme %}
+GORR: + {{ royaltyCalc.GorrMessage }}
+<br>
+GORR%    *   Prod    *   II  *      Val   =     R$     =     Rvol
+<br>
+{{ royaltyCalc.GorrRoyaltyRate, m.ProdVol, well.IndianInterest, royaltyCalc.RoyaltyPrice, royaltyCalc.GorrRoyaltyValue,
+royaltyCalc.GorrRoyaltyVolume }}
+{% endif %}
+
+<br>
+
+{*** Note: Handle Incentives}
+
+{% if royaltyCalc.RoyaltyValuePreDeductions != royaltyCalc.RoyaltyValue %}
+Royalty Pre Deductions: {{ royaltyCalc.RoyaltyValuePreDeductions }}
+<br>
+{% endif %}
+{% if royaltyCalc.RoyaltyTransportation > 0 %}
+Less Transportation {{royaltyCalc.RoyaltyVolume, m.TransRate,royaltyCalc.RoyaltyTransportation }}
+<br>
+{% endif %}
+{% if royaltyCalc.RoyaltyProcessing > 0 %}
+Less Processing {{ royaltyCalc.RoyaltyVolume,m.ProcessingRate,royaltyCalc.RoyaltyProcessing }}
+<br>
+{% endif %}
+{% if royaltyCalc.RoyaltyDeductions > 0 %}
+Total Deductions: {{ royaltyCalc.RoyaltyDeductions }}
+{% endif %}
+<br>
+Royalty Amount: {{ royaltyCalc.RoyaltyValue }}
+<br>
+{****Note: Handle Previous Paid Amount?}
+<br>
+</p1>
 
 </body>
 </html>
