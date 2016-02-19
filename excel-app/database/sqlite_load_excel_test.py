@@ -60,7 +60,7 @@ class TestLoader(unittest.TestCase):
         #clean up
         loader.close()
         shower.close()
-        loader.delete_database(self.TEST_DATABASE)        
+        # loader.delete_database(self.TEST_DATABASE)        
         self.assertFalse(os.path.exists(self.TEST_DATABASE))
 
 """
