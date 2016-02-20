@@ -19,5 +19,4 @@ CI build is triggered by every github push
 CI script is at ".travis.yml" in repository root directory
 each CI build also runs code coverage and uploads it to www.codecov.io, login credentials tbd
 
-
-Larry's Change
+Hello world!
