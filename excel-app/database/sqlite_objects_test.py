@@ -12,7 +12,6 @@ class Test(unittest.TestCase):
     def setUp(self):
         #Preparing the database
         self.dbi = config.get_database_instance()
-        self.dbi.connect()
         for table in self.dbi.get_table_names():
         	self.dbi.execute('DROP TABLE %s' % table)
         self.dbi.commit()
@@ -126,8 +125,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(self.do.universal_select('Lease')), 4)
         self.assertEqual(len(self.do.universal_select('Lease', Prov='SK')), 3)
 
-    def tearDown(self):
-        self.dbi.close()
+#     def tearDown(self):
+#         self.dbi.close()
 
 if __name__ == '__main__':
     unittest.main()

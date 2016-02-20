@@ -93,7 +93,7 @@ def adriennews():
         wellIds = request.args["WellId"]
         wellId = int(wellIds)
         print("looking for well", wellId)
-        prodMonth = 201501
+        prodMonth = 201503
         product = "Oil"
         print("about to get well")
         well=db.getWell(wellId)
@@ -104,6 +104,7 @@ def adriennews():
         royaltyCalc= db.getCalcDataByWellProdMonthProduct(wellId,prodMonth,product)
         print(royaltyCalc)
         monthlydata = db.getMonthlyDataByWellProdMonthProduct(wellId,prodMonth,product)
+        #yyyy_mm = str[0:4]+'-'+str[4:6]
         print(monthlydata)
     else:
         print("No monthly data for this well")
