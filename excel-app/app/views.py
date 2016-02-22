@@ -111,7 +111,7 @@ def adriennews():
 
 
 
-    return render_template('worksheetas.html', well=well, rm=royalty, m=monthlydata, product=product, lease=lease, royaltyCalc=royaltyCalc)
+    return render_template('worksheetas.html', well=well, rm=royalty, m=monthlydata, product=product, lease=lease, royaltyCalc=royaltyCalc, prodMonth=prodMonth)
 #    return "from adriennes well is" + wellId + "and the well is " + str(well.headers()) + str(well.data())
 
 
