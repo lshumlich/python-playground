@@ -24,7 +24,6 @@ ul.topnav {
     background-color: #333;
     position: fixed;
     top: 0;
-#	bottom: 0;
     width: 100%;
 }
 
@@ -34,14 +33,6 @@ li.topnav {
 
 
 li.topnav a {
-    text-align: center;
-    padding: 1px 10px;
-    text-decoration: none;
-}
-
-
-li.saveme a {
-    color: white;
     text-align: center;
     padding: 1px 10px;
     text-decoration: none;
@@ -64,46 +55,6 @@ body
  margin-right:30px;
  margin-bottom:30px;
 
-}
-
-.modalDialog {
-	position: fixed;
-	font-family: Arial, Helvetica, sans-serif;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	background: rgba(0,0,0,0.8);
-	z-index: 99999;
-	opacity:0;
-	-webkit-transition: opacity 400ms ease-in;
-	-moz-transition: opacity 400ms ease-in;
-	transition: opacity 400ms ease-in;
-	pointer-events: none;
-}
-.modalDialog:target {
-	opacity:1;
-	pointer-events: auto;
-}
-
-.modalDialog > div {
-	width: 400px;
-	position: relative;
-	margin: 10% auto;
-	padding: 5px 20px 13px 20px;
-	border-radius: 10px;
-	background: #fff;
-	background: -moz-linear-gradient(#fff, #999);
-	background: -webkit-linear-gradient(#fff, #999);
-	background: -o-linear-gradient(#fff, #999);
-}
-.lfsKeep {
-	position: fixed;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-//	position: static|absolute|fixed|relative|initial|inherit;
 }
 
 .lfsDialog {
@@ -138,3 +89,31 @@ body
 	background: -webkit-linear-gradient(#fff, #999);
 	background: -o-linear-gradient(#fff, #999);
 }
+.image:before {
+    content:url('/static/hyperlink.jpg');
+    display: block;
+    height: 30px;
+    width: 10px;
+    max-width: 50px;
+    max-height: 50px;
+    position: relative;
+    right: 0px;
+}
+
+.write .icon {
+    background-image: url('/static/contact-us-sprite.png');
+    background-repeat: no-repeat;
+    background-position: right top;
+}
+/*
+background:url(/i/hp/v14/gfx/contact-us-sprite.png) 0 -30px no-repeat
+.icon {
+    background-image: url('/static/contact-us-sprite.png');
+    background-repeat: no-repeat;
+    background-position: right top;
+    clip-path: inset(30px 30px 30px 10px);
+    display: block;
+    position: absolute;
+}
+
+*/

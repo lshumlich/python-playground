@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
@@ -17,10 +16,10 @@
  
  <div style="padding:10px;margin-top:25px;">
     {% if header %}
-    	<table border="1">
+    	<table border="1" id="table">
     	<tr>
         {% for h in header %}
-        	<td> <a href=?table={{table}}&attr={{ h }}> {{ h }} </a> {% if h in links %} - {% else %} <a onclick="openLink('{{table}}','{{h}}')">+</a> {% endif %}</td>
+        	<td> <a href=?table={{table}}&attr={{ h }}> {{ h }} </a> {% if h in links %} <img src="/static/x.png"> {% else %} <a onclick="openLink('{{table}}','{{h}}')"><img src="/static/pencil.png"></a> {% endif %} </td>
         {% endfor %}
     	</tr>
 	    {% if rows %} 
@@ -35,12 +34,9 @@
 	    {% endif %}
 	    </table>
     {% endif %}
-    <p>
-    {{ table }}
-    <p>v6
 </div>
 
-<p id="demo"></p>
+<div id="lfsconcole"></div>
 
 
 <a onclick="document.getElementById('openModal').innerHTML='<object type='text/html' data='/link' ></object>'">
@@ -75,9 +71,15 @@ Open Modal 2</a>
 <li><a id="lfsConsClear" href="#lfstst">Clear</a></li>
 <li><a id="lfsAJAX" href="#lfstst">AJAX</a></li>
 </ul>
-<div id="lfsconcole">
-Some Text in lfsconcol
-</div>
+<br>
+Should have an icon
+ <div class="write"> <div class="icon">and this</div> </div>
+<br>
+next
+<div class="icon">If this had more space </div>
+<br>
+
+<div class="lfsclass" id="lfsid" tab="lfstab" attr="lfsattr">This is in lfsclass,lfsid,lfstab...</div>
 
 <script>
 function openLink(table,attrname) {
@@ -90,28 +92,37 @@ function openLink(table,attrname) {
 // <a onclick=" window.open('/link','',' scrollbars=yes,menubar=no,width=300, height=300 resizable=yes,toolbar=no,location=no,status=no,address=no')">Next 2</a>
 }
 
+function consAppend(msg) {
+	el = document.getElementById('lfsconcole')
+    el.innerHTML = el.innerHTML + msg +'<br>'
+}
+
+function consClear() {
+	el = document.getElementById('lfsconcole')
+    el.innerHTML = ""
+}
+
 function lfsConsAppend(e){
-	el = document.getElementById('lfsconcole')
-	el.innerHTML = el.innerHTML + ' We just run lfsHrefFunc()<br>'
+	consAppend('We just run lfsHrefFunc()')
 }
+
 function lfsConsClear(e){
-	el = document.getElementById('lfsconcole')
-	el.innerHTML = ""
+	consClear()
 }
+
 function lfsAJAX(e){
-	el = document.getElementById('lfsconcole');
-	el.innerHTML = "Calling the AJAX one.";
+	consAppend("Calling the AJAX one.");
 	xhr = new XMLHttpRequest();
 	xhr.onload = function() {
-		el = document.getElementById('lfsconcole')
-		el.innerHTML = xhr.status;
+		consAppend(xhr.status);
 		if (xhr.status == 200) {
-			el.innerHTML = xhr.responseText;
+			consAppend(xhr.responseText);
 		}
 	}
 	xhr.open('GET','/',true);
 	xhr.send(null);
 }
+
 function showLfsDialog(event) {
 	
 	var el = document.getElementById('lfsModal');
@@ -125,35 +136,47 @@ function showLfsDialog(event) {
 		el.style.opacity = 0;
 	}
 	var msg = " you clicked boy: "
-		msg += ' sx=' + event.clientY + 'px';                    // Update element with screenX
-	  	msg += ' sy=' + event.clientX + 'px';                    // Update element with screenY
-//		  px.value = event.pageX;                      // Update element with pageX
-//		  py.value = event.pageY;                      // Update element with pageY
-//		  cx.value = event.clientX;                    // Update element with clientX
-//		  cy.value = event.clientY;                    // Update element with clientY
+		msg += ' sx=' + event.clientY + 'px';
+	  	msg += ' sy=' + event.clientX + 'px';
 		el = document.getElementById('lfsconcole');
 		el.innerHTML = msg;
 }
 
-function showPosition(event) {                 // Declare function
+function showPosition(event) {
 	var msg = ""
-	msg += ' sx=' + event.screenX;                    // Update element with screenX
-  	msg += ' sy=' + event.screenY;                    // Update element with screenY
-//	  px.value = event.pageX;                      // Update element with pageX
-//	  py.value = event.pageY;                      // Update element with pageY
-//	  cx.value = event.clientX;                    // Update element with clientX
-//	  cy.value = event.clientY;                    // Update element with clientY
-	el = document.getElementById('lfsconcole');
-	el.innerHTML = msg;
-	}
+	msg += ' sx=' + event.screenX;
+  	msg += ' sy=' + event.screenY;
+  	consAppend(msg);
+}
 
-var el = document.getElementById('body');      // Get body Element
-//el.addEventListener('mousemove', showPosition, false); // Move updates position
-el.addEventListener('click', showLfsDialog, false); // Move updates position
+function lfsid(event) {
+	showPosition(event);
+	var el = document.getElementById('lfsid');
+	consAppend(el.id);
+	consAppend(el.getAttribute("tab"));
+    consAppend(el.getAttribute("attr"));
+}
 
+function tableListener(event) {
+	var e1 = event.target;
+	var col = e1.cellIndex;
+	var p1 = e1.parentNode;
+	var row = p1.rowIndex;
+	var tab = document.getElementById('table');
+	var hRow = tab.rows[0];
+	var cell = hRow.getElementsByTagName("td")[col];
+	
+	tab.rows[0].innerHTML
+	consClear()
+    consAppend("We have a tableListner:" + row + "," + col + ' ' + cell.innerHTML + " = " + e1.innerHTML);
+}
+
+// document.getElementById('body').addEventListener('click', showLfsDialog, false); // Move updates position
 document.getElementById('lfsConsAppend').addEventListener('click', lfsConsAppend,false)
 document.getElementById('lfsConsClear').addEventListener('click', lfsConsClear,false)
 document.getElementById('lfsAJAX').addEventListener('click', lfsAJAX,false)
+document.getElementById('lfsid').addEventListener('click', lfsid,false)
+document.getElementById('table').addEventListener('click', tableListener,false)
 </script>    
 </body>
 </html>

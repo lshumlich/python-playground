@@ -20,7 +20,6 @@ def run_royalties_and_worksheet():
     pr = ProcessRoyalties()
     pr.process(config.get_file_dir() + 'database.xlsx')
 #     pr.process('d:/$temp/sample.xlsx')
-#     pr.process('d:/$temp/sample.xlsx')
     print('os name is:',os.name)
     if os.name != "posix":
         subprocess.call(['notepad.exe', config.get_temp_dir() + 'log.txt'])
@@ -46,12 +45,10 @@ def browser_app():
 print('-- Runing Batch')
 if __name__ == "__main__":
 #     sqliteLoadExcel()
-#     browser_app()
-    run_royalties_and_worksheet()
+    browser_app()
+#     run_royalties_and_worksheet()
 
     
-# runRoyaltiesAndWorksheet()
-# runTestModule()
 
 # if __name__ == "__main__":
 #     """This runs all the tests in the module"""
@@ -63,43 +60,3 @@ if __name__ == "__main__":
 #     tst = TestSaskRoyaltyCalc()
 #     tst.test_calcSaskOilProvCrownRoyaltyRate()
 
-
-
-#     Major Hack must be fixed.    
-""" Ignore all this commented out code for now
-class DataBaseTest(unittest.TestCase):
-
-    def xtest_getMonthlyDataByWellProdMonthProduct(self):
-        rw = RoyaltyWorksheet()
-        rw.printWithWellProdDate(6,201501,'Oil')
-        subprocess.call(['notepad.exe', 'Royalty Worksheet.txt'])
-        subprocess.call(['notepad.exe', 'log.txt'])
-
-        
-    def xtest_runRoyaltiesAndWorksheet(self):
-        pr = ProcessRoyalties()
-        pr.process('database.xlsx')
-        print('os name is:',os.name)
-        if os.name != "posix":
-            subprocess.call(['notepad.exe', 'Royalty Worksheet.txt'])
-            subprocess.call(['notepad.exe', 'log.txt'])
-
-        
-    def test_whatever2(self):
-        print ('in test_whatever2')
-
-        
-    def test_whatever3(self):
-        print ('in test_whatever3')
-        
-def suite(): # Need to play with this more.
-    suite = unittest.TestSuite()
-    suite.addTest (DataBaseTest('test_whatever2'))
-    return suite
-if __name__ == '__main__':
-    print('batch - running from main')
-    runner = unittest.TextTestRunner()
-    test_suite = suite()
-    runner.run (test_suite)
-"""
-    
