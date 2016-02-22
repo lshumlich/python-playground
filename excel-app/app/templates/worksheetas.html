@@ -13,7 +13,6 @@
 h1 {
     font-family: arial;
     padding: 20px;
-    background-color:lightgrey;
     font-size: 130%
 }
 p1  {
@@ -38,7 +37,7 @@ div {
 
 <h1 align="center">Well: {{ well.WellId }}<br>
 	UWI: {{ well.UWI }}</h1>
-
+<hr> </hr>
 
 <p1>
 
@@ -46,76 +45,76 @@ div {
 	<col width="50%">
 	<col width="50%">
    <TR>
-      <TD align=right>Lease:</TD>
+      <TD align=right><b>Lease:</b></TD>
       <TD align="left">{{ well.LeaseType }}-{{ well.LeaseID }} </TD>
    </TR>
    <TR>
-      <TD align=right>Right:</TD>
+      <TD align=right><b>Right:</b></TD>
       <TD align="left">{{ rm.RightsGranted }}</TD>
    </TR>
    <TR>
-      <TD align=right>Province:</TD>
+      <TD align=right><b>Province:</b></TD>
       <TD align="left">{{ well.Prov }}</TD>
    </TR>
        <TR>
-      <TD align=right>Royalty Base:</TD>
+      <TD align=right><b>Royalty Base:</b></TD>
       <TD align="left">{{ rm.RoyaltyScheme }}</TD>
    </TR>
    <TR>
-      <TD align=right>Crown Multiplier:</TD>
+      <TD align=right><b>Crown Multiplier:</b></TD>
       <TD align="left">{{ rm.CrownMultiplier }}</TD>
    </TR>
    <TR>
-      <TD align=right>Indian Interest:</TD>
+      <TD align=right><b>Indian Interest:</b></TD>
       <TD align="left">{{ well.IndianInterest }}</TD>
    </TR>
     <TR>
    {% if rm.MinRoyalty != None %}
-       <TD align=right>Min Royalty: </TD>
+       <TD align=right><b>Min Royalty:</b> </TD>
        <TD align="left">{{ rm.MinRoyalty }}</TD>
     </TR>
     {% endif %}
    <TR>
     {% if well.SRC != None %}
-       <TD align=right>SRC: </TD>
+       <TD align=right><b>SRC:</b> </TD>
        <TD align="left">{{ well.SRC }}</TD>
    </TR>
     {% endif %}
    <TR>
    {% if well.Classification != None %}
-      <TD align=right>Classification:</TD>
+      <TD align=right><b>Classification:</b></TD>
       <TD align="left">{{ well.Classification }}</TD>
    {% endif %}
    </TR>
    <TR>
    {% if well.RoyaltyClassification != None %}
-      <TD align=right>Royalty Classification:</TD>
+      <TD align=right><b>Royalty Classification:</b></TD>
       <TD align="left">{{ well.RoyaltyClassification }}</TD>
    </TR>
    {% endif %}
    <TR>
-      <TD align=right>Valuation Method:</TD>
+      <TD align=right><b>Valuation Method:</b></TD>
       <TD align="left">{{ rm.ValuationMethod }}</TD>
    </TR>
    <TR>
    {% if well.CommencementDate != None %}
-      <TD align=right>Commencement Date:</TD>
+      <TD align=right><b>Commencement Date:</b></TD>
       <TD align="left">{{ well.CommencementDate }}</TD>
    </TR>
    {% endif %}
    <TR>
    {% if royaltyCalc.CommencementPeriod != None %}
-      <TD align=right>Commencement Period:</TD>
+      <TD align=right><b>Commencement Period:</b></TD>
       <TD align="left">{{ royaltyCalc.CommencementPeriod }}</TD>
    </TR>
    {% endif %}
     <TR>
    {% if rm.TruckingDeducted == 'Y' %}
-      <TD align=right>Deductions:</TD>
+      <TD align=right><b>Deductions:</b></TD>
       <TD align="left">Trucking</TD>
    {% endif %}
    {% if rm.ProcessingDeducted == 'Y' %}
-      <TD align=right>Deductions:</TD>
+      <TD align=right><b>Deductions:</b></TD>
       <TD align="left">Processing</TD>
    {% endif %}
     </TR>
@@ -138,7 +137,7 @@ th, td {
 <body>
 
 
-    <TABLE align="right" style="width:100%" border="1">
+    <TABLE align="center" style="width:80%" border="1">
 
 	<caption><b>Monthly Sask Def of</b></caption>
 	<col width="12.5%">
@@ -181,7 +180,7 @@ th, td {
 
 <br>{*** Note: Replace Well Head Price with Petrinex detail when available ***}<br>
 {*** Note: Replace Trucking Price with Petrinex detail when available ***}<br>
-{*** Note: Replace Processing Price with Petrinex detail when available ***}<br>
+{*** Note: Replace Processing Price with Petrinex detail when available ***}<br> <br>
 
     <TABLE  align="center" style="width:50%">
 
@@ -195,7 +194,6 @@ th, td {
 	<col width="10%">
 
 
-<br>
 {% if royaltyCalc.X > 0 %}
 
     <TABLE  align="center" style="width:41%">
@@ -315,15 +313,15 @@ th, td {
 <br>
 {% endif %}
 {% if royaltyCalc.RoyaltyTransportation > 0 %}
-<tr align="center"><td colspan="2">Less Transportation</td> <td>{{royaltyCalc.RoyaltyVolume }}</td> <td>*</td> <td>{{ m.TransRate }}</td> <td>=</td> <td>{{ royaltyCalc.RoyaltyTransportation }}</td></tr>
+<tr align="center"><td colspan="2">Less Transportation:</td> <td>{{royaltyCalc.RoyaltyVolume }}</td> <td>*</td> <td>{{ m.TransRate }}</td> <td>=</td> <td>{{ '{:.2f}'.format(royaltyCalc.RoyaltyTransportation) }}</td></tr>
 <br>
 {% endif %}
 {% if royaltyCalc.RoyaltyProcessing > 0 %}
-<tr align="Center"><td colspan="2">Less Processing</td> <td>{{ royaltyCalc.RoyaltyVolume }}</td> <td>*</td> <td>{{ m.ProcessingRate }}</td> <td>=</td> <td>{{ royaltyCalc.RoyaltyProcessing }}</td></tr>
+<tr align="Center"><td colspan="2">Less Processing:</td> <td>{{ royaltyCalc.RoyaltyVolume }}</td> <td>*</td> <td>{{ m.ProcessingRate }}</td> <td>=</td> <td>{{ '{:.2f}'.format(royaltyCalc.RoyaltyProcessing) }}</td></tr>
 <br>
 {% endif %}
 {% if royaltyCalc.RoyaltyDeductions > 0 %}
-<tr align="left"><td colspan="2">Total Deductions:</td><td> &nbsp; </td> <td> &nbsp; </td> <td> &nbsp; </td> <td> &nbsp; </td> <td align="center">{{ royaltyCalc.RoyaltyDeductions }}</td></tr>
+<tr align="Center"><td colspan="2">Total Deductions:</td><td> &nbsp; </td> <td> &nbsp; </td> <td> &nbsp; </td> <td> &nbsp; </td> <td align="center">{{ '{:.2f}'.format(royaltyCalc.RoyaltyDeductions) }}</td></tr>
 <br>
 {% endif %}
 <tr><td align="left" colspan="2"> Royalty Amount:</td> <td colspan="6" align="right">{{ '{:.2f}'.format(royaltyCalc.RoyaltyValue) }}</td></tr>
