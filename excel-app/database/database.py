@@ -30,7 +30,12 @@ class DataStructure(object):
         return list(d.values())
     @property
     def Lease(self):
-        return '{}-{:04d}'.format(self.LeaseType,self.LeaseID)
+        if hasattr(self, 'LeaseID'):
+            lid = self.LeaseID
+        else:
+            lid = self.ID
+        
+        return '{}-{:04d}'.format(self.LeaseType,lid)
 
 """
     Generic class for fetching data.
@@ -118,7 +123,7 @@ class DataBase(object):
         self.wellList = self.excelLoadWsTable(self.wellTabName)
         self.well = dict()
         for ds in self.wellList:
-            self.well[ds.WellId] = ds
+            self.well[ds.ID] = ds
         
     def getWell(self, wellId):
         try:

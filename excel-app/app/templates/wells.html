@@ -22,7 +22,7 @@
 		</tr>
 		{% for w in wells %}
 		<tr>
-			<td><a href={{ url_for('well', wellid=w.WellId) }}>{{ w.WellId }}</a></td>
+			<td><a href={{ url_for('well', wellid=w.ID) }}>{{ w.ID }}</a></td>
 			<td>{{ w.UWI }}</td>
 			<td>{{ w.WellType }}</td>
 			<td>{{ w.Prov }}</td>
