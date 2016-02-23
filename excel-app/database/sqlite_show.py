@@ -9,9 +9,13 @@ class Shower(object):
 
     def connect(self,dbName):
         self.dbi = config.get_database_instance(dbName)
-        
-    def insert_link(self,tab,att,lnk):
-        stmt = 'insert into linktab values("' + tab + '", "' + att + '", "' + lnk + '")'
+    
+    def insert_link(self, tabName, attName, linkName, baseTab, showAttrs):
+        """ 
+        create table linktab (TabName text, AttrName text, LinkName text, BaseTab boolean, ShowAttrs text);
+        insert into linktab values ("BATable", "ID", "BA", 1, "ID,BAName");
+        """
+        stmt = 'insert into linktab values("' + tabName + '", "' + attName + '", "' + linkName + ', "' + baseTab + ',"' + showAttrs+ '")'
         self.dbi.execute(stmt)
         self.dbi.commit()
         

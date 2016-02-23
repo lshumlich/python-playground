@@ -19,7 +19,7 @@
     	<table border="1" id="table">
     	<tr>
         {% for h in header %}
-        	<td> <a href=?table={{table}}&attr={{ h }}> {{ h }} </a> {% if h in links %} <img src="/static/x.png"> {% else %} <a onclick="openLink('{{table}}','{{h}}')"><img src="/static/pencil.png"></a> {% endif %} </td>
+        	<td> <a href=?table={{table}}&attr={{ h }}> {{ h }} </a> </td>
         {% endfor %}
     	</tr>
 	    {% if rows %} 
@@ -80,6 +80,8 @@ next
 <br>
 
 <div class="lfsclass" id="lfsid" tab="lfstab" attr="lfsattr">This is in lfsclass,lfsid,lfstab...</div>
+
+<div class="linkDialog" id="linkDialog"> This is linkDialog </div> 
 
 <script>
 function openLink(table,attrname) {
@@ -164,11 +166,32 @@ function tableListener(event) {
 	var row = p1.rowIndex;
 	var tab = document.getElementById('table');
 	var hRow = tab.rows[0];
-	var cell = hRow.getElementsByTagName("td")[col];
+	var hcell = hRow.getElementsByTagName("td")[col];
+	var attrName = hcell.textContent
+	var attrValue = e1.textContent
+	var tabName = '{{table}}'
 	
-	tab.rows[0].innerHTML
 	consClear()
-    consAppend("We have a tableListner:" + row + "," + col + ' ' + cell.innerHTML + " = " + e1.innerHTML);
+    consAppend("We have a tableListner1:" + row + "," + col + ' ' + hcell.innerHTML + " = " + e1.innerHTML);
+    consAppend("We have a tableListner2:" + row + "," + col + ' ' + tabName + '.' + attrName + " = " + attrValue);
+	
+	consAppend("Calling the AJAX one.");
+    xhr = new XMLHttpRequest();
+    xhr.onload = function() {
+        consAppend(xhr.status);
+        if (xhr.status == 200) {
+       	    var elDialog = document.getElementById('linkDialog');
+       	    elDialog.style.opacity = 0;
+       	    elDialog.innerHTML = xhr.responseText
+       	    elDialog.style.top = event.clientY + 'px';
+       	    elDialog.style.left = event.clientX + 'px';
+       	    elDialog.style.opacity = 1;
+            consAppend('x: ' + event.clientX + ' y: ' + event.clientY);
+        }
+    }
+    parms = '/link/?tablename=' + tabName +'&attrname=' + attrName + '&linkname=' + 'whateverlinkname' 
+    xhr.open('GET',parms,true);
+    xhr.send(null);
 }
 
 // document.getElementById('body').addEventListener('click', showLfsDialog, false); // Move updates position

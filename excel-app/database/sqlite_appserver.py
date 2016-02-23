@@ -63,6 +63,7 @@ class AppServer(object):
         try:
             print('AppServer.link running')
             if request.method == 'POST':
+                print('  It was a post')
                 tablename = request.form['tablename']
                 attrname = request.form['attrname']
                 linkname = request.form['linkname']
@@ -79,9 +80,10 @@ class AppServer(object):
                     flash('Link name must be entered.')
                     
                 if not error:
-                    AppServer.shower.insertLink(tablename, attrname, linkname)
+                    AppServer.shower.insert_link(tablename, attrname, linkname,0,'id')
                     return render_template('closeme.html')
             else:   
+                print('  It was a get')
                 tablename = AppServer.reqorblank('tablename')
                 attrname = AppServer.reqorblank('attrname')
                 linkname = AppServer.reqorblank('linkname')
