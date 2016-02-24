@@ -13,7 +13,7 @@ class Test(unittest.TestCase):
         #Preparing the database
         self.dbi = config.get_database_instance()
         for table in self.dbi.get_table_names():
-        	self.dbi.execute('DROP TABLE %s' % table)
+            self.dbi.execute('DROP TABLE %s' % table)
         self.dbi.commit()
         self.do = database.sqlite_objects.DataObject()
 

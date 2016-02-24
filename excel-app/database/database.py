@@ -11,31 +11,9 @@ from openpyxl import load_workbook
 from openpyxl import Workbook
 
 from database.apperror import AppError
+from database.data_structure import DataStructure
 import config
 
-class DataStructure(object):
-    
-    def __init__(self):
-        None
-        
-    def __str__(self):
-        return str(vars(self))
-    
-    def headers(self):
-        d = vars(self)
-        return list(d.keys())
-
-    def data(self):
-        d = vars(self)
-        return list(d.values())
-    @property
-    def Lease(self):
-        if hasattr(self, 'LeaseID'):
-            lid = self.LeaseID
-        else:
-            lid = self.ID
-        
-        return '{}-{:04d}'.format(self.LeaseType,lid)
 
 """
     Generic class for fetching data.

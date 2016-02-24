@@ -17,9 +17,6 @@ check that audit has been create
   update
   delete
 
- 
-
-
 """
 
 from database.apperror import AppError
@@ -29,7 +26,6 @@ import config
 class DataBaseTest(unittest.TestCase):
 #    Major Hack must be fixed.    
     def test_getMonthlyDataByWellProdMonthProduct(self):
-        db = DataBase(config.get_file_dir() + 'database.xlsx')
+        db = DataBase(config.get_file_dir() + 'database new.xlsx')
         md = db.getMonthlyDataByWellProdMonthProduct(6,201501,'Oil')
         self.assertRaises(AppError,db.getMonthlyDataByWellProdMonthProduct,99999,201512,'Oil')
-        print(md)

@@ -8,10 +8,7 @@ import sqlite3
 
 import config
 from database.apperror import AppError
-
-class DataStructure(object):
-    def __str__(self):
-        return str(vars(self))
+from database.data_structure import DataStructure
 
 
 class DataObject(object):
