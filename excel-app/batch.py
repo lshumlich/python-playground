@@ -27,8 +27,8 @@ def run_royalties_and_worksheet():
         subprocess.call(['notepad.exe', config.get_temp_dir() + 'Royalty Worksheet.txt'])
 
 def runTestModule():
-#     unittest.main(module='database.calcroyalties_test')
-    unittest.main(module='database.sqlite_load_excel_test')
+    unittest.main(module='database.calcroyalties_test')
+#    unittest.main(module='database.sqlite_load_excel_test')
 
 def sqliteLoadExcel():
     database = config.get_temp_dir() + 'browser.db'
@@ -56,7 +56,8 @@ if __name__ == "__main__":
 #     sqliteLoadExcel()
 #     browser_app()
 #     run_royalties_and_worksheet()
-    unittest.main()
+#    unittest.main()
+    runTestModule()
     print("Goodby world!")
 
     

@@ -147,5 +147,35 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, IndianInterest, MinRoyalty, RoyaltyPr
 
         return
 
+    def test_calcSaskOilIOGR1995(self):
+        pr = ProcessRoyalties()
+        #all tests for SaskWellHead
+        self.assertEqual(pr.calcSaskOilIOGR1995(201501, datetime(2015,01,01), 70, "SaskWellHead", 0, 1), 0)
+        self.assertEqual(pr.calcSaskOilIOGR1995(201501, 201502, 100, "SaskWellHead", 0.25, 3), 1990.11)
+        self.assertEqual(pr.calcSaskOilIOGR1995(201501, 201503, 170, "SaskWellHead", 1, 0), 0)
+        self.assertEqual(pr.calcSaskOilIOGR1995(201501, 201506, 79.9, "SaskWellHead", 3, 2), 10600.66)
+        self.assertEqual(pr.calcSaskOilIOGR1995(201501, 201507, 150, "SaskWellHead", 2, 4), 38917.73)
+        self.assertEqual(pr.calcSaskOilIOGR1995(201501, 201508, 500, "SaskWellHead", 1, 5), 124271.38)
+        self.assertEqual(pr.calcSaskOilIOGR1995(201501, 201509, 800, "SaskWellHead", 5, 0.1), 21117.29)
+
+        #write tests for ActSales
+
+    def test_calcSaskOilRegulationSubsection2(self):
+        pr = ProcessRoyalties
+        self.assertEqual(pr.calcSaskOilRegulationSubsection2(70), 7)
+        self.assertEqual(pr.calcSaskOilRegulationSubsection2(100), 12)
+        self.assertEqual(pr.calcSaskOilRegulationSubsection2(170), 26.6)
+
+
+
+    def test_calcSaskOilRegulationSubsection3(self):
+        pr = ProcessRoyalties
+        # self.assertEqual(pr.calcSaskOilRegulationSubsection3(79.9), 7.99)
+        self.assertEqual(pr.calcSaskOilRegulationSubsection3(150), 22)
+        self.assertEqual(pr.calcSaskOilRegulationSubsection3(500), 112.4)
+        self.assertEqual(pr.calcSaskOilRegulationSubsection3(800), 191)
+
+
+
 if __name__ == '__main__':
     unittest.main()

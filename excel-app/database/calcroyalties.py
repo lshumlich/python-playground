@@ -78,7 +78,7 @@ class ProcessRoyalties(object):
 #                           monthlyData.Product + ' ' + well.RoyaltyClassification + ' ' +
 #                           well.Classification + ' ' + str(monthlyData.ProdVol) +
 #                           '\n')
-
+# ** call second method **
                 if monthlyData.Product == 'Oil' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
                     self.calcSaskOilProvCrown(monthlyData, well, royalty, lease, royaltyCalc)
                 elif monthlyData.Product == 'Oil' and 'IOGR1995' in royalty.RoyaltyScheme:
@@ -249,6 +249,97 @@ class ProcessRoyalties(object):
         return ProvCrownRoyaltyVolume, ProvCrownRoyaltyValue
 
 
+    def calcSaskOilIOGR1995(self, ProdMonth, CommencementDate, ProdVol, ValuationMethod, CrownMultiplier, IndianInterest):
+        """
+        Calculated Based on regulations described: http://laws-lois.justice.gc.ca/eng/regulations/SOR-94-753/page-16.html#h-35
+
+        """
+        # Calculate the Comensment Date
+        CommencementPeriod = self.determineCommencementPeriod(ProdMonth, CommencementDate)
+        if CommencementPeriod < 5:
+            IOGR1995RoyaltyVolume = self.calcSaskOilRegulationSubsection2(ProdVol)
+        else:
+            IOGR1995RoyaltyVolume = self.calcSaskOilRegulationSubsection3(ProdVol)
+
+
+        RoyaltyPrice = self.determineRoyaltyprice(ValuationMethod)
+
+        IOGR1995RoyaltyValue = round(CrownMultiplier *
+                                                      IOGR1995RoyaltyVolume *
+                                                      IndianInterest *
+                                                      RoyaltyPrice , 2)
+
+        return IOGR1995RoyaltyValue
+
+    def calcSaskOilRegulationSubsection2(self,mop):
+        """
+(2) During the five year period beginning on the date determined by the Executive Director
+    to be the date of commencement of production of oil from a contract area, the basic royalty
+    is the part of the oil that is obtained from, or attributable to, each well during each month
+    of that period calculated in accordance with the table to this subsection
+
+                Column I            Column II
+        Item    Monthly Production  Royalty per Month
+                (m3)
+        1.      Less than 80        10% of the number of cubic metres
+        2.      80 to 160           8 m3 plus 20% of the number of cubic metres in excess of 80
+        3.      More than 160       24 m3 plus 26% of the number of cubic metres in excess of 160
+        """
+        if mop < 80.0:
+            royVol = mop *.1
+        elif mop <= 160.0:
+            royVol = 8 + (mop - 80) * .2
+        else:
+            royVol = 24 + (mop - 160) * .26
+
+        return royVol
+
+    def calcSaskOilRegulationSubsection3(self, mop):
+        """
+(3) Commencing immediately after the period referred to in subsection (2), the basic royalty is the
+    part of the oil that is obtained from, or attributable to, each well in a contract area during
+    each month thereafter calculated in accordance with the table to this subsection.
+
+                Column I            Column II
+        Item    Monthly             Production
+                (m3)
+
+        1.      Less than 80        10% of the number of cubic metres
+        2.      80 to 160           8 m3 plus 20% of the number of cubic metres in excess of 80
+        3.      160 to 795          24 m3 plus 26% of the number of cubic metres in excess of 160
+        4.      More than 795       189 m3 plus 40% of the number of cubic metres in excess of 795
+        """
+        if mop < 80.0:
+            royVol = mop *.1
+        elif mop <= 160.0:
+            royVol = 8 + (mop - 80) * .2
+        elif mop <= 795.0:
+            royVol = 24 + (mop - 160) * .26
+        else:
+            royVol = 189 + (mop - 795) * .4
+
+        return royVol
+
+    def determineRoyaltyprice(self,method,monthlyData):
+
+        royaltyPrice = 0.0
+        if method == 'ActSales':
+            royaltyPrice = monthlyData.WellHeadPrice + monthlyData.TransRate + monthlyData.ProcessingRate
+        else:
+            royaltyPrice = monthlyData.WellHeadPrice
+
+        return royaltyPrice
+
+
+    def determineCommencementPeriod(self,prodMonth,commencementDate):
+        if commencementDate == None:
+            raise AppError('Commencement Date must be set for this Royalty Type.')
+        cd = self.ensureDate(commencementDate)
+        year = int(prodMonth / 100)
+        month = prodMonth - (year * 100)
+        prodDate = date(year,month,1)
+        diff = prodDate - cd
+        return round(diff.days/365,2)
     #
     # Sask Oil Royalty Calculation... Finally we are here...
     #
@@ -258,7 +349,7 @@ class ProcessRoyalties(object):
     #   OilFactors.pdf
 
 
-
+    """
 # Where is lease used in this method? - Adrienne
     def calcSaskOilProvCrown(self, monthlyData, well, royalty, lease, royaltyCalc):
         
@@ -268,7 +359,7 @@ class ProcessRoyalties(object):
         self.calcSaskOilProvCrownRoyaltyRate(royaltyCalc,econOilData, well.RoyaltyClassification, well.Classification, monthlyData.ProdVol, well.SRC)
 
 
-        """
+
 
         if well.RoyaltyClassification == 'Fourth Tier Oil':
 
@@ -341,43 +432,43 @@ class ProcessRoyalties(object):
             
         royaltyCalc.ProvCrownRoyaltyRate = round(royaltyCalc.ProvCrownRoyaltyRate, 6)
 
-        """
+
 
         # Note: If there is no sales. Use last months sales value... Not included in this code
 
         royaltyCalc.RoyaltyPrice = self.determineRoyaltyprice(royalty.ValuationMethod, monthlyData)
 
         royaltyCalc.ProvCrownUsedRoyaltyRate = royaltyCalc.ProvCrownRoyaltyRate
-        
+
         if royaltyCalc.ProvCrownUsedRoyaltyRate < 0:
             royaltyCalc.ProvCrownUsedRoyaltyRate = 0
-            
+
         if royalty.MinRoyalty != None:
             if royalty.MinRoyalty > royaltyCalc.ProvCrownUsedRoyaltyRate:
                 royaltyCalc.ProvCrownUsedRoyaltyRate = royalty.MinRoyalty
         #
         # This was done this way so precision was not lost.
         #
-        royaltyCalc.ProvCrownRoyaltyVolume = ((royaltyCalc.ProvCrownUsedRoyaltyRate / 100) * 
-                                                      royalty.CrownMultiplier * 
-                                                      monthlyData.ProdVol * 
+        royaltyCalc.ProvCrownRoyaltyVolume = ((royaltyCalc.ProvCrownUsedRoyaltyRate / 100) *
+                                                      royalty.CrownMultiplier *
+                                                      monthlyData.ProdVol *
                                                       well.IndianInterest)
 
-        royaltyCalc.ProvCrownRoyaltyValue = round((royaltyCalc.ProvCrownUsedRoyaltyRate / 100) * 
-                                               royalty.CrownMultiplier * 
-                                               monthlyData.ProdVol * 
-                                               well.IndianInterest * 
+        royaltyCalc.ProvCrownRoyaltyValue = round((royaltyCalc.ProvCrownUsedRoyaltyRate / 100) *
+                                               royalty.CrownMultiplier *
+                                               monthlyData.ProdVol *
+                                               well.IndianInterest *
                                                royaltyCalc.RoyaltyPrice , 2)
-        
+
         return
 
 
     def calcSaskOilIOGR1995(self, monthlyData, well, royalty, lease, royaltyCalc):
-        """
-        Calculated Based on regulations described: http://laws-lois.justice.gc.ca/eng/regulations/SOR-94-753/page-16.html#h-35
 
-        """
-        # Calculate the Comensment Date
+        #Calculated Based on regulations described: http://laws-lois.justice.gc.ca/eng/regulations/SOR-94-753/page-16.html#h-35
+
+
+        Calculate the Comensment Date
         royaltyCalc.CommencementPeriod = self.determineCommencementPeriod(monthlyData.ProdMonth,well.CommencementDate)
         if royaltyCalc.CommencementPeriod < 5:
             royaltyCalc.IOGR1995RoyaltyVolume = self.calcSaskOilRegulationSubsection2(monthlyData.ProdVol)
@@ -395,7 +486,7 @@ class ProcessRoyalties(object):
         return
     
     def calcSaskOilRegulationSubsection2(self,mop):
-        """
+
 (2) During the five year period beginning on the date determined by the Executive Director 
     to be the date of commencement of production of oil from a contract area, the basic royalty 
     is the part of the oil that is obtained from, or attributable to, each well during each month 
@@ -407,7 +498,7 @@ class ProcessRoyalties(object):
         1.      Less than 80        10% of the number of cubic metres
         2.      80 to 160           8 m3 plus 20% of the number of cubic metres in excess of 80
         3.      More than 160       24 m3 plus 26% of the number of cubic metres in excess of 160
-        """
+
         if mop < 80.0:
             royVol = mop *.1
         elif mop <= 160.0:
@@ -418,7 +509,7 @@ class ProcessRoyalties(object):
         return royVol
     
     def calcSaskOilRegulationSubsection3(self,mop):
-        """
+
 (3) Commencing immediately after the period referred to in subsection (2), the basic royalty is the 
     part of the oil that is obtained from, or attributable to, each well in a contract area during 
     each month thereafter calculated in accordance with the table to this subsection.
@@ -431,7 +522,7 @@ class ProcessRoyalties(object):
         2.      80 to 160           8 m3 plus 20% of the number of cubic metres in excess of 80
         3.      160 to 795          24 m3 plus 26% of the number of cubic metres in excess of 160
         4.      More than 795       189 m3 plus 40% of the number of cubic metres in excess of 795
-        """
+
         if mop < 80.0:
             royVol = mop *.1
         elif mop <= 160.0:
@@ -462,7 +553,9 @@ class ProcessRoyalties(object):
         prodDate = date(year,month,1)
         diff = prodDate - cd
         return round(diff.days/365,2)
-    
+    """
+
+
     def calcGorrPercent(self,vol,hours,gorr):
         """ returns the rr% and an explination string  """
         words = gorr.split(",")
