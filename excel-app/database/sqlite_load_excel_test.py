@@ -10,7 +10,7 @@ import database.sqlite_show
 
 class TestLoader(unittest.TestCase):
 
-    TEST_DATABASE = config.get_temp_dir() + 'test_database.db'
+    TEST_DATABASE = config.get_temp_dir() + 'unittest.db'
     TEST_SPREADSHEET = config.get_file_dir() + 'test_database.xlsx'
 
     def test_run(self):
@@ -55,12 +55,12 @@ class TestLoader(unittest.TestCase):
         print(shower.show_tables())
         loader.commit()
         loader.delete_table('Well')
-        self.assertNotIn('Well', shower.show_tables()) 
+        self.assertNotIn('Well', shower.show_tables())
 
         #clean up
 #         loader.close()
 #         shower.close()
-        # loader.delete_database(self.TEST_DATABASE)        
+        # loader.delete_database(self.TEST_DATABASE)
 #         self.assertFalse(os.path.exists(self.TEST_DATABASE))
 
 """
