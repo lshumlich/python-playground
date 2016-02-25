@@ -8,7 +8,7 @@ DataStructure is the base object for all the data objects in the system.
 class DataStructure(object):
     
     def __init__(self):
-        None
+        self.format = Formatter(self)
         
     def __str__(self):
         return str(vars(self))
@@ -28,5 +28,31 @@ class DataStructure(object):
             lid = self.LeaseID
         else:
             lid = self.ID
-        
         return '{}-{:04d}'.format(self.LeaseType,lid)
+
+"""
+Formatter: formats the attrabutes for various reports. 
+"""
+
+class Formatter(object):
+    
+    def __init__(self, dataObj):
+        self.dataObj = dataObj
+        
+    @property
+    def ExtractMonth(self):
+        return self.dataObj.ExtractMonth.strftime('%Y-%m-%d')
+    
+    @property
+    def Lease(self):
+        if hasattr(self.dataObj, 'LeaseID'):
+            lid = self.dataObj.LeaseID
+        else:
+            lid = self.dataObj.ID
+        return '{}-{:04d}'.format(self.dataObj.LeaseType,lid)
+
+    @property
+    def ProdMonth(self):
+        dts = str(self.dataObj.ProdMonth)
+        return dts[0:4]+'-'+dts[4:6]
+    

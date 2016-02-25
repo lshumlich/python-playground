@@ -35,7 +35,7 @@ div {
 </head>
 
 
-<h1 align="center">Well: {{ well.WellId }}<br>
+<h1 align="center">Well: {{ well.ID }}<br>
 	UWI: {{ well.UWI }}</h1>
 <hr> </hr>
 
@@ -46,7 +46,7 @@ div {
 	<col width="50%">
    <TR>
       <TD align=right><b>Lease:</b></TD>
-      <TD align="left">{{ well.LeaseType }}-{{ well.LeaseID }} </TD>
+      <TD align="left">{{ well.LeaseType }}-{{ well.LeaseID }} {{ well.Lease }} {{ well.format.Lease }}</TD>
    </TR>
    <TR>
       <TD align=right><b>Right:</b></TD>
@@ -161,10 +161,10 @@ th, td {
    </TR>
 
 	<TR>
-      <TD>{{ m.ExtractMonth }}</TD>
-      <TD>{{ prodMonth }}</TD>
+      <TD>{{ m.ExtractMonth }} {{ m.format.ExtractMonth }}</TD>
+      <TD>{{ m.format.ProdMonth }}</TD>
 	   <TD>{{ m.AmendNo }}</TD>
-	   <TD>{{ product }}</TD>
+	   <TD>{{ m.Product }}</TD>
 	   <TD>{{ m.ProdVol }}</TD>
 	   <TD>{{ '{:.2f}'.format(m.WellHeadPrice) }}</TD>
 	   <TD>2.1234</TD>
