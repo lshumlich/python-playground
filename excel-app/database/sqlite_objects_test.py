@@ -10,7 +10,7 @@ from database.apperror import AppError
 class Test(unittest.TestCase):
 
     def setUp(self):
-        #Preparing the database
+        # Preparing the database
         self.dbi = config.get_database_instance()
         for table in self.dbi.get_table_names():
             self.dbi.execute('DROP TABLE %s' % table)
@@ -22,9 +22,20 @@ class Test(unittest.TestCase):
             self.dbi.execute(line)
         self.dbi.commit()
 
+    def test_get_table_ids(self):
+        statement = """
+            CREATE TABLE Well ('ID' int, 'UWI' text, 'Prov' text, 'WellType' text, 'LeaseType' text, 'LeaseID' int, 'RoyaltyClassification' text, 'Classification' text, 'SRC' int, 'IndianInterest' float, 'CommencementDate' date, 'ReferencePrice' int);
+            INSERT INTO Well VALUES(1,'SKWI111062705025W300','SK','Oil','OL',1,'New Oil','Heavy',0,0.25,'2014-12-01 00:00:00',1);
+            INSERT INTO Well VALUES(2,'SKWI112062705025W300','SK','Oil','OL',2,'Third Tier Oil','Southwest',0,0.95,'2014-12-01 00:00:00',1);
+            INSERT INTO Well VALUES(3,'SKWI113062705025W300','SK','Oil','OL',3,'Fourth Tier Oil','Other',0,1.0,NULL,NULL);
+        """
+        self.execute_statement(statement)
+        self.assertEqual(len(self.do.get_table_ids('Well')), 3)
+        self.assertIn(1, self.do.get_table_ids('Well'))
+
     def test_wells(self):
         statement = """
-            CREATE TABLE Well ('WellId' int, 'UWI' text, 'Prov' text, 'WellType' text, 'LeaseType' text, 'LeaseID' int, 'RoyaltyClassification' text, 'Classification' text, 'SRC' int, 'IndianInterest' float, 'CommencementDate' date, 'ReferencePrice' int);
+            CREATE TABLE Well ('ID' int, 'UWI' text, 'Prov' text, 'WellType' text, 'LeaseType' text, 'LeaseID' int, 'RoyaltyClassification' text, 'Classification' text, 'SRC' int, 'IndianInterest' float, 'CommencementDate' date, 'ReferencePrice' int);
             INSERT INTO Well VALUES(1,'SKWI111062705025W300','SK','Oil','OL',1,'New Oil','Heavy',0,0.25,'2014-12-01 00:00:00',1);
             INSERT INTO Well VALUES(2,'SKWI112062705025W300','SK','Oil','OL',2,'Third Tier Oil','Southwest',0,0.95,'2014-12-01 00:00:00',1);
             INSERT INTO Well VALUES(3,'SKWI113062705025W300','SK','Oil','OL',3,'Fourth Tier Oil','Other',0,1.0,NULL,NULL);
@@ -32,14 +43,14 @@ class Test(unittest.TestCase):
         """
         self.execute_statement(statement)
         self.assertEqual(len(self.do.get_all_wells()), 4)
-        self.assertEqual(self.do.get_well_by_id(2).WellId, 2)
+        self.assertEqual(self.do.get_well_by_id(2).ID, 2)
         self.assertRaises(AppError, self.do.get_well_by_id, 99)
         self.assertIsNotNone(self.do.get_wells_by_lease(2))
         self.assertRaises(AppError, self.do.get_wells_by_lease, 666)
 
     def test_leases(self):
         statement = """
-            CREATE TABLE Lease ('LeaseType' text, 'LeaseID' int, 'Prov' text, 'FNReserve' int, 'Lessor' int, 'Notes' text);            
+            CREATE TABLE Lease ('LeaseType' text, 'ID' int, 'Prov' text, 'FNReserve' int, 'Lessor' int, 'Notes' text);
             INSERT INTO Lease VALUES('OL',1,'SK',123,2345,NULL);
             INSERT INTO Lease VALUES('OL',2,'SK',123,2345,NULL);
             INSERT INTO Lease VALUES('OL',3,'SK',123,2345,NULL);
@@ -48,16 +59,16 @@ class Test(unittest.TestCase):
         self.execute_statement(statement)
         self.assertEqual(len(self.do.get_all_leases()), 4)
         self.assertIsNotNone(self.do.get_lease_by_id(3))
-        self.assertEqual(self.do.get_lease_by_id(3).LeaseID, 3)
+        self.assertEqual(self.do.get_lease_by_id(3).ID, 3)
         self.assertRaises(AppError, self.do.get_lease_by_id, 99)
 
     def test_royalty_master(self):
         statement = """
-            CREATE TABLE RoyaltyMaster ("LeaseType" text, "LeaseID" int, "RightsGranted" text, "RoyaltyScheme" text, "CrownMultiplier" float, "MinRoyalty" int, "ValuationMethod" text, "TruckingDeducted" text, "ProcessingDeducted" text, "Gorr" text, "Notes" text);            
+            CREATE TABLE RoyaltyMaster ("LeaseType" text, "LeaseID" int, "RightsGranted" text, "RoyaltyScheme" text, "CrownMultiplier" float, "MinRoyalty" int, "ValuationMethod" text, "TruckingDeducted" text, "ProcessingDeducted" text, "Gorr" text, "Notes" text);
             INSERT INTO RoyaltyMaster VALUES('OL',1,'All','SKProvCrownVar, GORR',1.2,50,'SaskWellHead','Y','Y','mprod,250,2,300,3,400,4,500,5,0,6',NULL);
             INSERT INTO RoyaltyMaster VALUES('OL',2,'All','SKProvCrownVar, GORR',1.1,25,'ActSales','Y',NULL,'dprod,250,2,300,3,400,4,500,5,0,6',NULL);
             INSERT INTO RoyaltyMaster VALUES('OL',3,'AllExB','SKProvCrownVar, GORR',0.9,NULL,'ActSales',NULL,'Y','fixed,0,2',NULL);
-            INSERT INTO RoyaltyMaster VALUES('OL',4,'AllExB','SKProvCrownVar',1.25,NULL,'ActSales','Y','Y',NULL,NULL);        
+            INSERT INTO RoyaltyMaster VALUES('OL',4,'AllExB','SKProvCrownVar',1.25,NULL,'ActSales','Y','Y',NULL,NULL);
         """
         self.execute_statement(statement)
         self.assertIsNotNone(self.do.get_royalty_master(1))
@@ -74,6 +85,7 @@ class Test(unittest.TestCase):
         """
         self.execute_statement(statement)
         # not sure how to test iterator get_monthly_data() at the moment
+        self.assertEqual(len(self.do.get_monthly_data()), 4)
         self.assertEqual(self.do.get_monthly_by_well(6).WellId, 6)
         self.assertRaises(AppError, self.do.get_monthly_by_well, 555)
         self.assertEqual(self.do.get_monthly_by_well_prodmonth_product(7, 201501, 'Oil').WellId, 7)
@@ -88,11 +100,11 @@ class Test(unittest.TestCase):
             INSERT INTO Calc VALUES(201504,10,24.7,570,0,0,223.370366,16.15,19,19,0,0,16.15,0,0,3607.43,0.0,0.0,3607.43,0,0,0,3607.43,NULL,NULL,NULL);
         """
         self.execute_statement(statement)
-        self.assertEqual(self.do.get_royalty_calc(201501, 6).WellId, 6)        
+        self.assertEqual(self.do.get_royalty_calc(201501, 6).WellId, 6)
         self.assertRaises(AppError, self.do.get_royalty_calc, 200014, 10)
 
     def test_econ_oil_data(self):
-        statement= """
+        statement = """
             CREATE TABLE ECONData ("CharMonth" text, "ProdMonth" int, "HOP" int, "SOP" int, "NOP" int, "H4T_C" float, "H4T_D" float, "H4T_K" float, "H4T_X" int, "H3T_K" float, "H3T_X" int, "HNEW_K" float, "HNEW_X" int, "SW4T_C" float, "SW4T_D" float, "SW4T_K" float, "SW4T_X" int, "SW3T_K" float, "SW3T_X" int, "SWNEW_K" float, "SWNEW_X" int, "O4T_C" float, "O4T_D" float, "O4T_K" float, "O4T_X" int, "O3T_K" float, "O3T_X" int, "ONEW_K" float, "ONEW_X" int, "OOLD_K" float, "OOLD_X" int);
             INSERT INTO ECONData VALUES('Sept.',201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,25.85,1939,31.57,729,38.54,890,0.1209,3.02,29.91,2243,36.08,833,40.79,941,52.61,1214);
             INSERT INTO ECONData VALUES('Aug.',201508,198,232,273,0.1003,2.51,24.81,1861,22.65,523,27.58,637,0.111,2.77,27.46,2060,32.89,759,39.2,905,0.1203,3.01,29.77,2233,35.98,830,40.74,940,52.55,1213);
@@ -103,27 +115,94 @@ class Test(unittest.TestCase):
         self.assertEqual(self.do.get_econ_oil_data(201509).ProdMonth, 201509)
         self.assertRaises(AppError, self.do.get_econ_oil_data, 202013)
 
-    def test_universal_select(self):
+    def test_universal_selector(self):
         statement = """
-            CREATE TABLE Well ('WellId' int, 'UWI' text, 'Prov' text, 'WellType' text, 'LeaseType' text, 'LeaseID' int, 'RoyaltyClassification' text, 'Classification' text, 'SRC' int, 'IndianInterest' float, 'CommencementDate' date, 'ReferencePrice' int);
+            CREATE TABLE Well ('ID' int, 'UWI' text, 'Prov' text, 'WellType' text, 'LeaseType' text, 'LeaseID' int, 'RoyaltyClassification' text, 'Classification' text, 'SRC' int, 'IndianInterest' float, 'CommencementDate' date, 'ReferencePrice' int);
             INSERT INTO Well VALUES(1,'SKWI111062705025W300','SK','Oil','OL',1,'New Oil','Heavy',0,0.25,'2014-12-01 00:00:00',1);
             INSERT INTO Well VALUES(2,'SKWI112062705025W300','SK','Oil','OL',2,'Third Tier Oil','Southwest',0,0.95,'2014-12-01 00:00:00',1);
             INSERT INTO Well VALUES(3,'SKWI113062705025W300','SK','Oil','OL',3,'Fourth Tier Oil','Other',0,1.0,NULL,NULL);
             INSERT INTO Well VALUES(4,'SKWI114062705025W300','SK','Oil','OL',4,'Old Oil','Other',0,1.0,NULL,NULL);
-            CREATE TABLE Lease ('LeaseType' text, 'LeaseID' int, 'Prov' text, 'FNReserve' int, 'Lessor' int, 'Notes' text);            
+            CREATE TABLE Lease ('LeaseType' text, 'ID' int, 'Prov' text, 'FNReserve' int, 'Lessor' int, 'Notes' text);
             INSERT INTO Lease VALUES('OL',1,'SK',123,2345,NULL);
             INSERT INTO Lease VALUES('OL',2,'SK',123,2345,NULL);
             INSERT INTO Lease VALUES('OL',3,'SK',123,2345,NULL);
-            INSERT INTO Lease VALUES('OL',4,'AB',123,2345,NULL);            
+            INSERT INTO Lease VALUES('OL',4,'AB',123,2345,NULL);
         """
-        self.execute_statement(statement)        
-        self.assertIsNotNone(self.do.universal_select('Well', RoyaltyClassification='Old Oil'))
-        self.assertEqual(len(self.do.universal_select('Well', Prov='SK', Classification='Other')), 2)
-        self.assertEqual(len(self.do.universal_select('Well')), 4)
-        self.assertRaises(AppError, self.do.universal_select, 'WrongTable')
-        self.assertRaises(AppError, self.do.universal_select, 'Well', Foo='bar')
-        self.assertEqual(len(self.do.universal_select('Lease')), 4)
-        self.assertEqual(len(self.do.universal_select('Lease', Prov='SK')), 3)
+        self.execute_statement(statement)
+        self.assertIsNotNone(self.do.universal_selector('Well', RoyaltyClassification='Old Oil'))
+        self.assertEqual(len(self.do.universal_selector('Well', Prov='SK', Classification='Other')), 2)
+        self.assertEqual(len(self.do.universal_selector('Well')), 4)
+        self.assertRaises(AppError, self.do.universal_selector, 'WrongTable')
+        self.assertRaises(AppError, self.do.universal_selector, 'Well', Foo='bar')
+        self.assertEqual(len(self.do.universal_selector('Lease')), 4)
+        self.assertEqual(len(self.do.universal_selector('Lease', Prov='SK')), 3)
+
+    def test_universal_updater(self):
+        statement = """
+            CREATE TABLE Well ('ID' int, 'UWI' text, 'Prov' text, 'WellType' text, 'LeaseType' text, 'LeaseID' int, 'RoyaltyClassification' text, 'Classification' text, 'SRC' int, 'IndianInterest' float, 'CommencementDate' date, 'ReferencePrice' int);
+            INSERT INTO Well VALUES(1,'SKWI111062705025W300','SK','Oil','OL',1,'New Oil','Heavy',0,0.25,'2014-12-01 00:00:00',1);
+            INSERT INTO Well VALUES(2,'SKWI112062705025W300','SK','Oil','OL',2,'Third Tier Oil','Southwest',0,0.95,'2014-12-01 00:00:00',1);
+            CREATE TABLE Lease ('LeaseType' text, 'ID' int, 'Prov' text, 'FNReserve' int, 'Lessor' int, 'Notes' text);
+            INSERT INTO Lease VALUES('OL',1,'SK',123,2345,NULL);
+        """
+        self.execute_statement(statement)
+        self.do.universal_updater('Well', 1, UWI='Test')
+        self.assertEqual(self.do.get_well_by_id(1).UWI, 'Test')
+        self.do.universal_updater('Lease', 1, Prov='SK', Notes='Hello')
+        self.assertEqual(self.do.get_lease_by_id(1).Prov, 'SK')
+        self.assertEqual(self.do.get_lease_by_id(1).Notes, 'Hello')
+        self.assertRaises(AppError, self.do.universal_updater, 'TestTable', 5, UWI='Test')
+        self.assertRaises(AppError, self.do.universal_updater, 'Well', 1)
+        self.assertRaises(AppError, self.do.universal_updater, 'Well', 1, WrongField='Test')
+        self.assertRaises(AppError, self.do.universal_updater, 'Well', 5, WrongField='Test')
+
+    def test_update_well(self):
+        statement = """
+            CREATE TABLE Well ('ID' int, 'UWI' text, 'Prov' text, 'WellType' text, 'LeaseType' text, 'LeaseID' int, 'RoyaltyClassification' text, 'Classification' text, 'SRC' int, 'IndianInterest' float, 'CommencementDate' date, 'ReferencePrice' int);
+            INSERT INTO Well VALUES(1,'SKWI111062705025W300','SK','Oil','OL',1,'New Oil','Heavy',0,0.25,'2014-12-01 00:00:00',1);
+            INSERT INTO Well VALUES(2,'SKWI112062705025W300','SK','Oil','OL',2,'Third Tier Oil','Southwest',0,0.95,'2014-12-01 00:00:00',1);
+        """
+        self.execute_statement(statement)
+        self.do.update_well(1, UWI='Test', Prov='ON')
+        self.assertEqual(self.do.get_well_by_id(1).UWI, 'Test')
+        self.assertEqual(self.do.get_well_by_id(1).Prov, 'ON')
+        self.assertRaises(AppError, self.do.update_well, 1)
+
+    def test_update_lease(self):
+        statement = """
+            CREATE TABLE Lease ('LeaseType' text, 'ID' int, 'Prov' text, 'FNReserve' int, 'Lessor' int, 'Notes' text);
+            INSERT INTO Lease VALUES('OL',1,'SK',123,2345,NULL);
+        """
+        self.execute_statement(statement)
+        self.do.update_lease(1, Prov='SK', Notes='Hello')
+        self.assertEqual(self.do.get_lease_by_id(1).Prov, 'SK')
+        self.assertEqual(self.do.get_lease_by_id(1).Notes, 'Hello')
+        self.assertRaises(AppError, self.do.update_well, 555, Prov='SK')
+
+    def test_universal_deleter(self):
+        statement = """
+            CREATE TABLE Well ('ID' int, 'UWI' text, 'Prov' text, 'WellType' text, 'LeaseType' text, 'LeaseID' int, 'RoyaltyClassification' text, 'Classification' text, 'SRC' int, 'IndianInterest' float, 'CommencementDate' date, 'ReferencePrice' int);
+            INSERT INTO Well VALUES(1,'SKWI111062705025W300','SK','Oil','OL',1,'New Oil','Heavy',0,0.25,'2014-12-01 00:00:00',1);
+            INSERT INTO Well VALUES(2,'SKWI112062705025W300','SK','Oil','OL',2,'Third Tier Oil','Southwest',0,0.95,'2014-12-01 00:00:00',1);
+            INSERT INTO Well VALUES(3,'SKWI113062705025W300','SK','Oil','OL',3,'Fourth Tier Oil','Other',0,1.0,NULL,NULL);
+        """
+        self.execute_statement(statement)
+        self.do.universal_deleter('Well', 2)
+        self.assertNotIn(2, self.do.get_table_ids('Well'))
+        self.assertRaises(AppError, self.do.universal_deleter, 'Well', 2)
+        self.assertRaises(AppError, self.do.universal_deleter, 'WrongTable', 1)
+
+    def test_universal_inserter(self):
+        statement = """
+            CREATE TABLE Well ('ID' int, 'UWI' text, 'Prov' text, 'WellType' text, 'LeaseType' text, 'LeaseID' int, 'RoyaltyClassification' text, 'Classification' text, 'SRC' int, 'IndianInterest' float, 'CommencementDate' date, 'ReferencePrice' int);
+        """
+        self.execute_statement(statement)
+        self.do.universal_inserter('Well', ID=10, UWI='Test', Prov='ON')
+        self.assertIn(10, self.do.get_table_ids('Well'))
+        self.assertEqual(self.do.get_well_by_id(10).UWI, 'Test')
+        self.assertRaises(AppError, self.do.universal_inserter, 'WrongTable', UWI='Test')
+        self.assertRaises(AppError, self.do.universal_inserter, 'Well')
+        self.assertRaises(AppError, self.do.universal_inserter, 'Well', WrongColumn='Test')
 
 #     def tearDown(self):
 #         self.dbi.close()
