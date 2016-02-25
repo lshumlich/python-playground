@@ -1,6 +1,7 @@
 #!/bin/env python3
 
 import unittest
+from unittest import TestLoader, TextTestRunner, TestSuite
 import subprocess
 import os
 
@@ -41,12 +42,22 @@ def sqliteLoadExcel():
     
 def browser_app():
     AppServer.run(config.get_temp_dir() + 'browser.db')
+    
+def load_tests(loader, tests, pattern):
+    suite = TestSuite()
+    for all_test_suite in unittest.defaultTestLoader.discover('.', pattern='*_test.py'):
+        for test_suite in all_test_suite:
+            suite.addTests(test_suite)
+    return suite
+
 
 print('-- Runing Batch')
 if __name__ == "__main__":
 #     sqliteLoadExcel()
-    browser_app()
+#     browser_app()
 #     run_royalties_and_worksheet()
+    unittest.main()
+    print("Goodby world!")
 
     
 
