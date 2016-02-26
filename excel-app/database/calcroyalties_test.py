@@ -165,7 +165,9 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, IndianInterest, MinRoyalty, RoyaltyPr
         pr.calcSaskOilIOGR1995(datetime(2015,1,1), "SaskWellHead", 1.2, 0.25, m, calc)
         self.assertEqual(calc.IOGR1995RoyaltyValue,464.36)
         self.assertEqual(calc.CommencementPeriod,0)
-        #self.assertEqual(calc.)
+        self.assertEqual(calc.IOGR1995RoyaltyVolume,7)
+        self.assertEqual(calc.RoyaltyPrice,221.123456)
+
         m.ProdVol = 100
         pr.calcSaskOilIOGR1995(datetime(2015,4,2), "SaskWellHead", 0.25, 3, m, calc)
         self.assertEqual(calc.IOGR1995RoyaltyValue,1990.11)
