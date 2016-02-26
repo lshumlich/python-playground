@@ -6,6 +6,13 @@ install: "pip install -r excel-app/requirements.txt"
 # command to run tests
 script: py.test --cov=excel-app/ --cov-report=xml
 
+notifications:
+  email:
+    recipients:
+      - konstantin.lazutin@thesolutionstack.com
+      - larry.shumlich@thesolutionstack.com
+      - adrienne.shumlich@gmail.com
+
 before_install:
   - pip install codecov
 after_success:
