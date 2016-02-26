@@ -10,6 +10,7 @@ class SqliteShowerTest(unittest.TestCase):
 
 
     def test_check_linktab(self):
+        None
 # DODO Start writting this test
 #         shower = Shower()
 #         dbi = config.get_database_instance(dbName)
