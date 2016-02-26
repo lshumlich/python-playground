@@ -249,27 +249,27 @@ class ProcessRoyalties(object):
         return ProvCrownRoyaltyVolume, ProvCrownRoyaltyValue
 
 
-    def calcSaskOilIOGR1995(self, ProdMonth, CommencementDate, ProdVol, ValuationMethod, CrownMultiplier, IndianInterest):
+    def calcSaskOilIOGR1995(self, commencement_date, valuation_method, crown_multiplier, indian_interest, m, royalty_calc):
         """
         Calculated Based on regulations described: http://laws-lois.justice.gc.ca/eng/regulations/SOR-94-753/page-16.html#h-35
 
         """
         # Calculate the Comensment Date
-        CommencementPeriod = self.determineCommencementPeriod(ProdMonth, CommencementDate)
-        if CommencementPeriod < 5:
-            IOGR1995RoyaltyVolume = self.calcSaskOilRegulationSubsection2(ProdVol)
+        royalty_calc.CommencementPeriod = self.determineCommencementPeriod(m.ProdMonth, commencement_date)
+        if royalty_calc.CommencementPeriod < 5:
+            royalty_calc.IOGR1995RoyaltyVolume = self.calcSaskOilRegulationSubsection2(m.ProdVol)
         else:
-            IOGR1995RoyaltyVolume = self.calcSaskOilRegulationSubsection3(ProdVol)
+            royalty_calc.IOGR1995RoyaltyVolume = self.calcSaskOilRegulationSubsection3(m.ProdVol)
 
 
-        RoyaltyPrice = self.determineRoyaltyprice(ValuationMethod)
+        royalty_calc.RoyaltyPrice = self.determineRoyaltyPrice(valuation_method, m)
 
-        IOGR1995RoyaltyValue = round(CrownMultiplier *
-                                                      IOGR1995RoyaltyVolume *
-                                                      IndianInterest *
-                                                      RoyaltyPrice , 2)
+        royalty_calc.IOGR1995RoyaltyValue = round(crown_multiplier *
+                                                      royalty_calc.IOGR1995RoyaltyVolume *
+                                                      indian_interest *
+                                                      royalty_calc.RoyaltyPrice , 2)
 
-        return IOGR1995RoyaltyValue
+        return
 
     def calcSaskOilRegulationSubsection2(self,mop):
         """
@@ -320,7 +320,7 @@ class ProcessRoyalties(object):
 
         return royVol
 
-    def determineRoyaltyprice(self,method,monthlyData):
+    def determineRoyaltyPrice(self,method,monthlyData):
 
         royaltyPrice = 0.0
         if method == 'ActSales':

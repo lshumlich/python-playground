@@ -4,6 +4,7 @@ import unittest
 from datetime import date
 from datetime import datetime
 from database.database import AppError, DataStructure
+from database.data_structure import DataStructure
 
 
 from database.testhelper import TestHelper
@@ -147,21 +148,60 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, IndianInterest, MinRoyalty, RoyaltyPr
 
         return
 
+
+
     def test_calcSaskOilIOGR1995(self):
+        m = DataStructure()
+        m.WellHeadPrice = 221.123456
+        m.TransRate = 2.123455
+        m.ProcessingRate = 0.123455
+        m.ProdVol = 70
+        m.ProdMonth = 201501
+
+        calc = DataStructure()
+
         pr = ProcessRoyalties()
         #all tests for SaskWellHead
-        self.assertEqual(pr.calcSaskOilIOGR1995(201501, datetime(2015,01,01), 70, "SaskWellHead", 0, 1), 0)
-        self.assertEqual(pr.calcSaskOilIOGR1995(201501, 201502, 100, "SaskWellHead", 0.25, 3), 1990.11)
-        self.assertEqual(pr.calcSaskOilIOGR1995(201501, 201503, 170, "SaskWellHead", 1, 0), 0)
-        self.assertEqual(pr.calcSaskOilIOGR1995(201501, 201506, 79.9, "SaskWellHead", 3, 2), 10600.66)
-        self.assertEqual(pr.calcSaskOilIOGR1995(201501, 201507, 150, "SaskWellHead", 2, 4), 38917.73)
-        self.assertEqual(pr.calcSaskOilIOGR1995(201501, 201508, 500, "SaskWellHead", 1, 5), 124271.38)
-        self.assertEqual(pr.calcSaskOilIOGR1995(201501, 201509, 800, "SaskWellHead", 5, 0.1), 21117.29)
+        pr.calcSaskOilIOGR1995(datetime(2015,1,1), "SaskWellHead", 1.2, 0.25, m, calc)
+        self.assertEqual(calc.IOGR1995RoyaltyValue,464.36)
+        self.assertEqual(calc.CommencementPeriod,0)
+        #self.assertEqual(calc.)
+        m.ProdVol = 100
+        pr.calcSaskOilIOGR1995(datetime(2015,4,2), "SaskWellHead", 0.25, 3, m, calc)
+        self.assertEqual(calc.IOGR1995RoyaltyValue,1990.11)
+        m.ProdVol = 170
+        pr.calcSaskOilIOGR1995(datetime(2015,5,1), "SaskWellHead", 1, 1, m,calc)
+        self.assertEqual(calc.IOGR1995RoyaltyValue, 5881.88)
+        m.ProdVol = 79.9
+        pr.calcSaskOilIOGR1995(datetime(2010,1,1), "SaskWellHead", 3, 2, m, calc)
+        self.assertEqual(calc.IOGR1995RoyaltyValue,10600.66)
+        m.ProdVol = 150
+        pr.calcSaskOilIOGR1995(datetime(2009,7,3), "SaskWellHead", 2, 4, m, calc)
+        self.assertEqual(calc.IOGR1995RoyaltyValue, 38917.73)
+        m.ProdVol = 500
+        pr.calcSaskOilIOGR1995(datetime(2007,8,2), "SaskWellHead", 1, 5, m, calc)
+        self.assertEqual(calc.IOGR1995RoyaltyValue, 124271.38)
+        m.ProdVol = 800
+        pr.calcSaskOilIOGR1995(datetime(2008,9,9), "SaskWellHead", 5, 0.1, m, calc)
 
+        self.assertEqual(calc.IOGR1995RoyaltyValue, 21117.29)
+
+    def test_determineCommencementPeriod(self):
+        pr = ProcessRoyalties()
+        self.assertEqual(pr.determineCommencementPeriod(201501, datetime(2015,1,1)), 0)
+        self.assertEqual(pr.determineCommencementPeriod(201501, datetime(2014,12,1)), 0.08)
+        self.assertEqual(pr.determineCommencementPeriod(201501, datetime(2014,11,15)), 0.13)
+        self.assertEqual(pr.determineCommencementPeriod(201501, datetime(2014,1,1)), 1)
+        self.assertEqual(pr.determineCommencementPeriod(201501, datetime(2014,1,1)), 1)
+        self.assertEqual(pr.determineCommencementPeriod(201501, datetime(2010,1,1)), 5)
+        self.assertEqual(pr.determineCommencementPeriod(201501, datetime(2009,12,1)), 5.09)
+        self.assertRaises(AppError,pr.determineCommencementPeriod, 201501, None)
         #write tests for ActSales
 
+
+
     def test_calcSaskOilRegulationSubsection2(self):
-        pr = ProcessRoyalties
+        pr = ProcessRoyalties()
         self.assertEqual(pr.calcSaskOilRegulationSubsection2(70), 7)
         self.assertEqual(pr.calcSaskOilRegulationSubsection2(100), 12)
         self.assertEqual(pr.calcSaskOilRegulationSubsection2(170), 26.6)
@@ -169,12 +209,26 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, IndianInterest, MinRoyalty, RoyaltyPr
 
 
     def test_calcSaskOilRegulationSubsection3(self):
-        pr = ProcessRoyalties
-        # self.assertEqual(pr.calcSaskOilRegulationSubsection3(79.9), 7.99)
+        pr = ProcessRoyalties()
+        self.assertAlmostEqual(pr.calcSaskOilRegulationSubsection3(79.9), 7.99)
         self.assertEqual(pr.calcSaskOilRegulationSubsection3(150), 22)
         self.assertEqual(pr.calcSaskOilRegulationSubsection3(500), 112.4)
         self.assertEqual(pr.calcSaskOilRegulationSubsection3(800), 191)
 
+    def test_determineRoyaltyPrice(self):
+        m = DataStructure()
+        m.WellHeadPrice = 221.123456
+        m.TransRate = 2.123455
+        m.ProcessingRate = 0.123455
+
+        pr = ProcessRoyalties()
+        self.assertAlmostEqual(pr.determineRoyaltyPrice('ActSales', m),223.370366)
+
+        m.WellHeadPrice = 225
+        m.TransRate = 3
+        m.ProcessingRate = 1
+
+        self.assertAlmostEqual(pr.determineRoyaltyPrice('ActSales', m),229)
 
 
 if __name__ == '__main__':
