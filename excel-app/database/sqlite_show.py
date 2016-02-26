@@ -9,6 +9,10 @@ class Shower(object):
 
     def connect(self,dbName):
         self.dbi = config.get_database_instance(dbName)
+        
+    def check_linktab(self):
+        None
+        
     
     def insert_link(self, tabName, attName, linkName, baseTab, showAttrs):
         """ 

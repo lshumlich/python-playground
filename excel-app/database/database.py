@@ -173,12 +173,12 @@ class DataBase(object):
     def getMonthlyData(self):
         return self.monthlyTable[0]
     
-    def getMonthlyDataByWellProdMonthProduct(self,wellId,prodMonth,product):
+    def getMonthlyDataByWellProdMonthProduct(self,wellID,prodMonth,product):
         for md in self.monthlyTable:
-            if md.WellId == wellId and md.ProdMonth == prodMonth and md.Product == product:
+            if md.WellID == wellID and md.ProdMonth == prodMonth and md.Product == product:
 #             if (md.WellId == wellId and md.ProdMonth == prodMonth and md.Product = product):
                 return md
-        raise AppError ('Monthly Data not found for: ' + str(wellId) + ' ' + str(prodMonth) + ' ' + product)
+        raise AppError ('Monthly Data not found for: ' + str(wellID) + ' ' + str(prodMonth) + ' ' + product)
 
     #
     # ECON Monthly Oil Factors Data

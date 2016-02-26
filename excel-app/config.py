@@ -47,12 +47,6 @@ def get_database_instance(database_name=None):
 def get_database_name():
     return ConfigObject.database_name
 
-def database_reset():
-    """ Should only be used for unit testing """
-    ConfigObject.database_name = None
-    ConfigObject.database_instance = None
-    ConfigObject.database = None
-
 def get_database():
     raise AppError("*** Code Not Complete **** Larry")
     

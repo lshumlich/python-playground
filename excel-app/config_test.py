@@ -8,7 +8,6 @@ import unittest
 import os
 
 import config
-from database.apperror import AppError
 
 
 class Test(unittest.TestCase):
@@ -33,10 +32,3 @@ class Test(unittest.TestCase):
         self.assertNotEqual(dbi1, dbi2, 'These instances should not be the same.')
         dbi3 = config.get_database_instance()
         self.assertEqual(dbi2, dbi3, 'These should be the same.')
-        
-    def test_database_reset(self):
-        dbi1 = config.get_database_instance()
-        config.database_reset()
-        dbi2 = config.get_database_instance()
-        self.assertNotEqual(dbi1, dbi2, 'These instances should not be the same.')
-        

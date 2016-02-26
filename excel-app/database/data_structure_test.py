@@ -57,6 +57,3 @@ class Test(unittest.TestCase):
         
         # If there is no attribute in the object called 'LeaseID' use the ID attribute to format the lease string
         self.assertEqual(well.format.ProdMonth,'2016-02')
-
-    def test_to_fail(self):
-        self.assertEqual('a','b')

@@ -1,6 +1,6 @@
 #!/bin/env python3
 
-import sys
+import sys,traceback
 from flask import Flask, render_template, request, flash
 
 from database.sqlite_show import Shower
@@ -57,11 +57,11 @@ class AppServer(object):
     @staticmethod
     @app.route("/link/",methods=['GET','POST']) 
     def link():
+        print('AppServer.link2 running',request.method)
         tablename = None
         attrname = None
         linkname = None
         try:
-            print('AppServer.link running')
             if request.method == 'POST':
                 print('  It was a post')
                 tablename = request.form['tablename']
@@ -92,7 +92,14 @@ class AppServer(object):
             
         except Exception as e:
             print('AppServer.link: ***Error:',e)
+            traceback.print_exc(file=sys.stdout)
         return html
+    
+    @staticmethod
+    @app.route("/larry/",methods=['POST']) 
+    def larry():
+        print('AppServer.larry running',request.method)
+        return 'Thats it folks'
     
     @staticmethod
     def reqorblank(reqname):

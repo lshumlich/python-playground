@@ -4,19 +4,35 @@ python3 -m database.calcroyalties from root directory
 2. virtualenv for self-contained virtual environment.
 after environment is created, install all dependencies with "pip install -r requirements.txt"
 
-3. testing
-install pytest (probably makes sense to install systemwide, not in virtualenv) with "pip install pytest"
-run with "py.test" at the root directory of the project, pytest will start auto test discovery (default pattern: *_test.py)
-run tests for individual files with "py.test database/calcroyalties.py" from root directory
-you can even run "py.test calcroyalties.py" from "database" directory, it will still work
-adding "--cov" will generate a coverage report, like so "py.test --cov" 
-or for individual file "py.test --cov database/calcroyalties.py"
-adding "--cov-report html" will generate a standard html coverage report
 
-4. continuous integration
-see www.travis-ci.org, login credentials tbd
-CI build is triggered by every github push
-CI script is at ".travis.yml" in repository root directory
-each CI build also runs code coverage and uploads it to www.codecov.io, login credentials tbd
+General info of stuff in this package
 
-Hello world!
+
+To Install a package:
+
+    python -m pip install SomePackage
+
+To Checkin Code:
+
+    - check in code daily at least but it must work and tests must run
+    - check in code hourly if changes 
+    
+    1) make sure all unit tests pass
+        pytest_run.py
+    2) check out the latest version from git
+        using your version of git
+    3) make sure all unit tests still pass
+        pytest_run.py
+    4) checkin you code
+        using your version of git
+        
+To review code coverage:
+
+    1) run the unit tests
+        pytest_run.py
+    2) look at the coverage
+        htmlcov/index.html
+
+To run a module
+
+    python -m pydoc CalcRoyalties
