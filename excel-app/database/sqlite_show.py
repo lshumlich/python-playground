@@ -2,34 +2,36 @@
 
 import config
 
+
 class Shower(object):
     
+    LINK_TABLE = 'linktab'
+    
     def __init__(self):
-        print('Shower.__init__', self)
+        None
 
     def connect(self):
         self.dbi = config.get_database_instance()
+        self.check_linktab()
         
     def check_linktab(self):
-        None
-        
+        if not Shower.LINK_TABLE in self.dbi.get_table_names():
+            self.dbi.execute('create table ' + Shower.LINK_TABLE +' (TabName text, AttrName text, LinkName text, BaseTab boolean, ShowAttrs text);')
     
     def insert_link(self, tabName, attName, linkName, baseTab, showAttrs):
         """ 
         create table linktab (TabName text, AttrName text, LinkName text, BaseTab boolean, ShowAttrs text);
         insert into linktab values ("BATable", "ID", "BA", 1, "ID,BAName");
         """
-        stmt = 'insert into linktab values("' + tabName + '", "' + attName + '", "' + linkName + ', "' + baseTab + ',"' + showAttrs+ '")'
+        stmt = 'insert into ' + Shower.LINK_TABLE + ' values("' + tabName + '", "' + attName + '", "' + linkName + '",' + str(baseTab) + ',"' + showAttrs+ '")'
+        print(stmt)
         self.dbi.execute(stmt)
         self.dbi.commit()
         
-    def close(self):
-        self.dbi.close()
-
     def show_table(self,tableName,attr=None,key=None):
         stmt = 'select * from ' + tableName
         if key:
-            ctype = self.columnType(tableName, attr)
+            ctype = self.column_type(tableName, attr)
             where = ''
             if ctype == 'int':
                 where = attr + "=" + key
@@ -41,20 +43,21 @@ class Shower(object):
             stmt = stmt + " where " + where
         elif attr:
             stmt = stmt + " order by " + attr
-        print('SQL:', stmt)
+#         print('SQL:', stmt)
         values = self.dbi.execute(stmt)
         table_rows = []
         for row in values:
             table_rows.append(row)
         return table_rows
         
-    def show_tables(self):
-        stmt = 'select tbl_name from sqlite_master'
-        values = self.dbi.execute(stmt)
-        tables = []
-        for row in values:
-            tables.append(row[0])
-        return(tables)
+#     Use dbi.get_table_names()
+#     def show_tables(self):
+#         stmt = 'select tbl_name from sqlite_master'
+#         values = self.dbi.execute(stmt)
+#         tables = []
+#         for row in values:
+#             tables.append(row[0])
+#         return(tables)
 
     def show_columns(self,tableName):
         stmt = 'pragma table_info(' + tableName + ')'

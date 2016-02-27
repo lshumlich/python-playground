@@ -35,9 +35,6 @@ def get_file_dir():
 def get_temp_dir():
     return os.path.join(os.path.dirname(__file__), "tempfiles/")
 
-def get_default_database_name():
-    return get_temp_dir() + 'unittest.db'
-
 def reset():
     """ only used in test situations """
     ConfigObject.environment = None
@@ -65,7 +62,7 @@ def setup_environment():
                 if 'environment' in json_data:
                     ConfigObject.environment = json_data['environment']
                 if 'databasename' in json_data:
-                    ConfigObject.database_name = json_data['databasename']
+                    ConfigObject.database_name = get_temp_dir() + json_data['databasename']
                 
     if ConfigObject.database_name and not ConfigObject.environment:
         ConfigObject.environment = "????"
@@ -76,7 +73,9 @@ def setup_environment():
     if not ConfigObject.database_name and ConfigObject.environment:
         ConfigObject.database_name = get_temp_dir() + ConfigObject.environment + '.db'
         
-    ConfigObject.database_instance = SqliteInstance(get_default_database_name())
+    print("Setting Environment to:",ConfigObject.environment,ConfigObject.database_name)
+        
+    ConfigObject.database_instance = SqliteInstance(ConfigObject.database_name)
     ConfigObject.database = Database()
     
 def get_environment():

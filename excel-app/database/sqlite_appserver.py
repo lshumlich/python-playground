@@ -31,7 +31,7 @@ class AppServer(object):
         return "hello World/hello/" + username
     
     @staticmethod
-    @app.route("/data/")
+    @app.route("/data/",methods=['GET','POST'])
     def data():
         try:
             table=request.args.get('table')
@@ -41,7 +41,7 @@ class AppServer(object):
             links['BAid'] = '?table=BAInfo&attr=BAid&key=' 
             links['WellEvent'] = '?table=WellInfo&attr=Well&key='
             
-            tables = AppServer.shower.show_tables()
+            tables = AppServer.shower.dbi.get_table_names()
             header = None
             rows = None
             print('Table:',table)
@@ -55,7 +55,7 @@ class AppServer(object):
         return html
     
     @staticmethod
-    @app.route("/link/",methods=['GET','POST']) 
+    @app.route("/data/link/",methods=['GET','POST']) 
     def link():
         print('AppServer.link2 running',request.method)
         tablename = None
@@ -113,7 +113,7 @@ class AppServer(object):
     @staticmethod
     def run(dbName):
         print("Starting AppServer.run")
-        AppServer.shower.connect(dbName)
+        AppServer.shower.connect()
         print('starting the run method of AppServer')
         AppServer.app.secret_key = 'secret'
         AppServer.app.run()

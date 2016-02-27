@@ -54,10 +54,10 @@ def load_tests(loader, tests, pattern):
 print('-- Runing Batch')
 if __name__ == "__main__":
 #     sqliteLoadExcel()
-#     browser_app()
+    browser_app()
 #     run_royalties_and_worksheet()
 #    unittest.main()
-    runTestModule()
+#     runTestModule()
     print("Goodby world!")
 
     

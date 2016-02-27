@@ -1,30 +1,15 @@
-<html lang="en">
-<head>
-<title>Table Display</title>
-<link type="text/css" rel="stylesheet" href={{url_for("static", filename="style.css")}}>
-</head>
-
-<body style="margin:30">
 <h1>Link Key Attributes</h1>
-<form action="" method='POST'>
+<form name="linkform" action="#" method='POST'>
 
 <p>Table<br><input type="text" name=tablename value={{tablename}}>
 <p>Attribute<br><input type="text" name=attrname value={{attrname}}>
 <p><LinkName><input type="text" name=linkname value={{linkname}}>
-<p><input type="submit" value="Submit">
+<p><input type="submit" value="Submit" onclick="showFormData(this.form);">
 
 </form>
+<div id="linkData">Gather Data from link form</div>
+<script>
 
-{% with messages = get_flashed_messages() %}
-	{% if messages %}
-		<ul class='flasses'>
-		{% for message in messages %}
-			<li>{{ message }}</li>
-		{% endfor %}
-		</ul>
-	{% endif %}
-{% endwith %}
-		
+    
 
-</body>
-</html>
+</script>

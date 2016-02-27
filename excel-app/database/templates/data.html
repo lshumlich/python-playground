@@ -35,8 +35,22 @@
 	    </table>
     {% endif %}
 </div>
-
+<br>
+<div id="gatherData">Gather Data from the form</div>
+<br>
 <div id="lfsconcole"></div>
+
+<div id="divForm">
+<h1>Link Key Attributes</h1>
+<form name="linkform" action="#" method='POST'>
+
+<p>Table<br><input type="text" name=tablename value={{tablename}}>
+<p>Attribute<br><input type="text" name=attrname value={{attrname}}>
+<p><LinkName><input type="text" name=linkname value={{linkname}}>
+<p><input type="submit" value="Submit" onclick="showFormData(this.form);">
+</form>
+
+</div>
 
 
 <a onclick="document.getElementById('openModal').innerHTML='<object type='text/html' data='/link' ></object>'">
@@ -159,6 +173,46 @@ function lfsid(event) {
     consAppend(el.getAttribute("attr"));
 }
 
+function showFormData(oForm) {
+	  var msg = "The data that you entered for the form with 'name' attribute='" + oForm.name + "': \n";
+	  
+	  for (i = 0; i < oForm.length, oForm.elements[i].getAttribute("type") !== 'button'; i++) {
+	    msg += oForm.elements[i].tagName + " with 'name' attribute='" + oForm.elements[i].name + "' and data: ";
+	    if(oForm.elements[i].value == null || oForm.elements[i].value == '') {
+	    msg += "NOT SET \n";
+	    } else {
+	      msg += oForm.elements[i].value + "\n";
+	    }
+	  }
+
+	  alert(msg);
+	  return false;
+	}
+function showFormStuff(event) {
+    var oForm =  document.forms[0]
+      var msg = "The data that you entered for the form with 'name' attribute='" + oForm.name + "': \n";
+      
+      for (i = 0; i < oForm.length, oForm.elements[i].getAttribute("type") !== 'button'; i++) {
+        msg += oForm.elements[i].tagName + " with 'name' attribute='" + oForm.elements[i].name + "' and data: ";
+        if(oForm.elements[i].value == null || oForm.elements[i].value == '') {
+        msg += "NOT SET \n";
+        } else {
+          msg += oForm.elements[i].value + "\n";
+        }
+      }
+
+      alert(msg);
+      return false;
+    }
+function gatherForm(event) {
+	consClear()
+	consAppend('gathering data:')
+	var f1 = document.forms[0]
+	var f2 = document.forms["linkform"]
+	consAppend("f1" + f1)
+    consAppend("f2" + f2)
+    consAppend("f2.tablename" + f2['tablename'].value)
+}
 function tableListener(event) {
 	var e1 = event.target;
 	var col = e1.cellIndex;
@@ -189,17 +243,20 @@ function tableListener(event) {
             consAppend('x: ' + event.clientX + ' y: ' + event.clientY);
         }
     }
-    parms = '/link/?tablename=' + tabName +'&attrname=' + attrName + '&linkname=' + 'whateverlinkname' 
+    parms = '/data/link/?tablename=' + tabName +'&attrname=' + attrName + '&linkname=' + 'whateverlinkname' 
     xhr.open('GET',parms,true);
     xhr.send(null);
 }
 
 // document.getElementById('body').addEventListener('click', showLfsDialog, false); // Move updates position
-document.getElementById('lfsConsAppend').addEventListener('click', lfsConsAppend,false)
-document.getElementById('lfsConsClear').addEventListener('click', lfsConsClear,false)
-document.getElementById('lfsAJAX').addEventListener('click', lfsAJAX,false)
-document.getElementById('lfsid').addEventListener('click', lfsid,false)
-document.getElementById('table').addEventListener('click', tableListener,false)
+document.getElementById('lfsConsAppend').addEventListener('click', lfsConsAppend, false)
+document.getElementById('lfsConsClear').addEventListener('click', lfsConsClear, false)
+document.getElementById('lfsAJAX').addEventListener('click', lfsAJAX, false)
+document.getElementById('lfsid').addEventListener('click', lfsid, false)
+document.getElementById('table').addEventListener('click', tableListener, false)
+document.getElementById('gatherData').addEventListener('click', gatherForm, false)
+document.getElementById('linkData').addEventListener('click', showFormStuff, false)
+
 </script>    
 </body>
 </html>
