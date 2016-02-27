@@ -41,10 +41,10 @@ class FlaskTest(unittest.TestCase):
         html = resp.data.decode()        
         self.assertIn('OL-0007', html)             
 
-    def test_adriennews(self):
-        resp = self.myapp.get('/adriennews?WellId=1')
-        html = resp.data.decode()        
-        self.assertIn('27.11', html)   
+#     def test_adriennews(self):
+#         resp = self.myapp.get('/adriennews?WellId=1')
+#         html = resp.data.decode()        
+#         self.assertIn('27.11', html)   
           
 
 if __name__ == '__main__':

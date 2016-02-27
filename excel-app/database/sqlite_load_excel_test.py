@@ -1,27 +1,31 @@
 #!/bin/env python3
 
-import os
 import unittest
 
 import config
-import database.sqlite_load_excel
-import database.sqlite_show
+from database.sqlite_show import Shower
+from database.sqlite_database_test import DatabaseUtilities
+from database.sqlite_load_excel import Loader
 
 
 class TestLoader(unittest.TestCase):
 
-    TEST_DATABASE = config.get_temp_dir() + 'unittest.db'
     TEST_SPREADSHEET = config.get_file_dir() + 'test_database.xlsx'
 
     def test_run(self):
         #Testing loading an Excel spreadsheet into an sqlite3 database.
 #         print ("Creating temporary database %s" % self.TEST_DATABASE)
-        loader = database.sqlite_load_excel.Loader()
-        loader.delete_database(self.TEST_DATABASE)
-        loader.connect(self.TEST_DATABASE)
+
+        self.assertEqual(config.get_environment(),'unittest') # Distructive Tests must run in unittest enviornment
+
+        dbu = DatabaseUtilities()
+        loader = Loader()
+        dbu.delete_all_tables()
+        
+        loader.connect()
         loader.open_excel(self.TEST_SPREADSHEET)
-        shower = database.sqlite_show.Shower()
-        shower.connect(self.TEST_DATABASE)
+        shower = Shower()
+        shower.connect()
 
         #Test that the worksheet has x number of tabs
         self.assertEqual(len(loader.wb.get_sheet_names()), 2)
@@ -51,29 +55,9 @@ class TestLoader(unittest.TestCase):
 
         #test column type
         self.assertEqual(shower.column_type('Well', 'WellId'), 'int')
-        #!!!really odd: removing the following print will make deleteTable fail
-        print(shower.show_tables())
         loader.commit()
-        loader.delete_table('Well')
+        dbu.delete_table('well')
         self.assertNotIn('Well', shower.show_tables())
-
-        #clean up
-#         loader.close()
-#         shower.close()
-        # loader.delete_database(self.TEST_DATABASE)
-#         self.assertFalse(os.path.exists(self.TEST_DATABASE))
-
-"""
-        self.assertIn('Well', shower.showTables())
-        self.assertIn('RoyaltyMaster', shower.showTables())
-
-        self.assertIn('RoyaltyClassification', shower.showColumns('Well'))
-        self.assertIn('TruckingDeducted', shower.showColumns('RoyaltyMaster'))
-
-        table = shower.showTable('Well')
-        print(table)
-        self.assertIn('SKWI112062705025W300', table[1])
-"""
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,29 +1,23 @@
 #!/bin/env python3
 
-import os
 import datetime
-import sqlite3
 from openpyxl import load_workbook
 
 import config
+from database.sqlite_database_test import DatabaseUtilities
 from database.apperror import AppError
 
 
 class Loader(object):
 
     EXCLUDE_SHEETS = ['Roy Module Construct']
+    
+    def __init__(self):
+        self.dbu = DatabaseUtilities()
 
-    def connect(self,dbName):
-        self.dbi = config.get_database_instance(dbName)
+    def connect(self):
+        self.dbi = config.get_database_instance()
         
-    def delete_database(self, database):
-        try:
-            print('delete_database:', database)
-            os.remove(database)
-        except OSError:
-            print('could not delete_database:', database)
-            pass
-
     def open_excel(self, workbookName):
         self.wb = load_workbook(workbookName)
         
@@ -54,12 +48,9 @@ class Loader(object):
             raise e
                 
     def create_table(self,tableName,headerRow, dataRow):
-
-        try:
-            self.delete_table(tableName)
-        except AppError:
-            None  # Just means the table does not exist
         
+        if tableName in self.dbi.get_table_names():
+            self.dbu.delete_table(tableName)
        
         tableCreate = 'CREATE TABLE ' + tableName + ' ('
         cols = ""
@@ -84,20 +75,10 @@ class Loader(object):
         cols = cols.replace(', )', ')')
         
         tableCreate = tableCreate + cols
-    
-        
-#         print(tableCreate)
+
         self.dbi.execute(tableCreate)
         self.dbi.commit()
 
-    def delete_table(self,tableName):
-        
-        try:
-            self.dbi.execute('drop table ' + tableName)
-        except sqlite3.OperationalError:
-            raise AppError("Table did not exist so not deleted: " + tableName)
-
-        
     def insert_data(self,tableName,row, headerRow):
         insert = 'INSERT INTO ' + tableName + ' VALUES ('
         data = ""
@@ -139,9 +120,8 @@ class Loader(object):
 if __name__ == '__main__':
     None
     worksheet = config.get_file_dir() + 'database.xlsx'
-    database = config.get_temp_dir() + 'unittest.db'
+    config.set_database_name('browse.db')
     loader = Loader()
-    loader.connect(database)
     loader.open_excel(worksheet)
     loader.load_all_sheets()
     loader.close()

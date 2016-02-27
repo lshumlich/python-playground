@@ -7,6 +7,6 @@ class RoyaltyWorksheetTest(unittest.TestCase):
     
     def test_PrintWithWellProdDate(self):
         ws = RoyaltyWorksheet()
-        md = ws.printWithWellProdDate(6,201501,'Oil')
+        ws.printWithWellProdDate(6,201501,'Oil')
 
     

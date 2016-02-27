@@ -103,11 +103,11 @@ class DataBase(object):
         for ds in self.wellList:
             self.well[ds.ID] = ds
         
-    def getWell(self, wellId):
+    def getWell(self, wellID):
         try:
-            return self.well[wellId]
+            return self.well[wellID]
         except KeyError:
-            raise AppError ('Well not found for WellId: ' + str(wellId))
+            raise AppError ('Well not found for wellID: ' + str(wellID))
     
     def getAllWells(self):
         try:
@@ -261,12 +261,12 @@ class DataBase(object):
         self.calc = self.excelLoadWsTable(self.calcDataTabName)
 
     
-    def getCalcDataByWellProdMonthProduct(self,wellId,prodMonth,product):
+    def getCalcDataByWellProdMonthProduct(self,wellID,prodMonth,product):
         for md in self.calc:
-            if md.WellId == wellId and md.ProdMonth == prodMonth:
+            if md.WellID == wellID and md.ProdMonth == prodMonth:
 #             if (md.WellId == wellId and md.ProdMonth == prodMonth and md.Product = product):
                 return md
-        raise AppError ('Calc Data not found for: ' + str(wellId) + ' ' + str(prodMonth) + ' ' + product)
+        raise AppError ('Calc Data not found for: ' + str(wellID) + ' ' + str(prodMonth) + ' ' + product)
     #
     # Generic load a tab into a data structure
     #
@@ -363,13 +363,13 @@ class TestDataBase(unittest.TestCase):
         self.assertRaises(AppError,fd.getRoyaltyMaster,'BadLease')
 
     def test_wellUpdate(self):
-        wellId = 3000
+        wellID = 3000
         newUWI = 'Changed'
         newProv = 'Ch'
         NewReferencePrice = 10101.010101
         
         db = DataBase(self.validExcelFile)
-        well = db.getWell(wellId)
+        well = db.getWell(wellID)
         # Make sure we are not testing an already updated well
         self.assertNotEqual(well.UWI,newUWI) # If this fails we are testing with an already updated file
         
@@ -381,7 +381,7 @@ class TestDataBase(unittest.TestCase):
 
         # New look into the new database and make sure the changes are made
         newDb = DataBase(db.newWorksheetName)
-        newWell = newDb.getWell(wellId)
+        newWell = newDb.getWell(wellID)
         self.assertEqual(newWell.UWI,newUWI)
         self.assertEqual(newWell.Prov,newProv)
         self.assertEqual(newWell.ReferencePrice,NewReferencePrice)

@@ -7,8 +7,8 @@ class Shower(object):
     def __init__(self):
         print('Shower.__init__', self)
 
-    def connect(self,dbName):
-        self.dbi = config.get_database_instance(dbName)
+    def connect(self):
+        self.dbi = config.get_database_instance()
         
     def check_linktab(self):
         None

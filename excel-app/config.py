@@ -9,16 +9,18 @@ the tables and all of the functionality we require from a database.
 """
 
 
-import os
+import os,json
 
-from database.apperror import AppError
 from database.sqlite_instance import SqliteInstance
+from database.sqlite_database import Database
 
 
 class ConfigObject(object):
     """
     A static config class to hold application level data.
     """
+    CONFIG_FILE = 'config.json'
+    environment = None
     database_name = None
     database_instance = None
     database = None
@@ -36,17 +38,64 @@ def get_temp_dir():
 def get_default_database_name():
     return get_temp_dir() + 'unittest.db'
 
-def get_database_instance(database_name=None):
-    if database_name:
-        ConfigObject.database_name = database_name
-        ConfigObject.database_instance = SqliteInstance(database_name)
-    if not ConfigObject.database_instance:
-        ConfigObject.database_instance = SqliteInstance(get_default_database_name())
-    return ConfigObject.database_instance
+def reset():
+    """ only used in test situations """
+    ConfigObject.environment = None
+    ConfigObject.database_name = None
+    ConfigObject.database_instance = None
+    ConfigObject.database = None
+
+def set_enviornment(environment):
+    """ only used in test situations, valid values are unittest, test, qa, prod """
+    reset()
+    ConfigObject.environment = environment
+    
+def set_database_name(name):
+    reset()
+    ConfigObject.database_name = name
+    
+def setup_environment():
+    if not ConfigObject.database_name and not ConfigObject.environment:
+        configFile = get_temp_dir() + ConfigObject.CONFIG_FILE
+        if not os.path.exists(configFile):
+            ConfigObject.environment = 'unittest'
+        else :
+            with open(configFile) as json_file:
+                json_data = json.load(json_file)
+                if 'environment' in json_data:
+                    ConfigObject.environment = json_data['environment']
+                if 'databasename' in json_data:
+                    ConfigObject.database_name = json_data['databasename']
+                
+    if ConfigObject.database_name and not ConfigObject.environment:
+        ConfigObject.environment = "????"
+                
+    if not ConfigObject.database_name and not ConfigObject.environment:
+        ConfigObject.environment = "unittest"
+
+    if not ConfigObject.database_name and ConfigObject.environment:
+        ConfigObject.database_name = get_temp_dir() + ConfigObject.environment + '.db'
+        
+    ConfigObject.database_instance = SqliteInstance(get_default_database_name())
+    ConfigObject.database = Database()
+    
+def get_environment():
+    if not ConfigObject.environment:
+        setup_environment()
+    return ConfigObject.environment
     
 def get_database_name():
+    if not ConfigObject.database_name:
+        setup_environment()
     return ConfigObject.database_name
+    
+def get_database_instance():
+    if not ConfigObject.database_instance:
+        setup_environment()
+    return ConfigObject.database_instance
 
 def get_database():
-    raise AppError("*** Code Not Complete **** Larry")
+    if not ConfigObject.database:
+        setup_environment()
+    return ConfigObject.database
     

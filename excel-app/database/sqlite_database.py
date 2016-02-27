@@ -4,14 +4,12 @@
 This module will connect to the sqlite database and return Python objects.
 """
 
-import sqlite3
-
 import config
 from database.apperror import AppError
 from database.data_structure import DataStructure
 
 
-class DataObject(object):
+class Database(object):
 
     def __init__(self):
         self.dbi = config.get_database_instance()

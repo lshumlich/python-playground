@@ -10,28 +10,22 @@ class RoyaltyWorksheet(object):
         self.ws.write ("Hello World - Royalty Worksheet.\n")
         self.count = 0
         
-    def printWithWellProdDate(self,wellId,prodDate,product):
-        db = DataBase(config.get_temp_dir() + 'database.xlsx')
-        md = db.getMonthlyDataByWellProdMonthProduct(wellId,prodDate,product)
-        print(md)
-        well = db.getWell(wellId)
-        print(well)
+    def printWithWellProdDate(self,wellID,prodDate,product):
+        db = DataBase(config.get_file_dir() + 'database.xlsx')
+        md = db.getMonthlyDataByWellProdMonthProduct(wellID,prodDate,product)
+        well = db.getWell(wellID)
         royalty = db.getRoyaltyMaster(well.Lease)
-        print(royalty)
         lease = db.getLease(well.Lease)
-        print(lease)
-        calc = db.getCalcDataByWellProdMonthProduct(wellId,prodDate,product)
-        print(calc)
+        calc = db.getCalcDataByWellProdMonthProduct(wellID,prodDate,product)
 
         ws = RoyaltyWorksheet()
         ws.printSaskOilRoyaltyRate(md,well,royalty,lease,calc)
         
-        
     def printSaskOilRoyaltyRate(self, monthlyData, well, royalty, lease, royaltyCalc):
-#         print('Well:',well.WellId,lease.Lease,royaltyCalc)
+#         print('Well:',well.wellID,lease.Lease,royaltyCalc)
         self.count += 1
         self.ws.write ('\n')
-        self.ws.write ('Well: {:<33} Lease: {}\n'.format(well.WellId,lease.Lease))
+        self.ws.write ('Well: {:<33} Lease: {}\n'.format(well.ID,lease.Lease))
         fs = '{:>45}: {}\n'
         self.ws.write (fs.format("Right", royalty.RightsGranted))
         self.ws.write (fs.format("Province", well.Prov))
