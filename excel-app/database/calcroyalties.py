@@ -340,6 +340,52 @@ class ProcessRoyalties(object):
         prodDate = date(year,month,1)
         diff = prodDate - cd
         return round(diff.days/365,2)
+
+
+    def calcGorrPercent(self,vol,hours,gorr):
+        """ returns the rr% and an explination string  """
+        words = gorr.split(",")
+        gorrPercent = 0.0
+        gorrMaxVol = 0.0
+        lastGorrMaxVol = 0.0
+        gorrExplain = ''
+
+        i = 0
+        evalVol = 0
+
+        for s in words:
+            i += 1
+            if i == 1:
+                if s == 'dprod':
+                    evalVol = vol / hours
+                    gorrExplain = 'dprod = ' + '{:.6f}'.format(evalVol) + ' = ' + str(vol) + ' / ' + str(hours)
+                elif s == 'mprod':
+                    evalVol = vol
+                    gorrExplain = 'mprod = ' + str(evalVol)
+                elif s == 'fixed':
+                    gorrExplain = 'fixed'
+                else:
+                    raise AppError('GORR Base is not known: ' + s)
+#                 print (s,evalVol)
+            elif i % 2 == 0:
+                lastGorrMaxVol = gorrMaxVol
+                gorrMaxVol = float(s)
+#                 print('gorrMaxVol:', gorrMaxVol)
+            else:
+                gorrPercent = float(s)
+#                 print('gorrPercent:', gorrPercent)
+                if evalVol == 0:
+                    gorrExplain += ' for an RR of ' + str(gorrPercent) +'%'
+                    return gorrPercent, gorrExplain
+                elif gorrMaxVol == 0:
+                    gorrExplain += ' is greater than ' + str(lastGorrMaxVol) + ' for an RR of ' + str(gorrPercent) +'%'
+                    return gorrPercent, gorrExplain
+                elif evalVol <= gorrMaxVol:
+                    gorrExplain += ' is greater than ' + str(lastGorrMaxVol) + ' and less than or equal to ' + str(gorrMaxVol) + ' for an RR of ' + str(gorrPercent) +'%'
+                    return gorrPercent, gorrExplain
+
+        raise AppError('GORR Logic Error. We should never ever get here: ')
+
     #
     # Sask Oil Royalty Calculation... Finally we are here...
     #
@@ -553,11 +599,11 @@ class ProcessRoyalties(object):
         prodDate = date(year,month,1)
         diff = prodDate - cd
         return round(diff.days/365,2)
-    """
+
 
 
     def calcGorrPercent(self,vol,hours,gorr):
-        """ returns the rr% and an explination string  """
+         returns the rr% and an explination string
         words = gorr.split(",")
         gorrPercent = 0.0
         gorrMaxVol = 0.0
@@ -600,11 +646,13 @@ class ProcessRoyalties(object):
         
         raise AppError('GORR Logic Error. We should never ever get here: ')
 
+    """
+
     def ensureDate(self,d):
         if isinstance(d,datetime):
             return date(d.year, d.month, d.day)
         return d
- 
+
      
 if __name__ == '__main__':
     pr = ProcessRoyalties()

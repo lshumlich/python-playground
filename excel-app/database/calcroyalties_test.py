@@ -233,5 +233,36 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, IndianInterest, MinRoyalty, RoyaltyPr
         self.assertAlmostEqual(pr.determineRoyaltyPrice('ActSales', m),229)
 
 
+    def test_calcGorrPercent(self):
+        pr = ProcessRoyalties()
+        gorr = "dprod,250,2,300,3,400,4,500,5,0,6"
+        self.assertEqual(pr.calcGorrPercent(600, 10, gorr), (2.0, 'dprod = 60.000000 = 600 / 10 is greater than 0.0 and less than or equal to 250.0 for an RR of 2.0%'))
+        self.assertEqual(pr.calcGorrPercent(1008, 4, gorr), (3.0, 'dprod = 252.000000 = 1008 / 4 is greater than 250.0 and less than or equal to 300.0 for an RR of 3.0%'))
+        self.assertEqual(pr.calcGorrPercent(400, 1, gorr), (4.0, 'dprod = 400.000000 = 400 / 1 is greater than 300.0 and less than or equal to 400.0 for an RR of 4.0%'))
+        self.assertEqual(pr.calcGorrPercent(990, 2, gorr), (5.0, 'dprod = 495.000000 = 990 / 2 is greater than 400.0 and less than or equal to 500.0 for an RR of 5.0%'))
+        self.assertEqual(pr.calcGorrPercent(10000, 17, gorr), (6.0,'dprod = 588.235294 = 10000 / 17 is greater than 500.0 for an RR of 6.0%'))
+
+        gorr = "mprod,250,2,300,3,400,4,500,5,0,6"
+        self.assertEqual(pr.calcGorrPercent(200, 10, gorr), (2.0, 'mprod = 200 is greater than 0.0 and less than or equal to 250.0 for an RR of 2.0%'))
+        self.assertEqual(pr.calcGorrPercent(300, 4, gorr), (3.0, 'mprod = 300 is greater than 250.0 and less than or equal to 300.0 for an RR of 3.0%'))
+        self.assertEqual(pr.calcGorrPercent(350.6, 1, gorr), (4.0, 'mprod = 350.6 is greater than 300.0 and less than or equal to 400.0 for an RR of 4.0%'))
+        self.assertEqual(pr.calcGorrPercent(410, 2, gorr), (5.0, 'mprod = 410 is greater than 400.0 and less than or equal to 500.0 for an RR of 5.0%'))
+        self.assertEqual(pr.calcGorrPercent(10000, 17, gorr), (6.0,'mprod = 10000 is greater than 500.0 for an RR of 6.0%'))
+
+        gorr = "fixed,0,2"
+        self.assertEqual(pr.calcGorrPercent(200, 10, gorr), (2.0, 'fixed for an RR of 2.0%'))
+        self.assertEqual(pr.calcGorrPercent(10000, 4, gorr), (2.0, 'fixed for an RR of 2.0%'))
+
+        #self.assertEqual(pr.calcGorrPercent(None, 10, gorr), (2.0, 'fixed for an RR of 2.0%'))
+
+
+        gorr = "bad string,0,2"
+        self.assertRaises(AppError, pr.calcGorrPercent, 400, 10, gorr)
+        self.assertRaises(AppError, pr.calcGorrPercent, None, 10, gorr)
+
+        gorr = None,"0,2"
+        self.assertRaises(AttributeError, pr.calcGorrPercent, 400, 10, gorr)
+
+
 if __name__ == '__main__':
     unittest.main()
