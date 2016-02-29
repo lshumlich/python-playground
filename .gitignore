@@ -70,5 +70,4 @@ venv
 /excel-app/.project
 /sample/.pydevproject
 /sample/.project
-excel-app/tempfiles/*
 *sublime*
