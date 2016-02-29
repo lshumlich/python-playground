@@ -41,8 +41,11 @@ class DatabaseUtilities(object):
         self.db_instance = config.get_database_instance()
 
     def execute_statement(self,statement):
-        for line in statement.splitlines():
-            self.db_instance.execute(line)
+#        for line in statement.splitlines():
+        for line in statement.split(';'):
+            n_line = line.strip()
+            if n_line != '':
+                self.db_instance.execute(n_line)
         self.db_instance.commit()
     
     def delete_all_tables(self):

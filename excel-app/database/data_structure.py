@@ -8,7 +8,7 @@ DataStructure is the base object for all the data objects in the system.
 class DataStructure(object):
     
     def __init__(self):
-        self.format = Formatter(self)
+        self._format = Formatter(self)
         
     def __str__(self):
         return str(vars(self))

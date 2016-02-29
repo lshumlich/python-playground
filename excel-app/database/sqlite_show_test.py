@@ -45,9 +45,3 @@ class SqliteShowerTest(unittest.TestCase):
         link = shower.get_link('tabname2','attName2')
         self.assertEqual(link.LinkName,'linkName2')
         
-        link = shower.get_link('tabname1','attName1')
-        self.assertEqual(link.LinkName,'New Link Name')
-
-        print(link)
-        
-

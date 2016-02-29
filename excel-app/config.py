@@ -71,7 +71,8 @@ def setup_environment():
         ConfigObject.environment = "unittest"
 
     if not ConfigObject.database_name and ConfigObject.environment:
-        ConfigObject.database_name = get_temp_dir() + ConfigObject.environment + '.db'
+        ConfigObject.database_name = ":memory:"
+#         ConfigObject.database_name = get_temp_dir() + ConfigObject.environment + '.db'
         
     print("Setting Environment to:",ConfigObject.environment,ConfigObject.database_name)
         

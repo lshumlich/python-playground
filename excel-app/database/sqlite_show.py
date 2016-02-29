@@ -30,7 +30,7 @@ class Shower(object):
         self.dbi.commit()
         
     def get_link(self,tabName,attrName):
-        link = self.database.universal_selector(Shower.LINK_TABLE, TabName=tabName,AttrName=attrName)
+        link = self.database.select(Shower.LINK_TABLE, TabName=tabName,AttrName=attrName)
         return link 
 
     def show_table(self,tableName,attr=None,key=None):
