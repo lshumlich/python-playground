@@ -6,20 +6,19 @@ the best way to test it.
 """
 import unittest
 import config
-from database.sqlite_instance import SqliteInstance
+from database.sqlite_utilities_test import DatabaseUtilities
 
 class TestSqliteInstance(unittest.TestCase):
 
     TEST_TABLE_NAME = 'mytable'
 
     def test_all_features(self):
-        instance = SqliteInstance(config.get_temp_dir() + 'unittest.db')
-        dropStmt = 'drop table ' + self.TEST_TABLE_NAME
 
-        # Make sure the table does not exist from the last run
-        tables = instance.get_table_names()
-        if self.TEST_TABLE_NAME in tables:
-            instance.execute(dropStmt)
+        self.assertEqual(config.get_environment(),'unittest') # Distructive Tests must run in unittest enviornment
+        instance = config.get_database_instance()
+        
+        utils = DatabaseUtilities()
+        utils.delete_all_tables()
 
         createStmt = 'create table ' + self.TEST_TABLE_NAME  + ' (myKey int, myText text, myDate date)'
         instance.execute(createStmt)
@@ -43,8 +42,6 @@ class TestSqliteInstance(unittest.TestCase):
         self.assertEqual(2,len(rows), 'Should be two rows in the table')
         self.assertEqual(1,rows[0][0], 'First key should be 1')
         self.assertEqual(2,rows[1][0], 'First key should be 1')
-
-        instance.close()
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,5 +1,6 @@
 #!/bin/env python3
 
+import json
 import sys,traceback
 from flask import Flask, render_template, request, flash
 
@@ -94,6 +95,24 @@ class AppServer(object):
             print('AppServer.link: ***Error:',e)
             traceback.print_exc(file=sys.stdout)
         return html
+
+    @staticmethod
+    @app.route("/data/link.json",methods=['POST']) 
+    def link_json():
+        print('AppServer.link_json running',request.method)
+        data = AppServer.to_json(request)
+
+        return 'Thats it folks'
+
+    @staticmethod
+    @app.route("/data/getLinkData.json",methods=['POST']) 
+    def get_link_data():
+        print('AppServer.get_link_data running',request.method)
+        data = AppServer.to_json(request)
+        
+        
+
+        return 'Thats it folks'
     
     @staticmethod
     @app.route("/larry/",methods=['POST']) 
@@ -109,7 +128,18 @@ class AppServer(object):
             return a
         else:
             return ''
-
+        
+    @staticmethod
+    def to_json(req):
+        """
+        Do not remove this method. We could use request.json instead of all
+        this but... and it's a big but... flask unit testing does not 
+        suport the request.json method we we wrote this.
+        """
+        reqDataBytes = req.data
+        reqDataString = reqDataBytes.decode(encoding='UTF-8')
+        return json.loads(reqDataString)
+        
     @staticmethod
     def run(dbName):
         print("Starting AppServer.run")

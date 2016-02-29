@@ -16,18 +16,18 @@
  
  <div style="padding:10px;margin-top:25px;">
     {% if header %}
-    	<table border="1" id="table">
-    	<tr>
+    	<table id="SelTableId" class="Sel">
+    	<tr class="Sel">
         {% for h in header %}
-        	<td> <a href=?table={{table}}&attr={{ h }}> {{ h }} </a> </td>
+        	<th class="Sel"> <a href=?table={{table}}&attr={{ h }}>{{ h }}</a> </th>
         {% endfor %}
     	</tr>
 	    {% if rows %} 
 	    
 	        {% for r in rows %}
-		    	<tr>
+		    	<tr class="Sel">
 	        	{% for c in r %}
-	        		<td> {{ c }} {% if header[loop.index0] in links %} <a href="{{links[header[loop.index0]]}}{{c}} ">-</a>  {% endif %}</td>
+	        		<td class="Sel">{{ c }} {% if header[loop.index0] in links %} <a href="{{links[header[loop.index0]]}}{{c}} ">-</a>  {% endif %}</td>
 		        {% endfor %}
 		    	</tr>
 	        {% endfor %}
@@ -36,21 +36,165 @@
     {% endif %}
 </div>
 <br>
-<div id="gatherData">Gather Data from the form</div>
-<br>
 <div id="lfsconcole"></div>
 
-<div id="divForm">
-<h1>Link Key Attributes</h1>
-<form name="linkform" action="#" method='POST'>
-
-<p>Table<br><input type="text" name=tablename value={{tablename}}>
-<p>Attribute<br><input type="text" name=attrname value={{attrname}}>
-<p><LinkName><input type="text" name=linkname value={{linkname}}>
-<p><input type="submit" value="Submit" onclick="showFormData(this.form);">
-</form>
-
+<div id="LinkFormId" class="linkDialog center">
+    <h3>Link Attributes</h3>
+    <form name="linkform" action="#" method='POST'>
+    <table align="center" border="0">
+        <tr><td>Table</tr></td> 
+        <tr><td><input type="text" name=tableName></tr></td>
+        <tr><td>Attribute</tr></td> 
+        <tr><td><input type="text" name=attrName></tr></td>
+        <tr><td>Value</tr></td> 
+        <tr><td><input type="text" name=attrValue></tr></td>
+        <tr><td>Link Name</tr></td> 
+        <tr><td><input type="text" name=linkName></tr></td>
+        <tr><td><input type="checkbox" name="baseTab"> Base Table?</tr></td>
+        <tr><td>Attributes To Show</tr></td> 
+        <tr><td><input type="textarea" name=showAttrs rows="2"></tr></td>
+        <tr><td>&nbsp;</td></tr>
+        <tr><td><button id="SubmitLinkFormID" type="button">Submit</button>
+        <button id="CancelLinkFormID" type="button">Cancel</button></tr></td>
+     </table>
+     <br>
+    </form>
 </div>
+
+<script>
+
+function sendFormToServer(event) {
+
+	consClear()
+    var oForm = document.forms["linkform"];
+    
+    var dict = {};
+    for (i = 0; i < oForm.length; i++) {
+    	if (oForm.elements[i].name != '') {
+    		if (oForm.elements[i].type == 'text') {
+    			   dict[oForm.elements[i].name] = oForm.elements[i].value;
+    		} else if (oForm.elements[i].type == 'checkbox') {
+                dict[oForm.elements[i].name] = oForm.elements[i].checked;
+    		}
+    		
+    	consAppend(oForm.elements[i].name + "," + oForm.elements[i].value + "," + oForm.elements[i].type )
+    		
+    	}
+    }
+    var data = JSON.stringify(dict);
+    consAppend(data);    
+    
+    xhr = new XMLHttpRequest();
+    xhr.open('POST','/data/link.json',true);
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.onload = function() {
+        consAppend(xhr.status);
+        if (xhr.status == 200) {
+            consAppend(xhr.responseText);
+        }
+    }
+    xhr.send(data);
+}
+
+function talkToServer(location,data,functionToExecute) {
+    consClear()
+    consAppend('Talking to: ' + location);
+    consAppend('   sending: ' + data)
+//    consAppend(' returning: ' + functionToExecute)
+    
+    
+    xhr = new XMLHttpRequest();
+    xhr.open('POST',location,true);
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.onload = function() {
+        if (xhr.status == 200) {
+            consAppend(xhr.responseText);
+            data = JSON.parse(xhr.responseText);
+            consAppend(data);
+            functionToExecute(data);
+        } else {
+        	functionToExecute(data);
+        	consAppend('*** We have a bad response from server: ' + xhr.status)
+            consAppend('    url: ' + location)
+            consAppend('    data: ' + JSON.stringify(data))
+        }
+    }
+    
+    xhr.send(JSON.stringify(data));
+
+//  functionToExecute(data);  
+    
+
+}
+
+function cancelLinkForm(event) {
+    var elDialog = document.getElementById('LinkFormId');
+    elDialog.style.opacity = 0;
+    elDialog.style.zIndex = "-1";
+}
+
+function tableListener(event) {
+	
+	var data = {}
+    var e1 = event.target;
+    var col = e1.cellIndex;
+    var p1 = e1.parentNode;
+    var row = p1.rowIndex;
+    var tab = document.getElementById('SelTableId');
+    var hRow = tab.rows[0];
+    var hcell = hRow.getElementsByTagName("th")[col];
+    var attrName = hcell.textContent;
+    var attrValue = '';
+    if (row !== 0) {
+        attrValue = e1.textContent
+    }
+    var tabName = '{{table}}';
+    
+    data['tabName'] = tabName;
+    data['attrName'] = attrName;
+    data['attrValue'] = attrValue;
+
+    if (row == 0) {
+    	talkToServer('/data/getLinkData.json',data,linkForm)
+//        linkForm(data);
+    }
+}
+    
+function linkForm(data) {
+	
+    var oForm = document.forms["linkform"];
+    oForm.elements["tableName"].value = data["tabName"]
+    oForm.elements["attrName"].value = data["attrName"]
+    oForm.elements["attrValue"].value = data["attrValue"]
+    oForm.elements["linkName"].value = data["linkName"]
+//    oForm.elements["basTab"].value = data["basTab"]
+//    oForm.elements["showAttrs"].value = data["showAttrs"]
+    
+    var elDialog = document.getElementById('LinkFormId');
+    elDialog.style.opacity = 0;
+    elDialog.style.top = event.clientY + 'px';
+    elDialog.style.left = event.clientX + 'px';
+    elDialog.style.zIndex = "0";
+    elDialog.style.opacity = 1;
+
+//    consAppend('x: ' + event.clientX + ' y: ' + event.clientY);
+//    consClear()
+//    consAppend("We have a tableListner1:" + row + "," + col + ' ' + hcell.innerHTML + " = " + e1.innerHTML);
+//    consAppend("We have a tableListner2:" + row + "," + col + ' ' + tabName + '.' + attrName + " = " + attrValue);
+}
+
+
+document.getElementById('SubmitLinkFormID').addEventListener('click', sendFormToServer, false)
+document.getElementById('CancelLinkFormID').addEventListener('click', cancelLinkForm, false)
+document.getElementById('SelTableId').addEventListener('click', tableListener, false)
+
+//document.getElementById('gatherData').addEventListener('click', gatherForm, false)
+
+
+
+
+</script>
+
 
 
 <a onclick="document.getElementById('openModal').innerHTML='<object type='text/html' data='/link' ></object>'">
@@ -173,21 +317,6 @@ function lfsid(event) {
     consAppend(el.getAttribute("attr"));
 }
 
-function showFormData(oForm) {
-	  var msg = "The data that you entered for the form with 'name' attribute='" + oForm.name + "': \n";
-	  
-	  for (i = 0; i < oForm.length, oForm.elements[i].getAttribute("type") !== 'button'; i++) {
-	    msg += oForm.elements[i].tagName + " with 'name' attribute='" + oForm.elements[i].name + "' and data: ";
-	    if(oForm.elements[i].value == null || oForm.elements[i].value == '') {
-	    msg += "NOT SET \n";
-	    } else {
-	      msg += oForm.elements[i].value + "\n";
-	    }
-	  }
-
-	  alert(msg);
-	  return false;
-	}
 function showFormStuff(event) {
     var oForm =  document.forms[0]
       var msg = "The data that you entered for the form with 'name' attribute='" + oForm.name + "': \n";
@@ -213,7 +342,8 @@ function gatherForm(event) {
     consAppend("f2" + f2)
     consAppend("f2.tablename" + f2['tablename'].value)
 }
-function tableListener(event) {
+
+function xxxtableListener(event) {
 	var e1 = event.target;
 	var col = e1.cellIndex;
 	var p1 = e1.parentNode;
@@ -253,9 +383,9 @@ document.getElementById('lfsConsAppend').addEventListener('click', lfsConsAppend
 document.getElementById('lfsConsClear').addEventListener('click', lfsConsClear, false)
 document.getElementById('lfsAJAX').addEventListener('click', lfsAJAX, false)
 document.getElementById('lfsid').addEventListener('click', lfsid, false)
-document.getElementById('table').addEventListener('click', tableListener, false)
+//document.getElementById('table').addEventListener('click', tableListener, false)
 document.getElementById('gatherData').addEventListener('click', gatherForm, false)
-document.getElementById('linkData').addEventListener('click', showFormStuff, false)
+//document.getElementById('linkData').addEventListener('click', showFormStuff, false)
 
 </script>    
 </body>

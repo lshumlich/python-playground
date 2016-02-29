@@ -21,6 +21,7 @@ class TestLoader(unittest.TestCase):
         dbu = DatabaseUtilities()
         loader = Loader()
         dbu.delete_all_tables()
+        dbi = config.get_database_instance()
         
         loader.connect()
         loader.open_excel(self.TEST_SPREADSHEET)
@@ -38,12 +39,13 @@ class TestLoader(unittest.TestCase):
         self.assertEqual(len(loader.wb['Well'].rows), 9)
         self.assertEqual(len(loader.wb['Royalty Master'].rows), 11)
 
-        #Test that we have an empty database
-        self.assertEqual(len(shower.show_tables()), 0)
+        #Test that we have an empty database. The only one would the linktab created in shower
+        print(dbi.get_table_names())
+        self.assertEqual(len(dbi.get_table_names()), 1)
 
-        #Test that we have x number of tables
+        #Test that we have x number of tables plus the linktab tables
         loader.load_all_sheets()
-        self.assertEqual(len(shower.show_tables()), 2)
+        self.assertEqual(len(dbi.get_table_names()), 3)
 
         #test that each table has x number of columns
         self.assertEqual(len(shower.show_table('Well')), 8)
@@ -57,7 +59,7 @@ class TestLoader(unittest.TestCase):
         self.assertEqual(shower.column_type('Well', 'WellId'), 'int')
         loader.commit()
         dbu.delete_table('well')
-        self.assertNotIn('Well', shower.show_tables())
+        self.assertNotIn('Well', dbi.get_table_names())
 
 if __name__ == '__main__':
     unittest.main()
