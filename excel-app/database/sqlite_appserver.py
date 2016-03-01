@@ -14,6 +14,7 @@ class AppServer(object):
     app = Flask(__name__) 
 #     appinfo.debug = True
     shower = Shower()
+    db = config.get_database()
     
     def __init__(self):
 #         AppServer.appinfo = Flask(__name__)
@@ -100,19 +101,33 @@ class AppServer(object):
     @app.route("/data/link.json",methods=['POST']) 
     def link_json():
         print('AppServer.link_json running',request.method)
-        data = AppServer.to_json(request)
+        data = AppServer.json_decode(request)
 
         return 'Thats it folks'
 
     @staticmethod
     @app.route("/data/getLinkData.json",methods=['POST']) 
     def get_link_data():
-        print('AppServer.get_link_data running',request.method)
-        data = AppServer.to_json(request)
+        try:
+            print('AppServer.get_link_data running',request.method)
+            print('Instance:',config.get_database_name(),config.get_environment())
+            print('Tables',config.get_database_instance().get_table_names())
+            data = AppServer.json_decode(request)
+            link = AppServer.db.select("LinkTab", TabName = data['TabName'], AttrName = data['AttrName'])
+            if not link:
+                data['LinkName'] = ''
+                data['BaseTab'] = 0
+                data['ShowAttrs'] = ''
+            else:
+                data['LinkName'] = link.LinkName
+                data['BaseTab'] = link.BaseTab
+                data['ShowAttrs'] = link.ShowAttrs
+    
+            return json.dumps(data)
         
-        
-
-        return 'Thats it folks'
+        except Exception as e:
+            print('AppServer.link: ***Error:',e)
+            traceback.print_exc(file=sys.stdout)
     
     @staticmethod
     @app.route("/larry/",methods=['POST']) 
@@ -130,7 +145,7 @@ class AppServer(object):
             return ''
         
     @staticmethod
-    def to_json(req):
+    def json_decode(req):
         """
         Do not remove this method. We could use request.json instead of all
         this but... and it's a big but... flask unit testing does not 
@@ -144,6 +159,7 @@ class AppServer(object):
     def run(dbName):
         print("Starting AppServer.run")
         AppServer.shower.connect()
+#         AppServer.db = config.get_database()
         print('starting the run method of AppServer')
         AppServer.app.secret_key = 'secret'
         AppServer.app.run()

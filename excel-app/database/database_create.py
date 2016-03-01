@@ -11,14 +11,14 @@ To Update, do the following:
 """
 import datetime
 
-from database.sqlite_utilities_test import DatabaseUtilities
+import config
 
 class DatabaseCreate(object):
     
     DATABASE_VERSION = 1
 
     def __init__(self):
-        self.dbu = DatabaseUtilities()
+        self.dbi = config.get_database_instance()
         
     def create_all(self):
         self.config()
@@ -28,16 +28,17 @@ class DatabaseCreate(object):
         self.monthly()
         self.calc()
         self.econdata()
+        self.linktab()
         
     def config(self):
         statement = """
             CREATE TABLE Config ('ID' integer primary key autoincrement, 
             'Version' int, CreateDate date);
         """
-        self.dbu.execute_statement(statement)
+        self.dbi.execute_statement(statement)
         
         insertStatement = "insert into Config (Version, CreateDate) values(" + str(DatabaseCreate.DATABASE_VERSION) + ",'" + str(datetime.datetime.now()) + "');"
-        self.dbu.execute_statement(insertStatement)
+        self.dbi.execute(insertStatement)
 
     def well(self):
         statement = """
@@ -47,7 +48,7 @@ class DatabaseCreate(object):
             'Classification' text, 'SRC' int, 'IndianInterest' float, 
             'CommencementDate' date, 'ReferencePrice' int);
         """
-        self.dbu.execute_statement(statement)
+        self.dbi.execute_statement(statement)
         
     def royaltymaster(self):
         statement = """
@@ -57,7 +58,7 @@ class DatabaseCreate(object):
             "TruckingDeducted" text, "ProcessingDeducted" text, "Gorr" text,
              "Notes" text);
         """
-        self.dbu.execute_statement(statement)
+        self.dbi.execute_statement(statement)
         
     def lease(self):
         statement = """
@@ -65,7 +66,7 @@ class DatabaseCreate(object):
             "LeaseType" text, "Prov" text, "FNReserve" int, "Lessor" int, 
             "Notes" text);
         """
-        self.dbu.execute_statement(statement)
+        self.dbi.execute_statement(statement)
         
     def monthly(self):
         statement = """
@@ -74,7 +75,7 @@ class DatabaseCreate(object):
             "AmendNo" int, "ProdHours" int, "ProdVol" int, "TransPrice" float, 
             "WellHeadPrice" float, "TransRate" float, "ProcessingRate" float);
         """
-        self.dbu.execute_statement(statement)
+        self.dbi.execute_statement(statement)
         
     def calc(self):
         statement = """
@@ -91,7 +92,7 @@ class DatabaseCreate(object):
             "RoyaltyDeductions" int, "RoyaltyValue" float, 
             "CommencementPeriod" float, "Message" text, "GorrMessage" text);
         """
-        self.dbu.execute_statement(statement)
+        self.dbi.execute_statement(statement)
         
     def econdata(self):
         statement = """
@@ -109,4 +110,11 @@ class DatabaseCreate(object):
             "ONEW_K" float, "ONEW_X" int, 
             "OOLD_K" float, "OOLD_X" int);
         """
-        self.dbu.execute_statement(statement)
+        self.dbi.execute_statement(statement)
+
+    def linktab(self):        
+        statement = """
+            create table LinkTab ('ID' integer primary key autoincrement,
+            TabName text, AttrName text, LinkName text, BaseTab boolean, ShowAttrs text);
+        """
+        self.dbi.execute_statement(statement)

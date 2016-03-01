@@ -1,7 +1,6 @@
 #!/bin/env python3
 
 import unittest
-from sqlite3 import OperationalError
 
 import config
 from database.apperror import AppError
@@ -33,38 +32,25 @@ class SqliteDatabaseTest(unittest.TestCase):
         self.assertEqual('WhatEver',ds._table_name)
 
     def test_select(self):
-        statement = """
-            CREATE TABLE Well ('ID' int, 'UWI' text, 'Prov' text, 'WellType' text, 'LeaseType' text, 'LeaseID' int, 'RoyaltyClassification' text, 'Classification' text, 'SRC' int, 'IndianInterest' float, 'CommencementDate' date, 'ReferencePrice' int);
-            INSERT INTO Well VALUES(1,'SKWI111062705025W300','SK','Oil','OL',1,'New Oil','Heavy',0,0.25,'2014-12-01 00:00:00',1);
-            INSERT INTO Well VALUES(2,'SKWI112062705025W300','SK','Oil','OL',2,'Third Tier Oil','Southwest',0,0.95,'2014-12-01 00:00:00',1);
-            INSERT INTO Well VALUES(3,'SKWI113062705025W300','SK','Oil','OL',3,'Fourth Tier Oil','Other',0,1.0,NULL,NULL);
-            INSERT INTO Well VALUES(4,'SKWI114062705025W300','SK','Oil','OL',4,'Old Oil','Other',0,1.0,NULL,NULL);
-            CREATE TABLE Lease ('LeaseType' text, 'ID' int, 'Prov' text, 'FNReserve' int, 'Lessor' int, 'Notes' text);
-            INSERT INTO Lease VALUES('OL',1,'SK',123,2345,NULL);
-            INSERT INTO Lease VALUES('OL',2,'SK',123,2345,NULL);
-            INSERT INTO Lease VALUES('OL',3,'SK',123,2345,NULL);
-            INSERT INTO Lease VALUES('OL',4,'AB',123,2345,NULL);
-        """
-        self.dbu.execute_statement(statement)
+        self.dbu.create_some_test_wells()
+        self.dbu.create_some_test_leases()
+        
         self.assertIsNotNone(self.db.select('Well', RoyaltyClassification='Old Oil'))
         self.assertEqual(len(self.db.select('Well', Prov='SK', Classification='Other')), 2)
         self.assertEqual(len(self.db.select('Well')), 4)
         self.assertRaises(AppError, self.db.select, 'WrongTable')
+        self.assertRaises(AppError, self.db.select, 'WrongTable',WrongAttr='WhoCares')
+        self.db.select('Well',WrongAttr='WhoCares')
         self.assertRaises(AppError, self.db.select, 'Well', Foo='bar')
         self.assertEqual(len(self.db.select('Lease')), 4)
         self.assertEqual(len(self.db.select('Lease', Prov='SK')), 3)
         self.assertIsNone(self.db.select('Well', ID=1000))
-
-    def test_update(self):
-        statement = """
-            CREATE TABLE Well ('ID' int, 'UWI' text, 'Prov' text, 'WellType' text, 'LeaseType' text, 'LeaseID' int, 'RoyaltyClassification' text, 'Classification' text, 'SRC' int, 'IndianInterest' float, 'CommencementDate' date, 'ReferencePrice' int);
-            INSERT INTO Well VALUES(1,'SKWI111062705025W300','SK','Oil','OL',1,'New Oil','Heavy',0,0.25,'2014-12-01 00:00:00',1);
-            INSERT INTO Well VALUES(2,'SKWI112062705025W300','SK','Oil','OL',2,'Third Tier Oil','Southwest',0,0.95,'2014-12-01 00:00:00',1);
-            CREATE TABLE Lease ('LeaseType' text, 'ID' int, 'Prov' text, 'FNReserve' int, 'Lessor' int, 'Notes' text);
-            INSERT INTO Lease VALUES('OL',1,'SK',123,2345,NULL);
-        """
-        self.dbu.execute_statement(statement)
         
+        self.db.select('WrongTable',WrongAttr='WhoCares')
+        
+    def test_update(self):
+        self.dbu.create_some_test_wells()
+
         # change all types of attributes, read another record and then read the record again to make sure the changes were made.
         well = self.db.select('Well', ID=2)
         well.UWI = 'Changed'
@@ -134,18 +120,20 @@ class SqliteDatabaseTest(unittest.TestCase):
         self.assertRaises(AppError, self.db.insert,well)
         
     def test_delete(self):
-        statement = """
-            CREATE TABLE Well ('ID' int, 'UWI' text, 'Prov' text, 'WellType' text, 'LeaseType' text, 'LeaseID' int, 'RoyaltyClassification' text, 'Classification' text, 'SRC' int, 'IndianInterest' float, 'CommencementDate' date, 'ReferencePrice' int);
-            INSERT INTO Well VALUES(1,'SKWI111062705025W300','SK','Oil','OL',1,'New Oil','Heavy',0,0.25,'2014-12-01 00:00:00',1);
-            INSERT INTO Well VALUES(2,'SKWI112062705025W300','SK','Oil','OL',2,'Third Tier Oil','Southwest',0,0.95,'2014-12-01 00:00:00',1);
-            INSERT INTO Well VALUES(3,'SKWI113062705025W300','SK','Oil','OL',3,'Fourth Tier Oil','Other',0,1.0,NULL,NULL);
-        """
-        
-        self.dbu.execute_statement(statement)
-        self.assertEqual(3,len(self.db.select('Well')))
+#         statement = """
+#             CREATE TABLE Well ('ID' int, 'UWI' text, 'Prov' text, 'WellType' text, 'LeaseType' text, 'LeaseID' int, 'RoyaltyClassification' text, 'Classification' text, 'SRC' int, 'IndianInterest' float, 'CommencementDate' date, 'ReferencePrice' int);
+#             INSERT INTO Well VALUES(1,'SKWI111062705025W300','SK','Oil','OL',1,'New Oil','Heavy',0,0.25,'2014-12-01 00:00:00',1);
+#             INSERT INTO Well VALUES(2,'SKWI112062705025W300','SK','Oil','OL',2,'Third Tier Oil','Southwest',0,0.95,'2014-12-01 00:00:00',1);
+#             INSERT INTO Well VALUES(3,'SKWI113062705025W300','SK','Oil','OL',3,'Fourth Tier Oil','Other',0,1.0,NULL,NULL);
+#         """
+#         
+#         self.dbu.execute_statement(statement)
+        self.dbu.create_some_test_wells()
+
+        self.assertEqual(4,len(self.db.select('Well')))
                          
         self.db.delete('Well', 2)
-        self.assertEqual(2,len(self.db.select('Well')))
+        self.assertEqual(3,len(self.db.select('Well')))
         self.assertIsNone(self.db.select('Well', ID=2))
         
         

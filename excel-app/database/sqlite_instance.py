@@ -26,7 +26,13 @@ class SqliteInstance(object):
         
     def get_id(self):
         return self.cursor.lastrowid
-            
+
+    def execute_statement(self,statement):
+        for line in statement.split(';'):
+            n_line = line.strip()
+            if n_line != '':
+                self.execute(n_line)
+        self.commit()
         
     def get_table_names(self):
         stmt = 'SELECT tbl_name FROM sqlite_master'

@@ -5,8 +5,6 @@ import config
 
 class Shower(object):
     
-    LINK_TABLE = 'linktab'
-    
     def __init__(self):
         None
 
@@ -80,18 +78,3 @@ class Shower(object):
                 return row[2]
         return(None)
 
-
-def show_table(dbName, tableName):
-    shower = Shower()
-    shower.connect(dbName)
-    header = shower.showColumns(tableName)
-    print(header)
-    rows = shower.showTable(tableName,'Prov','SK')
-    for row in rows:
-        print(row)
-
-
-if __name__ == '__main__':
-    dbName = 'testload.db'
-    tableName = 'Well'
-    show_table(dbName, tableName)

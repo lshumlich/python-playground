@@ -14,6 +14,7 @@ class Database(object):
         self.dbi = config.get_database_instance()
     
     def get_table_headers(self, table_name):
+        print('get_table_header',table_name)
         statement = 'PRAGMA table_info(' + table_name + ')'
         values = self.dbi.execute(statement)
         columns = []
@@ -45,7 +46,7 @@ class Database(object):
         ds._table_name = table_name
         return ds
 
-    def select(self, table, **kwargs):
+    def xxxselect(self, table, **kwargs):
         statement = "SELECT * FROM %s " % table
         if kwargs:
             statement += "WHERE"
@@ -59,6 +60,22 @@ class Database(object):
                 else:
                     raise AppError('No column "%s" in table "%s"' % (arg, table))
         self.dbi.execute(statement)
+        result = self.dbi.cursor.fetchall()
+        result = self.sql_to_object(table, result)
+        return result
+
+    def select(self, table, **kwargs):
+        statement = "SELECT * FROM %s " % table
+        if kwargs:
+            statement += "WHERE"
+            i = len(kwargs)
+            for arg in kwargs:
+                statement += ' "%s" = "%s" ' % (arg, str(kwargs[arg]))
+                i -= 1
+                if i > 0:
+                    statement += 'AND'
+        x = self.dbi.execute(statement)
+        print('The Value of x:',x)
         result = self.dbi.cursor.fetchall()
         result = self.sql_to_object(table, result)
         return result
