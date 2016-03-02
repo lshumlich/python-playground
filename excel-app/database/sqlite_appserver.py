@@ -114,6 +114,7 @@ class AppServer(object):
             print('Tables',config.get_database_instance().get_table_names())
             data = AppServer.json_decode(request)
             link = AppServer.db.select("LinkTab", TabName = data['TabName'], AttrName = data['AttrName'])
+            print('link',link)
             if not link:
                 data['LinkName'] = ''
                 data['BaseTab'] = 0

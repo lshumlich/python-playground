@@ -35,7 +35,7 @@ class SqliteDatabaseTest(unittest.TestCase):
         self.dbu.create_some_test_wells()
         self.dbu.create_some_test_leases()
         
-        self.assertIsNotNone(self.db.select('Well', RoyaltyClassification='Old Oil'))
+        self.assertIsNotNone(self.db.select('Well', RoyaltyClassification='New Oil'))
         self.assertEqual(len(self.db.select('Well', Prov='SK', Classification='Other')), 2)
         self.assertEqual(len(self.db.select('Well')), 4)
         self.assertRaises(AppError, self.db.select, 'WrongTable')

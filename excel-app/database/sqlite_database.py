@@ -13,8 +13,13 @@ class Database(object):
     def __init__(self):
         self.dbi = config.get_database_instance()
     
+    #
+    #     This weird statement gets the columns for the last select... Who know. Found it on the internet. It will be
+    #     usefull tool one day that internet. 
+    #     names = [description[0] for description in c.description]
+    #
     def get_table_headers(self, table_name):
-        print('get_table_header',table_name)
+#         print('get_table_header',table_name)
         statement = 'PRAGMA table_info(' + table_name + ')'
         values = self.dbi.execute(statement)
         columns = []
@@ -52,7 +57,7 @@ class Database(object):
             statement += "WHERE"
             i = len(kwargs)
             for arg in kwargs:
-                statement += ' %s = "%s" ' % (arg, str(kwargs[arg]))
+                statement += " %s = '%s' " % (arg, str(kwargs[arg]))
                 i -= 1
                 if i > 0:
                     statement += 'AND'

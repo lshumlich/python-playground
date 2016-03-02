@@ -1,12 +1,18 @@
 #!/bin/env python3
 
 import unittest
+import json
 
 #TODO This test must be redone to not depend on a specific database
 
+import config
 from database.sqlite_appserver import AppServer
 from database.data_structure import DataStructure
+from database.database_create import DatabaseCreate
+from database.utils import Utils
+
 from database.sqlite_utilities_test import DatabaseUtilities
+
 
 class FlaskTest(unittest.TestCase):
 
@@ -26,7 +32,42 @@ class FlaskTest(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         
     def test_get_link_data(self):
-        resp = self.myapp.post('/data/getLinkData.json',data='{"TabName":"Well","AttrName":"UWI"}')
+        #setup stuff
+        db = config.get_database()
+        dbu = DatabaseUtilities()
+        db_create = DatabaseCreate()
+        utils = Utils()
+
+        dbu.delete_all_tables()
+
+        db_create.linktab()
+        linktab = db.get_data_structure('LinkTab')
+        linktab.TabName = 'Well'
+        linktab.AttrName = 'ID'
+        json_to_browser = json.dumps(utils.obj_to_dict(linktab))
+        print('json_to_browser', json_to_browser)
+
+        # Data should not be found but there should not be an error
+        resp = self.myapp.post('/data/getLinkData.json',data=json_to_browser)
+        data = AppServer.json_decode(resp)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(data["LinkName"],'')
+        
+        linktab.LinkName = 'Well'
+        linktab.BaseTab = 0
+        linktab.ShowAttrs = 'ID,UWI'
+        db.insert(linktab)
+        
+        # Data should be found 
+        resp = self.myapp.post('/data/getLinkData.json',data=json_to_browser)
+        data = AppServer.json_decode(resp)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(data["LinkName"],'Well')
+        self.assertEqual(data["ShowAttrs"],'ID,UWI')
+        
+
+        
+        
         print('status:',resp.status)
         print('status code:',resp.status_code)
         print(resp)
