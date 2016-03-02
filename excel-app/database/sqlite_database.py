@@ -64,19 +64,27 @@ class Database(object):
             return '1' if (value) else '0';
         
         raise AppError('sqlite_database.to_db_value can not handle update of: ' + str(type(value)) + ':' + str(value))
-        
+    
     def insert(self, ds):
-        # we need to either use sqlite's rowid or to make our ID a primary key
-        # then we need to make sure you can't insert a record without it
-        
-        # look at: https://docs.python.org/2/library/sqlite3.html ---> lastrowid (Should be available after an insert)
         dic = ds.__dict__
         
         to_insert_attr = '('
         to_insert_value  = '('
         
         for attr in dic:
-            if not attr.startswith('_'):
+            # This logic is to ignore attributes that start with _ and if the 
+            # ID attribute is not givin in all the ways it can be not given.
+            ignore = False
+            if attr.startswith('_'):
+                ignore = True 
+            if attr == 'ID':
+                if not dic[attr]:
+                    ignore = True
+                elif dic[attr] is str and dic[attr] == '': 
+                    ignore = True
+                elif dic[attr] is int and dic[attr] == 0:
+                    ignore = True
+            if not ignore:
                 if len(to_insert_attr) > 1:
                     to_insert_attr += ','
                     to_insert_value += ','

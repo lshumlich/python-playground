@@ -116,6 +116,20 @@ class SqliteDatabaseTest(unittest.TestCase):
         well.BadAttr = 'Just another value'
         self.assertRaises(AppError, self.db.insert,well)
         
+        # if the ID is None,Blank,or zero we shold still be able to insert a record
+        well = self.db.get_data_structure('Well')
+        well.ID = None
+        well.UWI = 'Just One More'
+        self.db.insert(well)
+        self.assertEqual(well.ID, 12)
+        well.ID = 0
+        self.db.insert(well)
+        self.assertEqual(well.ID, 13)
+        well.ID = ''
+        self.db.insert(well)
+        self.assertEqual(well.ID, 14)
+        
+        
     def test_delete(self):
 #         statement = """
 #             CREATE TABLE Well ('ID' int, 'UWI' text, 'Prov' text, 'WellType' text, 'LeaseType' text, 'LeaseID' int, 'RoyaltyClassification' text, 'Classification' text, 'SRC' int, 'IndianInterest' float, 'CommencementDate' date, 'ReferencePrice' int);

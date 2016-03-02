@@ -32,6 +32,44 @@ class FlaskTest(unittest.TestCase):
         resp = self.myapp.post('/data/link.json',data='{"fld1":"val1"}')
         self.assertEqual(resp.status_code, 200)
         
+    def test_link_update(self):
+        db = config.get_database()
+        dbu = DatabaseUtilities()
+        db_create = DatabaseCreate()
+        utils = Utils()
+
+        dbu.delete_all_tables()
+        db_create.linktab()
+
+        # Test Insert
+        data = dict()
+        data["ID"] = ''
+        data["TabName"] = 'Lease'
+        data["AttrName"] = 'ID'
+        data["LinkName"] = 'Lease'
+        json_to_browser = json.dumps(data)
+        resp = self.myapp.post('/data/updateLinkRow.json',data=json_to_browser)
+        self.assertEqual(resp.status_code, 200)
+        data = AppServer.json_decode(resp)
+        self.assertEqual(data["StatusCode"],0)
+        
+        result = db.select('LinkTab', TabName='Lease', AttrName='ID')
+        self.assertEqual(len(result), 1)
+        
+        # Test Update
+        data = utils.obj_to_dict(result[0])
+        data['LinkName'] = 'Changed' 
+
+        json_to_browser = json.dumps(data)
+        resp = self.myapp.post('/data/updateLinkRow.json',data=json_to_browser)
+        self.assertEqual(resp.status_code, 200)
+        data = AppServer.json_decode(resp)
+        self.assertEqual(data["StatusCode"],0)
+        
+        result = db.select('LinkTab', TabName='Lease', AttrName='ID')
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].LinkName,'Changed')
+        
     def test_get_link_row(self):
         #setup stuff
         db = config.get_database()
@@ -50,8 +88,8 @@ class FlaskTest(unittest.TestCase):
 
         # Data should not be found but there should not be an error
         resp = self.myapp.post('/data/getLinkRow.json',data=json_to_browser)
-        data = AppServer.json_decode(resp)
         self.assertEqual(resp.status_code, 200)
+        data = AppServer.json_decode(resp)
         self.assertEqual(data["LinkName"],'')
         
         linktab.LinkName = 'Well'
@@ -103,7 +141,7 @@ class FlaskTest(unittest.TestCase):
         data["KeyValue"] = '2'
         
         json_from_browser = json.dumps(data)
-        print('json_to_browser', json_from_browser)
+        print('json_from_browser', json_from_browser)
 
         # Data should be found
         resp = self.myapp.post('/data/getLinkData.json',data=json_from_browser)
@@ -119,4 +157,10 @@ class FlaskTest(unittest.TestCase):
         self.assertEqual(rows[1][0],2)
         self.assertEqual(rows[1][1],2346)
         
+        rows = data['Links']
+        self.assertEqual(len(rows),2)
+        self.assertEqual(rows[0][0],'Lease')
+        self.assertEqual(rows[0][1],'ID')
+        self.assertEqual(rows[1][0],'Well')
+        self.assertEqual(rows[1][1],'LeaseID')
         
