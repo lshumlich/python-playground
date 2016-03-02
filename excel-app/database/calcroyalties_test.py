@@ -235,12 +235,22 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, IndianInterest, MinRoyalty, RoyaltyPr
 
     def test_calcGorrPercent(self):
         pr = ProcessRoyalties()
+
+        gorr = "bad string,0,2"
+        self.assertRaises(AppError, pr.calcGorrPercent, 400, 10, gorr)
+        self.assertRaises(AppError, pr.calcGorrPercent, None, 10, gorr)
+
+        gorr = None,"0,2"
+        self.assertRaises(AttributeError, pr.calcGorrPercent, 400, 10, gorr)
+
         gorr = "dprod,250,2,300,3,400,4,500,5,0,6"
         self.assertEqual(pr.calcGorrPercent(600, 10, gorr), (2.0, 'dprod = 60.000000 = 600 / 10 is greater than 0.0 and less than or equal to 250.0 for an RR of 2.0%'))
         self.assertEqual(pr.calcGorrPercent(1008, 4, gorr), (3.0, 'dprod = 252.000000 = 1008 / 4 is greater than 250.0 and less than or equal to 300.0 for an RR of 3.0%'))
         self.assertEqual(pr.calcGorrPercent(400, 1, gorr), (4.0, 'dprod = 400.000000 = 400 / 1 is greater than 300.0 and less than or equal to 400.0 for an RR of 4.0%'))
         self.assertEqual(pr.calcGorrPercent(990, 2, gorr), (5.0, 'dprod = 495.000000 = 990 / 2 is greater than 400.0 and less than or equal to 500.0 for an RR of 5.0%'))
         self.assertEqual(pr.calcGorrPercent(10000, 17, gorr), (6.0,'dprod = 588.235294 = 10000 / 17 is greater than 500.0 for an RR of 6.0%'))
+
+        self.assertRaises(TypeError, pr.calcGorrPercent, None, 10, gorr)
 
         gorr = "mprod,250,2,300,3,400,4,500,5,0,6"
         self.assertEqual(pr.calcGorrPercent(200, 10, gorr), (2.0, 'mprod = 200 is greater than 0.0 and less than or equal to 250.0 for an RR of 2.0%'))
@@ -252,16 +262,21 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, IndianInterest, MinRoyalty, RoyaltyPr
         gorr = "fixed,0,2"
         self.assertEqual(pr.calcGorrPercent(200, 10, gorr), (2.0, 'fixed for an RR of 2.0%'))
         self.assertEqual(pr.calcGorrPercent(10000, 4, gorr), (2.0, 'fixed for an RR of 2.0%'))
+        #In future make this raise an error:
+        self.assertEqual(pr.calcGorrPercent(None, 10, gorr), (2.0, 'fixed for an RR of 2.0%'))
 
-        #self.assertEqual(pr.calcGorrPercent(None, 10, gorr), (2.0, 'fixed for an RR of 2.0%'))
+    def test_calcSupplementaryRoyaltiesIOGR1995(self):
+        reference_price = {'Pigeon Lake Indian': 24.04, 'Reserve no.138A': 25.37, 'Sawridge Indian': 25.13, 'Stony Plain Indian': 24.64}
+        pr = ProcessRoyalties()
+        self.assertEqual(pr.calcSupplementaryRoyaltiesIOGR1995(3.5, 228, 80, 60, reference_price['Pigeon Lake Indian']),2039.6)
+        self.assertEqual(pr.calcSupplementaryRoyaltiesIOGR1995(5, 200, 90, 40, reference_price['Reserve no.138A']),4365.75)
+        self.assertEqual(pr.calcSupplementaryRoyaltiesIOGR1995(4, 221.123456, 100, 50, reference_price['Sawridge Indian']),4899.84)
+        self.assertEqual(pr.calcSupplementaryRoyaltiesIOGR1995(.2, 180, 80, 35, reference_price['Stony Plain Indian']),3495.6)
 
-
-        gorr = "bad string,0,2"
-        self.assertRaises(AppError, pr.calcGorrPercent, 400, 10, gorr)
-        self.assertRaises(AppError, pr.calcGorrPercent, None, 10, gorr)
-
-        gorr = None,"0,2"
-        self.assertRaises(AttributeError, pr.calcGorrPercent, 400, 10, gorr)
+        self.assertEqual(pr.calcSupplementaryRoyaltiesIOGR1995(6, 228, 80, 60, reference_price['Pigeon Lake Indian']),2996.5)
+        self.assertEqual(pr.calcSupplementaryRoyaltiesIOGR1995(5.5, 200, 90, 40, reference_price['Reserve no.138A']),6391.38)
+        self.assertEqual(pr.calcSupplementaryRoyaltiesIOGR1995(8, 221.123456, 100, 50, reference_price['Sawridge Indian']),7192.5)
+        self.assertEqual(pr.calcSupplementaryRoyaltiesIOGR1995(15, 180, 80, 35, reference_price['Stony Plain Indian']),5101.88)
 
 
 if __name__ == '__main__':

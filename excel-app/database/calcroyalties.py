@@ -50,7 +50,8 @@ by code coverage.
 class ProcessRoyalties(object):
 
     def __init__(self):
-        None
+        self.reference_price = {'Pigeon Lake Indian': 24.04, 'Reserve no.138A': 25.37, 'Sawridge Indian': 25.13, 'Stony Plain Indian': 24.64}
+
 
     """
     The place where the calculations begin.
@@ -72,7 +73,9 @@ class ProcessRoyalties(object):
                 lease = self.db.getLease(well.Lease)
                 #pe =  self.db.getProducingEntity(well.Lease)
                 royaltyCalc = self.db.getRoyaltyCalc(monthlyData.ProdMonth,monthlyData.WellId)
-
+                commencement_period = self.db.determineCommencementPeriod(monthlyData.ProdMonth, well.CommencementDate)
+                royalty_price = self.db.determineRoyaltyPrice(royalty.ValuationMethod,monthlyData)
+                reference_price = {'Pigeon Lake Indian': 24.04, 'Reserve no.138A': 25.37, 'Sawridge Indian': 25.13, 'Stony Plain Indian': 24.64}
 #                 log.write('Processing: ' + str(monthlyData.RecordNumber) + 
 #                           ' ' + str(monthlyData.ProdMonth) + ' ' +
 #                           monthlyData.Product + ' ' + well.RoyaltyClassification + ' ' +
@@ -111,6 +114,10 @@ class ProcessRoyalties(object):
                     royaltyCalc.RoyaltyDeductions += royaltyCalc.RoyaltyProcessing
                     royaltyCalc.RoyaltyValue -= royaltyCalc.RoyaltyProcessing
                 
+                # self.calcSupplementaryRoyaltiesIOGR1995(commencement_period, monthlyData, royalty_price, reference_price['Sawridge Indian'])
+                #print(calcSupplementaryRoyaltiesIOGR1995)
+
+
                 self.ws.printSaskOilRoyaltyRate(monthlyData, well, royalty, lease, royaltyCalc)
 #                 log.write('--- Royalty Calculated: {} {} {} prod: {} Crown Rate: {}\n'.format(monthlyData.Row, royaltyCalc.ProdMonth,
 #                                                                                              royaltyCalc.WellId, monthlyData.ProdVol, royaltyCalc.RoyaltyRate))
@@ -341,9 +348,16 @@ class ProcessRoyalties(object):
         diff = prodDate - cd
         return round(diff.days/365,2)
 
+    # called well head price the selling price
+    def calcSupplementaryRoyaltiesIOGR1995(self, commencement_period, well_head_price, prod_vol, royalty_price, reference_price):
+        if commencement_period <= 5:
+            supplementary_royalty = (prod_vol - royalty_price)*0.5*(well_head_price - reference_price)
+        else:
+            supplementary_royalty = (prod_vol - royalty_price)*(0.75*(well_head_price - reference_price - 12.58) + 6.29)
+        return round(supplementary_royalty, 2)
 
     def calcGorrPercent(self,vol,hours,gorr):
-        """ returns the rr% and an explination string  """
+        """ returns the rr% based on the GORR base and an explination string  """
         words = gorr.split(",")
         gorrPercent = 0.0
         gorrMaxVol = 0.0
@@ -352,7 +366,6 @@ class ProcessRoyalties(object):
 
         i = 0
         evalVol = 0
-
         for s in words:
             i += 1
             if i == 1:
@@ -384,7 +397,6 @@ class ProcessRoyalties(object):
                     gorrExplain += ' is greater than ' + str(lastGorrMaxVol) + ' and less than or equal to ' + str(gorrMaxVol) + ' for an RR of ' + str(gorrPercent) +'%'
                     return gorrPercent, gorrExplain
 
-        raise AppError('GORR Logic Error. We should never ever get here: ')
 
     #
     # Sask Oil Royalty Calculation... Finally we are here...
