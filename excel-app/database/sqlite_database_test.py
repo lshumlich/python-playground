@@ -40,13 +40,10 @@ class SqliteDatabaseTest(unittest.TestCase):
         self.assertEqual(len(self.db.select('Well')), 4)
         self.assertRaises(AppError, self.db.select, 'WrongTable')
         self.assertRaises(AppError, self.db.select, 'WrongTable',WrongAttr='WhoCares')
-        self.db.select('Well',WrongAttr='WhoCares')
         self.assertRaises(AppError, self.db.select, 'Well', Foo='bar')
         self.assertEqual(len(self.db.select('Lease')), 4)
         self.assertEqual(len(self.db.select('Lease', Prov='SK')), 3)
         self.assertIsNone(self.db.select('Well', ID=1000))
-        
-        self.db.select('WrongTable',WrongAttr='WhoCares')
         
     def test_update(self):
         self.dbu.create_some_test_wells()

@@ -5,6 +5,7 @@ import config
 
 class Shower(object):
     
+    LINK_TABLE = "LinkTab"
     def __init__(self):
         None
 
