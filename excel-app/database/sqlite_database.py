@@ -24,12 +24,13 @@ class Database(object):
             for cell in header_row:
                 setattr(ds, cell, row[i])
                 i += 1
-        if len(result) == 1:
-            return result[0]
-        elif len(result) == 0:
-            return None
-        else:
-            return result
+        return result
+#         if len(result) == 1:
+#             return result[0]
+#         elif len(result) == 0:
+#             return None
+#         else:
+#             return result
 
     def get_data_structure(self,table_name):
         """ This method must be called to create a valid database data structure. """ 
@@ -47,8 +48,8 @@ class Database(object):
                 i -= 1
                 if i > 0:
                     statement += 'AND'
-        x = self.dbi.execute(statement)
-        print('The Value of x:',x)
+        self.dbi.execute(statement)
+#         print('The Value of x:',x)
         result = self.dbi.cursor.fetchall()
         result = self.sql_to_object(table, result)
         return result
@@ -95,10 +96,10 @@ class Database(object):
     def update(self, ds):
         # Rule 1: all tables that can be updated must have an ID attrabute that is the primary key.
         orig_ds = self.select(ds._table_name, ID=ds.ID)
-        if not orig_ds:
+        if len(orig_ds) == 0:
             raise AppError('sqlite_database.update can not find: ' + str(ds.ID) + ' to update.')
             
-        orig_dict = orig_ds.__dict__
+        orig_dict = orig_ds[0].__dict__
         new_dict = ds.__dict__
         to_update = ''
         for attr in  orig_dict:

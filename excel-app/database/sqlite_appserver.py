@@ -5,6 +5,7 @@ import sys,traceback
 from flask import Flask, render_template, request, flash
 
 from database.sqlite_show import Shower
+from database.data_structure import DataStructure
 import config
 
 
@@ -106,10 +107,10 @@ class AppServer(object):
         return 'Thats it folks'
 
     @staticmethod
-    @app.route("/data/getLinkData.json",methods=['POST']) 
-    def get_link_data():
+    @app.route("/data/getLinkRow.json",methods=['POST']) 
+    def get_link_row():
         try:
-            print('AppServer.get_link_data running',request.method)
+            print('AppServer.get_link_row running',request.method)
             print('Instance:',config.get_database_name(),config.get_environment())
             print('Tables',config.get_database_instance().get_table_names())
             data = AppServer.json_decode(request)
@@ -120,12 +121,61 @@ class AppServer(object):
                 data['BaseTab'] = 0
                 data['ShowAttrs'] = ''
             else:
-                data['LinkName'] = link.LinkName
-                data['BaseTab'] = link.BaseTab
-                data['ShowAttrs'] = link.ShowAttrs
+                data['LinkName'] = link[0].LinkName
+                data['BaseTab'] = link[0].BaseTab
+                data['ShowAttrs'] = link[0].ShowAttrs
     
             return json.dumps(data)
         
+        except Exception as e:
+            print('AppServer.link: ***Error:',e)
+            traceback.print_exc(file=sys.stdout)
+
+    @staticmethod
+    @app.route("/data/getLinkData.json",methods=['POST']) 
+    def get_link_data():
+        try:
+            print('AppServer.get_link_data running',request.method)
+            print('Instance:',config.get_database_name(),config.get_environment())
+            print('Tables',config.get_database_instance().get_table_names())
+            print('request:', request)
+            data = AppServer.json_decode(request)
+            print('data', data)
+            result_rows = AppServer.db.select("LinkTab", LinkName=data['LinkName'], BaseTab=1)
+            print('result:',result_rows)
+            print('result.type:',type(result_rows))
+                 
+            for result in result_rows:
+                print('We have a datastructure')
+                attrs_to_show = result.ShowAttrs.split(',')
+                print('attrs_to_show:',attrs_to_show)
+                args = dict()
+                args[result.AttrName] = data['KeyValue']
+                key_data_rows = AppServer.db.select(result.TabName,**args)
+                for keyData in key_data_rows:
+                    print('keyData',keyData)
+                    print('keyData.__dict__',keyData.__dict__)
+                    row = []
+                    for a in attrs_to_show:
+                        row.append(keyData.__dict__[a])
+                    rows = []
+                    rows.append(attrs_to_show)
+                    rows.append(row)
+                    data['BaseData'] = rows
+                    
+#                 
+#             print('link',link)
+#             if not link:
+#                 data['LinkName'] = ''
+#                 data['BaseTab'] = 0
+#                 data['ShowAttrs'] = ''
+#             else:
+#                 data['LinkName'] = link.LinkName
+#                 data['BaseTab'] = link.BaseTab
+#                 data['ShowAttrs'] = link.ShowAttrs
+            print('data at return:',data)
+            return json.dumps(data)
+#         
         except Exception as e:
             print('AppServer.link: ***Error:',e)
             traceback.print_exc(file=sys.stdout)

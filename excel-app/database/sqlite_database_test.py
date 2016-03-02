@@ -41,27 +41,27 @@ class SqliteDatabaseTest(unittest.TestCase):
         self.assertRaises(AppError, self.db.select, 'WrongTable')
         self.assertRaises(AppError, self.db.select, 'WrongTable',WrongAttr='WhoCares')
         self.assertRaises(AppError, self.db.select, 'Well', Foo='bar')
-        self.assertEqual(len(self.db.select('Lease')), 4)
+        self.assertEqual(len(self.db.select('Lease')), 3)
         self.assertEqual(len(self.db.select('Lease', Prov='SK')), 3)
-        self.assertIsNone(self.db.select('Well', ID=1000))
+        self.assertEqual(len(self.db.select('Well', ID=1000)),0)
         
     def test_update(self):
         self.dbu.create_some_test_wells()
 
         # change all types of attributes, read another record and then read the record again to make sure the changes were made.
         well = self.db.select('Well', ID=2)
-        well.UWI = 'Changed'
-        well.LeaseID = 100
-        well.CommencementDate = '2016-02-01 00:00:00'
-        self.db.update(well)
+        well[0].UWI = 'Changed'
+        well[0].LeaseID = 100
+        well[0].CommencementDate = '2016-02-01 00:00:00'
+        self.db.update(well[0])
         well = self.db.select('Well', ID=1)
-        self.assertEqual(well.ID, 1)
-        self.assertEqual(well.UWI, 'SKWI111062705025W300')
+        self.assertEqual(well[0].ID, 1)
+        self.assertEqual(well[0].UWI, 'SKWI111062705025W300')
         well = self.db.select('Well', ID=2)
-        self.assertEqual(well.ID, 2)
-        self.assertEqual(well.UWI, 'Changed')
-        self.assertEqual(well.LeaseID, 100)
-        self.assertEqual(well.CommencementDate, '2016-02-01 00:00:00')
+        self.assertEqual(well[0].ID, 2)
+        self.assertEqual(well[0].UWI, 'Changed')
+        self.assertEqual(well[0].LeaseID, 100)
+        self.assertEqual(well[0].CommencementDate, '2016-02-01 00:00:00')
 
         ds = DataStructure()
         self.assertRaises(AttributeError, self.db.update, ds)
@@ -90,8 +90,8 @@ class SqliteDatabaseTest(unittest.TestCase):
         self.assertEqual(well.ID, 2)
         
         well = self.db.select('Well', ID=1)
-        self.assertEqual(well.ID, 1)
-        self.assertEqual(well.UWI, 'UWI for this well')
+        self.assertEqual(well[0].ID, 1)
+        self.assertEqual(well[0].UWI, 'UWI for this well')
         
         well = self.db.get_data_structure('Well')
         well.UWI = 'Next Well UWI'
@@ -99,12 +99,12 @@ class SqliteDatabaseTest(unittest.TestCase):
         self.db.insert(well)
         
         well = self.db.select('Well', ID=1)
-        self.assertEqual(well.ID, 1)
-        self.assertEqual(well.UWI, 'UWI for this well')
+        self.assertEqual(well[0].ID, 1)
+        self.assertEqual(well[0].UWI, 'UWI for this well')
         
         well = self.db.select('Well', ID=10)
-        self.assertEqual(well.ID, 10)
-        self.assertEqual(well.UWI, 'Next Well UWI')
+        self.assertEqual(well[0].ID, 10)
+        self.assertEqual(well[0].UWI, 'Next Well UWI')
 
         well = self.db.get_data_structure('Well')
         well.UWI = 'Just One More'
@@ -131,6 +131,6 @@ class SqliteDatabaseTest(unittest.TestCase):
                          
         self.db.delete('Well', 2)
         self.assertEqual(3,len(self.db.select('Well')))
-        self.assertIsNone(self.db.select('Well', ID=2))
+        self.assertEqual(0, len(self.db.select('Well', ID=2)))
         
         

@@ -34,7 +34,7 @@ class SqliteShowerTest(unittest.TestCase):
         self.assertEqual(len(rows), 3)
         
         link = shower.get_link('tabname2','attName2')
-        self.assertEqual(link.LinkName,'linkName2')
+        self.assertEqual(link[0].LinkName,'linkName2')
         
         # Update a record then read antoher and then read this one again to make sure it works
 #         link = shower.get_link('tabname1','attName1')
@@ -43,5 +43,5 @@ class SqliteShowerTest(unittest.TestCase):
         
         # Fails because this is the next thing we are going to make work... Sorry about the failure
         link = shower.get_link('tabname2','attName2')
-        self.assertEqual(link.LinkName,'linkName2')
+        self.assertEqual(link[0].LinkName,'linkName2')
         
