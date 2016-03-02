@@ -33,6 +33,11 @@ class SqliteInstance(object):
             if n_line != '':
                 self.execute(n_line)
         self.commit()
+
+    def get_column_names(self):
+        """ Get the column names of the last select. This only works after a select """
+        return [description[0] for description in self.cursor.description]
+        
         
     def get_table_names(self):
         stmt = 'SELECT tbl_name FROM sqlite_master'

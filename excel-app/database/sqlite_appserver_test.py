@@ -17,6 +17,7 @@ from database.sqlite_utilities_test import DatabaseUtilities
 class FlaskTest(unittest.TestCase):
 
     def setUp(self):
+        self.assertEqual(config.get_environment(),'unittest') # Distructive Tests must run in unittest enviornment
         self.myapp = AppServer.app.test_client()
 
     def test_to_json(self):

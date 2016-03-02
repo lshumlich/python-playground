@@ -13,25 +13,11 @@ class Database(object):
     def __init__(self):
         self.dbi = config.get_database_instance()
     
-    #
-    #     This weird statement gets the columns for the last select... Who know. Found it on the internet. It will be
-    #     usefull tool one day that internet. 
-    #     names = [description[0] for description in c.description]
-    #
-    def get_table_headers(self, table_name):
-#         print('get_table_header',table_name)
-        statement = 'PRAGMA table_info(' + table_name + ')'
-        values = self.dbi.execute(statement)
-        columns = []
-        for row in values:
-            columns.append(row[1])
-        return(columns)
-
     def sql_to_object(self, table_name, input_list):
-        header_row = self.get_table_headers(table_name)
+        header_row = self.dbi.get_column_names() # must run after the select statement
         result = []
         for row in input_list:
-            ds = DataStructure()
+            ds=self.get_data_structure(table_name)
             setattr(ds, "_table_name", table_name)
             result.append(ds)
             i = 0
@@ -44,7 +30,7 @@ class Database(object):
             return None
         else:
             return result
-        
+
     def get_data_structure(self,table_name):
         """ This method must be called to create a valid database data structure. """ 
         ds = DataStructure()
