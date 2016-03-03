@@ -4,6 +4,12 @@ table.Sel, th.Sel, td.Sel {
     border-collapse: collapse;
 }
 
+table.Norm, th.Norm, td.Norm {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+
 th.Sel:after {
     content: url('/static/pencil.png');
 }

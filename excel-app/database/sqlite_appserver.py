@@ -158,60 +158,49 @@ class AppServer(object):
     @app.route("/data/getLinkData.json",methods=['POST']) 
     def get_link_data():
         try:
-            print('AppServer.get_link_data running',request.method)
-            print('Instance:',config.get_database_name(),config.get_environment())
-            print('Tables',config.get_database_instance().get_table_names())
-            print('request:', request)
             data = AppServer.json_decode(request)
-            print('data', data)
-            result_rows = AppServer.db.select("LinkTab", LinkName=data['LinkName'], BaseTab=1)
-            print('result:',result_rows)
-            print('result.type:',type(result_rows))
-            
-            # Get the base table
-            for result in result_rows:
-                print('We have a base table')
-                attrs_to_show = result.ShowAttrs.split(',')
-                print('attrs_to_show:',attrs_to_show)
-                args = dict()
-                args[result.AttrName] = data['KeyValue']
-                key_data_rows = AppServer.db.select(result.TabName,**args)
+#             print('data', data)
+            link = AppServer.db.select("LinkTab", TabName = data['TabName'], AttrName = data['AttrName'])
+#             print('link',link)
+            if len(link) > 0:
+                result_rows = AppServer.db.select("LinkTab", LinkName=link[0].LinkName, BaseTab=1)
+#                 print('result:',result_rows)
+#                 print('result.type:',type(result_rows))
+                
+                # Get the base table
+                for result in result_rows:
+                    print('We have a base table')
+                    attrs_to_show = result.ShowAttrs.split(',')
+                    args = dict()
+                    args[result.AttrName] = data['AttrValue']
+                    key_data_rows = AppServer.db.select(result.TabName,**args)
+                    rows = []
+                    for keyData in key_data_rows:
+                        row = []
+                        for a in attrs_to_show:
+                            row.append(keyData.__dict__[a])
+                        rows.append(attrs_to_show)
+                        rows.append(row)
+                    data['BaseData'] = rows
+                
+                # Get all the tables that the link uses
+                result_rows = AppServer.db.select("LinkTab", LinkName=link[0].LinkName)
+                
                 rows = []
-                for keyData in key_data_rows:
-                    print('keyData',keyData)
-                    print('keyData.__dict__',keyData.__dict__)
+                for result in result_rows:
                     row = []
-                    for a in attrs_to_show:
-                        row.append(keyData.__dict__[a])
-                    rows.append(attrs_to_show)
+                    row.append(result.TabName)
+                    row.append(result.AttrName)
                     rows.append(row)
-                data['BaseData'] = rows
-            
-            # Get all the tables that the link uses
-            result_rows = AppServer.db.select("LinkTab", LinkName=data['LinkName'])
-            print('result:',result_rows)
-            
-            rows = []
-            for result in result_rows:
-                print('We have a tables in the link')
-                row = []
-                row.append(result.TabName)
-                row.append(result.AttrName)
-                rows.append(row)
-            data['Links'] = rows
-            
-            print('data at return:',data)
+                data['Links'] = rows
+                
+            else:
+                data["Message"] = data['AttrName'] + " has not been linked."
             return json.dumps(data)
 #         
         except Exception as e:
             print('AppServer.link: ***Error:',e)
             traceback.print_exc(file=sys.stdout)
-    
-    @staticmethod
-    @app.route("/larry/",methods=['POST']) 
-    def larry():
-        print('AppServer.larry running',request.method)
-        return 'Thats it folks'
     
     @staticmethod
     def reqorblank(reqname):
@@ -243,24 +232,3 @@ class AppServer(object):
         AppServer.app.run()
         print('after the run in run in AppServer')
     
-def helloMsg():
-    print('Hello World from ' + sys.argv[0])
-    
-def goodbyMsg():
-    print("*** Done ***")
-
-def sampleCode():
-    print('we are in sample code')
-    print('what do we do now')
-    
-def appServer():
-#     appinfo = AppServer()
-#     appinfo.run()
-    AppServer.run(config.get_temp_dir() + 'browser.db')
-
-if __name__ == '__main__':
-    helloMsg()
-    print('v2')
-    appServer()
-    # showTable(database,'well')
-    goodbyMsg()

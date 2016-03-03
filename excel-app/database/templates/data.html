@@ -36,7 +36,8 @@
     {% endif %}
 </div>
 <br>
-<div id="lfsconcole"></div>
+
+<div id="ConsoleID"></div>
 
 <div id="LinkFormId" class="linkDialog center">
     <h3>Link Attributes</h3>
@@ -60,12 +61,16 @@
     </form>
 </div>
 
-<div id="KeyFormId" class="linkDialog center">
-    <h3>Key Display</h3>
-    <div id="KeyData"></div>
+<div id="LinkDataId" class="linkDialog center">
+    <h3>Link Data</h3>
+    <div id="LinkData"></div>
 </div>
 
-<h4>v5</h4>
+<ul>
+<li><a id="ConsAppendID" href="#">Append</a></li>
+<li><a id="ConsClearID" href="#">Clear</a></li>
+</ul>
+<h4>v10</h4>
 
 <script>
 
@@ -79,10 +84,10 @@ function tableListener(event) {
     var tab = document.getElementById('SelTableId');
     var hRow = tab.rows[0];
     var hcell = hRow.getElementsByTagName("th")[col];
-    var AttrName = hcell.textContent;
+    var AttrName = hcell.textContent.trim();
     var AttrValue = '';
     if (row !== 0) {
-        attrValue = e1.textContent
+        AttrValue = e1.textContent
     }
     var TabName = '{{table}}';
     
@@ -93,9 +98,63 @@ function tableListener(event) {
     if (row == 0) {
     	talkToServer('/data/getLinkRow.json',data,linkFormShow,event)
     } else {
-    	consAppend("Let's show some data")
+    	talkToServer('/data/getLinkData.json',data,linkDataShow,event)
     } 
 }
+
+//-------- key display -----------
+
+
+function linkDataShow(data,event) {
+	
+//    dictToForm(data, document.forms["linkform"]);
+	el = document.getElementById('LinkData')
+	var s = [];
+//	for (var key in data) {
+//		s.push('<br>' + key + '=' + data[key]);
+//	}
+	if ('BaseData' in data) {
+		s.push('<br> we have base data');
+	    var bd = data['BaseData'];
+	    s.push('<table id="SelTableId" align="center" class="Norm">');
+	    for (var i = 0; i < bd.length; i++) {
+	    	s.push('<tr class="Norm">');
+	    	for (var j = 0; j < bd[i].length; j++) {
+	    		s.push('<td class="Norm">' + bd[i][j] + '</td>');
+	    	}
+	    	s.push("</tr>");
+	    }
+	    s.push("</table>");
+	}
+
+	if ('Links' in data) {
+		s.push('<br> we have links');
+	    var bd = data['Links'];
+	    s.push('<table id="SelTableId" align="center" class="Norm">');
+	    for (var i = 0; i < bd.length; i++) {
+	    	s.push('<tr class="Norm">');
+	    	for (var j = 0; j < bd[i].length; j++) {
+	    		s.push('<td class="Norm">' + bd[i][j] + '</td>');
+	    	}
+	    	s.push("</tr>");
+	    }
+	    s.push("</table>");
+	}
+	if ('Message' in data) {
+		s.push('<br><b>' + data['Message'] + '</b><br>');
+	}
+	
+    el.innerHTML = s.join('');
+    
+    showAndLocate(document.getElementById('LinkDataId'),event);
+}
+
+function linkDataHide(event) {
+	hideElement(document.getElementById('LinkDataId'));
+}
+
+
+//-------- link form logic -----------
 
 function linkFormShow(data,event) {
     dictToForm(data, document.forms["linkform"]);
@@ -179,11 +238,6 @@ function hideElement(el) {
 
 
 function talkToServer(location,data,functionToExecute,event) {
-//    consClear()
-//    consAppend('Talking to: ' + location);
-//    consAppend('   sending: ' + data)
-//    consAppend(' returning: ' + functionToExecute)
-    
     
     xhr = new XMLHttpRequest();
     xhr.open('POST',location,true);
@@ -205,206 +259,28 @@ function talkToServer(location,data,functionToExecute,event) {
     xhr.send(JSON.stringify(data));
 }
 
-document.getElementById('SubmitLinkFormID').addEventListener('click', linkFormSubmit, false)
-document.getElementById('CancelLinkFormID').addEventListener('click', linkFormHide, false)
-document.getElementById('SelTableId').addEventListener('click', tableListener, false)
-
-//document.getElementById('gatherData').addEventListener('click', gatherForm, false)
-
-</script>
-
-
-
-<a onclick="document.getElementById('openModal').innerHTML='<object type='text/html' data='/link' ></object>'">
-Open Modal 2</a>
-
-<p>
-
-<a href="#openModal">Open Modal</a>
-
-<div id="openModal" class="modalDialog">
-	<div>
-		<a href="#close" title="Close" class="close">Xxx</a>
-		<h2>Modal Box</h2>
-		<p>This is a sample modal box that can be created using the powers of CSS3.</p>
-		<p>You could do a lot of things here like have a pop-up ad that shows when your website loads, or create a login/register form for users.</p>
-	</div>
-</div>
-
-<div id="lfsModal" class="lfsDialog">
-	<div id="lfsInner">
-		<a href="#close" title="Close" class="close">Xxx</a>
-		<h2>Modal lfs Box</h2>
-		<p>Larry is just playing with this.</p>
-		<p>You could do a lot of things here like have a pop-up ad that shows when your website loads, or create a login/register form for users.</p>
-	</div>
-</div>
-
-<a href="#lfsModal">Open lfs Modal</a>
-
-<ul>
-<li><a id="lfsConsAppend" href="#">Append</a></li>
-<li><a id="lfsConsClear" href="#lfstst">Clear</a></li>
-<li><a id="lfsAJAX" href="#lfstst">AJAX</a></li>
-</ul>
-<br>
-Should have an icon
- <div class="write"> <div class="icon">and this</div> </div>
-<br>
-next
-<div class="icon">If this had more space </div>
-<br>
-
-<div class="lfsclass" id="lfsid" tab="lfstab" attr="lfsattr">This is in lfsclass,lfsid,lfstab...</div>
-
-<div class="linkDialog" id="linkDialog"> This is linkDialog </div> 
-
-<script>
-function openLink(table,attrname) {
-	document.getElementById("demo").innerHTML = table + '-Joining type text-' + attrname
-	link = "/link?tablename=" + table + "&attrname=" + attrname
-	document.getElementById("demo").innerHTML = link
-	window.open(link,'',' scrollbars=yes,menubar=no,top=100,left=100,width=300, height=300 resizable=yes,toolbar=no,location=no,status=no,address=no')
-//	window.open('/link','',' scrollbars=yes,menubar=no,top=100,left=100,width=300, height=300 resizable=yes,toolbar=no,location=no,status=no,address=no')
-// <a style="cursor: pointer" onclick=" window.open('/link','',' scrollbars=yes,menubar=no,width=300, height=300 resizable=yes,toolbar=no,location=no,status=no,location=no')">Next 1</a>
-// <a onclick=" window.open('/link','',' scrollbars=yes,menubar=no,width=300, height=300 resizable=yes,toolbar=no,location=no,status=no,address=no')">Next 2</a>
-}
-
 function consAppend(msg) {
-	el = document.getElementById('lfsconcole')
+	el = document.getElementById('ConsoleID')
     el.innerHTML = el.innerHTML + msg +'<br>'
 }
 
 function consClear() {
-	el = document.getElementById('lfsconcole')
+	el = document.getElementById('ConsoleID')
     el.innerHTML = ""
 }
 
-function lfsConsAppend(e){
-	consAppend('We just run lfsHrefFunc()')
+function userConsAppend(e){
+	consAppend('---------------------')
 }
 
-function lfsConsClear(e){
-	consClear()
-}
+document.getElementById('SubmitLinkFormID').addEventListener('click', linkFormSubmit, false)
+document.getElementById('CancelLinkFormID').addEventListener('click', linkFormHide, false)
+document.getElementById('SelTableId').addEventListener('click', tableListener, false)
+document.getElementById('LinkDataId').addEventListener('click', linkDataHide, false)
+document.getElementById('ConsAppendID').addEventListener('click', userConsAppend, false)
+document.getElementById('ConsClearID').addEventListener('click', consClear, false)
 
-function lfsAJAX(e){
-	consAppend("Calling the AJAX one.");
-	xhr = new XMLHttpRequest();
-	xhr.onload = function() {
-		consAppend(xhr.status);
-		if (xhr.status == 200) {
-			consAppend(xhr.responseText);
-		}
-	}
-	xhr.open('GET','/',true);
-	xhr.send(null);
-}
-
-function showLfsDialog(event) {
-	
-	var el = document.getElementById('lfsModal');
-	
-	if (el.style.opacity == 0) {
-		var elloc = document.getElementById('lfsInner');
-		elloc.style.top = event.clientY + 'px';
-		elloc.style.left = event.clientX + 'px';
-		el.style.opacity = 1;
-	} else {
-		el.style.opacity = 0;
-	}
-	var msg = " you clicked boy: "
-		msg += ' sx=' + event.clientY + 'px';
-	  	msg += ' sy=' + event.clientX + 'px';
-		el = document.getElementById('lfsconcole');
-		el.innerHTML = msg;
-}
-
-function showPosition(event) {
-	var msg = ""
-	msg += ' sx=' + event.screenX;
-  	msg += ' sy=' + event.screenY;
-  	consAppend(msg);
-}
-
-function lfsid(event) {
-	showPosition(event);
-	var el = document.getElementById('lfsid');
-	consAppend(el.id);
-	consAppend(el.getAttribute("tab"));
-    consAppend(el.getAttribute("attr"));
-}
-
-function showFormStuff(event) {
-    var oForm =  document.forms[0]
-      var msg = "The data that you entered for the form with 'name' attribute='" + oForm.name + "': \n";
-      
-      for (i = 0; i < oForm.length, oForm.elements[i].getAttribute("type") !== 'button'; i++) {
-        msg += oForm.elements[i].tagName + " with 'name' attribute='" + oForm.elements[i].name + "' and data: ";
-        if(oForm.elements[i].value == null || oForm.elements[i].value == '') {
-        msg += "NOT SET \n";
-        } else {
-          msg += oForm.elements[i].value + "\n";
-        }
-      }
-
-      alert(msg);
-      return false;
-    }
-function gatherForm(event) {
-	consClear()
-	consAppend('gathering data:')
-	var f1 = document.forms[0]
-	var f2 = document.forms["linkform"]
-	consAppend("f1" + f1)
-    consAppend("f2" + f2)
-    consAppend("f2.tablename" + f2['tablename'].value)
-}
-
-function xxxtableListener(event) {
-	var e1 = event.target;
-	var col = e1.cellIndex;
-	var p1 = e1.parentNode;
-	var row = p1.rowIndex;
-	var tab = document.getElementById('table');
-	var hRow = tab.rows[0];
-	var hcell = hRow.getElementsByTagName("td")[col];
-	var attrName = hcell.textContent
-	var attrValue = e1.textContent
-	var tabName = '{{table}}'
-	
-	consClear()
-    consAppend("We have a tableListner1:" + row + "," + col + ' ' + hcell.innerHTML + " = " + e1.innerHTML);
-    consAppend("We have a tableListner2:" + row + "," + col + ' ' + tabName + '.' + attrName + " = " + attrValue);
-	
-	consAppend("Calling the AJAX one.");
-    xhr = new XMLHttpRequest();
-    xhr.onload = function() {
-        consAppend(xhr.status);
-        if (xhr.status == 200) {
-       	    var elDialog = document.getElementById('linkDialog');
-       	    elDialog.style.opacity = 0;
-       	    elDialog.innerHTML = xhr.responseText
-       	    elDialog.style.top = event.clientY + 'px';
-       	    elDialog.style.left = event.clientX + 'px';
-       	    elDialog.style.opacity = 1;
-            consAppend('x: ' + event.clientX + ' y: ' + event.clientY);
-        }
-    }
-    parms = '/data/link/?tablename=' + tabName +'&attrname=' + attrName + '&linkname=' + 'whateverlinkname' 
-    xhr.open('GET',parms,true);
-    xhr.send(null);
-}
-
-// document.getElementById('body').addEventListener('click', showLfsDialog, false); // Move updates position
-document.getElementById('lfsConsAppend').addEventListener('click', lfsConsAppend, false)
-document.getElementById('lfsConsClear').addEventListener('click', lfsConsClear, false)
-document.getElementById('lfsAJAX').addEventListener('click', lfsAJAX, false)
-document.getElementById('lfsid').addEventListener('click', lfsid, false)
-//document.getElementById('table').addEventListener('click', tableListener, false)
-//document.getElementById('gatherData').addEventListener('click', gatherForm, false)
-//document.getElementById('linkData').addEventListener('click', showFormStuff, false)
-
-</script>    
+</script>
+    
 </body>
 </html>

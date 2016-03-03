@@ -133,8 +133,9 @@ class FlaskTest(unittest.TestCase):
         db.insert(linktab)
 
         data = dict()
-        data["LinkName"] = 'Lease'
-        data["KeyValue"] = '2'
+        data["TabName"] = 'Well'
+        data["AttrName"] = 'LeaseID'
+        data["AttrValue"] = 2
         
         json_from_browser = json.dumps(data)
         print('json_from_browser', json_from_browser)
