@@ -11,7 +11,7 @@ table.Norm, th.Norm, td.Norm {
 
 
 th.Sel:after {
-    content: url('/static/pencil.png');
+    content: url('/static/img/pencil.png');
 }
 
 .save {

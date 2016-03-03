@@ -1,4 +1,5 @@
 #!/bin/env python3
+import json
 
 from database.data_structure import DataStructure
 class Utils(object):
@@ -22,4 +23,17 @@ class Utils(object):
             obj.__dict__[k] = dic[k]
             
         return obj
-        
+
+
+    def json_decode(self,req):
+        """
+        This is used primarly in the browser app. 
+        Do not remove this method. In the app we could use request.json 
+        instead of all
+        this but... and it's a big but... flask unit testing does not 
+        suport the request.json method we wrote this.
+        """
+        reqDataBytes = req.data
+        reqDataString = reqDataBytes.decode(encoding='UTF-8')
+        return json.loads(reqDataString)
+            

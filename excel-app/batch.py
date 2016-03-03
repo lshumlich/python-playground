@@ -10,7 +10,7 @@ from database.royaltyworksheet import RoyaltyWorksheet
 from database.calcroyalties import ProcessRoyalties
 from database.calcroyalties_test import TestSaskRoyaltyCalc
 from database.sqlite_load_excel import Loader
-from database.sqlite_appserver import AppServer
+# from database.sqlite_appserver import AppServer
 from database.database_create import DatabaseCreate
 from database.sqlite_utilities_test import DatabaseUtilities 
 import config
@@ -61,11 +61,18 @@ def load_sample_data():
     dbu.create_some_test_wells()
     dbu.create_some_test_leases()
 
+
+def create_tables():
+    db_create = DatabaseCreate()
+    db_create.create_all()
+
+
 print('-- Runing Batch')
 if __name__ == "__main__":
+    create_tables()
 #     sqliteLoadExcel()
-    load_sample_data()
-    browser_app()
+#     load_sample_data()
+#     browser_app()
 #     run_royalties_and_worksheet()
 #    unittest.main()
 #     runTestModule()

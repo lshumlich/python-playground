@@ -41,3 +41,14 @@ class UtilsTest(unittest.TestCase):
         self.assertEqual(ds.fld1,'val1')
         self.assertEqual(ds.fld2,'val2')
         
+    def test_to_json(self):
+        utils= Utils()
+        # create a dummy request structure
+        request = DataStructure()
+        # This is exactly what the data from the browser looks like:
+        request.data = b'{"tableName":"BAInfo","attrName":" StartDate ","attrValue":"","linkName":"undefined","baseTab":false,"showAttrs":""}'
+#         dictionaryStructure = AppServer.json_decode(request)
+        dictionaryStructure = utils.json_decode(request)
+        self.assertEqual("BAInfo", dictionaryStructure['tableName'])
+        
+        

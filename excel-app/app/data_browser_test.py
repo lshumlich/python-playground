@@ -6,10 +6,11 @@ import json
 #TODO This test must be redone to not depend on a specific database
 
 import config
-from database.sqlite_appserver import AppServer
-from database.data_structure import DataStructure
+# from database.sqlite_appserver import AppServer
+# from database.data_structure import DataStructure
 from database.database_create import DatabaseCreate
 from database.utils import Utils
+from app import app
 
 from database.sqlite_utilities_test import DatabaseUtilities
 
@@ -18,15 +19,9 @@ class FlaskTest(unittest.TestCase):
 
     def setUp(self):
         self.assertEqual(config.get_environment(),'unittest') # Distructive Tests must run in unittest enviornment
-        self.myapp = AppServer.app.test_client()
+        self.myapp = app.test_client()
 
-    def test_to_json(self):
-        # create a dummy request structure
-        request = DataStructure()
-        # This is exactly what the data from the browser looks like:
-        request.data = b'{"tableName":"BAInfo","attrName":" StartDate ","attrValue":"","linkName":"undefined","baseTab":false,"showAttrs":""}'
-        dictionaryStructure = AppServer.json_decode(request)
-        self.assertEqual("BAInfo", dictionaryStructure['tableName'])
+#         self.myapp = AppServer.app.test_client()
 
     def test_link_update(self):
         db = config.get_database()
@@ -46,7 +41,7 @@ class FlaskTest(unittest.TestCase):
         json_to_browser = json.dumps(data)
         resp = self.myapp.post('/data/updateLinkRow.json',data=json_to_browser)
         self.assertEqual(resp.status_code, 200)
-        data = AppServer.json_decode(resp)
+        data = utils.json_decode(resp)
         self.assertEqual(data["StatusCode"],0)
         
         result = db.select('LinkTab', TabName='Lease', AttrName='ID')
@@ -59,7 +54,7 @@ class FlaskTest(unittest.TestCase):
         json_to_browser = json.dumps(data)
         resp = self.myapp.post('/data/updateLinkRow.json',data=json_to_browser)
         self.assertEqual(resp.status_code, 200)
-        data = AppServer.json_decode(resp)
+        data = utils.json_decode(resp)
         self.assertEqual(data["StatusCode"],0)
         
         result = db.select('LinkTab', TabName='Lease', AttrName='ID')
@@ -85,7 +80,7 @@ class FlaskTest(unittest.TestCase):
         # Data should not be found but there should not be an error
         resp = self.myapp.post('/data/getLinkRow.json',data=json_to_browser)
         self.assertEqual(resp.status_code, 200)
-        data = AppServer.json_decode(resp)
+        data = utils.json_decode(resp)
         self.assertEqual(data["LinkName"],'')
         
         linktab.LinkName = 'Well'
@@ -95,7 +90,7 @@ class FlaskTest(unittest.TestCase):
         
         # Data should be found 
         resp = self.myapp.post('/data/getLinkRow.json',data=json_to_browser)
-        data = AppServer.json_decode(resp)
+        data = utils.json_decode(resp)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(data["LinkName"],'Well')
         self.assertEqual(data["ShowAttrs"],'ID,UWI')
@@ -107,6 +102,7 @@ class FlaskTest(unittest.TestCase):
         
     def test_get_link_data(self):
         #setup stuff
+        utils = Utils()
         db = config.get_database()
         dbu = DatabaseUtilities()
         db_create = DatabaseCreate()
@@ -144,7 +140,7 @@ class FlaskTest(unittest.TestCase):
         resp = self.myapp.post('/data/getLinkData.json',data=json_from_browser)
         print("resp:",resp)
         self.assertEqual(resp.status_code, 200)
-        data = AppServer.json_decode(resp)
+        data = utils.json_decode(resp)
         
         print('data',data)
         rows = data['BaseData']

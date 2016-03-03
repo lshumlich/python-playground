@@ -1,11 +1,16 @@
 #!/bin/env python3
 
 from flask import render_template, request, redirect, url_for, flash
+import json
+import sys,traceback
 
 from app import app
 from database import database
 from database import calcroyalties
+from database.sqlite_show import Shower
+from database.utils import Utils
 import config
+
 
 db = database.DataBase(config.get_file_dir() + 'database new.xlsx')
 pr = calcroyalties.ProcessRoyalties()
@@ -75,6 +80,143 @@ def wells():
 @app.route('/searchleases')
 def searchleases():
     return render_template('searchleases.html')
+
+
+@app.route("/data/",methods=['GET','POST'])
+def data():
+    try:
+        db_instance = config.get_database_instance()
+        shower = Shower()
+
+        table=request.args.get('table')
+        attr=request.args.get('attr')
+        key=request.args.get('key')
+        links = {}
+        links['BAid'] = '?table=BAInfo&attr=BAid&key=' 
+        links['WellEvent'] = '?table=WellInfo&attr=Well&key='
+        
+        tables = db_instance.get_table_names()
+        header = None
+        rows = None
+        print('Table:',table)
+        if table:
+            header = shower.show_columns(table)
+            rows = shower.show_table(table,attr,key)
+        html = render_template('data.html',table=table,tables=tables,header=header,rows=rows,links=links)
+    except Exception as e:
+        print('views.data: ***Error:',e)
+        traceback.print_exc(file=sys.stdout)
+
+    return html
+
+@staticmethod
+@app.route("/data/updateLinkRow.json",methods=['POST']) 
+def update_link_row():
+    utils = Utils()
+    db = config.get_database()
+    return_data = dict()
+    try:
+        print('AppServer.update_link_row running',request.method)
+        data = utils.json_decode(request)
+        print('data:',data)
+        linktab = db.get_data_structure('LinkTab')
+        utils.dict_to_obj(data,linktab)
+        print('just before if data:',data)
+        print('just before if data:',data['ID'])
+        if data['ID'] == '0':
+            db.insert(linktab)
+        else:
+            db.update(linktab)
+        
+        return_data['StatusCode'] = 0
+        return json.dumps(return_data)
+    
+    except Exception as e:
+        print('AppServer.link: ***Error:',e)
+        traceback.print_exc(file=sys.stdout)
+        return_data['StatusCode'] = -1
+        return_data['Message'] = str(e)
+        return json.dumps(return_data)
+        
+@staticmethod
+@app.route("/data/getLinkRow.json",methods=['POST']) 
+def get_link_row():
+    utils = Utils()
+    db = config.get_database()
+    try:
+        print('AppServer.get_link_row running',request.method)
+        print('Instance:',config.get_database_name(),config.get_environment())
+        print('Tables',config.get_database_instance().get_table_names())
+        data = utils.json_decode(request)
+        link = db.select("LinkTab", TabName = data['TabName'], AttrName = data['AttrName'])
+        print('link',link)
+        if not link:
+            data['ID'] = 0
+            data['LinkName'] = ''
+            data['BaseTab'] = 0
+            data['ShowAttrs'] = ''
+        else:
+            data['ID'] = link[0].ID
+            data['LinkName'] = link[0].LinkName
+            data['BaseTab'] = link[0].BaseTab
+            data['ShowAttrs'] = link[0].ShowAttrs
+
+        return json.dumps(data)
+    
+    except Exception as e:
+        print('AppServer.link: ***Error:',e)
+        traceback.print_exc(file=sys.stdout)
+
+@staticmethod
+@app.route("/data/getLinkData.json",methods=['POST']) 
+def get_link_data():
+    utils = Utils()
+    db = config.get_database()
+    try:
+        data = utils.json_decode(request)
+#             print('data', data)
+        link = db.select("LinkTab", TabName = data['TabName'], AttrName = data['AttrName'])
+#             print('link',link)
+        if len(link) > 0:
+            result_rows = db.select("LinkTab", LinkName=link[0].LinkName, BaseTab=1)
+#                 print('result:',result_rows)
+#                 print('result.type:',type(result_rows))
+            
+            # Get the base table
+            for result in result_rows:
+                print('We have a base table')
+                attrs_to_show = result.ShowAttrs.split(',')
+                args = dict()
+                args[result.AttrName] = data['AttrValue']
+                key_data_rows = db.select(result.TabName,**args)
+                rows = []
+                for keyData in key_data_rows:
+                    row = []
+                    for a in attrs_to_show:
+                        row.append(keyData.__dict__[a])
+                    rows.append(attrs_to_show)
+                    rows.append(row)
+                data['BaseData'] = rows
+            
+            # Get all the tables that the link uses
+            result_rows = db.select("LinkTab", LinkName=link[0].LinkName)
+            
+            rows = []
+            for result in result_rows:
+                row = []
+                row.append(result.TabName)
+                row.append(result.AttrName)
+                rows.append(row)
+            data['Links'] = rows
+            
+        else:
+            data["Message"] = data['AttrName'] + " has not been linked."
+        return json.dumps(data)
+#         
+    except Exception as e:
+        print('AppServer.link: ***Error:',e)
+        traceback.print_exc(file=sys.stdout)
+
 
 @app.route('/worksheet')
 def worksheet():

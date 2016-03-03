@@ -6,7 +6,7 @@ class Shower(object):
     
     LINK_TABLE = "LinkTab"
     def __init__(self):
-        None
+        self.dbi = config.get_database_instance()
 
     def connect(self):
         self.dbi = config.get_database_instance()
