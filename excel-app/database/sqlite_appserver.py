@@ -59,8 +59,8 @@ class AppServer(object):
         return html
     
     @staticmethod
-    @app.route("/data/link/",methods=['GET','POST']) 
-    def link():
+    @app.route("/data/linkxxx/",methods=['GET','POST']) 
+    def xxx_link():
         print('AppServer.link2 running',request.method)
         tablename = None
         attrname = None
@@ -100,14 +100,6 @@ class AppServer(object):
         return html
 
     @staticmethod
-    @app.route("/data/link.json",methods=['POST']) 
-    def link_json():
-        print('AppServer.link_json running',request.method)
-        data = AppServer.json_decode(request)
-
-        return 'Thats it folks'
-
-    @staticmethod
     @app.route("/data/updateLinkRow.json",methods=['POST']) 
     def update_link_row():
         utils = Utils()
@@ -118,8 +110,9 @@ class AppServer(object):
             print('data:',data)
             linktab = AppServer.db.get_data_structure('LinkTab')
             utils.dict_to_obj(data,linktab)
-            if data['ID'] == '':
-                linktab.ID = None
+            print('just before if data:',data)
+            print('just before if data:',data['ID'])
+            if data['ID'] == '0':
                 AppServer.db.insert(linktab)
             else:
                 AppServer.db.update(linktab)
@@ -134,8 +127,6 @@ class AppServer(object):
             return_data['Message'] = str(e)
             return json.dumps(return_data)
             
-            
-
     @staticmethod
     @app.route("/data/getLinkRow.json",methods=['POST']) 
     def get_link_row():
@@ -147,6 +138,7 @@ class AppServer(object):
             link = AppServer.db.select("LinkTab", TabName = data['TabName'], AttrName = data['AttrName'])
             print('link',link)
             if not link:
+                data['ID'] = 0
                 data['LinkName'] = ''
                 data['BaseTab'] = 0
                 data['ShowAttrs'] = ''

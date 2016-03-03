@@ -42,17 +42,16 @@
     <h3>Link Attributes</h3>
     <form name="linkform" action="#" method='POST'>
     <table align="center" border="0">
+        <tr><td><input type="hidden" name=ID></tr></td>
         <tr><td>Table</tr></td> 
-        <tr><td><input type="text" name=tableName></tr></td>
+        <tr><td><input type="text" name=TabName></tr></td>
         <tr><td>Attribute</tr></td> 
-        <tr><td><input type="text" name=attrName></tr></td>
-        <tr><td>Value</tr></td> 
-        <tr><td><input type="text" name=attrValue></tr></td>
+        <tr><td><input type="text" name=AttrName></tr></td>
         <tr><td>Link Name</tr></td> 
-        <tr><td><input type="text" name=linkName></tr></td>
-        <tr><td><input type="checkbox" name="baseTab"> Base Table?</tr></td>
+        <tr><td><input type="text" name=LinkName></tr></td>
+        <tr><td><input type="checkbox" name="BaseTab"> Base Table?</tr></td>
         <tr><td>Attributes To Show</tr></td> 
-        <tr><td><input type="textarea" name=showAttrs rows="2"></tr></td>
+        <tr><td><input type="textarea" name=ShowAttrs rows="2"></tr></td>
         <tr><td>&nbsp;</td></tr>
         <tr><td><button id="SubmitLinkFormID" type="button">Submit</button>
         <button id="CancelLinkFormID" type="button">Cancel</button></tr></td>
@@ -61,77 +60,14 @@
     </form>
 </div>
 
+<div id="KeyFormId" class="linkDialog center">
+    <h3>Key Display</h3>
+    <div id="KeyData"></div>
+</div>
+
+<h4>v5</h4>
+
 <script>
-
-function sendFormToServer(event) {
-
-	consClear()
-    var oForm = document.forms["linkform"];
-    
-    var dict = {};
-    for (i = 0; i < oForm.length; i++) {
-    	if (oForm.elements[i].name != '') {
-    		if (oForm.elements[i].type == 'text') {
-    			   dict[oForm.elements[i].name] = oForm.elements[i].value;
-    		} else if (oForm.elements[i].type == 'checkbox') {
-                dict[oForm.elements[i].name] = oForm.elements[i].checked;
-    		}
-    		
-    	consAppend(oForm.elements[i].name + "," + oForm.elements[i].value + "," + oForm.elements[i].type )
-    		
-    	}
-    }
-    var data = JSON.stringify(dict);
-    consAppend(data);    
-    
-    xhr = new XMLHttpRequest();
-    xhr.open('POST','/data/link.json',true);
-    xhr.setRequestHeader("Content-type", "application/json");
-    xhr.onload = function() {
-        consAppend(xhr.status);
-        if (xhr.status == 200) {
-            consAppend(xhr.responseText);
-        }
-    }
-    xhr.send(data);
-}
-
-function talkToServer(location,data,functionToExecute) {
-    consClear()
-    consAppend('Talking to: ' + location);
-    consAppend('   sending: ' + data)
-//    consAppend(' returning: ' + functionToExecute)
-    
-    
-    xhr = new XMLHttpRequest();
-    xhr.open('POST',location,true);
-    xhr.setRequestHeader("Content-type", "application/json");
-    xhr.onload = function() {
-        if (xhr.status == 200) {
-            consAppend(xhr.responseText);
-            data = JSON.parse(xhr.responseText);
-            consAppend(data);
-            functionToExecute(data);
-        } else {
-        	functionToExecute(data);
-        	consAppend('*** We have a bad response from server: ' + xhr.status)
-            consAppend('    url: ' + location)
-            consAppend('    data: ' + JSON.stringify(data))
-        }
-    }
-    
-    xhr.send(JSON.stringify(data));
-
-//  functionToExecute(data);  
-    
-
-}
-
-function cancelLinkForm(event) {
-    var elDialog = document.getElementById('LinkFormId');
-    elDialog.style.opacity = 0;
-    elDialog.style.zIndex = "-1";
-}
 
 function tableListener(event) {
 	
@@ -143,55 +79,137 @@ function tableListener(event) {
     var tab = document.getElementById('SelTableId');
     var hRow = tab.rows[0];
     var hcell = hRow.getElementsByTagName("th")[col];
-    var attrName = hcell.textContent;
-    var attrValue = '';
+    var AttrName = hcell.textContent;
+    var AttrValue = '';
     if (row !== 0) {
         attrValue = e1.textContent
     }
-    var tabName = '{{table}}';
+    var TabName = '{{table}}';
     
-    data['tabName'] = tabName;
-    data['attrName'] = attrName;
-    data['attrValue'] = attrValue;
+    data['TabName'] = TabName;
+    data['AttrName'] = AttrName;
+    data['AttrValue'] = AttrValue;
 
     if (row == 0) {
-    	talkToServer('/data/getLinkData.json',data,linkForm)
-//        linkForm(data);
-    }
+    	talkToServer('/data/getLinkRow.json',data,linkFormShow,event)
+    } else {
+    	consAppend("Let's show some data")
+    } 
 }
-    
-function linkForm(data) {
+
+function linkFormShow(data,event) {
+    dictToForm(data, document.forms["linkform"]);
+    showAndLocate(document.getElementById('LinkFormId'),event);
+}
+
+function linkFormHide(event) {
+	hideElement(document.getElementById('LinkFormId'));
+}
+
+function linkFormSubmit(event) {
+    var dict = formToDict(document.forms["linkform"]);
+    talkToServer('/data/updateLinkRow.json',dict,linkFormResponse,event)
+}
+
+function linkFormResponse(data,event) {
+	if (data['StatusCode'] == 0) {
+		linkFormHide(event)
+	} else {
+		consAppend('*** We have a problem ***:' + data['Message'])
+	}
+}
+
+// -------- Common Functions -----------
+
+//
+// move the form attributes to a dict object to transfer to the server
+//
+function formToDict(oForm) {
 	
-    var oForm = document.forms["linkform"];
-    oForm.elements["tableName"].value = data["tabName"]
-    oForm.elements["attrName"].value = data["attrName"]
-    oForm.elements["attrValue"].value = data["attrValue"]
-    oForm.elements["linkName"].value = data["linkName"]
-//    oForm.elements["basTab"].value = data["basTab"]
-//    oForm.elements["showAttrs"].value = data["showAttrs"]
-    
-    var elDialog = document.getElementById('LinkFormId');
-    elDialog.style.opacity = 0;
-    elDialog.style.top = event.clientY + 'px';
-    elDialog.style.left = event.clientX + 'px';
-    elDialog.style.zIndex = "0";
-    elDialog.style.opacity = 1;
+    var dict = {};
+    for (i = 0; i < oForm.length; i++) {
+//    	consAppend('---' + oForm.elements[i].name + "," + oForm.elements[i].value + "," + oForm.elements[i].type )
+    	if (oForm.elements[i].name != '') {
+    		if (oForm.elements[i].type == 'text' || oForm.elements[i].type == 'hidden') {
+    			dict[oForm.elements[i].name] = oForm.elements[i].value;
+    		} else if (oForm.elements[i].type == 'checkbox') {
+                dict[oForm.elements[i].name] = oForm.elements[i].checked;
+    		} else {
+    			consAppend('*** did not handle: ' + oForm.elements[i].name + "," + oForm.elements[i].value + "," + oForm.elements[i].type)
+    		}
+    	}
+    }
+	
+	return dict
+}
 
-//    consAppend('x: ' + event.clientX + ' y: ' + event.clientY);
-//    consClear()
-//    consAppend("We have a tableListner1:" + row + "," + col + ' ' + hcell.innerHTML + " = " + e1.innerHTML);
-//    consAppend("We have a tableListner2:" + row + "," + col + ' ' + tabName + '.' + attrName + " = " + attrValue);
+//
+//move the form attributes to a dict object to transfer to the server
+//
+function dictToForm(dict,oForm) {
+	
+	for (i = 0; i < oForm.length; i++) {
+	//	consAppend('---' + oForm.elements[i].name + "," + oForm.elements[i].value + "," + oForm.elements[i].type )
+		if (oForm.elements[i].name != '') {
+			if (oForm.elements[i].type == 'text' || oForm.elements[i].type == 'hidden') {
+				oForm.elements[i].value = dict[oForm.elements[i].name];
+			} else if (oForm.elements[i].type == 'checkbox') {
+				oForm.elements[i].checked = (dict[oForm.elements[i].name] ==1) 
+			} else {
+				consAppend('*** did not handle: ' + oForm.elements[i].name + "," + oForm.elements[i].value + "," + oForm.elements[i].type)
+			}
+		}
+	}
+}
+
+function showAndLocate(el,event) {
+
+    el.style.opacity = 0;
+    el.style.top = event.clientY + 'px';
+    el.style.left = event.clientX + 'px';
+    el.style.zIndex = "0";
+    el.style.opacity = 1;
+
+}
+
+function hideElement(el) {
+    el.style.opacity = 0;
+    el.style.zIndex = "-1";
 }
 
 
-document.getElementById('SubmitLinkFormID').addEventListener('click', sendFormToServer, false)
-document.getElementById('CancelLinkFormID').addEventListener('click', cancelLinkForm, false)
+function talkToServer(location,data,functionToExecute,event) {
+//    consClear()
+//    consAppend('Talking to: ' + location);
+//    consAppend('   sending: ' + data)
+//    consAppend(' returning: ' + functionToExecute)
+    
+    
+    xhr = new XMLHttpRequest();
+    xhr.open('POST',location,true);
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.onload = function() {
+        if (xhr.status == 200) {
+//            consAppend(xhr.responseText);
+            data = JSON.parse(xhr.responseText);
+//            consAppend(data);
+            functionToExecute(data,event);
+        } else {
+        	functionToExecute(data);
+        	consAppend('*** We have a bad response from server: ' + xhr.status)
+            consAppend('    url: ' + location)
+            consAppend('    data: ' + JSON.stringify(data))
+        }
+    }
+    
+    xhr.send(JSON.stringify(data));
+}
+
+document.getElementById('SubmitLinkFormID').addEventListener('click', linkFormSubmit, false)
+document.getElementById('CancelLinkFormID').addEventListener('click', linkFormHide, false)
 document.getElementById('SelTableId').addEventListener('click', tableListener, false)
 
 //document.getElementById('gatherData').addEventListener('click', gatherForm, false)
-
-
-
 
 </script>
 
@@ -384,7 +402,7 @@ document.getElementById('lfsConsClear').addEventListener('click', lfsConsClear, 
 document.getElementById('lfsAJAX').addEventListener('click', lfsAJAX, false)
 document.getElementById('lfsid').addEventListener('click', lfsid, false)
 //document.getElementById('table').addEventListener('click', tableListener, false)
-document.getElementById('gatherData').addEventListener('click', gatherForm, false)
+//document.getElementById('gatherData').addEventListener('click', gatherForm, false)
 //document.getElementById('linkData').addEventListener('click', showFormStuff, false)
 
 </script>    

@@ -21,14 +21,23 @@ class DatabaseCreate(object):
         self.dbi = config.get_database_instance()
         
     def create_all(self):
-        self.config()
-        self.well()
-        self.royaltymaster()
-        self.lease()
-        self.monthly()
-        self.calc()
-        self.econdata()
-        self.linktab()
+        tables = self.dbi.get_table_names()
+        if not 'Config' in tables:
+            self.config()
+        if not 'Well' in tables:
+            self.well()
+        if not 'RoyaltyMaster' in tables:
+            self.royaltymaster()
+        if not 'Lease' in tables:
+            self.lease()
+        if not 'Monthly' in tables:
+            self.monthly()
+        if not 'Calc' in tables:
+            self.calc()
+        if not 'ECONData' in tables:
+            self.econdata()
+        if not 'LinkTab' in tables:
+            self.linktab()
         
     def config(self):
         statement = """

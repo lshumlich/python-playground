@@ -1,4 +1,5 @@
 {
     "enviornment": "unittest",
-    "databasenamexxx": "unittest.db"
+    "databasenamexxx": "unittest.db",
+    "debug_sql": true
 }

@@ -28,10 +28,6 @@ class FlaskTest(unittest.TestCase):
         dictionaryStructure = AppServer.json_decode(request)
         self.assertEqual("BAInfo", dictionaryStructure['tableName'])
 
-    def test_linkjson(self):
-        resp = self.myapp.post('/data/link.json',data='{"fld1":"val1"}')
-        self.assertEqual(resp.status_code, 200)
-        
     def test_link_update(self):
         db = config.get_database()
         dbu = DatabaseUtilities()
@@ -43,7 +39,7 @@ class FlaskTest(unittest.TestCase):
 
         # Test Insert
         data = dict()
-        data["ID"] = ''
+        data["ID"] = '0'
         data["TabName"] = 'Lease'
         data["AttrName"] = 'ID'
         data["LinkName"] = 'Lease'

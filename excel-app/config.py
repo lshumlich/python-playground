@@ -24,6 +24,7 @@ class ConfigObject(object):
     database_name = None
     database_instance = None
     database = None
+    debug_sql = False
     
 def where_am_i():
     BASE_DIR = os.path.dirname(__file__)
@@ -63,6 +64,8 @@ def setup_environment():
                     ConfigObject.environment = json_data['environment']
                 if 'databasename' in json_data:
                     ConfigObject.database_name = get_temp_dir() + json_data['databasename']
+                if 'debug_sql' in json_data:
+                    ConfigObject.debug_sql = json_data['debug_sql']
                 
     if ConfigObject.database_name and not ConfigObject.environment:
         ConfigObject.environment = "????"
@@ -74,7 +77,7 @@ def setup_environment():
         ConfigObject.database_name = ":memory:"
 #         ConfigObject.database_name = get_temp_dir() + ConfigObject.environment + '.db'
         
-    print("Setting Environment to:",ConfigObject.environment,ConfigObject.database_name)
+    print("config.setup_environment",ConfigObject.environment,ConfigObject.database_name)
         
     ConfigObject.database_instance = SqliteInstance(ConfigObject.database_name)
     ConfigObject.database = Database()
@@ -98,4 +101,6 @@ def get_database():
     if not ConfigObject.database:
         setup_environment()
     return ConfigObject.database
+def debug_sql():
+    return ConfigObject.debug_sql
     

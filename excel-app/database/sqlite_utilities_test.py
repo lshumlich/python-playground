@@ -51,23 +51,24 @@ class DatabaseUtilities(object):
         self.db_instance.execute('DROP TABLE %s' % table)
 
     def create_some_test_wells(self):
-        self.db_create.well()
+        if not 'Well' in self.db_instance.get_table_names():
+            self.db_create.well()
+            
         statement = """
             INSERT INTO Well VALUES(1,'SKWI111062705025W300','SK','Oil','OL',1,'New Oil','Heavy',0,0.25,'2014-12-01 00:00:00',1);
             INSERT INTO Well VALUES(2,'SKWI112062705025W300','SK','Oil','OL',2,'Third Tier Oil','Southwest',0,0.95,'2014-12-01 00:00:00',1);
             INSERT INTO Well VALUES(3,'SKWI113062705025W300','SK','Oil','OL',2,'Fourth Tier Oil','Other',0,1.0,NULL,NULL);
             INSERT INTO Well VALUES(4,'SKWI114062705025W300','SK','Oil','OL',3,'Old Oil','Other',0,1.0,NULL,NULL);
         """
-#             CREATE TABLE Well ('ID' int, 'UWI' text, 'Prov' text, 'WellType' text, 'LeaseType' text, 'LeaseID' int, 'RoyaltyClassification' text, 'Classification' text, 'SRC' int, 'IndianInterest' float, 'CommencementDate' date, 'ReferencePrice' int);
-
+        
         self.db_instance.execute_statement(statement)
 
     def create_some_test_leases(self):
+        if not 'Lease' in self.db_instance.get_table_names():
+            self.db_create.lease()
         statement = """
-            CREATE TABLE Lease ('LeaseType' text, 'ID' int, 'Prov' text, 'FNReserve' int, 'Lessor' int, 'Notes' text);
-            INSERT INTO Lease VALUES('OL',1,'SK',123,2345,NULL);
-            INSERT INTO Lease VALUES('OL',2,'SK',123,2346,NULL);
-            INSERT INTO Lease VALUES('OL',3,'SK',123,2347,NULL);
+            INSERT INTO Lease VALUES(1,'OL','SK',123,2345,NULL);
+            INSERT INTO Lease VALUES(2,'OL','SK',123,2346,NULL);
+            INSERT INTO Lease VALUES(3,'OL','SK',123,2347,NULL);
         """
         self.db_instance.execute_statement(statement)
-

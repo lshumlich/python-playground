@@ -39,13 +39,12 @@ class TestLoader(unittest.TestCase):
         self.assertEqual(len(loader.wb['Well'].rows), 9)
         self.assertEqual(len(loader.wb['Royalty Master'].rows), 11)
 
-        #Test that we have an empty database. The only one would the linktab created in shower
         print(dbi.get_table_names())
-        self.assertEqual(len(dbi.get_table_names()), 1)
+        self.assertEqual(len(dbi.get_table_names()), 0)
 
-        #Test that we have x number of tables plus the linktab tables
+        #Test that we have x number of tables
         loader.load_all_sheets()
-        self.assertEqual(len(dbi.get_table_names()), 3)
+        self.assertEqual(len(dbi.get_table_names()), 2)
 
         #test that each table has x number of columns
         self.assertEqual(len(shower.show_table('Well')), 8)

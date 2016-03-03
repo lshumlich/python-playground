@@ -8,6 +8,7 @@ import sqlite3
 from sqlite3 import OperationalError
 
 from database.apperror import AppError
+import config
 
 
 class SqliteInstance(object):
@@ -16,9 +17,11 @@ class SqliteInstance(object):
         self.databaseName = databaseName
         self.conn = sqlite3.connect(self.databaseName)
         self.cursor = self.conn.cursor()
+        self.debug_sql = config.debug_sql()
 
     def execute(self,stmt):
-#         print('SqliteInstance.execute:',stmt)
+        if self.debug_sql:
+            print('SqliteInstance.execute:',stmt)
         try:
             return self.cursor.execute(stmt)
         except OperationalError as e:

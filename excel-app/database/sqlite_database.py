@@ -84,6 +84,8 @@ class Database(object):
                     ignore = True
                 elif dic[attr] is int and dic[attr] == 0:
                     ignore = True
+                elif dic[attr] == '0':
+                    ignore = True
             if not ignore:
                 if len(to_insert_attr) > 1:
                     to_insert_attr += ','

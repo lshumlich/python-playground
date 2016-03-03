@@ -2,7 +2,6 @@
 
 import config
 
-
 class Shower(object):
     
     LINK_TABLE = "LinkTab"
@@ -11,27 +10,7 @@ class Shower(object):
 
     def connect(self):
         self.dbi = config.get_database_instance()
-        self.check_linktab()
-        self.database = config.get_database()
         
-    def check_linktab(self):
-        if not Shower.LINK_TABLE in self.dbi.get_table_names():
-            self.dbi.execute('create table ' + Shower.LINK_TABLE +' (TabName text, AttrName text, LinkName text, BaseTab boolean, ShowAttrs text);')
-    
-    def insert_link(self, tabName, attName, linkName, baseTab, showAttrs):
-        """ 
-        create table linktab (TabName text, AttrName text, LinkName text, BaseTab boolean, ShowAttrs text);
-        insert into linktab values ("BATable", "ID", "BA", 1, "ID,BAName");
-        """
-        stmt = 'insert into ' + Shower.LINK_TABLE + ' values("' + tabName + '", "' + attName + '", "' + linkName + '",' + str(baseTab) + ',"' + showAttrs+ '")'
-        print(stmt)
-        self.dbi.execute(stmt)
-        self.dbi.commit()
-        
-    def get_link(self,tabName,attrName):
-        link = self.database.select(Shower.LINK_TABLE, TabName=tabName,AttrName=attrName)
-        return link 
-
     def show_table(self,tableName,attr=None,key=None):
         stmt = 'select * from ' + tableName
         if key:

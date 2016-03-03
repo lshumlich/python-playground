@@ -11,6 +11,8 @@ from database.calcroyalties import ProcessRoyalties
 from database.calcroyalties_test import TestSaskRoyaltyCalc
 from database.sqlite_load_excel import Loader
 from database.sqlite_appserver import AppServer
+from database.database_create import DatabaseCreate
+from database.sqlite_utilities_test import DatabaseUtilities 
 import config
 #
 # Using this technique I do not know how to run just one of the methods in the class. If you can 
@@ -50,10 +52,19 @@ def load_tests(loader, tests, pattern):
             suite.addTests(test_suite)
     return suite
 
+def load_sample_data():
+    dbu = DatabaseUtilities()
+    db_create = DatabaseCreate()
+
+    dbu.delete_all_tables()
+    db_create.create_all()
+    dbu.create_some_test_wells()
+    dbu.create_some_test_leases()
 
 print('-- Runing Batch')
 if __name__ == "__main__":
 #     sqliteLoadExcel()
+    load_sample_data()
     browser_app()
 #     run_royalties_and_worksheet()
 #    unittest.main()
