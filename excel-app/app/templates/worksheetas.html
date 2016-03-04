@@ -46,7 +46,7 @@ div {
 	<col width="50%">
    <TR>
       <TD align=right><b>Lease:</b></TD>
-      <TD align="left">{{ well.LeaseType }}-{{ well.LeaseID }} {{ well.Lease }} {{ well.format.Lease }}</TD>
+      <TD align="left">{{ well.LeaseType }}-{{ well.LeaseID }} {{ well.Lease }} {{ well.Lease }}</TD>
    </TR>
    <TR>
       <TD align=right><b>Right:</b></TD>
@@ -111,8 +111,9 @@ div {
     <TR>
    {% if rm.TruckingDeducted == 'Y' %}
       <TD align=right><b>Deductions:</b></TD>
-      <TD align="left">Trucking</TD>
+      <TD align="left">Trucking</TD></TR>
    {% endif %}
+    <TR>
    {% if rm.ProcessingDeducted == 'Y' %}
       <TD align=right><b>Deductions:</b></TD>
       <TD align="left">Processing</TD>
@@ -161,8 +162,8 @@ th, td {
    </TR>
 
 	<TR>
-      <TD>{{ m.ExtractMonth }} {{ m.format.ExtractMonth }}</TD>
-      <TD>{{ m.format.ProdMonth }}</TD>
+      <TD>{{ m.ExtractMonth }} {{ m.ExtractMonth }}</TD>
+      <TD>{{ m.ProdMonth }}</TD>
 	   <TD>{{ m.AmendNo }}</TD>
 	   <TD>{{ m.Product }}</TD>
 	   <TD>{{ m.ProdVol }}</TD>
@@ -328,9 +329,18 @@ th, td {
     </table>
     <br>
 
-{****Note: Handle Previous Paid Amount?}
+{****Note: Handle Previous Paid Amount?} <br>
+
+        <TD>{% if commencement_period <= 5 %}</TD>
+        S = (T-B)*0.50*(P-R)<br>
+        {{ supplementary_royalty }} = ({{ prod_vol }} - {{ royalty_price }}) * 0.50 * ({{ well_head_price }} - {{ reference_price }})
+
+        {% else %}
+        Greater than 5
+        {% endif %}
 <br>
 </p1>
 
 </body>
 </html>
+
