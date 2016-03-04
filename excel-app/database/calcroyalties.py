@@ -349,11 +349,11 @@ class ProcessRoyalties(object):
         return round(diff.days/365,2)
 
     # called well head price the selling price
-    def calcSupplementaryRoyaltiesIOGR1995(self, commencement_period, well_head_price, prod_vol, royalty_price, reference_price):
+    def calcSupplementaryRoyaltiesIOGR1995(self, commencement_period, well_head_price, prod_vol, royalty_regulation, reference_price):
         if commencement_period <= 5:
-            supplementary_royalty = (prod_vol - royalty_price)*0.5*(well_head_price - reference_price)
+            supplementary_royalty = (prod_vol - royalty_regulation)*0.5*(well_head_price - reference_price)
         else:
-            supplementary_royalty = (prod_vol - royalty_price)*(0.75*(well_head_price - reference_price - 12.58) + 6.29)
+            supplementary_royalty = (prod_vol - royalty_regulation)*(0.75*(well_head_price - reference_price - 12.58) + 6.29)
         return round(supplementary_royalty, 2)
 
     def calcGorrPercent(self,vol,hours,gorr):

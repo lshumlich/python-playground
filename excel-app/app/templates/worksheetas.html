@@ -329,16 +329,38 @@ th, td {
     </table>
     <br>
 
-{****Note: Handle Previous Paid Amount?} <br>
+{****Note: Handle Previous Paid Amount?} <br><br>
 
+<table align="center" width="50%">
+    <col width="4%">
+	<col width="4%">
+	<col width="4%">
+	<col width="4%">
+    <col width="4%">
+    <col width="4%">
+	<col width="4%">
+	<col width="4%">
+	<col width="4%">
+    <col width="4%">
+    <col width="4%">
+    <col width="4%">
+    <col width="4%">
+{% if commencement_period <= 5 %}
+<tr align="center"><td>S</td> <td>=</td> <td>(T</td> <td>-</td> <td>B)</td> <td>*</td> <td>0.50</td> <td>*</td> <td>P</td> <td>-</td> <td>R)</td></tr>
+<br>
+<tr align="center"><td>{{ supplementary_royalty }}</td> <td>=</td> <td>({{ prod_vol }}</td> <td>*</td> <td>{{ royalty_regulation2 }})</td> <td>*</td>
+<td>0.50</td> <td>*</td> <td>({{ well_head_price }}</td> <td>-</td> <td>{{ reference_price }})</td></tr>
+{% endif %}
+</table>
+<br>
         <TD>{% if commencement_period <= 5 %}</TD>
         S = (T-B)*0.50*(P-R)<br>
         {{ supplementary_royalty }} = ({{ prod_vol }} - {{ royalty_regulation2 }}) * 0.50 * ({{ well_head_price }} - {{ reference_price }}) <br>
-
-
         {% else %}
-        Greater than 5
+        S = (T-B)*[0.75*(P-R - $12.58) + $6.29]<br>
+        {{ supplementary_royalty }} = ({{ prod_vol }} - {{ royalty_regulation3 }}) * [0.75 * ({{ well_head_price }} - {{ reference_price }} - 12.58) + $6.29] <br>
         {% endif %}
+
 <br>
 </p1>
 
