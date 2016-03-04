@@ -333,7 +333,8 @@ th, td {
 
         <TD>{% if commencement_period <= 5 %}</TD>
         S = (T-B)*0.50*(P-R)<br>
-        {{ supplementary_royalty }} = ({{ prod_vol }} - {{ royalty_price }}) * 0.50 * ({{ well_head_price }} - {{ reference_price }})
+        {{ supplementary_royalty }} = ({{ prod_vol }} - {{ royalty_regulation2 }}) * 0.50 * ({{ well_head_price }} - {{ reference_price }}) <br>
+
 
         {% else %}
         Greater than 5

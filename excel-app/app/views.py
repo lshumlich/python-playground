@@ -231,21 +231,30 @@ def worksheet():
 @app.route('/adriennews')
 def adriennews():
     if request.args:
-        print("i am here")
         wellIds = request.args["WellId"]
         wellId = int(wellIds)
-        print("looking for well", wellId)
-        prodMonth = 201503
+        prodMonth = 201501
         product = "Oil"
-        print("about to get well")
         well=db.getWell(wellId)
-        print("should have found the well")
         lease=db.getLease(well.Lease)
         royalty = db.getRoyaltyMaster(well.Lease)
-        #calc = db.getCalcDataByWellProdMonthProduct(wellId,prodMonth,product)
         royaltyCalc= db.getCalcDataByWellProdMonthProduct(wellId,prodMonth,product)
-        print(royaltyCalc)
         monthlydata = db.getMonthlyDataByWellProdMonthProduct(wellId,prodMonth,product)
+
+        commencement_period = pr.determineCommencementPeriod(prodMonth, well.CommencementDate)
+        well_head_price = monthlydata.WellHeadPrice
+        prod_vol = monthlydata.ProdVol
+        method = royalty.ValuationMethod
+        royalty_regulation2 = pr.calcSaskOilRegulationSubsection2(prod_vol)
+        royalty_regulation3 = pr.calcSaskOilRegulationSubsection3(prod_vol)
+        if commencement_period <= 5:
+            royalty_regulation = royalty_regulation2
+        else:
+            royalty_regulation = royalty_regulation3
+        reference_price = 25
+        supplementary_royalty = pr.calcSupplementaryRoyaltiesIOGR1995(commencement_period, well_head_price, prod_vol, royalty_regulation, reference_price)
+
+        #calc = db.getCalcDataByWellProdMonthProduct(wellId,prodMonth,product)
         #yyyy_mm = str[0:4]+'-'+str[4:6]
         print(monthlydata)
     else:
@@ -253,7 +262,13 @@ def adriennews():
 
 
 
-    return render_template('worksheetas.html', well=well, rm=royalty, m=monthlydata, product=product, lease=lease, royaltyCalc=royaltyCalc, prodMonth=prodMonth)
+
+
+    return render_template('worksheetas.html', well=well, rm=royalty, m=monthlydata, product=product, lease=lease,
+                           royaltyCalc=royaltyCalc, prodMonth=prodMonth, commencement_period = commencement_period,
+                           well_head_price = well_head_price, prod_vol = prod_vol, method = method, royalty_regulation2 = royalty_regulation2,
+                           royalty_regulation3 = royalty_regulation3, reference_price = reference_price, supplementary_royalty = supplementary_royalty)
+
 #    return "from adriennes well is" + wellId + "and the well is " + str(well.headers()) + str(well.data())
 
 
