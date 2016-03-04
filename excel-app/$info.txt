@@ -4,9 +4,7 @@ python3 -m database.calcroyalties from root directory
 2. virtualenv for self-contained virtual environment.
 after environment is created, install all dependencies with "pip install -r requirements.txt"
 
-
 General info of stuff in this package
-
 
 To Install a package:
 
@@ -33,6 +31,17 @@ To review code coverage:
     2) look at the coverage
         htmlcov/index.html
 
-To run a module
+Using the SQL database
 
-    python -m pydoc CalcRoyalties
+- there is a config file now. It will default to the following:
+	- in memory database (great for unit testing not so good for manual testing)
+	- sql_debug = false
+
+- to start using a sample database do the following:
+	- copy files\sample.db --> tempfiles\sample.db
+	- copy files\sample_config.json --> tempfiles\config.json
+	- edit tempfiles\config.json and change unittest.db to sample.db 
+	    ******* Warning ***** The next unit test will wipe out the database.
+	- for some example of how to use the sql engine see: database.sqlite_database_test.py
+
+Good Luck it's rough out there...
