@@ -32,18 +32,16 @@ def runTestModule():
     unittest.main(module='database.calcroyalties_test')
 #    unittest.main(module='database.sqlite_load_excel_test')
 
-def sqliteLoadExcel():
-    database = config.get_temp_dir() + 'browser.db'
-    excelSheet = r'd:\$temp\Onion Lake SK wells.xlsx'
-#     loader = database.sqlite_load_excel.Loader()
+def load_excel_to_sql():
+    """ The database is configured in config.json in the tempfiles directory """
+    drop_create_tables()
+#     excelSheet = r'd:\$temp\Onion Lake SK wells.xlsx'
+    excelSheet = config.get_file_dir() +  'database new.xlsx'
     loader = Loader()
-    loader.connect(database)
+    loader.connect()
     loader.open_excel(excelSheet)
     loader.load_all_sheets()
     loader.close()
-    
-def browser_app():
-    AppServer.run(config.get_temp_dir() + 'browser.db')
     
 def load_tests(loader, tests, pattern):
     suite = TestSuite()
@@ -52,25 +50,23 @@ def load_tests(loader, tests, pattern):
             suite.addTests(test_suite)
     return suite
 
-def load_sample_data():
+def drop_create_tables():
     dbu = DatabaseUtilities()
     db_create = DatabaseCreate()
 
     dbu.delete_all_tables()
     db_create.create_all()
+
+def load_sample_data():
+    dbu = DatabaseUtilities()
+    drop_create_tables()
     dbu.create_some_test_wells()
     dbu.create_some_test_leases()
 
-
-def create_tables():
-    db_create = DatabaseCreate()
-    db_create.create_all()
-
-
 print('-- Runing Batch')
 if __name__ == "__main__":
-    create_tables()
-#     sqliteLoadExcel()
+#     create_tables()
+    load_excel_to_sql()
 #     load_sample_data()
 #     browser_app()
 #     run_royalties_and_worksheet()

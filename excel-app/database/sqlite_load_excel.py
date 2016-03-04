@@ -9,7 +9,11 @@ from database.apperror import AppError
 
 
 class Loader(object):
-
+    """ 
+    Load data from execl into sql tables. The tab names are the table
+    names. The first row must contain the column names. Be carefull there
+    are no blank lines at the end of you sheets.
+    """
     EXCLUDE_SHEETS = ['Roy Module Construct']
     
     def __init__(self):
@@ -37,7 +41,8 @@ class Loader(object):
                 for row in ws.rows:
                     if not headerRow:
                         headerRow = row
-                        self.create_table(tableName,headerRow, ws.rows[1])
+                        if not tableName in self.dbi.get_table_names():
+                            self.create_table(tableName,headerRow, ws.rows[1])
                     else:
                         recordNo = recordNo +1
                         self.insert_data(tableName,row, headerRow)
@@ -49,9 +54,6 @@ class Loader(object):
                 
     def create_table(self,tableName,headerRow, dataRow):
         
-        if tableName in self.dbi.get_table_names():
-            self.dbu.delete_table(tableName)
-       
         tableCreate = 'CREATE TABLE ' + tableName + ' ('
         cols = ""
         i = 0
