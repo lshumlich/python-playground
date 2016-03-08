@@ -20,6 +20,10 @@ rw = calcroyalties.RoyaltyWorksheet()
 def index():
     return render_template('index.html')
 
+@app.route('/2')
+def index2():
+    return render_template('index2.html')
+
 @app.route('/searchwells/')
 def searchwells():
     return render_template('searchwells.html')

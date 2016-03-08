@@ -51,3 +51,138 @@ body {
     margin-right: 0;
 }
 }
+
+
+/* ---- This starts the change of look and feel for the presentation layer.  Let's see what it does. */
+
+
+html, body, div, span, applet, object, iframe, table, caption, tbody, tfoot, thead, tr, th, td, 
+del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, 
+h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, 
+dl, dt, dd, ol, ul, li, fieldset, form, label, legend {
+	padding: 0px;
+	margin: 0px;
+	border: 0px;
+	outline: 0px;		
+	line-height: normal;
+	vertical-align: baseline;
+	font-family: inherit;
+	font-size: 100%;
+}
+
+
+.bodyMainMVC{font-family:Verdana,Arial,Sans-Serif;font-size:12px;color:#444;height:100%}
+
+/*
+Define the main banner 
+*/
+
+.bannerContent {
+	top: 0px;
+    width: 100%;
+	height: 60px;
+	float: left;
+}
+
+.bannerLeft {
+    padding-top: 5px;
+	width: 25%;
+    float: left;
+}
+
+.bannerCenter {
+    width: 49%;
+	float: left;
+    padding-top: 2px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.bannerRight {
+	padding-top: 2px;
+	width: 25%;
+    float: right;
+    text-align: right;
+}
+
+.bannerSubTitle {
+    font-weight: normal;
+    font-size: 72%;
+}
+
+/*
+Define the top line navagation
+    position: relative;
+*/
+
+
+ul.topnav {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+    top: 0;
+    width: 100%;
+}
+li.topnav {
+	float: left;
+  	color: white;
+  	padding: 10;
+}
+
+li.topnav:before {
+	content:'@ '
+}
+li:hover.topnav {
+  	background-color: grey;
+}
+
+/*
+Define the main body navagation
+	zIndex = -1;
+	height: 200px;
+*/
+
+div.pageMenuSpaceKeeper {
+	width: 100%;
+	overflow:scroll;
+}
+
+div.fullwidth {
+	position:absolute;
+	opacity: 0;
+	width: 100%;
+	float: left;
+}
+
+div.pagenav3 {
+	float: left;
+	width: 20%;
+  	padding: 20;
+}
+li.pagenav3 {
+	margin: 5px;
+	margin-left: 20px;
+	font-size: .9em;
+}
+
+h2.pagenav {
+	text-decoration: underline;
+	font-size: 1.2em;
+}
+/*
+general classes to assist with debug 
+*/
+.border {
+	border-width: 1px;
+	border-style: groove;
+}
+
+div.container {
+  display: inline-block;
+}
+
+
