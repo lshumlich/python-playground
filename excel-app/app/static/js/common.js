@@ -36,9 +36,6 @@ function viewPanel(element) {
 	} else {
 		consAppend("viewPanel - elementn is null")
 	}
-	
-	
-	
 }
 
 function hidePanel(element) {
@@ -48,7 +45,6 @@ function hidePanel(element) {
 	} 
 	element.style.opacity = 0;
 	element.style.zIndex = "-1";
-	
 }
 
 //-------- Menu Page -----------
@@ -61,6 +57,9 @@ function pageMenu(event) {
 	if (node != null) {
 		var link = node.value;
 		consAppend(' Link:' + link);
+		if (link == 'browse') {
+			browse();
+		}
 	} else {
 		consAppend('You pressed a null node')
 	}
@@ -69,9 +68,21 @@ function pageMenu(event) {
 function consAppendtxt(event) {
 	var msg = 'Just some some text<br>More Text<br>'
 	consAppend(msg)
-	
 }
 
+//-------- Menue level Functions -----------
+
+function browse() {
+	consAppend('Ok now we are in teh browse function here we go....');
+	talkToServerHtml('/data/',null,browseResponse,null);
+}
+
+function browseResponse(data,event) {
+	consAppend('Ok so now here is our response from browse:...');
+	el = document.getElementById('data');
+    el.innerHTML = data;
+	
+}
 
 //-------- Common Functions -----------
 
@@ -84,6 +95,27 @@ function consClear() {
 	el = document.getElementById('consoleEl')
     el.innerHTML = ""
 }
+
+function talkToServerHtml(location,data,functionToExecute,event) {
+    
+    xhr = new XMLHttpRequest();
+    xhr.open('POST',location,true);
+    xhr.setRequestHeader("Content-type", "application/html");
+    xhr.onload = function() {
+        if (xhr.status == 200) {
+//            consAppend(xhr.responseText);
+            data = xhr.responseText;
+            functionToExecute(data,event);
+        } else {
+        	functionToExecute(data);
+        	consAppend('*** We have a bad response from server: ' + xhr.status)
+            consAppend('    url: ' + location)
+            consAppend('    data: ' + data)
+        }
+    }
+    xhr.send();
+}
+
 
 //-------- Listeners -----------
 

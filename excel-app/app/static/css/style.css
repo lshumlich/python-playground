@@ -152,7 +152,7 @@ div.pageMenuSpaceKeeper {
 }
 
 div.fullwidth {
-	position:absolute;
+	position: absolute;
 	opacity: 0;
 	width: 100%;
 	float: left;

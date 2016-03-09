@@ -96,9 +96,9 @@ function tableListener(event) {
     data['AttrValue'] = AttrValue;
 
     if (row == 0) {
-    	talkToServer('/data/getLinkRow.json',data,linkFormShow,event)
+    	talkToServerJson('/data/getLinkRow.json',data,linkFormShow,event)
     } else {
-    	talkToServer('/data/getLinkData.json',data,linkDataShow,event)
+    	talkToServerJson('/data/getLinkData.json',data,linkDataShow,event)
     } 
 }
 
@@ -167,7 +167,7 @@ function linkFormHide(event) {
 
 function linkFormSubmit(event) {
     var dict = formToDict(document.forms["linkform"]);
-    talkToServer('/data/updateLinkRow.json',dict,linkFormResponse,event)
+    talkToServerJson('/data/updateLinkRow.json',dict,linkFormResponse,event)
 }
 
 function linkFormResponse(data,event) {
@@ -237,7 +237,7 @@ function hideElement(el) {
 }
 
 
-function talkToServer(location,data,functionToExecute,event) {
+function talkToServerJson(location,data,functionToExecute,event) {
     
     xhr = new XMLHttpRequest();
     xhr.open('POST',location,true);
