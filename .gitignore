@@ -71,3 +71,5 @@ venv
 /sample/.pydevproject
 /sample/.project
 *sublime*
+/excel-app/tempfiles/*.db
+/excel-app/tempfiles/*.json

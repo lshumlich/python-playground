@@ -66,26 +66,25 @@ class ProcessRoyalties(object):
         log.write ("Hello World.\n")
 
         for monthlyData in self.db.monthlyData():
-            print('**** Processing ***', monthlyData.WellId)
+            print('**** Processing ***', monthlyData.WellID)
             try:
-                well = self.db.getWell(monthlyData.WellId)
+                well = self.db.getWell(monthlyData.WellID)
                 royalty = self.db.getRoyaltyMaster(well.Lease)
                 lease = self.db.getLease(well.Lease)
                 #pe =  self.db.getProducingEntity(well.Lease)
-                royaltyCalc = self.db.getRoyaltyCalc(monthlyData.ProdMonth,monthlyData.WellId)
-                commencement_period = self.db.determineCommencementPeriod(monthlyData.ProdMonth, well.CommencementDate)
-                royalty_price = self.db.determineRoyaltyPrice(royalty.ValuationMethod,monthlyData)
-                reference_price = {'Pigeon Lake Indian': 24.04, 'Reserve no.138A': 25.37, 'Sawridge Indian': 25.13, 'Stony Plain Indian': 24.64}
+                royaltyCalc = self.db.getRoyaltyCalc(monthlyData.ProdMonth,monthlyData.WellID)
 #                 log.write('Processing: ' + str(monthlyData.RecordNumber) + 
 #                           ' ' + str(monthlyData.ProdMonth) + ' ' +
 #                           monthlyData.Product + ' ' + well.RoyaltyClassification + ' ' +
 #                           well.Classification + ' ' + str(monthlyData.ProdVol) +
 #                           '\n')
+ # def calcSaskOilIOGR1995(self, commencement_date, valuation_method, crown_multiplier, indian_interest, m, royalty_calc):
 # ** call second method **
                 if monthlyData.Product == 'Oil' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
                     self.calcSaskOilProvCrown(monthlyData, well, royalty, lease, royaltyCalc)
                 elif monthlyData.Product == 'Oil' and 'IOGR1995' in royalty.RoyaltyScheme:
-                    self.calcSaskOilIOGR1995(monthlyData, well, royalty, lease, royaltyCalc)
+                    self.calcSaskOilIOGR1995(well.CommencementDate, royalty.ValuationMethod, royalty.CrownMultiplier, well.IndianInterest, monthlyData, royaltyCalc)
+#                    self.calcSaskOilIOGR1995(monthlyData, well, royalty, lease, royaltyCalc)
                 else:
                     raise AppError('Royalty Scheme not yet developed: ' + lease.Prov + ' ' + monthlyData.Product)
 
@@ -405,6 +404,17 @@ class ProcessRoyalties(object):
     # under the Sask Folder:
     #   Factor Circulars.pdf
     #   OilFactors.pdf
+    def calcSaskOilProvCrown(self, monthlyData, well, royalty, lease, royaltyCalc):
+        econOilData = self.db.getECONOilData(monthlyData.ProdMonth)
+        self.calcSaskOilProvCrownRoyaltyRate(royaltyCalc,econOilData, well.RoyaltyClassification, 
+                                             well.Classification, monthlyData.ProdVol, well.SRC)
+        
+        royaltyCalc.RoyaltyPrice = self.determineRoyaltyPrice(royalty.ValuationMethod, monthlyData)
+        
+        self.calcSaskOilProvCrownRoyaltyVolumeValue(royaltyCalc.ProvCrownUsedRoyaltyRate, 
+                                            monthlyData.ProdVol, well.IndianInterest,
+                                            royalty.MinRoyalty, royalty.CrownMultiplier, 
+                                            royaltyCalc.RoyaltyPrice)
 
 
     """

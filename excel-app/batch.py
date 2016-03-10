@@ -66,10 +66,10 @@ def load_sample_data():
 print('-- Runing Batch')
 if __name__ == "__main__":
 #     create_tables()
-    load_excel_to_sql()
+#     load_excel_to_sql()
 #     load_sample_data()
 #     browser_app()
-#     run_royalties_and_worksheet()
+    run_royalties_and_worksheet()
 #    unittest.main()
 #     runTestModule()
     print("Goodby world!")

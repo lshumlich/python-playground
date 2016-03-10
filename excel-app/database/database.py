@@ -198,10 +198,11 @@ class DataBase(object):
     #
     # Royalty Calculation
     #
-    def getRoyaltyCalc(self,month,wellId):
+    def getRoyaltyCalc(self,month,wellID):
         rc = DataStructure()
+        setattr(rc, 'ID', 0)
         setattr(rc, 'ProdMonth', month)
-        setattr(rc, 'WellId', wellId)
+        setattr(rc, 'WellID', wellID)
 
         setattr(rc, 'K', 0.0)
         setattr(rc, 'X', 0.0)
@@ -251,7 +252,7 @@ class DataBase(object):
             raise AppError('The excel worksheet ' + self.worksheetName + " does not have tab: '" + self.calcTabName + "'")
             raise e
         except AttributeError as e:
-            raise AppError("Royalty Calc Object has no value for attribute: '" + cell.value + "' correct worksheet header and continue.")
+            raise AppError("database.updateRoyaltyCalc Royalty Calc Object has no value for attribute: '" + cell.value + "' correct worksheet header and continue.")
             raise e
 
         except Exception as e:
