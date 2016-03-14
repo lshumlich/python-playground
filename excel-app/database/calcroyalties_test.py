@@ -9,6 +9,7 @@ from database.data_structure import DataStructure
 
 from database.testhelper import TestHelper
 from database.calcroyalties import ProcessRoyalties
+
 #from DataBase import DataBase,AppError,DataStructure,TestDataBase
 
 class DataObj(object):
@@ -277,6 +278,10 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, IndianInterest, MinRoyalty, RoyaltyPr
         self.assertEqual(pr.calcSupplementaryRoyaltiesIOGR1995(5.5, 200, 90, 40, reference_price['Reserve no.138A']),6391.38)
         self.assertEqual(pr.calcSupplementaryRoyaltiesIOGR1995(8, 221.123456, 100, 50, reference_price['Sawridge Indian']),7192.5)
         self.assertEqual(pr.calcSupplementaryRoyaltiesIOGR1995(15, 180, 80, 35, reference_price['Stony Plain Indian']),5101.88)
+
+    def test_process_monthly(self):
+        pr = ProcessRoyalties()
+        self.assertEqual(pr.process_one(1, 201501),1,2)
 
 
 if __name__ == '__main__':

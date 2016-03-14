@@ -53,9 +53,16 @@ class Database(object):
         result = self.dbi.cursor.fetchall()
         result = self.sql_to_object(table, result)
         return result
-        
+
+    def select1(self, table, **kwargs):
+        result = self.select(table, **kwargs)
+        if len(result) != 1:
+            raise AppError("Adrienne.royalty_calc_needs should have only found 1, but we found "+ str(len(table))+
+            ". We are only looking for "+ str(kwargs))
+        return result
+
     def to_db_value (self,value):
-        
+
         if type(value) is str:
             return '"' + value +'"'
         elif type(value) is int or type(value) is float:
