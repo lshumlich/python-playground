@@ -12,7 +12,10 @@ from database.calcroyalties_test import TestSaskRoyaltyCalc
 from database.sqlite_load_excel import Loader
 # from database.sqlite_appserver import AppServer
 from database.database_create import DatabaseCreate
-from database.sqlite_utilities_test import DatabaseUtilities 
+from database.sqlite_utilities_test import DatabaseUtilities
+#from database.Adrienne import calc_royalties
+#from database.Adrienne_test import test_calcSaskOilProvCrownRoyaltyRate
+
 import config
 #
 # Using this technique I do not know how to run just one of the methods in the class. If you can 
@@ -21,7 +24,9 @@ import config
 
 def run_royalties_and_worksheet():
     pr = ProcessRoyalties()
-    pr.process(config.get_file_dir() + 'database.xlsx')
+    pr.process_all()
+
+#    pr.process(config.get_file_dir() + 'database.xlsx')
 #     pr.process('d:/$temp/sample.xlsx')
     print('os name is:',os.name)
     if os.name != "posix":
@@ -65,14 +70,14 @@ def load_sample_data():
 
 print('-- Runing Batch')
 if __name__ == "__main__":
-#     create_tables()
+    # drop_create_tables()
 #     load_excel_to_sql()
 #     load_sample_data()
 #     browser_app()
     run_royalties_and_worksheet()
 #    unittest.main()
 #     runTestModule()
-    print("Goodby world!")
+    print("Goodbye world!")
 
     
 
