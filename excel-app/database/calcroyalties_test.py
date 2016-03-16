@@ -281,7 +281,7 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, IndianInterest, MinRoyalty, RoyaltyPr
 
     def test_process_monthly(self):
         pr = ProcessRoyalties()
-        self.assertEqual(pr.process_one(1, 201501),1,2)
+        self.assertEqual(pr.process_one(1, 201501, 'Oil'),1,2)
 
 
 if __name__ == '__main__':
