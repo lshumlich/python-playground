@@ -32,11 +32,11 @@ class Loader(object):
                 self.load_worksheet(sheet)
 
     def load_worksheet(self,tabName):
+        recordNo = 0;
         try:
             ws = self.wb[tabName]
             tableName = tabName.replace(' ', '')
             if len(ws.rows) > 1:
-                recordNo = 0;
                 headerRow = None
                 for row in ws.rows:
                     if not headerRow:
@@ -50,6 +50,7 @@ class Loader(object):
 #             else:
 #                 print('*** No data to load for tab:', tabName)
         except Exception as e:
+            print('*** sqlite_load_excel.load_worksheet -- Tab:', tabName , ' row:', recordNo, row )
             raise e
                 
     def create_table(self,tableName,headerRow, dataRow):
