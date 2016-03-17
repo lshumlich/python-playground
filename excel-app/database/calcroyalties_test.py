@@ -79,7 +79,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         th = TestHelper()
         royaltyCalc = DataStructure()
 
-        th.loadObjectCSVStyle(econOilData, econStringData)
+        th.load_object_csv_style(econOilData, econStringData)
               
         pr = ProcessRoyalties()
 
@@ -130,7 +130,7 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, IndianInterest, MinRoyalty, RoyaltyPr
         th = TestHelper()
         royaltyCalc = DataStructure()
 
-        th.loadObjectCSVStyle(royOilData, royStringData)
+        th.load_object_csv_style(royOilData, royStringData)
         print('ProvCrownUsedRoyaltyRate:',royOilData.ProvCrownUsedRoyaltyRate)
         print('CrownMultiplier:',royOilData.CrownMultiplier)
         print(vars(royOilData))

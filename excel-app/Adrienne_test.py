@@ -18,7 +18,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
     th = TestHelper()
     royaltyCalc = DataStructure()
 
-    th.loadObjectCSVStyle(econOilData, econStringData)
+    th.load_object_csv_style(econOilData, econStringData)
 
     cr = calc_royalties()
 

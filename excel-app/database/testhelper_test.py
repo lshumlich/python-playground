@@ -14,7 +14,7 @@ class Test(unittest.TestCase):
 fld1,fld2,fld3,ival,fval
 val1,val2,val3,1234,12.0
 """
-        th.loadObjectCSVStyle(o,s)
+        th.load_object_csv_style(o,s)
         self.assertTrue(hasattr(o,'fld1'))
         self.assertFalse(hasattr(o,'fldx'))
         self.assertEqual(o.fld1,'val1')
@@ -24,10 +24,10 @@ val1,val2,val3,1234,12.0
 
     def test_whatAmI(self):
         th = TestHelper()
-        self.assertEqual(th.whatAmI('123.4'),123.4)
-        self.assertEqual(th.whatAmI('1'),1)
-        self.assertEqual(type(th.whatAmI('1')),int)
-        self.assertEqual(th.whatAmI('asdf'),'asdf')
+        self.assertEqual(th.what_am_i('123.4'),123.4)
+        self.assertEqual(th.what_am_i('1'),1)
+        self.assertEqual(type(th.what_am_i('1')),int)
+        self.assertEqual(th.what_am_i('asdf'),'asdf')
         
 
 if __name__ == "__main__":
