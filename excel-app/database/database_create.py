@@ -42,7 +42,7 @@ class DatabaseCreate(object):
     def config(self):
         statement = """
             CREATE TABLE Config ('ID' integer primary key autoincrement, 
-            'Version' int, CreateDate date);
+            'Version' int, CreateDate timestamp);
         """
         self.dbi.execute_statement(statement)
         
@@ -55,7 +55,7 @@ class DatabaseCreate(object):
             'UWI' text, 'Prov' text, 'WellType' text, 'LeaseType' text, 
             'LeaseID' int, 'RoyaltyClassification' text, 
             'Classification' text, 'SRC' int, 'IndianInterest' float, 
-            'CommencementDate' date, 'ReferencePrice' int);
+            'CommencementDate' timestamp, 'ReferencePrice' int);
         """
         self.dbi.execute_statement(statement)
         
@@ -80,7 +80,7 @@ class DatabaseCreate(object):
     def monthly(self):
         statement = """
             CREATE TABLE Monthly ('ID' integer primary key autoincrement, 
-            "ExtractMonth" date, "ProdMonth" int, "WellID" int, "Product" text,
+            "ExtractMonth" timestamp, "ProdMonth" int, "WellID" int, "Product" text,
             "AmendNo" int, "ProdHours" int, "ProdVol" int, "TransPrice" float, 
             "WellHeadPrice" float, "TransRate" float, "ProcessingRate" float);
         """

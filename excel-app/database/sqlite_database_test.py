@@ -1,6 +1,7 @@
 #!/bin/env python3
 
 import unittest
+from datetime import datetime
 
 import config
 from database.apperror import AppError
@@ -61,7 +62,7 @@ class SqliteDatabaseTest(unittest.TestCase):
         self.assertEqual(well[0].ID, 2)
         self.assertEqual(well[0].UWI, 'Changed')
         self.assertEqual(well[0].LeaseID, 100)
-        self.assertEqual(well[0].CommencementDate, '2016-02-01 00:00:00')
+        self.assertEqual(well[0].CommencementDate, datetime(2016,2,1,0,0))
 
         ds = DataStructure()
         self.assertRaises(AttributeError, self.db.update, ds)
@@ -131,14 +132,6 @@ class SqliteDatabaseTest(unittest.TestCase):
         
         
     def test_delete(self):
-#         statement = """
-#             CREATE TABLE Well ('ID' int, 'UWI' text, 'Prov' text, 'WellType' text, 'LeaseType' text, 'LeaseID' int, 'RoyaltyClassification' text, 'Classification' text, 'SRC' int, 'IndianInterest' float, 'CommencementDate' date, 'ReferencePrice' int);
-#             INSERT INTO Well VALUES(1,'SKWI111062705025W300','SK','Oil','OL',1,'New Oil','Heavy',0,0.25,'2014-12-01 00:00:00',1);
-#             INSERT INTO Well VALUES(2,'SKWI112062705025W300','SK','Oil','OL',2,'Third Tier Oil','Southwest',0,0.95,'2014-12-01 00:00:00',1);
-#             INSERT INTO Well VALUES(3,'SKWI113062705025W300','SK','Oil','OL',3,'Fourth Tier Oil','Other',0,1.0,NULL,NULL);
-#         """
-#         
-#         self.dbu.execute_statement(statement)
         self.dbu.create_some_test_wells()
 
         self.assertEqual(4,len(self.db.select('Well')))
@@ -147,4 +140,9 @@ class SqliteDatabaseTest(unittest.TestCase):
         self.assertEqual(3,len(self.db.select('Well')))
         self.assertEqual(0, len(self.db.select('Well', ID=2)))
         
+    def test_date_format(self):
+        self.dbu.create_some_test_wells()
         
+        well = self.db.select('Well', ID=1)
+        self.assertTrue(isinstance(well[0].CommencementDate,datetime))
+#         print('CommencementDate:' , well[0].CommencementDate, type(well[0].CommencementDate))

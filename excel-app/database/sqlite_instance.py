@@ -15,8 +15,7 @@ class SqliteInstance(object):
     
     def __init__(self, databaseName):
         self.databaseName = databaseName
-        # self.conn = sqlite3.connect(self.databaseName, detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
-        self.conn = sqlite3.connect(self.databaseName)
+        self.conn = sqlite3.connect(self.databaseName, detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
         self.cursor = self.conn.cursor()
         self.debug_sql = config.debug_sql()
 
