@@ -12,9 +12,10 @@ from database.utils import Utils
 import config
 
 
-db = database.DataBase(config.get_file_dir() + 'database new.xlsx')
-pr = calcroyalties.ProcessRoyalties()
-rw = calcroyalties.RoyaltyWorksheet()
+# *** Note *** I commented out these lines and /data/ started working. I think it is because they grab a connecton to the db and then it restarts in another thread.
+# db = database.DataBase(config.get_file_dir() + 'database new.xlsx')
+# pr = calcroyalties.ProcessRoyalties()
+# rw = calcroyalties.RoyaltyWorksheet()
 
 @app.route('/')
 def index():
@@ -88,6 +89,7 @@ def searchleases():
 
 @app.route("/data/",methods=['GET','POST'])
 def data():
+    html =""
     try:
         db_instance = config.get_database_instance()
         shower = Shower()
