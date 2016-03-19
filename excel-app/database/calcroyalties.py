@@ -63,17 +63,67 @@ class ProcessRoyalties(object):
         errorCount = 0
         log = open(config.get_temp_dir() + 'log.txt','w')
         log.write ("Hello World.\n")
-        well_array = self.db.select1('Well', ID=well_id)
-        well = well_array[0]
-        royalty_array = self.db.select1('Royaltymaster', ID=well.LeaseID)
-        royalty = royalty_array[0]
-        lease_array = self.db.select1('Lease', ID=well.LeaseID)
-        lease = lease_array[0]
-        calc_array = self.db.select1('Calc', WellID=well_id, ProdMonth = prod_month)
-        calc = calc_array[0]
-        monthly_array = self.db.select1('Monthly', WellID = well_id, ProdMonth = prod_month, Product = product)
-        monthly = monthly_array[0]
+        well = self.db.select1('Well', ID=well_id)
+        royalty = self.db.select1('Royaltymaster', ID=well.LeaseID)
+        lease = self.db.select1('Lease', ID=well.LeaseID)
+        monthly = self.db.select1('Monthly', WellID = well_id, ProdMonth = prod_month, Product = product)
+        calc_array = self.db.select('Calc', WellID=well_id, ProdMonth = prod_month)
+        print('calc_array:', len(calc_array))
+        if len(calc_array) == 0:
+            calc = None
+        else:
+            calc = calc_array[0]
+        calc = self.zero_royalty_calc(prod_month, well_id, calc)
         self.calc_royalties(well, royalty, lease, calc, monthly)
+        if len(calc_array) == 0:
+            self.db.insert(calc)
+        else:
+            self.db.update(calc)
+
+    #
+    # Royalty Calculation
+    #
+    def zero_royalty_calc(self, month, wellID, rc):
+        if rc == None:
+            rc = self.db.get_data_structure('Calc')
+#         rc.ID = 0
+        rc.ProdMonth = month
+        rc.WellID = wellID
+
+        setattr(rc, 'K', 0.0)
+        setattr(rc, 'X', 0.0)
+        setattr(rc, 'C', 0.0)
+        setattr(rc, 'D', 0.0)
+
+        setattr(rc, 'RoyaltyPrice', 0.0)
+        setattr(rc, 'RoyaltyVolume', 0.0)
+
+        setattr(rc, 'ProvCrownRoyaltyRate', 0.0)
+        setattr(rc, 'ProvCrownUsedRoyaltyRate', 0.0)
+        setattr(rc, 'IOGR1995RoyaltyRate', 0.0)
+        setattr(rc, 'GorrRoyaltyRate', 0.0)
+        
+        setattr(rc, 'ProvCrownRoyaltyVolume', 0.0)
+        setattr(rc, 'GorrRoyaltyVolume', 0.0)
+        setattr(rc, 'IOGR1995RoyaltyVolume', 0.0)
+        
+        setattr(rc, 'ProvCrownRoyaltyValue', 0.0)
+        setattr(rc, 'IOGR1995RoyaltyValue', 0.0)
+        setattr(rc, 'GorrRoyaltyValue', 0.0)
+        
+        setattr(rc, 'RoyaltyValuePreDeductions', 0.0)
+        setattr(rc, 'RoyaltyTransportation', 0.0)
+        setattr(rc, 'RoyaltyProcessing', 0.0)
+        setattr(rc, 'RoyaltyDeductions', 0.0)
+        setattr(rc, 'RoyaltyValue', 0.0)
+        
+        setattr(rc, 'CommencementPeriod', None)
+        setattr(rc, 'Message', None)
+        setattr(rc, 'GorrMessage', None)
+        
+        return rc
+
+
 
     def process_all(self):
         db = config.get_database()
@@ -127,7 +177,7 @@ class ProcessRoyalties(object):
             self.ws.printSaskOilRoyaltyRate(monthly, well, royalty, lease, calc)
 #                 log.write('--- Royalty Calculated: {} {} {} prod: {} Crown Rate: {}\n'.format(monthly.Row, calc.ProdMonth,
 #                                                                                              calc.WellId, monthly.ProdVol, calc.RoyaltyRate))
-            self.db.updateRoyaltycalc(calc)
+#             self.db.updateRoyaltycalc(calc)
 
         # except AppError as e:
         #     errorCount +=1
@@ -144,10 +194,10 @@ class ProcessRoyalties(object):
 
 
         self.db.commit()
-        log.write ("*** That's it folks " + str(errorCount) + ' errors \n')
-        log.close()
-
-        del self.ws
+#         log.write ("*** That's it folks " + str(errorCount) + ' errors \n')
+#         log.close()
+# 
+#         del self.ws
 
 # Adrienne - Write this method...
     def calcSaskOilProvCrownRoyaltyRate(self,calc,econOilData,
@@ -265,24 +315,23 @@ class ProcessRoyalties(object):
     def calcSaskOilIOGR1995(self, commencement_date, valuation_method, crown_multiplier, indian_interest, m, royalty_calc):
         """
         Calculated Based on regulations described: http://laws-lois.justice.gc.ca/eng/regulations/SOR-94-753/page-16.html#h-35
-
-        # """
-        # # Calculate the Comensment Date
-        # royalty_calc.CommencementPeriod = self.determineCommencementPeriod(m.ProdMonth, commencement_date)
-        # if royalty_calc.CommencementPeriod < 5:
-        #     royalty_calc.IOGR1995RoyaltyVolume = self.calcSaskOilRegulationSubsection2(m.ProdVol)
-        # else:
-        #     royalty_calc.IOGR1995RoyaltyVolume = self.calcSaskOilRegulationSubsection3(m.ProdVol)
-        #
-        #
-        # royalty_calc.RoyaltyPrice = self.determineRoyaltyPrice(valuation_method, m)
-        #
-        # royalty_calc.IOGR1995RoyaltyValue = round(crown_multiplier *
-        #                                               royalty_calc.IOGR1995RoyaltyVolume *
-        #                                               indian_interest *
-        #                                               royalty_calc.RoyaltyPrice , 2)
-        #
-        # return
+        """
+        # Calculate the Comensment Date
+        royalty_calc.CommencementPeriod = self.determineCommencementPeriod(m.ProdMonth, commencement_date)
+        if royalty_calc.CommencementPeriod < 5:
+            royalty_calc.IOGR1995RoyaltyVolume = self.calcSaskOilRegulationSubsection2(m.ProdVol)
+        else:
+            royalty_calc.IOGR1995RoyaltyVolume = self.calcSaskOilRegulationSubsection3(m.ProdVol)
+        
+        
+        royalty_calc.RoyaltyPrice = self.determineRoyaltyPrice(valuation_method, m)
+        
+        royalty_calc.IOGR1995RoyaltyValue = round(crown_multiplier *
+                                                      royalty_calc.IOGR1995RoyaltyVolume *
+                                                      indian_interest *
+                                                      royalty_calc.RoyaltyPrice , 2)
+        
+        return
 
     def calcSaskOilRegulationSubsection2(self,mop):
         """
@@ -344,25 +393,25 @@ class ProcessRoyalties(object):
         return royaltyPrice
 
 
-    # def determineCommencementPeriod(self,prodMonth,commencementDate):
-    #     if commencementDate == None:
-    #         raise AppError('Commencement Date must be set for this Royalty Type.')
-    #     # if type(commencementDate) != 'date':
-    #     # commencementDate = datetime.strptime(commencementDate,'%Y-%m-%d %I:%M:%S')
-    #     cd = self.ensureDate(commencementDate)
-    #     year = int(prodMonth / 100)
-    #     month = prodMonth - (year * 100)
-    #     prodDate = date(year,month,1)
-    #     diff = prodDate - cd
-    #     return round(diff.days/365,2)
-    #
-    # # called well head price the selling price
-    # def calcSupplementaryRoyaltiesIOGR1995(self, calc, commencement_period, well_head_price, prod_vol, royalty_regulation, reference_price):
-    #     if commencement_period <= 5:
-    #         calc.supplementary_royalty = (prod_vol - royalty_regulation)*0.5*(well_head_price - reference_price)
-    #     else:
-    #         calc.supplementary_royalty = (prod_vol - royalty_regulation)*(0.75*(well_head_price - reference_price - 12.58) + 6.29)
-    #     return round(supplementary_royalty, 2)
+    def determineCommencementPeriod(self,prodMonth,commencementDate):
+        if commencementDate == None:
+            raise AppError('Commencement Date must be set for this Royalty Type.')
+        # if type(commencementDate) != 'date':
+        # commencementDate = datetime.strptime(commencementDate,'%Y-%m-%d %I:%M:%S')
+        cd = self.ensureDate(commencementDate)
+        year = int(prodMonth / 100)
+        month = prodMonth - (year * 100)
+        prodDate = date(year,month,1)
+        diff = prodDate - cd
+        return round(diff.days/365,2)
+    
+    # called well head price the selling price
+    def calcSupplementaryRoyaltiesIOGR1995(self, calc, commencement_period, well_head_price, prod_vol, royalty_regulation, reference_price):
+        if commencement_period <= 5:
+            calc.supplementary_royalty = (prod_vol - royalty_regulation)*0.5*(well_head_price - reference_price)
+        else:
+            calc.supplementary_royalty = (prod_vol - royalty_regulation)*(0.75*(well_head_price - reference_price - 12.58) + 6.29)
+        return round(supplementary_royalty, 2)
 
     def calcGorrPercent(self,vol,hours,gorr):
         """ returns the rr% based on the GORR base and an explination string  """
@@ -414,7 +463,7 @@ class ProcessRoyalties(object):
     #   Factor Circulars.pdf
     #   OilFactors.pdf
     def calcSaskOilProvCrown(self, monthly, well, royalty, lease, calc):
-        econOilData = db.select(ECONData)
+        econOilData = self.db.select1("ECONData",ProdMonth = monthly.ProdMonth)
         self.calcSaskOilProvCrownRoyaltyRate(calc,econOilData, well.RoyaltyClassification,
                                              well.Classification, monthly.ProdVol, well.SRC)
 

@@ -57,9 +57,9 @@ class Database(object):
     def select1(self, table, **kwargs):
         result = self.select(table, **kwargs)
         if len(result) != 1:
-            raise AppError("Adrienne.royalty_calc_needs should have only found 1, but we found "+ str(len(table))+
+            raise AppError("sqlite_database.select1 should have only found 1, but we found " + str(len(result)) + " in table: " + table +
             ". We are only looking for "+ str(kwargs))
-        return result
+        return result[0]
 
     def to_db_value (self,value):
 
@@ -68,7 +68,9 @@ class Database(object):
         elif type(value) is int or type(value) is float:
             return str(value)
         elif type(value) is bool:
-            return '1' if (value) else '0';
+            return '1' if (value) else '0'
+        elif not value:
+            return 'null'
         
         raise AppError('sqlite_database.to_db_value can not handle update of: ' + str(type(value)) + ':' + str(value))
     
@@ -108,7 +110,7 @@ class Database(object):
         self.dbi.execute(insert_stmt)
         ds.ID = self.dbi.get_id()
         
-        self.dbi.commit()
+        self.commit()
 
     def update(self, ds):
         # Rule 1: all tables that can be updated must have an ID attrabute that is the primary key.
@@ -136,5 +138,8 @@ class Database(object):
     def delete(self, table, ds_id):
         statement = 'DELETE FROM %s where ID = %i' % (table, ds_id)
         self.dbi.execute(statement)
+        self.commit()
+        
+    def commit(self):
         self.dbi.commit()
         

@@ -27,6 +27,7 @@ class SqliteDatabaseTest(unittest.TestCase):
         self.assertEqual('123.45', self.db.to_db_value(123.45))
         self.assertEqual('1', self.db.to_db_value(True))
         self.assertEqual('0', self.db.to_db_value(False))
+        self.assertEqual('null', self.db.to_db_value(None))
         
     def test_get_data_structure(self):
         ds = self.db.get_data_structure('WhatEver')
@@ -54,6 +55,7 @@ class SqliteDatabaseTest(unittest.TestCase):
         well[0].UWI = 'Changed'
         well[0].LeaseID = 100
         well[0].CommencementDate = '2016-02-01 00:00:00'
+        well[0].WellType = None
         self.db.update(well[0])
         well = self.db.select('Well', ID=1)
         self.assertEqual(well[0].ID, 1)
@@ -63,6 +65,7 @@ class SqliteDatabaseTest(unittest.TestCase):
         self.assertEqual(well[0].UWI, 'Changed')
         self.assertEqual(well[0].LeaseID, 100)
         self.assertEqual(well[0].CommencementDate, datetime(2016,2,1,0,0))
+        self.assertEqual(well[0].WellType, None)
 
         ds = DataStructure()
         self.assertRaises(AttributeError, self.db.update, ds)
