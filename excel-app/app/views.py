@@ -21,10 +21,6 @@ import config
 def index():
     return render_template('index.html')
 
-@app.route('/2')
-def index2():
-    return render_template('index2.html')
-
 @app.route('/searchwells/')
 def searchwells():
     return render_template('searchwells.html')
@@ -86,6 +82,22 @@ def wells():
 def searchleases():
     return render_template('searchleases.html')
 
+@app.route('/worksheet')
+def worksheet():
+#    if request.args:
+#        md = db.getMonthlyByWell(int(request.args["WellId"]))
+#    pr.process('database/database.xlsx')
+    with open("Royalty Worksheet.txt", 'r') as f:
+        ws = f.read()
+        return render_template('worksheet.html', ws=ws)
+
+###
+### New stuff below:
+###
+
+@app.route('/2')
+def index2():
+    return render_template('index2.html')
 
 @app.route("/data/",methods=['GET','POST'])
 def data():
@@ -98,9 +110,9 @@ def data():
         attr=request.args.get('attr')
         key=request.args.get('key')
         links = {}
-        links['BAid'] = '?table=BAInfo&attr=BAid&key=' 
+        links['BAid'] = '?table=BAInfo&attr=BAid&key='
         links['WellEvent'] = '?table=WellInfo&attr=Well&key='
-        
+
         tables = db_instance.get_table_names()
         header = None
         rows = None
@@ -112,11 +124,10 @@ def data():
     except Exception as e:
         print('views.data: ***Error:',e)
         traceback.print_exc(file=sys.stdout)
-
     return html
 
 @staticmethod
-@app.route("/data/updateLinkRow.json",methods=['POST']) 
+@app.route("/data/updateLinkRow.json",methods=['POST'])
 def update_link_row():
     utils = Utils()
     db = config.get_database()
@@ -133,19 +144,18 @@ def update_link_row():
             db.insert(linktab)
         else:
             db.update(linktab)
-        
+
         return_data['StatusCode'] = 0
         return json.dumps(return_data)
-    
     except Exception as e:
         print('AppServer.link: ***Error:',e)
         traceback.print_exc(file=sys.stdout)
         return_data['StatusCode'] = -1
         return_data['Message'] = str(e)
         return json.dumps(return_data)
-        
+
 @staticmethod
-@app.route("/data/getLinkRow.json",methods=['POST']) 
+@app.route("/data/getLinkRow.json",methods=['POST'])
 def get_link_row():
     utils = Utils()
     db = config.get_database()
@@ -168,13 +178,13 @@ def get_link_row():
             data['ShowAttrs'] = link[0].ShowAttrs
 
         return json.dumps(data)
-    
+
     except Exception as e:
         print('AppServer.link: ***Error:',e)
         traceback.print_exc(file=sys.stdout)
 
 @staticmethod
-@app.route("/data/getLinkData.json",methods=['POST']) 
+@app.route("/data/getLinkData.json",methods=['POST'])
 def get_link_data():
     utils = Utils()
     db = config.get_database()
@@ -187,7 +197,7 @@ def get_link_data():
             result_rows = db.select("LinkTab", LinkName=link[0].LinkName, BaseTab=1)
 #                 print('result:',result_rows)
 #                 print('result.type:',type(result_rows))
-            
+
             # Get the base table
             for result in result_rows:
                 print('We have a base table')
@@ -203,10 +213,10 @@ def get_link_data():
                     rows.append(attrs_to_show)
                     rows.append(row)
                 data['BaseData'] = rows
-            
+
             # Get all the tables that the link uses
             result_rows = db.select("LinkTab", LinkName=link[0].LinkName)
-            
+
             rows = []
             for result in result_rows:
                 row = []
@@ -214,25 +224,14 @@ def get_link_data():
                 row.append(result.AttrName)
                 rows.append(row)
             data['Links'] = rows
-            
+
         else:
             data["Message"] = data['AttrName'] + " has not been linked."
         return json.dumps(data)
-#         
+#
     except Exception as e:
         print('AppServer.link: ***Error:',e)
         traceback.print_exc(file=sys.stdout)
-
-
-@app.route('/worksheet')
-def worksheet():
-#    if request.args:
-#        md = db.getMonthlyByWell(int(request.args["WellId"]))
-#    pr.process('database/database.xlsx')
-    with open("Royalty Worksheet.txt", 'r') as f:
-        ws = f.read()
-        return render_template('worksheet.html', ws=ws)
-
 
 @app.route('/adriennews')
 def adriennews():
@@ -246,7 +245,6 @@ def adriennews():
         royalty = db.getRoyaltyMaster(well.Lease)
         royaltyCalc= db.getCalcDataByWellProdMonthProduct(wellId,prodMonth,product)
         monthlydata = db.getMonthlyDataByWellProdMonthProduct(wellId,prodMonth,product)
-
         commencement_period = pr.determineCommencementPeriod(prodMonth, well.CommencementDate)
         well_head_price = monthlydata.WellHeadPrice
         prod_vol = monthlydata.ProdVol
@@ -259,25 +257,40 @@ def adriennews():
             royalty_regulation = royalty_regulation3
         reference_price = 25
         supplementary_royalty = pr.calcSupplementaryRoyaltiesIOGR1995(commencement_period, well_head_price, prod_vol, royalty_regulation, reference_price)
-
         #calc = db.getCalcDataByWellProdMonthProduct(wellId,prodMonth,product)
         #yyyy_mm = str[0:4]+'-'+str[4:6]
         print(monthlydata)
     else:
         print("No monthly data for this well")
-
-
-
-
-
     return render_template('worksheetas.html', well=well, rm=royalty, m=monthlydata, product=product, lease=lease,
                            royaltyCalc=royaltyCalc, prodMonth=prodMonth, commencement_period = commencement_period,
                            well_head_price = well_head_price, prod_vol = prod_vol, method = method, royalty_regulation2 = royalty_regulation2,
                            royalty_regulation3 = royalty_regulation3, reference_price = reference_price, supplementary_royalty = supplementary_royalty)
-
 #    return "from adriennes well is" + wellId + "and the well is " + str(well.headers()) + str(well.data())
-
 
 @app.errorhandler(404)
 def not_found(error):
     return render_template('404.html')
+
+
+###
+### Temporary place for new stuff:
+###
+
+@app.route('/new/well/index')
+def new_indexwells():
+    return render_template('new/searchwells.html')
+
+@app.route('/new/well/search')
+def new_searchwells():
+    return render_template('new/searchwells.html')
+
+@app.route('/new/api/wellresults')
+def new_wellresults():
+    # return "hello!"
+    try:
+        db = config.get_database()
+        results = db.select('Well')
+        return render_template('new/wellresults.html', results = results)
+    except:
+        return "<h2>No results found</h2>"

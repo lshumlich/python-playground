@@ -1,0 +1,18 @@
+body {
+	font-size: 12px;
+}
+
+table {
+
+}
+
+th {
+	background-color: dimgray;
+	color: white;
+	height: 50px;
+	font-weight: bold;
+}
+
+tr {
+	height: 30px;
+}
