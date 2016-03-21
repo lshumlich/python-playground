@@ -116,7 +116,9 @@ class ProcessRoyalties(object):
         setattr(rc, 'RoyaltyProcessing', 0.0)
         setattr(rc, 'RoyaltyDeductions', 0.0)
         setattr(rc, 'RoyaltyValue', 0.0)
-        
+        setattr(rc, 'SupplementaryRoyalties', 0.0)
+        setattr(rc, 'RoyaltyRegulation', 0.0)
+
         setattr(rc, 'CommencementPeriod', None)
         setattr(rc, 'Message', None)
         setattr(rc, 'GorrMessage', None)
@@ -320,9 +322,11 @@ class ProcessRoyalties(object):
         royalty_calc.CommencementPeriod = self.determineCommencementPeriod(m.ProdMonth, commencement_date)
         if royalty_calc.CommencementPeriod < 5:
             royalty_calc.IOGR1995RoyaltyVolume = self.calcSaskOilRegulationSubsection2(m.ProdVol)
+            royalty_calc.RoyaltyRegulation = self.calcSaskOilRegulationSubsection2(m.ProdVol)
         else:
             royalty_calc.IOGR1995RoyaltyVolume = self.calcSaskOilRegulationSubsection3(m.ProdVol)
-        
+            royalty_calc.RoyaltyRegulation = self.calcSaskOilRegulationSubsection3(m.ProdVol)
+
         
         royalty_calc.RoyaltyPrice = self.determineRoyaltyPrice(valuation_method, m)
         
