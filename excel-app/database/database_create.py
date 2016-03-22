@@ -15,7 +15,7 @@ import config
 
 class DatabaseCreate(object):
     
-    DATABASE_VERSION = 1
+    DATABASE_VERSION = 1.1
 
     def __init__(self):
         self.dbi = config.get_database_instance()
@@ -97,7 +97,8 @@ class DatabaseCreate(object):
             "GorrRoyaltyVolume" int, "IOGR1995RoyaltyVolume" int, 
             "ProvCrownRoyaltyValue" int, "IOGR1995RoyaltyValue" float, 
             "GorrRoyaltyValue" float, "RoyaltyValuePreDeductions" float, 
-            "RoyaltyTransportation" int, "RoyaltyProcessing" int, 
+            "RoyaltyTransportation" int, "RoyaltyProcessing" int,
+            "SupplementaryRoyalties" int, "RoyaltyRegulation" int,
             "RoyaltyDeductions" int, "RoyaltyValue" float, 
             "CommencementPeriod" float, "Message" text, "GorrMessage" text);
         """

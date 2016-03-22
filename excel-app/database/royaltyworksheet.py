@@ -64,10 +64,18 @@ class RoyaltyWorksheet(object):
         self.ws.write (fsh.format('','','','','Monthly','Sask Def Of','',''))
         self.ws.write (fsh.format('Extract','Prod','Amend','Prod','Prod','Well Head','Trucking','Processing'))
         self.ws.write (fsh.format('Date','Month','No','','Vol','Price','Price','Price'))
+        print('we are printing', monthlyData.ExtractMonth,self.yyyy_mm(monthlyData.ProdMonth),monthlyData.AmendNo,
+                                  monthlyData.Product,monthlyData.ProdVol,
+                                  monthlyData.WellHeadPrice,
+                                  monthlyData.TransRate, monthlyData.ProcessingRate)
+        print('--->')
+        print(type(monthlyData.ExtractMonth))
+
         self.ws.write (fsd.format(monthlyData.ExtractMonth,self.yyyy_mm(monthlyData.ProdMonth),monthlyData.AmendNo,
                                   monthlyData.Product,monthlyData.ProdVol,
                                   monthlyData.WellHeadPrice,
                                   monthlyData.TransRate, monthlyData.ProcessingRate))
+
         self.ws.write ('\n')
         self.ws.write ('   {*** Note: Replace Well Head Price with Petrinex detail when available***}\n')
         self.ws.write ('   {*** Note: Replace Trucking Price with Petrinex detail when available***}\n')
