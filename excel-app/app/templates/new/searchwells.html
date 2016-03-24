@@ -1,25 +1,17 @@
-<html>
-  <head>
-    <title>Search for wells</title>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-    <link rel="stylesheet" href={{ url_for('static', filename='css/newstyle.css') }}>
-    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-    <script>
-      $(function() {
-      	$('#tabs').tabs();
-        $('#accordion').accordion({
-          collapsible:true,
-          heightStyle:'content',
-        });
-        $('#search-basic, #search-advanced').button({
-          icons: {primary: 'ui-icon-search'}
-        });
-      });
-    </script>
-  </head>
-
-<body>
+{% extends "new/layout.html" %}
+{% block body %}
+<script>
+  $(function() {
+  	$('#tabs').tabs();
+    $('#accordion').accordion({
+      collapsible:true,
+      heightStyle:'content',
+    });
+    $('#search-basic, #search-advanced').button({
+      icons: {primary: 'ui-icon-search'}
+    });
+  });
+</script>
 
 <h2>Well Search</h2>
 
@@ -81,10 +73,9 @@
     });
   });
 </script>
-</body>
 </html>
 
-
+{% endblock %}
 <!--
 When searching, send the search parameters from this form as a post request to the server.
 When displaying results, display the same template (this page) but also pass on the search results. Then, if search results are passed:

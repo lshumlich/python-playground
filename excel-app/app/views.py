@@ -17,8 +17,6 @@ import config
 # pr = calcroyalties.ProcessRoyalties()
 # rw = calcroyalties.RoyaltyWorksheet()
 
-
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -238,30 +236,37 @@ def get_link_data():
 @app.route('/adriennews')
 def adriennews():
     if request.args:
-        db = config.get_database()
-        pr = calcroyalties.ProcessRoyalties()
         wellIds = request.args["WellId"]
-        well_id = int(wellIds)
+        wellId = int(wellIds)
         prodMonth = 201501
         product = "Oil"
-        # well=db.getWell(wellId)
-        # lease=db.getLease(well.Lease)
-        # royalty = db.getRoyaltyMaster(well.Lease)
-        # royaltyCalc= db.getCalcDataByWellProdMonthProduct(wellId,prodMonth,product)
-        # monthlydata = db.getMonthlyDataByWellProdMonthProduct(wellId,prodMonth,product)
-        well = db.select1('Well', ID=well_id)
-        royalty = db.select1('Royaltymaster', ID=well.LeaseID)
-        lease = db.select1('Lease', ID=well.LeaseID)
-        monthly = db.select1('Monthly', WellID = well_id, prodMonth = prodMonth, Product = product)
-        calc_array = db.select('Calc', WellID=well_id, prodMonth = prodMonth)
-        calc = calc_array[0]
+        well=db.getWell(wellId)
+        lease=db.getLease(well.Lease)
+        royalty = db.getRoyaltyMaster(well.Lease)
+        royaltyCalc= db.getCalcDataByWellProdMonthProduct(wellId,prodMonth,product)
+        monthlydata = db.getMonthlyDataByWellProdMonthProduct(wellId,prodMonth,product)
+        commencement_period = pr.determineCommencementPeriod(prodMonth, well.CommencementDate)
+        well_head_price = monthlydata.WellHeadPrice
+        prod_vol = monthlydata.ProdVol
+        method = royalty.ValuationMethod
+        royalty_regulation2 = pr.calcSaskOilRegulationSubsection2(prod_vol)
+        royalty_regulation3 = pr.calcSaskOilRegulationSubsection3(prod_vol)
+        if commencement_period <= 5:
+            royalty_regulation = royalty_regulation2
+        else:
+            royalty_regulation = royalty_regulation3
+        reference_price = 25
+        supplementary_royalty = pr.calcSupplementaryRoyaltiesIOGR1995(commencement_period, well_head_price, prod_vol, royalty_regulation, reference_price)
         #calc = db.getCalcDataByWellProdMonthProduct(wellId,prodMonth,product)
         #yyyy_mm = str[0:4]+'-'+str[4:6]
-        print(monthly)
+        print(monthlydata)
     else:
         print("No monthly data for this well")
-    return render_template('worksheetas.html', well=well, rm=royalty, m=monthly,  lease=lease, calc=calc)
-#   return "from adriennes well is" + wellId + "and the well is " + str(well.headers()) + str(well.data())
+    return render_template('worksheetas.html', well=well, rm=royalty, m=monthlydata, product=product, lease=lease,
+                           royaltyCalc=royaltyCalc, prodMonth=prodMonth, commencement_period = commencement_period,
+                           well_head_price = well_head_price, prod_vol = prod_vol, method = method, royalty_regulation2 = royalty_regulation2,
+                           royalty_regulation3 = royalty_regulation3, reference_price = reference_price, supplementary_royalty = supplementary_royalty)
+#    return "from adriennes well is" + wellId + "and the well is " + str(well.headers()) + str(well.data())
 
 @app.errorhandler(404)
 def not_found(error):
@@ -282,10 +287,18 @@ def new_searchwells():
 
 @app.route('/new/api/wellresults')
 def new_wellresults():
-    # return "hello!"
     try:
         db = config.get_database()
         results = db.select('Well')
         return render_template('new/wellresults.html', results = results)
     except:
         return "<h2>No results found</h2>"
+
+@app.route('/new/api/wellinfo')
+def new_wellinfo():
+    try:
+        db = config.get_database()
+        result = db.select1('Well', ID=request.args.get('ID'))
+        return render_template('new/wellinfo.html', result = result)
+    except:
+        return "<h2>Well details not found</h2>"

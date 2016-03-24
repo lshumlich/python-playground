@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<head>
+<title>Information Management System</title>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<link rel="stylesheet" href={{ url_for('static', filename='css/newstyle.css') }}>
+<link rel="stylesheet" href={{ url_for('static', filename='css/mgmenu.css') }} type="text/css" media="screen" />
+<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script src={{ url_for('static', filename='js/mgmenu_plugins.js') }}></script>
+<script src={{ url_for('static', filename='js/mgmenu.js') }}></script>
+<script>
+$(document).ready(function($){
+    $('#mgmenu1').universalMegaMenu({
+        menu_speed_show: 300,
+        menu_speed_hide: 200,
+        menu_speed_delay: 200,
+        menu_effect: 'hover_fade',
+        menu_click_outside: true,
+        menubar_trigger : false,
+        menubar_hide : false,
+        menu_responsive: false
+    });
+});
+</script>
+</head>
+<body>
+
+<div class="header" style="width:100%; height:60px; float:left; margin-top:8px">
+  <div class="header_left" style="width:25%; float:left">
+    <img src="{{url_for("static", filename="img/logo.png")}}" style="height:40px">
+  </div>
+  <div class="header_center" style="width:50%; text-align:center; float:left">
+    <div style="font-size:2em; font-weight:bold">The Solution Stack</div>
+    <div style="font-size:1.5em">Information Management System</div>
+  </div>
+  <div class="header_right" style="width:25%; float:right; text-align:right">
+    Welcome
+    <br><br>
+    <a href="#">FAQ</a>    
+    <a href="#">My Account</a>
+    <a href="#">Logout</a>    
+  </div>
+</div>
+
+
+<!-- THE MENU STARTS HERE -->
+    <div id="mgmenu1" class="mgmenu_container" style="clear:left;"><!-- Begin Mega Menu Container -->
+        
+        <ul class="mgmenu"><!-- Begin Mega Menu -->
+
+            <li><a href="/new/well/search"><i class="mini_icon ic_bookmark"></i>Wells</span></a>
+               
+            <li><span><i class="mini_icon ic_tag"></i>Categories</span><!-- Begin Item -->
+            
+            
+                <div class="dropdown_container dropdown_7columns"><!-- Begin Item Container -->
+                    <div class="col_12">
+                        <h3>Find more infos about us</h3>
+                        <p>Nunc vulputate purus a justo scelerisque viverra. Morbi eleifend tortor vehicula, adipiscing metus interdum, mattis diam. Etiam non augue elementum, blandit leo vel, vestibulum ipsum. Ut ac vulputate sem. Cras mi mi, suscipit sit amet dapibus in, interdum sit amet libero. Mauris tristique eleifend lectus, vitae sodales urna aliquet ut.</p>
+                        <p>Nullam varius congue nisi eu porttitor. Pellentesque fringilla vehicula tortor nec tempor. Donec lectus mi, gravida a fermentum a, malesuada id nulla. Duis vestibulum faucibus justo ut molestie.</p>
+                        <hr>
+                    
+                    </div>
+                    <div class="col_4">
+                        <h4>John Doe</h4>
+                        <a href="#"><img src="img/products/product01@2x.jpg" width="220" height="140" alt="" class="inline_img" /></a>
+                        <p>Nunc vulputate purus a justo scelerisque viverra.</p>   
+                    </div>
+                    <div class="col_4">
+                        <h4>Jane Austin</h4>
+                        <a href="#"><img src="img/products/product02@2x.jpg" width="220" height="140" alt="" class="inline_img" /></a>
+                        <p>Nunc vulputate purus a justo scelerisque viverra.</p>   
+                    </div>
+                    <div class="col_4">
+                        <h4>Mark Way</h4>
+                        <a href="#"><img src="img/products/product03@2x.jpg" width="220" height="140" alt="" class="inline_img" /></a>
+                        <p>Nunc vulputate purus a justo scelerisque viverra.</p>   
+                    
+                    </div>
+                </div><!-- End Item Container -->
+            </li><!-- End Item -->
+            <li><span><i class="mini_icon ic_picture"></i>Products</span><!-- Begin Item -->
+            
+            
+                <div class="dropdown_container dropdown_9columns mgmenu_tabs mgmenu_tabs_top"><!-- Begin Item Container -->
+                
+                    <ul class="mgmenu_tabs_nav">
+                        <li><a href="#section1" class="current">Boxes</a></li>
+                        <li><a href="#section2">Texts</a></li>
+                        <li><a href="#section3">Lists</a></li>
+                    </ul>
+        
+                    <div class="mgmenu_tabs_panels"><!-- Begin Panels Container -->
+                    
+                        <div id="section1"><!-- Begin Section 1 -->
+                            
+                            <div class="col_12">
+                                <h4>Colored Text Boxes</h4>
+                            </div>
+                            <div class="col_4">
+                                <p class="text_box text_box_red">Mauris eu massa turpis, at blandit elit. Mauris rutrum placerat libero, ut rhoncus leo euismod non. Aliquam urna felis, rutrum eu rhoncus at, elementum id est.</p>
+                            </div>
+                            <div class="col_4">
+                                <p class="text_box text_box_blue">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris venenatis bibendum nunc dapibus posuere. Sed quis laoreet justo. Aliquam urna eu.</p>
+                                
+                            </div>
+                            <div class="col_4">
+                                <p class="text_box text_box_green">Aliquam urna felis, rutrum eu rhoncus at, elementum id est. Sed rutrum eu rhoncus at, elementum id est lacus purus, ullamcorper ut aliquet ut, dictum nec odio.</p>
+                                
+                            </div>
+                            <div class="col_4">
+                                <p class="text_box text_box_brown">Mauris eu massa turpis, at blandit elit. Mauris rutrum placerat libero, ut rhoncus leo euismod non. Aliquam urna felis, rutrum eu rhoncus at, elementum id est..</p>
+                            </div>
+                            <div class="col_4">
+                                <p class="text_box text_box_purple">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris venenatis bibendum nunc dapibus posuere. Sed quis laoreet justo. Aliquam urna felis.</p>
+                                
+                            </div>
+                            <div class="col_4">
+                                <p class="text_box text_box_yellow">Aliquam urna felis, rutrum eu rhoncus at, elementum id est. Sed rutrum eu rhoncus at, elementum id est lacus purus, ullamcorper ut aliquet ut, dictum nec odio..</p>
+                                
+                            </div>
+                            <div class="col_12">
+                                <p>Morbi volutpat pharetra tempor. Mauris dignissim eget nisl vel blandit. Nam pellentesque faucibus gravida. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas egestas, quam nec molestie.</p>
+                            </div>
+                        
+                        </div><!-- End Section 1 -->
+                        
+                        <div id="section2" class="mgmenu_tabs_hide"><!-- Begin Section 2 -->
+                        
+                            
+                            <div class="col_8">
+                                <p>Integer nisl nunc, venenatis sagittis condimentum vel, tincidunt in est. Aenean felis sem, suscipit in posuere ultrices, placerat vel ipsum. Donec quis dolor turpis, non accumsan nisl. Ut lorem turpis, consequat eget condimentum quis, consectetur vitae enim. Proin ultricies ornare nibh eget tincidunt. Nulla id lectus est. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Cras pharetra tincidunt erat sit amet sodales. Donec volutpat, leo lacinia facilisis semper, mauris nunc convallis enim, imperdiet volutpat urna nulla ut augue. Suspendisse potenti varius molestie.</p>
+                            </div>
+                            <div class="col_4">
+                                <p class="text_box text_box_black">Sed lacus purus, ullamcorper ut aliquet ut, dictum nec odio. Donec sed odio ac lectus fermentum accumsan quis ut magna. Sed consectetur ipsum dolor, non laoreet lectus. Phasellus malesuada.</p>
+                            </div>
+                        
+                        </div><!-- End Section 2 -->
+                        
+                        <div id="section3" class="mgmenu_tabs_hide"><!-- Begin Section 3 -->
+                        
+                            <div class="col_12">
+                                
+                                <h4>List Elements</h4>
+                            </div>
+                            <div class="col_3">
+                                <ul>
+                                
+                                    <li><a href="#">Codecanyon</a></li>
+                                    <li><a href="#">Themeforest</a></li>
+                                    <li><a href="#">Videohive</a></li>
+                                    <li><a href="#">Audiojungle</a></li>
+                                    <li><a href="#">Photodune</a></li>
+                                    
+                                </ul>
+                            </div>
+                            <div class="col_3">
+                                <ul>
+                                
+                                    <li><a href="#">Nettuts</a></li>
+                                    <li><a href="#">Webdesigntuts</a></li>
+                                    <li><a href="#">PSDtuts</a></li>
+                                    <li><a href="#">Vectortuts</a></li>
+                                    <li><a href="#">Audiotuts</a></li>
+                                    
+                                </ul>
+                            </div>
+                            <div class="col_3">
+                                <ul>
+                                
+                                    <li><a href="#">Calendars</a></li>
+                                    <li><a href="#">Countdowns</a></li>
+                                    <li><a href="#">Forms</a></li>
+                                    <li><a href="#">Images</a></li>
+                                    <li><a href="#">Medias</a></li>
+                                    
+                                </ul>
+                            </div>
+                            <div class="col_3">
+                                <ul>
+                                
+                                    <li><a href="#">Loaders</a></li>
+                                    <li><a href="#">Uploaders</a></li>
+                                    <li><a href="#">Navigation</a></li>
+                                    <li><a href="#">News Tickets</a></li>
+                                    <li><a href="#">Charts</a></li>
+                                    
+                                </ul>
+                            </div>
+                            <div class="col_12">
+                                
+                                <hr>
+                                <h4>Additional Categories</h4>
+                            </div>
+                            <div class="col_3">
+                                <ul>
+                                
+                                    <li><a href="#">Calendars</a></li>
+                                    <li><a href="#">Countdowns</a></li>
+                                    <li><a href="#">Forms</a></li>
+                                    <li><a href="#">Images</a></li>
+                                    <li><a href="#">Medias</a></li>
+                                    
+                                </ul>
+                            </div>
+                            <div class="col_3">
+                                <ul>
+                                
+                                    <li><a href="#">Loaders</a></li>
+                                    <li><a href="#">Uploaders</a></li>
+                                    <li><a href="#">Navigation</a></li>
+                                    <li><a href="#">News Tickets</a></li>
+                                    <li><a href="#">Charts</a></li>
+                                    
+                                </ul>
+                            </div>                    
+                            <div class="col_3">
+                                <ul>
+                                
+                                    <li><a href="#">Codecanyon</a></li>
+                                    <li><a href="#">Themeforest</a></li>
+                                    <li><a href="#">Videohive</a></li>
+                                    <li><a href="#">Audiojungle</a></li>
+                                    <li><a href="#">Photodune</a></li>
+                                    
+                                </ul>
+                            </div>
+                            <div class="col_3">
+                                <ul>
+                                
+                                    <li><a href="#">Nettuts</a></li>
+                                    <li><a href="#">Webdesigntuts</a></li>
+                                    <li><a href="#">PSDtuts</a></li>
+                                    <li><a href="#">Vectortuts</a></li>
+                                    <li><a href="#">Audiotuts</a></li>
+                                    
+                                </ul>
+                            </div>
+                        
+                        </div><!-- End Section 3 -->
+                    
+                    </div><!-- End Panels Container -->
+                                
+                </div><!-- End Item Container -->
+            
+            </li><!-- End Item -->
+            
+            <li><span><i class="mini_icon ic_documents"></i>Horizontal Lists</span><!-- Begin Item -->
+                <div class="dropdown_container dropdown_fullwidth"><!-- Begin Item Container -->
+                    
+                    <div class="col_2">
+                        <ul>
+                            <li><a href="#">Codecanyon</a></li>
+                            <li><a href="#">Themeforest</a></li>
+                            <li><a href="#">Videohive</a></li>
+                            <li><a href="#">Audiojungle</a></li>
+                            <li><a href="#">Photodune</a></li>
+                        </ul>
+                    </div>
+                    <div class="col_2">
+                        <ul>
+                            <li><a href="#">Psdtuts</a></li>
+                            <li><a href="#">Nettuts</a></li>
+                            <li><a href="#">Vectortuts</a></li>
+                            <li><a href="#">Audiotuts</a></li>
+                            <li><a href="#">Aetuts</a></li>
+                        </ul>
+                    </div>
+                    <div class="col_2">
+                        <ul>
+                            <li><a href="#">Cgtuts</a></li>
+                            <li><a href="#">Phototuts</a></li>
+                            <li><a href="#">Mobiletuts</a></li>
+                            <li><a href="#">Webdesigntuts</a></li>
+                            <li><a href="#">Mobiletuts</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="col_2">
+                        <ul>
+                            <li><a href="#">Appstorm</a></li>
+                            <li><a href="#">Android</a></li>
+                            <li><a href="#">iPhone</a></li>
+                            <li><a href="#">iPad</a></li>
+                            <li><a href="#">Windows</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="col_4">
+                        <p class="text_box">Aliquam nunc sapien, pretium eu dapibus vel, adipiscing sed nisl. Nulla facilisi. Duis iaculis leo. Integer auctor sagittis massa.</p>
+                    </div>
+                </div><!-- End Item Container -->
+            </li><!-- End Item -->
+            
+            <li id="map"><span><i class="mini_icon ic_pin"></i>Location</span><!-- Begin Item -->
+                <div class="dropdown_container dropdown_6columns"><!-- Begin Item Container -->
+                    
+                    <div class="col_12">
+                        <h3>Visit Us !</h3>
+                        <p>Curabitur quis fermentum dolor. Curabitur ultrices sem eget lectus fermentum eleifend. Nullam suscipit egestas est sed convallis. Phasellus sem velit, luctus nec diam et, interdum vehicula velit. Interdum et malesuada fames ac ante ipsum primis in faucibus.</p>
+                        <img src="img/map.jpg" alt="" class="inline_img inline_img_border" />
+                        <p>Sed lacinia, nisl at porta imperdiet, odio mi auctor lectus, eu dapibus tellus sapien tincidunt lorem. Sed magna est, accumsan sed sollicitudin quis, malesuada at est. Duis ac convallis metus. Integer ligula massa, cursus non ornare quis, varius id urna. Vivamus pulvinar mauris sed libero aliquet tincidunt. Donec et lacinia lorem. Curabitur nec nibh tortor. Sed consequat imperdiet gravida.</p>
+                    </div>
+                </div><!-- End Item Container -->
+            </li><!-- End Item -->
+               <!--
+            <li class="right_item menubar_icon">
+                <ul>
+                    <li><a href="#" class="icon_vimeo"></a></li>
+                    <li><a href="#" class="icon_dribbble"></a></li>
+                    <li><a href="#" class="icon_twitter"></a></li>
+                    <li><a href="#" class="icon_facebook"></a></li>
+                    <li><a href="#" class="icon_flickr"></a></li>
+                </ul>
+            </li> -->
+        </ul><!-- End Mega Menu -->
+    </div><!-- End Mega Menu Container -->
+    <!-- THE MENU ENDS HERE -->
+
+<div class="body" style="padding:10px">
+{% block body %}
+{% endblock %}
+</div>
+<hr>
+<div style="text-align:center; font-size:10px">The Solution Stack, 2016</div>
+</body>

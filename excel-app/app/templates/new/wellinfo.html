@@ -1,0 +1,83 @@
+<style>
+table {
+  width: 100%;
+}
+td {
+  width: 25%;
+}
+input {
+  width: 100%;
+}
+</style>
+
+<div id="dialog">
+  <form>
+    <fieldset>
+      <legend>Well</legend>
+      <table cellpadding=5>
+        <tr>
+          <td><label for="ID">ID</label></td>
+          <td><input type="text" name="ID" value={{result.ID}}></td>
+          <td><label for="UWI">UWI</label></td>
+          <td><input type="text" name="UWI" value={{result.UWI}}></td>
+        </tr>
+        <tr>
+          <td><label for="WellType">Well Type</label></td>
+          <td><input type="text" name="WellType" value={{result.WellType}}></td>
+          <td><label for="LeaseType">Lease Type</label></td>
+          <td><input type="text" name="LeaseType" value={{result.LeaseType}}></td>
+        </tr>
+        <tr>
+          <td><label for="RoyaltyClassification">Royalty Classification</label></td>
+          <td><input type="text" name="RoyaltyClassification" value={{result.RoyaltyClassification}}></td>
+          <td><label for="Classification">Classification</label></td>
+          <td><input type="text" name="Classification" value={{result.Classification}}></td>
+        </tr>
+        <tr>
+          <td><label for="Province">Province</label></td>
+          <td><input type="text" name="Province" value={{result.Prov}}></td>
+          <td><label for="SRC">SRC</label></td>
+          <td><input type="text" name="SRC" value={{result.SRC}}></td>
+        </tr>
+        <tr>
+          <td><label for="IndianInterest">IndianInterest</label></td>
+          <td><input type="text" name="IndianInterest" value={{result.IndianInterest}}></td>
+          <td><label for="CommencementDate">CommencementDate</label></td>
+          <td><input type="text" name="CommencementDate" value={{result.CommencementDate}}></td>
+        </tr>
+        <tr>
+          <td><label for="ReferencePrice">ReferencePrice</label></td>
+          <td><input type="text" name="ReferencePrice" value={{result.ReferencePrice}}></td>
+          <td></td>
+          <td></td>
+        </tr>
+      </table>
+    </fieldset>
+  </form>
+</div>
+
+<script>
+  $(function(){
+    function formSave(){
+      console.log();
+    }
+
+  dialog = $("#dialog").dialog({
+    autoOpen: true,
+    height: 400,
+    width: 800,
+    modal: true,
+    title: "Edit well",
+    buttons: {
+      "Save": formSave,
+      Cancel: function() {dialog.dialog("close");}
+    },
+      close: function() {form[0].reset();}
+  });
+
+  form = dialog.find( "form" ).on( "submit", function( event ) {
+    event.preventDefault();
+    formSave();
+  });
+  })
+</script>
