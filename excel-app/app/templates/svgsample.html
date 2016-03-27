@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Table Style</title>
+        <script type="text/javascript" src="d3/d3.js"></script>
+<style>
+
+html{
+    font: 10px sans-serif;
+}
+
+svg{
+    border: 1px solid silver;
+}
+
+.well, .batt, .disp {
+    cursor: pointer;
+}
+
+.node circle{
+    stroke: steelblue;
+    stroke-width: 1.5px;
+}
+
+.link{
+    fill: none;
+    stroke: lightgray;
+    stroke-width: 1.5px;
+}
+
+.dialog {
+    position: absolute;
+    top: 200px;
+    left: 200px;
+    opacity: 0;
+    z-index: -1;
+    background: rgba(100,100,100,0.9);
+    padding: 5px 25px 5px 25px;
+    border-radius: 10px;
+    border: 3px solid #73AD21;
+}
+
+
+</style>        
+      
+    </head>
+    <body>
+<h1> Hello World! Tree4 from SVG land </h1>
+
+<div id="dialogId" class="dialog">
+    <h3>Dialog Attributes</h3>
+    <div id="dialogData"></div>
+</div>
+
+
+<script type="text/javascript">
+
+
+
+var data = 
+{
+	"batt" : [
+    	{"name": "SKBTG103796"}
+    ],
+    "wells": [
+       {"name":"SKWI101010605627W301"},
+       {"name":"SKWI101010605627W302"},
+       {"name":"SKWI101010605627W303"},
+       {"name":"SKWI101010605627W304"},
+       {"name":"SKWI101010605627W305"},
+       {"name":"SKWI101010605627W306"},
+       {"name":"SKWI101010605627W307"},
+       {"name":"SKWI101010605627W308"},
+       {"name":"SKWI101010605627W309"}
+	],
+    "disps": [
+          {"name":"disp101010605627W301"},
+          {"name":"disp101010605627W302"}
+	]	
+};
+
+function click(d, i) {
+	el = document.getElementById('dialogId')
+
+    el.style.opacity = 0;
+    el.style.top = d3.event.clientY + 'px';
+    el.style.left = d3.event.clientX + 'px';
+    el.style.zIndex = "1";
+    el.style.opacity = 1;
+    
+    el = document.getElementById('dialogData')
+    el.innerHTML = el.innerHTML + d.name +'<br>'
+}
+
+function hide() {
+	el = document.getElementById('dialogId')
+    el.style.opacity = 0;
+    el.style.zIndex = "-1";
+}
+
+function addNodes(nodeName, nodes) {
+	var node = svg.selectAll("g." + nodeName)
+		.data(nodes);
+	
+	var nodeEnter = node.enter()
+		.append("g")
+		.on("click", click)
+		.attr("transform", function(d) { 
+			return "translate(" + d.x + "," + d.y + ")"; 
+		})
+		.attr("class", nodeName);
+
+	nodeEnter.append("circle")
+		.attr("r",radius)
+		.style("fill", function(d){ 
+	    	return "lightsteelblue"; 
+	});
+
+	nodeEnter.append("text")
+		.attr("x", function(d){ 
+		    return -radius; 
+		})
+		.attr("dy", "-10")
+		.attr("text-anchor", function(d){ return "middle"; })
+		.text(function(d){ return d.name; });
+}
+
+function positionNodes(data, x) {
+	var vspacing = height / (data.length + 1)
+
+	for (i = 0; i < data.length; i++) {
+		data[i].x = x;
+		data[i].y = (i + 1) * vspacing;
+	}
+}
+
+function addPath(a,b) {
+	
+	xm = a.x + ((b.x - a.x) / 2);
+	
+	var s = "M " + (a.x + radius) + "," + a.y +
+		" C " + xm + "," + a.y + " " + 
+		xm + "," + b.y + " " + (b.x - radius) + "," + b.y;
+	
+	p = svg.append("path")
+	.attr("d", s)
+	.attr("stroke","lightsteelblue")
+	.attr("fill","none");
+	return p;
+
+}
+
+
+var margin = {top: 10, right: 10, bottom: 0, left: 10},
+	width = 460 - margin.left - margin.right,
+	height = (data.wells.length * 35) - margin.top - margin.bottom;
+
+
+var svg = d3.select("body").append("svg")
+	.attr("width", width + margin.left + margin.right)
+	.attr("height", height + margin.top + margin.bottom)
+  .append("g")
+	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var radius = 8
+
+positionNodes(data.wells, 70);
+positionNodes(data.batt, 220);
+positionNodes(data.disps, 380);
+
+addNodes("batt" , data.batt);
+addNodes("well" , data.wells);
+addNodes("disp" , data.disps);
+
+for (i = 0; i < data.wells.length; i++) {
+	addPath(data.wells[i],data.batt[0]);
+};
+
+for (i = 0; i < data.disps.length; i++) {
+	addPath(data.batt[0],data.disps[i]);
+};
+
+
+document.getElementById('dialogId').addEventListener('click', hide, false)
+
+</script>
+<h2>This should be the end</h2>
+<p> Click on one of the nodes to see a popup window. 
+Click on the window to have it disappear.  
+</body>
+</html>
