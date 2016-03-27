@@ -1,0 +1,51 @@
+<div id="modal">
+Hello
+</div>
+
+<table style="width:100%">
+  <tr>
+    <td colspan=12><b>{{results|length}}</b> results found</td>
+  </tr>
+  <tr>
+    <th>Facility</th>
+    <th>Start Date</th>
+    <th>End Date</th>
+    <th>Name</th>
+    <th>Subtype</th>
+    <th>FacLicence</th>
+    <th>Meridian</th>
+    <th>Range</th>
+    <th>TWP</th>
+    <th>LSD</th>
+    <th>Actions</th>
+  </tr>
+  {% for row in results %}
+  <tr>
+    <td>{{ row.Facility or "" }}</td>
+    <td>{{ row.StartDate or "" }}</td>
+    <td>{{ row.EndDate or "" }}</td>
+    <td>{{ row.Name or "" }}</td>
+    <td>{{ row.Subtype or "" }}</td>
+    <td>{{ row.FacLicence or "" }}</td>
+    <td>{{ row.Meridian or "" }}</td>
+    <td>{{ row.Range or "" }}</td>
+    <td>{{ row.Township or "" }}</td>
+    <td>{{ row.LSD or "" }}</td>
+    <td><a href="#" onclick=openInfo({{"'" + row.Facility + "'" }})>Edit</a></td>
+  </tr>
+  {% endfor %}
+</table>
+
+
+<script>
+function openInfo(id) {
+  var idObject = {ID:id}
+  console.log(idObject);
+  $.ajax({
+    url: "/new/api/facilityinfo",
+    data: idObject,
+  })
+  .done(function(data){
+    $('#modal').html(data)});
+  }
+</script>

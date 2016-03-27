@@ -1,0 +1,105 @@
+<style>
+table {
+  width: 100%;
+}
+td {
+  width: 25%;
+}
+input {
+  width: 100%;
+}
+</style>
+
+<div id="dialog">
+  <form>
+    <fieldset>
+      <legend>Facility</legend>
+      <table cellpadding=5>
+        <tr>
+          <td><label for="Facility">Facility</label></td>
+          <td><input type="text" name="Facility" value={{result.Facility}}></td>
+          <td><label for="StartDate">StartDate</label></td>
+          <td><input type="text" name="StartDate" value={{result.StartDate}}></td>
+        </tr>
+        <tr>
+          <td><label for="WellType">Well Type</label></td>
+          <td><input type="text" name="WellType" value={{result.WellType}}></td>
+          <td><label for="LeaseType">Lease Type</label></td>
+          <td><input type="text" name="LeaseType" value={{result.LeaseType}}></td>
+        </tr>
+        <tr>
+          <td><label for="RoyaltyClassification">Royalty Classification</label></td>
+          <td><input type="text" name="RoyaltyClassification" value={{result.RoyaltyClassification}}></td>
+          <td><label for="Classification">Classification</label></td>
+          <td><input type="text" name="Classification" value={{result.Classification}}></td>
+        </tr>
+        <tr>
+          <td><label for="Province">Province</label></td>
+          <td><input type="text" name="Province" value={{result.Prov}}></td>
+          <td><label for="SRC">SRC</label></td>
+          <td><input type="text" name="SRC" value={{result.SRC}}></td>
+        </tr>
+        <tr>
+          <td><label for="IndianInterest">IndianInterest</label></td>
+          <td><input type="text" name="IndianInterest" value={{result.IndianInterest}}></td>
+          <td><label for="CommencementDate">CommencementDate</label></td>
+          <td><input type="text" name="CommencementDate" value={{result.CommencementDate}}></td>
+        </tr>
+        <tr>
+          <td><label for="ReferencePrice">ReferencePrice</label></td>
+          <td><input type="text" name="ReferencePrice" value={{result.ReferencePrice}}></td>
+          <td></td>
+          <td></td>
+        </tr>
+      </table>
+    </fieldset>
+  </form>
+<h2>Is there well data or not?</h2>
+
+<table style="width:100%">
+  <tr>
+    <td colspan=12><b>{{wells|length}}</b> wells attached</td>
+  </tr>
+  <tr>
+    <th>WellEvent</th>
+    <th>Start Date</th>
+    <th>End Date</th>
+    <th>Actions</th>
+  </tr>
+  {% for row in wells %}
+  <tr>
+    <td>{{ row.WellEvent or "" }}</td>
+    <td>{{ row.StartDate or "" }}</td>
+    <td>{{ row.EndDate or "" }}</td>
+    <td><a href="#" onclick=openInfo({{"'" + row.WellEvent + "'" }})>Edit</a></td>
+  </tr>
+  {% endfor %}
+</table>
+
+</div>
+
+<script>
+  $(function(){
+    function formSave(){
+      console.log();
+    }
+
+  dialog = $("#dialog").dialog({
+    autoOpen: true,
+    height: 600,
+    width: 600,
+    modal: true,
+    title: "View Facility",
+    buttons: {
+      "Save": formSave,
+      Cancel: function() {dialog.dialog("close");}
+    },
+      close: function() {form[0].reset();}
+  });
+
+  form = dialog.find( "form" ).on( "submit", function( event ) {
+    event.preventDefault();
+    formSave();
+  });
+  })
+</script>

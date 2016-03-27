@@ -302,3 +302,33 @@ def new_wellinfo():
         return render_template('new/wellinfo.html', result = result)
     except:
         return "<h2>Well details not found</h2>"
+    
+@app.route('/new/facility/search')
+def new_search_facilities():
+    return render_template('new/facilitysearch.html')
+
+@app.route('/new/api/facilityresults')
+def new_facility_results():
+    try:
+        db = config.get_database()
+        results = db.select('FacilityInfo')
+        return render_template('new/facilityresults.html', results = results)
+    except Exception as e:
+        print('views.new_facility_results: ***Error:',e)
+        traceback.print_exc(file=sys.stdout)
+        return "<h2>No results found</h2>"
+
+
+@app.route('/new/api/facilityinfo')
+def new_facility_info():
+    try:
+        db = config.get_database()
+        result = db.select1('FacilityInfo', Facility=request.args.get('ID'))
+        wells  = db.select('WellFacilityLink', Facility=request.args.get('ID'))
+        print('new_facility_info:',len(wells),"found")
+        
+        return render_template('new/facilityinfo.html', result = result, wells = wells)
+    except Exception as e:
+        print('views.new_facility_info: ***Error:',e)
+        traceback.print_exc(file=sys.stdout)
+        return "<h2>Facility details not found</h2>"

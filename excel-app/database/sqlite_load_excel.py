@@ -68,7 +68,7 @@ class Loader(object):
             elif type(dataRow[i].value) is float:
                 cols = cols + str(name) + ' float, '
             elif type(dataRow[i].value) is datetime.datetime:
-                cols = cols + str(name) + ' date, '
+                cols = cols + str(name) + ' timestamp, '
             else:
                 cols = cols + name + ' text, '
 #                 print('*** Null first line so defaulting to str',cell.value,type(dataRow[i].value))
