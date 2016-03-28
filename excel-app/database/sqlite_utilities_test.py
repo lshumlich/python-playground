@@ -96,7 +96,7 @@ class DatabaseUtilities(object):
             INSERT INTO Lease VALUES(3,'OL','SK',123,2347,NULL);
         """
         self.db_instance.execute_statement(statement)
-
+    
     def create_some_test_econdata(self):
         if not 'Econdata' in self.db_instance.get_table_names():
             self.db_create.Econdata()
