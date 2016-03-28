@@ -52,7 +52,7 @@ class DatabaseUtilities(object):
 
     def create_some_test_wells(self):
         if not 'Well' in self.db_instance.get_table_names():
-            self.db_create.well()
+            self.db_create.Well()
             
         statement = """
             INSERT INTO Well VALUES(1,'SKWI111062705025W300','SK','Oil','OL',1,'New Oil','Heavy',0,0.25,'2014-12-01 00:00:00',1);
@@ -65,10 +65,10 @@ class DatabaseUtilities(object):
 
     def create_some_test_royalties(self):
         if not 'RoyaltyMaster' in self.db_instance.get_table_names():
-            self.db_create.royaltymaster()
+            self.db_create.Royaltymaster()
 
         statement = """
-            INSERT INTO RoyaltyMaster VALUES(3, 'OL', 'All', 'SkProvCrownVar, GORR', 1.2, 50, 'SaskWellHead', 'Y', 'Y', 'mprod,250,2,300,3,400,4,500,5,0,6', NULL)
+            INSERT INTO RoyaltyMaster VALUES(3, 'OL', 'All', 'SKProvCrownVar, GORR', 1.2, 50, 'SaskWellHead', 'Y', 'Y', 'mprod,250,2,300,3,400,4,500,5,0,6', NULL)
         """
 
         self.db_instance.execute_statement(statement)
@@ -76,7 +76,7 @@ class DatabaseUtilities(object):
 
     def create_some_test_monthly(self):
         if not 'Monthly' in self.db_instance.get_table_names():
-            self.db_create.monthly()
+            self.db_create.Monthly()
 
         statement = """
             INSERT INTO Monthly Values(4, '2015-09-29 00:00:00', 201501, 4, 'Oil', 2, 740, 100, 2.2, 221.123456, 2.123455, 0.123455)
@@ -85,14 +85,23 @@ class DatabaseUtilities(object):
 
     def create_calc(self):
         if not 'Calc' in self.db_instance.get_table_names():
-            self.db_create.calc()
+            self.db_create.Calc()
 
     def create_some_test_leases(self):
         if not 'Lease' in self.db_instance.get_table_names():
-            self.db_create.lease()
+            self.db_create.Lease()
         statement = """
             INSERT INTO Lease VALUES(1,'OL','SK',123,2345,NULL);
             INSERT INTO Lease VALUES(2,'OL','SK',123,2346,NULL);
             INSERT INTO Lease VALUES(3,'OL','SK',123,2347,NULL);
+        """
+        self.db_instance.execute_statement(statement)
+
+    def create_some_test_econdata(self):
+        if not 'Econdata' in self.db_instance.get_table_names():
+            self.db_create.Econdata()
+        statement = """
+            INSERT INTO table VALUES(39,'Jan.',201501,181,223,262,0.0934,2.34,23.12,1734,21.73,502,27.11,626,0.1085,2.71,
+            26.84,2013,32.38,747,38.94,899,0.1181,2.95,29.22,2192,35.58,821,40.54,936,52.3,1207);
         """
         self.db_instance.execute_statement(statement)

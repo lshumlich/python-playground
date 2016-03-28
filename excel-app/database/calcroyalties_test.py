@@ -293,6 +293,7 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, IndianInterest, MinRoyalty, RoyaltyPr
         self.dbu.create_some_test_royalties()
         self.dbu.create_some_test_leases()
         self.dbu.create_some_test_monthly()
+        self.dbu.create_some_test_econdata()
         self.dbu.create_calc()
         pr = ProcessRoyalties()
         pr.process_one(4, 201501, 'Oil')

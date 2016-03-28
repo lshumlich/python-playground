@@ -49,7 +49,7 @@ class DatabaseCreate(object):
         insertStatement = "insert into Config (Version, CreateDate) values(" + str(DatabaseCreate.DATABASE_VERSION) + ",'" + str(datetime.datetime.now()) + "');"
         self.dbi.execute(insertStatement)
 
-    def well(self):
+    def Well(self):
         statement = """
             CREATE TABLE Well ('ID' integer primary key autoincrement, 
             'UWI' text, 'Prov' text, 'WellType' text, 'LeaseType' text, 
@@ -59,9 +59,9 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
         
-    def royaltymaster(self):
+    def Royaltymaster(self):
         statement = """
-            CREATE TABLE RoyaltyMaster ('ID' integer primary key autoincrement, 
+            CREATE TABLE Royaltymaster ('ID' integer primary key autoincrement,
             "LeaseType" text, "RightsGranted" text, "RoyaltyScheme" text, 
             "CrownMultiplier" float, "MinRoyalty" int, "ValuationMethod" text,
             "TruckingDeducted" text, "ProcessingDeducted" text, "Gorr" text,
@@ -69,7 +69,7 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
         
-    def lease(self):
+    def Lease(self):
         statement = """
             CREATE TABLE Lease ('ID' integer primary key autoincrement, 
             "LeaseType" text, "Prov" text, "FNReserve" int, "Lessor" int, 
@@ -77,7 +77,7 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
         
-    def monthly(self):
+    def Monthly(self):
         statement = """
             CREATE TABLE Monthly ('ID' integer primary key autoincrement, 
             "ExtractMonth" timestamp, "ProdMonth" int, "WellID" int, "Product" text,
@@ -86,7 +86,7 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
         
-    def calc(self):
+    def Calc(self):
         statement = """
             CREATE TABLE Calc ('ID' integer primary key autoincrement, 
             "ProdMonth" int, "WellID" int, 
@@ -104,7 +104,7 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
         
-    def econdata(self):
+    def Econdata(self):
         statement = """
             CREATE TABLE ECONData ('ID' integer primary key autoincrement,
             "CharMonth" text, "ProdMonth" int, 

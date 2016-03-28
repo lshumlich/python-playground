@@ -145,7 +145,7 @@ class ProcessRoyalties(object):
             self.calcSaskOilIOGR1995(well.CommencementDate, royalty.ValuationMethod, royalty.CrownMultiplier, well.IndianInterest, monthly, calc)
 #           self.calcSaskOilIOGR1995(monthly, well, royalty, lease, calc)
         else:
-            raise AppError('Royalty Scheme not yet developed: ' + lease.Prov + ' ' + monthly.Product)
+            raise AppError('Royalty Scheme not yet developed: ' + royalty.RoyaltyScheme + ' ' + monthly.Product)
 
 
         if monthly.Product == 'Oil' and 'GORR' in royalty.RoyaltyScheme:
