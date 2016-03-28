@@ -5,8 +5,6 @@ import json
 import sys,traceback
 
 from app import app
-from database import database
-from database import calcroyalties
 from database.sqlite_show import Shower
 from database.utils import Utils
 import config
@@ -236,24 +234,23 @@ def get_link_data():
     print("hello")
 
 @staticmethod
-@app.route('/adriennews') 
-def adriennews(): 
-    if request.args: 
-        db = config.get_database() 
-        pr = calcroyalties.ProcessRoyalties() 
-        wellIds = request.args["WellId"] 
-        well_id = int(wellIds) 
-        prodMonth = 201501 
-        product = "Oil" 
-        well = db.select1('Well', ID=well_id) 
-        royalty = db.select1('Royaltymaster', ID=well.LeaseID) 
-        lease = db.select1('Lease', ID=well.LeaseID) 
+@app.route('/adriennews')
+def adriennews():
+    if request.args:
+        db = config.get_database()
+        wellIds = request.args["WellId"]
+        well_id = int(wellIds)
+        prodMonth = 201501
+        product = "Oil"
+        well = db.select1('Well', ID=well_id)
+        royalty = db.select1('Royaltymaster', ID=well.LeaseID)
+        lease = db.select1('Lease', ID=well.LeaseID)
         monthly = db.select1('Monthly', WellID = well_id, prodMonth = prodMonth, product = product)
-         calc_array = db.select('Calc', WellID=well_id, prodMonth = prodMonth) 
-        calc = calc_array[0]  
-        print(monthly) 
-    else: 
-        print("No monthly data for this well")   
+        calc_array = db.select('Calc', WellID=well_id, prodMonth = prodMonth)
+        calc = calc_array[0]
+        print(monthly)
+    else:
+        print("No monthly data for this well")
     return render_template('worksheetas.html', well=well, rm=royalty, m=monthly,  lease=lease, calc=calc)
 
 
