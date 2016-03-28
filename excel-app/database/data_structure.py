@@ -38,10 +38,6 @@ class Formatter(object):
     
     def __init__(self, dataObj):
         self.dataObj = dataObj
-        
-    @property
-    def ExtractMonth(self):
-        return self.dataObj.ExtractMonth.strftime('%Y-%m-%d')
     
     @property
     def Lease(self):
@@ -55,4 +51,9 @@ class Formatter(object):
     def ProdMonth(self):
         dts = str(self.dataObj.ProdMonth)
         return dts[0:4]+'-'+dts[4:6]
-    
+
+    def yyyy_mm_dd(self, dt):
+        if dt:
+            return dt.strftime('%Y-%m-%d')
+        else:
+            return ""
