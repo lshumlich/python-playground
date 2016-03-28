@@ -5,10 +5,6 @@ body {
 	margin: 0px;
 }
 
-table {
-
-}
-
 th {
 	background-color: dimgray;
 	color: white;
@@ -18,4 +14,14 @@ th {
 
 tr {
 	height: 30px;
+}
+
+.wellmodal {
+  width: 100%;
+}
+.wellmodal td {
+  width: 25%;
+}
+.wellmodal input {
+  width: 100%;
 }
