@@ -101,7 +101,7 @@ class DatabaseUtilities(object):
         if not 'Econdata' in self.db_instance.get_table_names():
             self.db_create.Econdata()
         statement = """
-            INSERT INTO table VALUES(39,'Jan.',201501,181,223,262,0.0934,2.34,23.12,1734,21.73,502,27.11,626,0.1085,2.71,
+            INSERT INTO ECONData VALUES(39,'Jan.',201501,181,223,262,0.0934,2.34,23.12,1734,21.73,502,27.11,626,0.1085,2.71,
             26.84,2013,32.38,747,38.94,899,0.1181,2.95,29.22,2192,35.58,821,40.54,936,52.3,1207);
         """
         self.db_instance.execute_statement(statement)
