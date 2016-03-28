@@ -5,10 +5,12 @@ from datetime import date
 from datetime import datetime
 from database.database import AppError, DataStructure
 from database.data_structure import DataStructure
+from database.sqlite_utilities_test import DatabaseUtilities
 
 
 from database.testhelper import TestHelper
 from database.calcroyalties import ProcessRoyalties
+import config
 
 #from DataBase import DataBase,AppError,DataStructure,TestDataBase
 
@@ -16,6 +18,9 @@ class DataObj(object):
     None
 
 class TestSaskRoyaltyCalc(unittest.TestCase):
+
+    def setUp(self):
+        self.assertEqual(config.get_environment(),'unittest') # Distructive Tests must run in unittest enviornment
 
 
 #     def xtest_determineRoyaltyPrice (self):
@@ -269,6 +274,8 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, IndianInterest, MinRoyalty, RoyaltyPr
     def test_calcSupplementaryRoyaltiesIOGR1995(self):
         reference_price = {'Pigeon Lake Indian': 24.04, 'Reserve no.138A': 25.37, 'Sawridge Indian': 25.13, 'Stony Plain Indian': 24.64}
         pr = ProcessRoyalties()
+        calc = DataStructure()
+
         self.assertEqual(pr.calcSupplementaryRoyaltiesIOGR1995(3.5, 228, 80, 60, reference_price['Pigeon Lake Indian']),2039.6)
         self.assertEqual(pr.calcSupplementaryRoyaltiesIOGR1995(5, 200, 90, 40, reference_price['Reserve no.138A']),4365.75)
         self.assertEqual(pr.calcSupplementaryRoyaltiesIOGR1995(4, 221.123456, 100, 50, reference_price['Sawridge Indian']),4899.84)
@@ -280,8 +287,16 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, IndianInterest, MinRoyalty, RoyaltyPr
         self.assertEqual(pr.calcSupplementaryRoyaltiesIOGR1995(15, 180, 80, 35, reference_price['Stony Plain Indian']),5101.88)
 
     def test_process_monthly(self):
+        self.dbu = DatabaseUtilities()
+        self.dbu.delete_all_tables()
+        self.dbu.create_some_test_wells()
+        self.dbu.create_some_test_royalties()
+        self.dbu.create_some_test_leases()
+        self.dbu.create_some_test_monthly()
+        self.dbu.create_calc()
         pr = ProcessRoyalties()
-        self.assertEqual(pr.process_one(1, 201501, 'Oil'),1,2)
+        pr.process_one(4, 201501, 'Oil')
+
 
 
 if __name__ == '__main__':

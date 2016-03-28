@@ -63,6 +63,30 @@ class DatabaseUtilities(object):
         
         self.db_instance.execute_statement(statement)
 
+    def create_some_test_royalties(self):
+        if not 'RoyaltyMaster' in self.db_instance.get_table_names():
+            self.db_create.royaltymaster()
+
+        statement = """
+            INSERT INTO RoyaltyMaster VALUES(3, 'OL', 'All', 'SkProvCrownVar, GORR', 1.2, 50, 'SaskWellHead', 'Y', 'Y', 'mprod,250,2,300,3,400,4,500,5,0,6', NULL)
+        """
+
+        self.db_instance.execute_statement(statement)
+
+
+    def create_some_test_monthly(self):
+        if not 'Monthly' in self.db_instance.get_table_names():
+            self.db_create.monthly()
+
+        statement = """
+            INSERT INTO Monthly Values(4, '2015-09-29 00:00:00', 201501, 4, 'Oil', 2, 740, 100, 2.2, 221.123456, 2.123455, 0.123455)
+        """
+        self.db_instance.execute_statement(statement)
+
+    def create_calc(self):
+        if not 'Calc' in self.db_instance.get_table_names():
+            self.db_create.calc()
+
     def create_some_test_leases(self):
         if not 'Lease' in self.db_instance.get_table_names():
             self.db_create.lease()
