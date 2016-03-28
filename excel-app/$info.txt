@@ -45,3 +45,9 @@ Using the SQL database
 	- for some example of how to use the sql engine see: database.sqlite_database_test.py
 
 Good Luck it's rough out there...
+
+Usefull Sqlite Commands:
+
+select * from sqlite_master;
+Pragma table_info(well);
+

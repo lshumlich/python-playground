@@ -307,6 +307,8 @@ def new_wellinfo():
 def new_search_facilities():
     return render_template('new/facilitysearch.html')
 
+# Faclility Information 2016-03-26
+
 @app.route('/new/api/facilityresults')
 def new_facility_results():
     try:
