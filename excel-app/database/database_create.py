@@ -23,23 +23,23 @@ class DatabaseCreate(object):
     def create_all(self):
         tables = self.dbi.get_table_names()
         if not 'Config' in tables:
-            self.config()
+            self.Config()
         if not 'Well' in tables:
-            self.well()
-        if not 'RoyaltyMaster' in tables:
-            self.royaltymaster()
+            self.Well()
+        if not 'Royaltymaster' in tables:
+            self.Royaltymaster()
         if not 'Lease' in tables:
-            self.lease()
+            self.Lease()
         if not 'Monthly' in tables:
-            self.monthly()
+            self.Monthly()
         if not 'Calc' in tables:
-            self.calc()
+            self.Calc()
         if not 'ECONData' in tables:
-            self.econdata()
+            self.Econdata()
         if not 'LinkTab' in tables:
-            self.linktab()
+            self.Linktab()
         
-    def config(self):
+    def Config(self):
         statement = """
             CREATE TABLE Config ('ID' integer primary key autoincrement, 
             'Version' int, CreateDate timestamp);
