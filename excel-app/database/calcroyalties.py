@@ -171,12 +171,10 @@ class ProcessRoyalties(object):
                 calc.RoyaltyProcessing = calc.RoyaltyVolume * monthly.ProcessingRate
                 calc.RoyaltyDeductions += calc.RoyaltyProcessing
                 calc.RoyaltyValue -= calc.RoyaltyProcessing
-
-                calc.SupplementaryRoyalties = self.calcSupplementaryRoyaltiesIOGR1995(commencement_period, monthly, royalty_price, reference_price['Sawridge Indian'])
-
+                print("this is commencement period", calc.CommencementPeriod)
+                calc.SupplementaryRoyalties = self.calcSupplementaryRoyaltiesIOGR1995(calc.CommencementPeriod, monthly.WellHeadPrice, monthly.ProdVol, calc.RoyaltyPrice, self.reference_price['Sawridge Indian'])
                 #print(calcSupplementaryRoyaltiesIOGR1995)
-
-
+                #Royalty Price for Royalty Deduction???
             self.ws.printSaskOilRoyaltyRate(monthly, well, royalty, lease, calc)
 #                 log.write('--- Royalty Calculated: {} {} {} prod: {} Crown Rate: {}\n'.format(monthly.Row, calc.ProdMonth,
 #                                                                                              calc.WellId, monthly.ProdVol, calc.RoyaltyRate))
@@ -205,7 +203,7 @@ class ProcessRoyalties(object):
 # Adrienne - Write this method...
     def calcSaskOilProvCrownRoyaltyRate(self,calc,econOilData,
                 wellRoyaltyClassification,wellClassification,mop,src):
-
+    #ADD COMMENCEMENT
      #   econOilData = self.db.getECONOilData(monthly.ProdMonth)
      #   mop = monthly.ProdVol
 
@@ -400,18 +398,20 @@ class ProcessRoyalties(object):
 
     def determineCommencementPeriod(self,prodMonth,commencementDate):
         if commencementDate == None:
-            raise AppError('Commencement Date must be set for this Royalty Type.')
+            return 5
         # if type(commencementDate) != 'date':
         # commencementDate = datetime.strptime(commencementDate,'%Y-%m-%d %I:%M:%S')
-        cd = self.ensureDate(commencementDate)
-        year = int(prodMonth / 100)
-        month = prodMonth - (year * 100)
-        prodDate = date(year,month,1)
-        diff = prodDate - cd
-        return round(diff.days/365,2)
-    
+        else:
+            cd = self.ensureDate(commencementDate)
+            year = int(prodMonth / 100)
+            month = prodMonth - (year * 100)
+            prodDate = date(year,month,1)
+            diff = prodDate - cd
+            return round(diff.days/365,2)
+
     # called well head price the selling price
     def calcSupplementaryRoyaltiesIOGR1995(self, commencement_period, well_head_price, prod_vol, royalty_regulation, reference_price):
+        print("This is the commencement_period", commencement_period)
         if commencement_period <= 5:
             supplementary_royalty = (prod_vol - royalty_regulation)*0.5*(well_head_price - reference_price)
         else:
@@ -468,6 +468,7 @@ class ProcessRoyalties(object):
     #   Factor Circulars.pdf
     #   OilFactors.pdf
     def calcSaskOilProvCrown(self, monthly, well, royalty, lease, calc):
+        calc.CommencementPeriod = self.determineCommencementPeriod(monthly.ProdMonth, well.CommencementDate)
         econOilData = self.db.select1("ECONData",ProdMonth = monthly.ProdMonth)
         self.calcSaskOilProvCrownRoyaltyRate(calc,econOilData, well.RoyaltyClassification,
                                              well.Classification, monthly.ProdVol, well.SRC)

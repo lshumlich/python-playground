@@ -203,7 +203,7 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, IndianInterest, MinRoyalty, RoyaltyPr
         self.assertEqual(pr.determineCommencementPeriod(201501, datetime(2014,1,1)), 1)
         self.assertEqual(pr.determineCommencementPeriod(201501, datetime(2010,1,1)), 5)
         self.assertEqual(pr.determineCommencementPeriod(201501, datetime(2009,12,1)), 5.09)
-        self.assertRaises(AppError,pr.determineCommencementPeriod, 201501, None)
+        self.assertEqual(pr.determineCommencementPeriod(201501, None), 5)
         #write tests for ActSales
 
 
