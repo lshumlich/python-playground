@@ -64,11 +64,11 @@ class DatabaseUtilities(object):
         self.db_instance.execute_statement(statement)
 
     def create_some_test_royalties(self):
-        if not 'Royaltymaster' in self.db_instance.get_table_names():
+        if not 'RoyaltyMaster' in self.db_instance.get_table_names():
             self.db_create.Royaltymaster()
 
         statement = """
-            INSERT INTO Royaltymaster VALUES(3, 'OL', 'All', 'SKProvCrownVar, GORR', 1.2, 50, 'SaskWellHead', 'Y', 'Y', 'mprod,250,2,300,3,400,4,500,5,0,6', NULL)
+            INSERT INTO RoyaltyMaster VALUES(3, 'OL', 'All', 'SKProvCrownVar, GORR', 1.2, 50, 'SaskWellHead', 'Y', 'Y', 'mprod,250,2,300,3,400,4,500,5,0,6', NULL)
         """
 
         self.db_instance.execute_statement(statement)

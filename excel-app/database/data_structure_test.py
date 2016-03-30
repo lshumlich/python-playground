@@ -38,7 +38,7 @@ class Test(unittest.TestCase):
         monthly.ID = 123
         #extract month is in monthly
         monthly.ExtractMonth = datetime(2016,2,22)
-        self.assertEqual(monthly._format.yyy_mm_dd,'2016-02-22')
+        self.assertEqual(monthly._format.yyy_mm_dd(monthly.ExtractMonth)
 
     def test_formatter_lease(self):        
         well = DataStructure()
