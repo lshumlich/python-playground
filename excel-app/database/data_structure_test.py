@@ -36,9 +36,9 @@ class Test(unittest.TestCase):
     def test_formatter_date(self):
         monthly = DataStructure()
         monthly.ID = 123
-        #extract month is in monthly
         monthly.ExtractMonth = datetime(2016,2,22)
-        self.assertEqual(monthly._format.yyy_mm_dd(monthly.ExtractMonth)
+        self.assertEqual(monthly._format.yyyy_mm_dd(monthly.ExtractMonth), '2016-02-22')
+
 
     def test_formatter_lease(self):        
         well = DataStructure()

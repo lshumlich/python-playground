@@ -27,7 +27,7 @@ class DatabaseCreate(object):
         if not 'Well' in tables:
             self.Well()
         if not 'Royaltymaster' in tables:
-            self.Royaltymaster()
+            self.RoyaltyMaster()
         if not 'Lease' in tables:
             self.Lease()
         if not 'Monthly' in tables:
@@ -59,9 +59,9 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
         
-    def Royaltymaster(self):
+    def RoyaltyMaster(self):
         statement = """
-            CREATE TABLE Royaltymaster ('ID' integer primary key autoincrement,
+            CREATE TABLE RoyaltyMaster ('ID' integer primary key autoincrement,
             "LeaseType" text, "RightsGranted" text, "RoyaltyScheme" text, 
             "CrownMultiplier" float, "MinRoyalty" int, "ValuationMethod" text,
             "TruckingDeducted" text, "ProcessingDeducted" text, "Gorr" text,
