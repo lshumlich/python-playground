@@ -52,6 +52,7 @@ class Formatter(object):
         dts = str(self.dataObj.ProdMonth)
         return dts[0:4]+'-'+dts[4:6]
 
+    @property
     def yyyy_mm_dd(self, dt):
         if dt:
             return dt.strftime('%Y-%m-%d')

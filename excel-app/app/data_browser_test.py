@@ -30,7 +30,7 @@ class FlaskTest(unittest.TestCase):
         utils = Utils()
 
         dbu.delete_all_tables()
-        db_create.linktab()
+        db_create.Linktab()
 
         # Test Insert
         data = dict()
@@ -70,7 +70,7 @@ class FlaskTest(unittest.TestCase):
 
         dbu.delete_all_tables()
 
-        db_create.linktab()
+        db_create.Linktab()
         linktab = db.get_data_structure('LinkTab')
         linktab.TabName = 'Well'
         linktab.AttrName = 'ID'
@@ -108,7 +108,7 @@ class FlaskTest(unittest.TestCase):
         db_create = DatabaseCreate()
 
         dbu.delete_all_tables()
-        db_create.linktab()
+        db_create.Linktab()
         dbu.create_some_test_wells()
         dbu.create_some_test_leases()
         

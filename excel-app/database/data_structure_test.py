@@ -34,10 +34,11 @@ class Test(unittest.TestCase):
         self.assertEqual(well.Lease,'OL-0001')
 
     def test_formatter_date(self):
-        well = DataStructure()
-        well.ID = 123
-        well.ExtractMonth = datetime(2016,2,22)
-        self.assertEqual(well._format.ExtractMonth,'2016-02-22')
+        monthly = DataStructure()
+        monthly.ID = 123
+        #extract month is in monthly
+        monthly.ExtractMonth = datetime(2016,2,22)
+        self.assertEqual(monthly._format.yyy_mm_dd,'2016-02-22')
 
     def test_formatter_lease(self):        
         well = DataStructure()
