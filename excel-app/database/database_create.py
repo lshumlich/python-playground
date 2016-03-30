@@ -35,7 +35,7 @@ class DatabaseCreate(object):
         if not 'Calc' in tables:
             self.Calc()
         if not 'ECONData' in tables:
-            self.Econdata()
+            self.ECONdata()
         if not 'LinkTab' in tables:
             self.Linktab()
         
@@ -104,7 +104,7 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
         
-    def Econdata(self):
+    def ECONdata(self):
         statement = """
             CREATE TABLE ECONData ('ID' integer primary key autoincrement,
             "CharMonth" text, "ProdMonth" int, 
@@ -122,7 +122,7 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
 
-    def linktab(self):        
+    def Linktab(self):
         statement = """
             create table LinkTab ('ID' integer primary key autoincrement,
             TabName text, AttrName text, LinkName text, BaseTab boolean, ShowAttrs text);

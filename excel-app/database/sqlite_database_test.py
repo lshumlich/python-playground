@@ -76,7 +76,7 @@ class SqliteDatabaseTest(unittest.TestCase):
         self.assertRaises(AppError, self.db.update, ds)
 
     def test_insert(self):
-        self.db_create.well()
+        self.db_create.Well()
         
         well = DataStructure()
         well.UWI = 'UWI for this well'

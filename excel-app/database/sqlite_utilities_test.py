@@ -64,11 +64,11 @@ class DatabaseUtilities(object):
         self.db_instance.execute_statement(statement)
 
     def create_some_test_royalties(self):
-        if not 'RoyaltyMaster' in self.db_instance.get_table_names():
+        if not 'Royaltymaster' in self.db_instance.get_table_names():
             self.db_create.Royaltymaster()
 
         statement = """
-            INSERT INTO RoyaltyMaster VALUES(3, 'OL', 'All', 'SKProvCrownVar, GORR', 1.2, 50, 'SaskWellHead', 'Y', 'Y', 'mprod,250,2,300,3,400,4,500,5,0,6', NULL)
+            INSERT INTO Royaltymaster VALUES(3, 'OL', 'All', 'SKProvCrownVar, GORR', 1.2, 50, 'SaskWellHead', 'Y', 'Y', 'mprod,250,2,300,3,400,4,500,5,0,6', NULL)
         """
 
         self.db_instance.execute_statement(statement)
@@ -96,10 +96,10 @@ class DatabaseUtilities(object):
             INSERT INTO Lease VALUES(3,'OL','SK',123,2347,NULL);
         """
         self.db_instance.execute_statement(statement)
-    
+
     def create_some_test_econdata(self):
-        if not 'Econdata' in self.db_instance.get_table_names():
-            self.db_create.Econdata()
+        if not 'ECONdata' in self.db_instance.get_table_names():
+            self.db_create.ECONdata()
         statement = """
             INSERT INTO ECONData VALUES(39,'Jan.',201501,181,223,262,0.0934,2.34,23.12,1734,21.73,502,27.11,626,0.1085,2.71,
             26.84,2013,32.38,747,38.94,899,0.1181,2.95,29.22,2192,35.58,821,40.54,936,52.3,1207);
