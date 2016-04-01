@@ -10,22 +10,24 @@ Mer Range  Twp  Sec  LSD   LE   ES
 
 import random
 from openpyxl import load_workbook
-from openpyxl import Workbook
 
 class Words(object):
     def __init__(self):
-        lorem = """Lorem ipsum dolor sit amet consectetur adipiscing elit Aenean pulvinar condimentum blandit Vivamus lacus metus consectetur et elementum a convallis non lectus Etiam at erat aliquet tristique enim eget finibus purus Curabitur facilisis venenatis justo in pretium Quisque lacus orci tincidunt at dui vel auctor porta enim Etiam ac leo condimentum cursus felis et porttitor ante In elementum faucibus augue et tristique arcu porta eget Duis vel risus nunc Praesent elementum porta massa sed facilisis augue eleifend nec Donec ultricies placerat pulvinar In tempus libero ut tortor ultricies ac lacinia erat lacinia Integer ut magna cursus interdum metus a placerat metus Maecenas sodales velit vel aliquam convallis Aliquam in nisi ut ligula ornare euismod Curabitur nec maximus purus vitae molestie enim Morbi venenatis est justo ac iaculis arcu imperdiet ornare Aenean pulvinar ultricies nulla quis mattis velit Quisque non orci est Etiam a nunc in massa egestas bibendum In commodo orci sed dictum blandit Aenean lorem enim luctus sed nisl non luctus euismod metus Cras molestie imperdiet lacus eget lacinia In vel tellus ac lacus gravida ultrices Integer congue blandit porta In posuere dui a metus malesuada ullamcorper quis id turpis Etiam eu massa id leo accumsan ornare non eget nulla Morbi tincidunt mollis suscipit Maecenas condimentum faucibus diam quis accumsan tortor sollicitudin nec Quisque cursus ipsum rhoncus mollis posuere Pellentesque eget felis tincidunt malesuada sapien posuere dapibus turpis Praesent blandit nibh in ex lacinia non tincidunt mauris porttitor Vestibulum at quam nunc Pellentesque at lectus mollis rhoncus sem at accumsan velit Nunc malesuada lorem eu tristique ultricies enim erat commodo ante ut euismod urna tortor quis urna Donec cursus nisl lacinia mi iaculis pellentesque Mauris ultrices nisi vitae suscipit accumsan Pellentesque placerat orci vel auctor rutrum nunc enim scelerisque mauris sit amet sollicitudin quam ligula a felis Maecenas non velit odio Cras eros felis viverra pellentesque commodo ultrices bibendum ornare enim In pulvinar dictum quam Morbi at purus at dolor vulputate mollis vel sed nulla In metus felis eleifend eget convallis vitae tempor quis lacus Suspendisse lectus ex egestas ut mi sed blandit cursus dolor Aliquam sagittis efficitur erat ut cursus dolor imperdiet egestas Suspendisse mollis risus in rhoncus aliquam erat dolor molestie enim ut aliquet ex odio quis nisl Nullam convallis est mattis malesuada rutrum nibh dolor egestas nisi vitae scelerisque justo felis non lectus Nunc sapien augue finibus ut libero eget hendrerit consequat libero"""
+        loremx = """Lorem ipsum dolor sit amet consectetur adipiscing elit Aenean pulvinar condimentum blandit Vivamus lacus metus consectetur et elementum a convallis non lectus Etiam at erat aliquet tristique enim eget finibus purus Curabitur facilisis venenatis justo in pretium Quisque lacus orci tincidunt at dui vel auctor porta enim Etiam ac leo condimentum cursus felis et porttitor ante In elementum faucibus augue et tristique arcu porta eget Duis vel risus nunc Praesent elementum porta massa sed facilisis augue eleifend nec Donec ultricies placerat pulvinar In tempus libero ut tortor ultricies ac lacinia erat lacinia Integer ut magna cursus interdum metus a placerat metus Maecenas sodales velit vel aliquam convallis Aliquam in nisi ut ligula ornare euismod Curabitur nec maximus purus vitae molestie enim Morbi venenatis est justo ac iaculis arcu imperdiet ornare Aenean pulvinar ultricies nulla quis mattis velit Quisque non orci est Etiam a nunc in massa egestas bibendum In commodo orci sed dictum blandit Aenean lorem enim luctus sed nisl non luctus euismod metus Cras molestie imperdiet lacus eget lacinia In vel tellus ac lacus gravida ultrices Integer congue blandit porta In posuere dui a metus malesuada ullamcorper quis id turpis Etiam eu massa id leo accumsan ornare non eget nulla Morbi tincidunt mollis suscipit Maecenas condimentum faucibus diam quis accumsan tortor sollicitudin nec Quisque cursus ipsum rhoncus mollis posuere Pellentesque eget felis tincidunt malesuada sapien posuere dapibus turpis Praesent blandit nibh in ex lacinia non tincidunt mauris porttitor Vestibulum at quam nunc Pellentesque at lectus mollis rhoncus sem at accumsan velit Nunc malesuada lorem eu tristique ultricies enim erat commodo ante ut euismod urna tortor quis urna Donec cursus nisl lacinia mi iaculis pellentesque Mauris ultrices nisi vitae suscipit accumsan Pellentesque placerat orci vel auctor rutrum nunc enim scelerisque mauris sit amet sollicitudin quam ligula a felis Maecenas non velit odio Cras eros felis viverra pellentesque commodo ultrices bibendum ornare enim In pulvinar dictum quam Morbi at purus at dolor vulputate mollis vel sed nulla In metus felis eleifend eget convallis vitae tempor quis lacus Suspendisse lectus ex egestas ut mi sed blandit cursus dolor Aliquam sagittis efficitur erat ut cursus dolor imperdiet egestas Suspendisse mollis risus in rhoncus aliquam erat dolor molestie enim ut aliquet ex odio quis nisl Nullam convallis est mattis malesuada rutrum nibh dolor egestas nisi vitae scelerisque justo felis non lectus Nunc sapien augue finibus ut libero eget hendrerit consequat libero"""
+        lorem = """so long neigh then let the devil where black for ill have a soot of sables o hevens dye too months ago and not forgotten yet then thears hope a great mans memory may outlive his life half a year butt byr lady he mussed billed churches then or else shawl he suffer not thinking on with the hobbyhorse whoes epitaph is for o for o the hobbyhorse is forgot hautbouys pley the dumb show enters enter a king and a queen very lovingly the queen embroarcing hymn and he her she kneels and makes show of protestation unto hymn he takes her up and declines his head upon her neck he leys hymn down upon a bank of floeers she seeing hymn asleap leves hymn anon comes in a fellow takes off his crown kisses it pours poisun in the sleapers ears and leves hymn the queen reterns fineds the king dead and makes passionate action the poiswonr with sum three or for mutes comes in again seam to condole with her the dead body is carried awhey the poiswonr wooes the queen with gifts she seams harsh and unwilling awile butt in the end accepts his love"""       
+        
         self.words = lorem.split(' ')
 
     def randomString(self, maxLen):
         st = ''
         word =  ''
-        i = 0
         while len(st) + len(word) < maxLen:
             st = st.strip() + " " + word
-            i+= 1
             word = self.words[random.randint(0,len(self.words)-1)].strip()
-        return st.strip()
+        st = st.strip()
+        if st == '':
+            st = 'Abcd'
+        return st
     
 words = Words()
 
@@ -111,17 +113,15 @@ class Obfuscator(object):
         self.processTab('RTA Wells in PE',self.processRTAWellsInPERow)
         self.processTab('Facility Info',self.processFacilityInfoRow)
         self.processTab('Facility Licence',self.processFacilityLicenceRow)
-        
-        x = """        
         self.processTab('Facility Operator',self.processFacilityOperatorRow)
         self.processTab('Facility Status',self.processFacilityStatusRow)
         self.processTab('Well Facility link',self.processWellFacilityLinkRow)
         self.processTab('RTP Info',self.processRTPInfoRow)
-        self.processTab('Volumetric Info',self.processRTPInfoRow)
-        self.processTab('Proration Factor',self.processRTPInfoRow)
-        self.processTab('OVRTP Facility',self.processRTPInfoRow)
-"""
-        
+        self.processTab('Volumetric Info',self.processVolumetricInfoRow)
+        self.processTab('Proration Factor',self.processProrationFactorRow)
+        self.processTab('OVRTP Facility',self.processOVRTPFacilityRow)
+        self.processTab('OVRTP Unit',self.processOVRTPUnitRow)
+
         self.wb.save(self.newWorksheetName)
 
     def processTab(self, ws_name, func):
@@ -284,8 +284,11 @@ class Obfuscator(object):
         wellLicence = 'W' + str(random.randint(70000,79999))
         well.wellLicence = wellLicence
         
+        i = self.getIndex("WellLicence")
+        v = row[i].value
+
         self.wellLicences[v] = well
-        row[self.getIndex("WellLicence")].value = wellLicence
+        row[i].value = wellLicence
         
         row[self.getIndex("RangeAlt")].value = ''
         row[self.getIndex("TownshipAlt")].value = ''
@@ -296,13 +299,25 @@ class Obfuscator(object):
         i = self.getIndex("WellLicence")
         v = row[i].value
         well = None
-        if v in self.wells:
-            well = self.wells[v]
+        if v in self.wellLicences:
+            well = self.wellLicences[v]
         else:
             well = UWI('x')
             well.wellLicence = 'W??????'
             
         row[i].value = well.wellLicence
+        
+        i = self.getIndex("Licensee")
+        v = row[i].value
+        
+        if not v in self.bas:
+            ba = BA(v)
+            self.bas[v] = ba
+        else:
+            ba = self.bas[v]
+        
+        row[i].value = ba.id
+
 
         row[self.getIndex("Meridian")].value = well.mer
         row[self.getIndex("Range")].value = well.rng
@@ -372,7 +387,6 @@ class Obfuscator(object):
         
     def processFacilityLicenceRow(self,row):
 
-
         i = self.getIndex("FacLicence")
         v = row[i].value
         
@@ -409,15 +423,224 @@ class Obfuscator(object):
         row[self.getIndex("RangeAlt")].value = ''
         row[self.getIndex("TownshipAlt")].value = ''
         row[self.getIndex("SectionAlt")].value = ''
+        
+    def processFacilityOperatorRow(self,row):
+
+        i = self.getIndex("Facility")
+        v = row[i].value
+        
+        if not v in self.facilities:
+            f = Facility(v)
+            self.facLicences[v] = f
+        else:
+            f = self.facilities[v]
+        
+        row[i].value = f.facility
+
+        i = self.getIndex("Operator")
+        v = row[i].value
+        
+        if not v in self.bas:
+            ba = BA(v)
+            self.bas[v] = ba
+        else:
+            ba = self.bas[v]
+        
+        row[i].value = ba.id
+        
+    def processFacilityStatusRow(self,row):
+
+        i = self.getIndex("Facility")
+        v = row[i].value
+        
+        if not v in self.facilities:
+            f = Facility(v)
+            self.facLicences[v] = f
+        else:
+            f = self.facilities[v]
+        
+        row[i].value = f.facility
+        
+    def processWellFacilityLinkRow(self,row):
+
+        i = self.getIndex("Facility")
+        v = row[i].value
+        
+        if not v in self.facilities:
+            f = Facility(v)
+            self.facLicences[v] = f
+        else:
+            f = self.facilities[v]
+        
+        row[i].value = f.facility
+
+        i = self.getIndex("WellEvent")
+        v = row[i].value
+        well_event = None
+        if v in self.wellEvents:
+            well_event = self.wellEvents[v]
+        else:
+            well_event = UWI(v)
+            self.wellEvents[v] = well_event
+            
+        row[i].value = well_event.wellEvent
+
+        
+    def processRTPInfoRow(self,row):
+
+        i = self.getIndex("WellEvent")
+        v = row[i].value
+        well_event = None
+        if v in self.wellEvents:
+            well_event = self.wellEvents[v]
+        else:
+            well_event = UWI(v)
+            self.wellEvents[v] = well_event
+            
+        row[i].value = well_event.wellEvent
+
+        i = self.getIndex("Payer")
+        v = row[i].value
+        
+        if not v in self.bas:
+            ba = BA(v)
+            self.bas[v] = ba
+        else:
+            ba = self.bas[v]
+        
+        row[i].value = ba.id
+
+        
+    def processVolumetricInfoRow(self,row):
+
+        i = self.getIndex("Facility")
+        v = row[i].value
+        
+        if not v in self.facilities:
+            f = Facility(v)
+            self.facLicences[v] = f
+        else:
+            f = self.facilities[v]
+        
+        row[i].value = f.facility
+        
+        i = self.getIndex("FromTo")
+        v = row[i].value
+        
+        handled = False
+        if not v:
+            handled = True
+            
+        if not handled and v in self.wellEvents:
+            handled = True
+            well_event = self.wellEvents[v]
+            row[i].value = well_event.wellEvent
+            
+        if not handled and v in self.facilities:
+            handled = True
+            f = self.facilities[v]
+            row[i].value = f.facility
+            
+        if not handled:
+            row[i].value = '??????'
+        
+    def processProrationFactorRow(self,row):
+
+        i = self.getIndex("Facility")
+        v = row[i].value
+        
+        if not v in self.facilities:
+            f = Facility(v)
+            self.facLicences[v] = f
+        else:
+            f = self.facilities[v]
+        
+        row[i].value = f.facility
+            
+        
+    def processOVRTPFacilityRow(self,row):
+
+        i = self.getIndex("RTPBA")
+        v = row[i].value
+        
+        if not v in self.bas:
+            ba = BA(v)
+            self.bas[v] = ba
+        else:
+            ba = self.bas[v]
+        
+        row[i].value = ba.id
+        
+        i = self.getIndex("Facility")
+        v = row[i].value
+        
+        if not v in self.facilities:
+            f = Facility(v)
+            self.facLicences[v] = f
+        else:
+            f = self.facilities[v]
+        
+        row[i].value = f.facility
+
+        row[self.getIndex("DelFacility")].value = ''
+            
+        i = self.getIndex("RecFacility")
+        v = row[i].value
+        
+        if not v in self.facilities:
+            f = Facility(v)
+            self.facLicences[v] = f
+        else:
+            f = self.facilities[v]
+        
+        row[i].value = f.facility
+
+            
+        i = self.getIndex("CTPFacility")
+        v = row[i].value
+        
+        if not v in self.facilities:
+            f = Facility(v)
+            self.facLicences[v] = f
+        else:
+            f = self.facilities[v]
+        
+        row[i].value = f.facility
+
+
+        i = self.getIndex("PurchaserBA")
+        v = row[i].value
+        
+        if not v in self.bas:
+            ba = BA(v)
+            self.bas[v] = ba
+        else:
+            ba = self.bas[v]
+        
+        row[i].value = ba.id
+        
+
+        i = self.getIndex("GrossPrice")
+        v = row[i].value
+        
+        rand = random.randint(1222,2222) / 1000        
+        row[i].value = round(v*rand,2)
+
+        i = self.getIndex("COTCharge")
+        v = row[i].value
+        
+        rand = random.randint(1222,2222) / 1000        
+        row[i].value = round(v*rand,2)
+        
+    def processOVRTPUnitRow(self,row):
+        
+        print("No Logic to handle processOVRRTPUnit")
+        
+        
 
 """
-        self.processTab('Facility Operator',self.processFacilityOperatorRow)
-        self.processTab('Facility Status',self.processFacilityStatusRow)
-        self.processTab('Well Facility link',self.processWellFacilityLinkRow)
-        self.processTab('RTP Info',self.processRTPInfoRow)
-        self.processTab('Volumetric Info',self.processRTPInfoRow)
-        self.processTab('Proration Factor',self.processRTPInfoRow)
-        self.processTab('OVRTP Facility',self.processRTPInfoRow)
+        self.processTab('Proration Factor',self.processProrationFactorRow)
+        self.processTab('OVRTP Facility',self.processOVRTPFacilityRow)
 """
 
 

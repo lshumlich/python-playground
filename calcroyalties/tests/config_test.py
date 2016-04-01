@@ -41,9 +41,8 @@ class Test(unittest.TestCase):
         
         # test that if we the database name we have an unknown environmentwe
         config.reset()
-        config.set_database_name('MyTest.db')
+        config.set_database_name(':memory:')
         self.assertEqual(config.get_environment(), '????')
-        os.remove('MyTest.db')
         
         # test that if we the database name we have an unknown environmentwe
         config.reset()

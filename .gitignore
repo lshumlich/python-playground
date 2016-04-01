@@ -73,3 +73,7 @@ venv
 *sublime*
 /excel-app/tempfiles/*.db
 /excel-app/tempfiles/*.json
+/calcroyalties/.project
+/calcroyalties/tempfiles/*.db
+/calcroyalties/tempfiles/*.json
+/calcroyalties/.pydevproject
