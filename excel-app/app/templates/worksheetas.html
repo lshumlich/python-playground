@@ -22,11 +22,13 @@ p1  {
 
 
 div {
+    font-family: arial;
+    font-size: 13px;
     border-collapse: collapse;
+    align: center;
 }
-div {
-    padding: 2px;
-}
+
+
 
 
 
@@ -38,7 +40,8 @@ div {
 	UWI: {{ well.UWI }}</h1>
 <hr> </hr>
 
-<p1>
+<!--<p1>-->
+<div>
 
 <TABLE align="center">
 	<col width="25%">
@@ -296,17 +299,24 @@ th, td {
 
 {% if calc.CommencementPeriod != None %}
     {% if calc.CommencementPeriod < 5 %}
-    IOGR 1995 - Commencement Period < 5 Years: {{ calc.CommencementPeriod }}:
+    Royalty Calc Type: IOGR 1995 with Commencement Period < 5 Years:
     {% else %}
-    IOGR 1995 - Commencement Period >=  5Years: {{calc.CommencementPeriod }}:
+    Royalty Calc Type: IOGR 1995  with Commencement Period >=  5 Years:
     {% endif %}
-    <br>
-{% endif %}
+{% endif %}</div>
+
+    <TABLE align="center" style="width:41%">
+	<col width="20%">
+    <col width="1%">
+	<col width="20%">
 
 {% if m.ProdVol < 80 %}
-    MOP < 80  -> RVol = 10% * MOP + {{ calc.IOGR1995RoyaltyVolume }}
+    <tr><td align ="right">MOP < 80  -> RVol</td> <td align="center">=</td> <td align="left">10% * MOP + {{ calc.IOGR1995RoyaltyVolume }}</td></tr>
+
 {% elif m.ProdVol < 160 %}
-   <TR align="center"> MOP 80 to 160  -> RVol = 8 + 20% * (MOP - 80) + {{ '{:.2f}'.format(calc.IOGR1995RoyaltyVolume) }}</TR>
+   <tr><td align="right"> MOP 80 to 160: RVol</td> <td align="center">=</td> <td align="left">8 + 20% * (MOP - 80) + {{ '{:.2f}'.format(calc.IOGR1995RoyaltyVolume) }}</td></TR>
+   <tr><td align="right"> RVol</td><td align="center">=</td><td align="left">8 + 20% * ({{ m.ProdVol }} - 80) + {{ '{:.2f}'.format(calc.IOGR1995RoyaltyVolume) }}</td></tr>
+   <tr><td align="right"> RVol</td><td align="center">=</td><td align="left">{{ '{:.2f}'.format(calc.IOGR1995RoyaltyVolume) }}</td></tr></TABLE>
 {% elif calc.CommencementPeriod < 5 %}
     MOP > 160  -> RVol = 24 + 26% * (MOP - 160) + {{ '{:.2f}'.format(calc.IOGR1995RoyaltyVolume) }}
 {% elif m.ProdVol < 795 %}
@@ -314,7 +324,7 @@ th, td {
 {% else %}
     MOP > 795 -> RVol = 189 + 40% * (MOP - 795) + + {{ '{:.2f}'.format(calc.IOGR1995RoyaltyVolume) }}
 <br>
-{% endif %}</div>
+{% endif %}
 
 
 <table align="center" width="50%">
@@ -422,7 +432,8 @@ th, td {
 {% endif %}
 </table>
 
-</p1>
+<!--</p1>-->
+</div>
 
 </body>
 </html>
