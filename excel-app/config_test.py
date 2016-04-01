@@ -4,7 +4,7 @@ Test all the weird and wonderful configuration parameters
 """
 
 import unittest
-import os.path
+import os, os.path
 
 import config
 
@@ -43,6 +43,7 @@ class Test(unittest.TestCase):
         config.reset()
         config.set_database_name('MyTest.db')
         self.assertEqual(config.get_environment(), '????')
+        os.remove('MyTest.db')
         
         # test that if we the database name we have an unknown environmentwe
         config.reset()

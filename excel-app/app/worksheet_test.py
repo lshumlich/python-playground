@@ -3,6 +3,7 @@ import unittest
 
 import config
 import app
+import os
 
 class our_flask_test(unittest.TestCase):
 
@@ -19,6 +20,7 @@ class our_flask_test(unittest.TestCase):
         f.write(html)
         f.flush()
         f.close()
+        os.remove(config.get_temp_dir() + 'teststuff.html')
         
         
         
