@@ -67,8 +67,8 @@ def facility_info():
         traceback.print_exc(file=sys.stdout)
         return "<h2>Facility details not found</h2>"
 
-@app.route('/adriennews')
-def adriennews():
+@app.route('/worksheet')
+def worksheet():
     if request.args:
         db = config.get_database()
         wellIds = request.args["WellId"]
@@ -84,7 +84,7 @@ def adriennews():
         print(monthly)
     else:
         print("No monthly data for this well")
-    return render_template('worksheetas.html', well=well, rm=royalty, m=monthly,  lease=lease, calc=calc)
+    return render_template('worksheet.html', well=well, rm=royalty, m=monthly,  lease=lease, calc=calc)
 
 @app.errorhandler(404)
 def not_found(error):
