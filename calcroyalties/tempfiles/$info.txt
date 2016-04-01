@@ -1,0 +1,4 @@
+
+This should be the only file in this directory checked into our repository.
+
+It is a location to store temp files that we do not want checked in. 

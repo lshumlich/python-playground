@@ -1,0 +1,53 @@
+1. accessing individual modules (e.g. calcroyalties.py):
+python3 -m database.calcroyalties from root directory
+
+2. virtualenv for self-contained virtual environment.
+after environment is created, install all dependencies with "pip install -r requirements.txt"
+
+General info of stuff in this package
+
+To Install a package:
+
+    python -m pip install SomePackage
+
+To Checkin Code:
+
+    - check in code daily at least but it must work and tests must run
+    - check in code hourly if changes 
+    
+    1) make sure all unit tests pass
+        pytest_run.py
+    2) check out the latest version from git
+        using your version of git
+    3) make sure all unit tests still pass
+        pytest_run.py
+    4) checkin you code
+        using your version of git
+        
+To review code coverage:
+
+    1) run the unit tests
+        pytest_run.py
+    2) look at the coverage
+        htmlcov/index.html
+
+Using the SQL database
+
+- there is a config file now. It will default to the following:
+	- in memory database (great for unit testing not so good for manual testing)
+	- sql_debug = false
+
+- to start using a sample database do the following:
+	- copy files\sample.db --> tempfiles\sample.db
+	- copy files\sample_config.json --> tempfiles\config.json
+	- edit tempfiles\config.json and change unittest.db to sample.db 
+	    ******* Warning ***** The next unit test will wipe out the database.
+	- for some example of how to use the sql engine see: database.sqlite_database_test.py
+
+Good Luck it's rough out there...
+
+Usefull Sqlite Commands:
+
+select * from sqlite_master;
+Pragma table_info(well);
+

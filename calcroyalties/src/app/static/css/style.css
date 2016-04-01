@@ -1,0 +1,27 @@
+body {
+	font-size: 12px;
+	font-family: Verdana, Arial, Sans-Serif;
+	color:#444;
+	margin: 0px;
+}
+
+th {
+	background-color: dimgray;
+	color: white;
+	height: 50px;
+	font-weight: bold;
+}
+
+tr {
+	height: 30px;
+}
+
+.wellmodal {
+  width: 100%;
+}
+.wellmodal td {
+  width: 25%;
+}
+.wellmodal input {
+  width: 100%;
+}

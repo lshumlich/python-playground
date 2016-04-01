@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+{% block body %}
+<script>
+  $(function() {
+  	$('#tabs').tabs();
+    $('#accordion').accordion({
+      collapsible:true,
+      heightStyle:'content',
+    });
+    $('#search-basic, #search-advanced').button({
+      icons: {primary: 'ui-icon-search'}
+    });
+  });
+</script>
+
+<h2>Well Search</h2>
+
+<div id="accordion">
+  <h3>Search Criteria</h3>
+  <div>
+  	<div id="tabs">
+  	  <ul>
+  	    <li><a href="#tabs-basic">Basic search</a></li>
+  	    <li><a href="#tabs-advanced">Advanced search</a></li>
+  	  </ul>
+
+  	  <div id="tabs-basic">
+  	    Well ID
+        <br>
+        <input id='well-search-id'></input>
+        <br>
+        <br>
+        UWI
+        <br>
+        <input id='well-search-uwi'></input>
+        <br>
+        <br>
+        <button id='search-basic'>Search</button>
+  	  </div>
+
+  	  <div id="tabs-advanced">
+  	    Province
+        <br>
+        <input id='well-search-prov'></input>
+        <br>
+        <br>
+        Well Type
+        <br>
+        <input id='well-search-type'></input>
+        <br>
+        <br>
+        <button id='search-advanced'>Search</button>
+  	  </div>
+
+  	</div>
+  </div>
+</div>
+
+<div id='results-table'>
+</div>
+
+<script>
+  $('#search-basic, #search-advanced').click(function() {
+    // console.log('hello');
+    $.ajax({
+      url: "/api/wellresults",
+      dataType: "html"
+    })
+      .done(function (msg){
+        $('#results-table').html(msg);
+        $("tr:even").css("background-color", "lightgray");
+        $("#accordion").accordion("option", "active", false)
+    });
+  });
+</script>
+</html>
+
+{% endblock %}
+<!--
+When searching, send the search parameters from this form as a post request to the server.
+When displaying results, display the same template (this page) but also pass on the search results. Then, if search results are passed:
+- collapse the search parameters accordion;
+- unhide results table
+- prepopulate results table with results
+-->

@@ -1,0 +1,54 @@
+<div id="modal">
+</div>
+
+<table style="width:100%">
+  <tr>
+    <td colspan=13><b>{{results|length}}</b> results found</td>
+  </tr>
+  <tr>
+    <th>Well ID</th>
+    <th>UWI</th>
+    <th>Province</th>
+    <th>Well Type</th>
+    <th>Lease Type</th>
+    <th>Lease ID</th>
+    <th>Royalty Classification</th>
+    <th>Classification</th>
+    <th>SRC</th>
+    <th>Indian Interest</th>
+    <th>Commencement Date</th>
+    <th>Reference Price</th>
+    <th>Actions</th>
+  </tr>
+  {% for row in results %}
+  <tr>
+    <td>{{ row.ID or "" }}</td>
+    <td>{{ row.UWI or "" }}</td>
+    <td>{{ row.Prov or "" }}</td>
+    <td>{{ row.WellType or "" }}</td>
+    <td>{{ row.LeaseType or "" }}</td>
+    <td>{{ row.LeaseID or "" }}</td>
+    <td>{{ row.RoyaltyClassification or "" }}</td>
+    <td>{{ row.Classification or "" }}</td>
+    <td>{{ row.SRC or "" }}</td>
+    <td>{{ row.IndianInterest }}</td>
+    <td>{{ row.CommencementDate or "" }}</td>
+    <td>{{ row.ReferencePrice or "" }}</td>
+    <td><a href="#" onclick=openInfo({{ row.ID }})>Edit</a></td>
+  </tr>
+  {% endfor %}
+</table>
+
+
+<script>
+function openInfo(id) {
+  var idObject = {ID:id}
+  console.log(idObject);
+  $.ajax({
+    url: "/api/wellinfo",
+    data: idObject,
+  })
+  .done(function(data){
+    $('#modal').html(data)});
+  }
+</script>

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=UnifrakturMaguntia">
+	<link rel="stylesheet" href={{url_for("static", filename="css/jqmath-0.4.3.css")}}>
+
+	<script src={{url_for("static", filename="js/jquery-2.1.4.min.js")}}></script>
+	<script src={{url_for("static", filename="js/jqmath-etc-0.4.3.min.js")}}></script>
+	<!-- <script>M.MathPlayer = false; M.trustHtml = true;</script> -->
+<style>
+
+h1 {
+    font-family: arial;
+    padding: 3px;
+    font-size: 120%
+}
+p1  {
+    font-family: arial;
+    font-size: 80%;
+}
+
+
+div {
+    border-collapse: collapse;
+}
+div {
+    padding: 2px;
+}
+
+
+
+</style>
+</head>
+
+
+<h1 align="center">Well: {{ well.ID }}<br>
+	UWI: {{ well.UWI }}</h1>
+<hr> </hr>
+
+<p1>
+
+<TABLE align="center">
+	<col width="25%">
+	<col width="25%">
+	<col width="25%">
+	<col width="25%">
+
+    <tr>
+      <TD align=right><b>Lease:<br>
+      Right:<br>
+      Province:<br>
+      Royalty Base:<br>
+      {% if rm.Gorr %}
+      GORR:<br>
+      {%endif%}
+      Crown Multiplier:<br>
+      Indian Interest:
+      </b></td>
+
+      <TD align="left">{{ well.Lease }}<br>
+      {{ rm.RightsGranted }}<br>
+      {{ well.Prov }}<br>
+      {{ rm.RoyaltyScheme }}<br>
+      {% if rm.Gorr %}
+      {{ rm.Gorr }}<br>
+      {% endif %}
+      {{  '{:.2f}'.format(rm.CrownMultiplier) }}<br>
+      {{  '{:.2f}'.format(well.IndianInterest) }}
+      </TD>
+
+      <TD align=right><b>
+      {% if rm.MinRoyalty != None %}
+      Min Royalty:<br>
+      {% endif %}
+      {% if well.SRC != None %}
+      SRC:<br>
+      {% endif %}
+      {% if well.Classification != None %}
+      Classification:<br>
+      {% endif %}
+      {% if well.RoyaltyClassification != None %}
+      Royalty Classification:<br>
+      {% endif %}
+      Valuation Method:<br>
+      {% if well.CommencementDate != None %}
+      Commencement Date:<br>
+      {% endif %}
+      {% if calc.CommencementPeriod != None %}
+      Commencement Period:<br>
+      {% endif %}
+      {% if rm.TruckingDeducted == 'Y' %}
+      Deductions:<br>
+      {% endif %}
+      {% if rm.ProcessingDeducted == 'Y' %}
+      Deductions:</b></TD>
+      {% endif %}
+
+
+      <TD align="left">
+      {% if rm.MinRoyalty != None %}
+      {{ rm.MinRoyalty }}<br>
+      {% endif %}
+      {% if well.SRC != None %}
+      {{ well.SRC }}<br>
+      {% endif %}
+      {% if well.Classification != None %}
+      {{ well.Classification }}<br>
+      {% endif %}
+      {% if well.RoyaltyClassification != None %}
+      {{ well.RoyaltyClassification }}<br>
+      {% endif %}
+      {{ rm.ValuationMethod }}<br>
+      {% if well.CommencementDate != None %}
+      {{ well._format.yyyy_mm_dd(well.CommencementDate) }}<br>
+      {% endif %}
+      {% if well.CommencementPeriod != None %}
+      {{ calc.CommencementPeriod }}<br>
+      {% endif %}
+      {% if rm.TruckingDeducted == 'Y' %}
+      Trucking<br>
+      {% endif %}
+      {% if rm.ProcessingDeducted == 'Y' %}
+      Processing
+      {% endif %}
+      </TD>
+
+
+   </TR>
+
+<!--<TABLE align="center">-->
+	<!--<col width="25%">-->
+	<!--<col width="25%">-->
+
+    <!--<tr>-->
+      <!--<TD align=right><b>Lease:</b></TD>-->
+      <!--<TD align="left">{{ well.Lease }}</TD>-->
+    <!--</tr>-->
+
+    <!--<tr>-->
+      <!--<TD align=right><b>Right:</b></TD>-->
+      <!--<TD align="left">{{ rm.RightsGranted }}</TD>-->
+    <!--</tr>-->
+
+    <!--<tr>-->
+      <!--<TD align=right><b>Province:</b></TD>-->
+      <!--<TD align="left">{{ well.Prov }}</TD>-->
+    <!--</tr>-->
+
+    <!--<tr>-->
+      <!--<TD align=right><b>Royalty Base:</b></TD>-->
+      <!--<TD align="left">{{ rm.RoyaltyScheme }}</TD>-->
+   <!--</TR>-->
+
+   <!--<tr>-->
+       <!--{% if rm.Gorr %}-->
+       <!--<TD align=right><b>GORR:</b> </TD>-->
+       <!--<TD align="left">{{ rm.Gorr }}</TD>-->
+   <!--</TR>-->
+    <!--{% endif %}-->
+   <!--<TR>-->
+      <!--<TD align=right><b>Crown Multiplier:</b></TD>-->
+      <!--<TD align="left">{{  '{:.2f}'.format(rm.CrownMultiplier) }}</TD>-->
+   <!--</TR>-->
+   <!--<TR>-->
+      <!--<TD align=right><b>Indian Interest:</b></TD>-->
+      <!--<TD align="left">{{  '{:.2f}'.format(well.IndianInterest) }}</TD>-->
+   <!--</TR>-->
+    <!--<TR>-->
+   <!--{% if rm.MinRoyalty != None %}-->
+       <!--<TD align=right><b>Min Royalty:</b> </TD>-->
+       <!--<TD align="left">{{ rm.MinRoyalty }}</TD>-->
+    <!--</TR>-->
+    <!--{% endif %}-->
+   <!--<TR>-->
+    <!--{% if well.SRC != None %}-->
+       <!--<TD align=right><b>SRC:</b> </TD>-->
+       <!--<TD align="left">{{ well.SRC }}</TD>-->
+   <!--</TR>-->
+    <!--{% endif %}-->
+   <!--<TR>-->
+   <!--{% if well.Classification != None %}-->
+      <!--<TD align=right><b>Classification:</b></TD>-->
+      <!--<TD align="left">{{ well.Classification }}</TD>-->
+   <!--{% endif %}-->
+   <!--</TR>-->
+   <!--<TR>-->
+   <!--{% if well.RoyaltyClassification != None %}-->
+      <!--<TD align=right><b>Royalty Classification:</b></TD>-->
+      <!--<TD align="left">{{ well.RoyaltyClassification }}</TD>-->
+   <!--</TR>-->
+   <!--{% endif %}-->
+   <!--<TR>-->
+      <!--<TD align=right><b>Valuation Method:</b></TD>-->
+      <!--<TD align="left">{{ rm.ValuationMethod }}</TD>-->
+   <!--</TR>-->
+   <!--<TR>-->
+   <!--{% if well.CommencementDate != None %}-->
+      <!--<TD align=right><b>Commencement Date:</b></TD>-->
+      <!--<TD align="left">{{ well._format.yyyy_mm_dd(well.CommencementDate) }}</TD>-->
+   <!--</TR>-->
+   <!--{% endif %}-->
+   <!--<TR>-->
+   <!--{% if calc.CommencementPeriod != None %}-->
+      <!--<TD align=right><b>Commencement Period:</b></TD>-->
+      <!--<TD align="left">{{ calc.CommencementPeriod }}</TD>-->
+   <!--</TR>-->
+   <!--{% endif %}-->
+    <!--<TR>-->
+   <!--{% if rm.TruckingDeducted == 'Y' %}-->
+      <!--<TD align=right><b>Deductions:</b></TD>-->
+      <!--<TD align="left">Trucking</TD></TR>-->
+   <!--{% endif %}-->
+    <!--<TR>-->
+   <!--{% if rm.ProcessingDeducted == 'Y' %}-->
+      <!--<TD align=right><b>Deductions:</b></TD>-->
+      <!--<TD align="left">Processing</TD>-->
+   <!--{% endif %}-->
+    <!--</TR>-->
+
+
+<!--</TABLE><br>-->
+
+
+
+<head>
+<style>
+table, th, td {
+    border-collapse: collapse;
+}
+th, td {
+    padding: 3px;
+}
+</style>
+</head>
+<body>
+
+
+    <TABLE align="center" style="width:90%" border="1">
+
+	<caption><b>Monthly Sask Def of</b></caption>
+	<col width="12.5%">
+	<col width="12.5%">
+	<col width="12.5%">
+	<col width="12.5%">
+	<col width="12.5%">
+	<col width="12.5%">
+	<col width="12.5%">
+	<col width="12.5%">
+
+   <TR>
+      <TD>Extract Date</TD>
+      <TD>Prod. Month</TD>
+	   <TD>Amend No.</TD>
+	   <TD>Prod.</TD>
+	   <TD>Monthly Prod. Vol.</TD>
+	   <TD>Well Head Price</TD>
+	   <TD>Trucking Price</TD>
+	   <TD>Processing Price</TD>
+   </TR>
+
+	<TR>
+      <TD>{{ m._format.yyyy_mm_dd(m.ExtractMonth) }}</TD>
+      <TD>{{ m._format.ProdMonth }}</TD>
+	   <TD>{{ m.AmendNo }}</TD>
+	   <TD>{{ m.Product }}</TD>
+	   <TD>{{ '{:.2f}'.format(m.ProdVol) }}</TD>
+	   <TD>{{ '{:.6f}'.format(m.WellHeadPrice) }}</TD>
+	   <TD>{{ '{:.6f}'.format(m.TransRate) }}</TD>
+	   <TD>{{ '{:.6f}'.format(m.ProcessingRate) }}</TD>
+    </TR>
+
+</TABLE>
+
+
+
+<br><div align="center">{*** Note: Replace Well Head Price with Petrinex detail when available ***}<br>
+{*** Note: Replace Trucking Price with Petrinex detail when available ***}<br>
+{*** Note: Replace Processing Price with Petrinex detail when available ***}<br><br>
+
+{% if calc.X > 0 %}
+
+[(K - x) / MOP]- SRC  |  $$({ {{ calc.K }} } -
+    { {{ calc.X }} }/{ {{ m.ProdVol }} } )- { {{ well.SRC }} }$$
+
+{% endif %}
+
+{% if calc.C > 0 %}
+    (C * MOP) - D | {{calc.C, m.ProdVol, calc.D, calc.ProvCrownRoyaltyRate}}
+{% endif %}
+
+
+{% if calc.Message != None %}
+{{ calc.Message }}
+{% endif %}
+
+{% if calc.CommencementPeriod != None %}
+    {% if calc.CommencementPeriod < 5 %}
+    IOGR 1995 - Commencement Period < 5 Years: {{ calc.CommencementPeriod }}:
+    {% else %}
+    IOGR 1995 - Commencement Period >=  5Years: {{calc.CommencementPeriod }}:
+    {% endif %}
+    <br>
+{% endif %}
+
+{% if m.ProdVol < 80 %}
+    MOP < 80  -> RVol = 10% * MOP + {{ calc.IOGR1995RoyaltyVolume }}
+{% elif m.ProdVol < 160 %}
+   <TR align="center"> MOP 80 to 160  -> RVol = 8 + 20% * (MOP - 80) + {{ '{:.2f}'.format(calc.IOGR1995RoyaltyVolume) }}</TR>
+{% elif calc.CommencementPeriod < 5 %}
+    MOP > 160  -> RVol = 24 + 26% * (MOP - 160) + {{ '{:.2f}'.format(calc.IOGR1995RoyaltyVolume) }}
+{% elif m.ProdVol < 795 %}
+    MOP 160 to 795 -> RVol = 24 + 26% * (MOP - 160) + {{ '{:.2f}'.format(calc.IOGR1995RoyaltyVolume) }}
+{% else %}
+    MOP > 795 -> RVol = 189 + 40% * (MOP - 795) + + {{ '{:.2f}'.format(calc.IOGR1995RoyaltyVolume) }}
+<br>
+{% endif %}</div>
+
+
+<table align="center" width="50%">
+    <col width="4%">
+	<col width="4%">
+	<col width="4%">
+	<col width="4%">
+    <col width="4%">
+    <col width="4%">
+	<col width="4%">
+	<col width="4%">
+	<col width="4%">
+    <col width="4%">
+    <col width="4%">
+    <col width="4%">
+    <col width="4%">
+
+{% if m.Product == 'Oil' and 'SKProvCrownVar' in rm.RoyaltyScheme %}
+<tr align="center"><td>CR%</td> <td>*</td> <td>CMult</td> <td>*</td> <td>Prod</td> <td>*</td> <td>II</td> <td>*</td> <td>Val</td>
+    <td>=</td> <td>R$</td> <td>=</td> <td>Rvol</td></tr>
+<tr align="center"><td>{{ calc.ProvCrownUsedRoyaltyRate }}</td> <td>*</td> <td>{{ rm.CrownMultiplier }}</td> <td>*</td> <td>{{ m.ProdVol }}</td>
+<td>*</td> <td>{{ well.IndianInterest }}</td> <td>*</td> <td>{{ '{:.6f}'.format(calc.RoyaltyPrice) }}</td> <td>=</td> <td>{{calc.ProvCrownRoyaltyValue}}</td>
+    <td>=</td> <td>{{ calc.ProvCrownRoyaltyVolume }}</td>
+{% endif %}
+
+{% if m.Product == 'Oil' and 'IOGR1995' in rm.RoyaltyScheme %}
+<tr align="center"><td>CMult</td> <td>*</td> <td>RoyVol</td> <td>*</td> <td>II</td> <td>*</td> <td>Val</td> <td>=</td> <td>R$</td> <td>=</td> <td>Rvol</td></tr>
+<br>
+<tr align="center"><td>{{ rm.CrownMultiplier }}</td> <td>*</td> <td>{{ '{:.2f}'.format(calc.IOGR1995RoyaltyVolume) }}</td> <td>*</td> <td>{{ well.IndianInterest/1 }}</td> <td>*</td>
+<td>{{ '{:.6f}'.format(calc.RoyaltyPrice) }}</td> <td>=</td> <td>{{ '{:.2f}'.format(calc.IOGR1995RoyaltyValue) }}</td> <td>=</td> <td>{{ '{:.2f}'.format(calc.IOGR1995RoyaltyVolume) }}</td> </tr>
+<br>
+    {% endif %}
+</table>
+
+{% if 'GORR' in rm.RoyaltyScheme %}
+<table align="center" width="50%">
+    <col width="4%">
+	<col width="4%">
+	<col width="4%">
+	<col width="4%">
+    <col width="4%">
+    <col width="4%">
+	<col width="4%">
+	<col width="4%">
+	<col width="4%">
+    <col width="4%">
+    <col width="4%">
+<caption><center> GORR: + {{ calc.GorrMessage }} </center></caption>
+<tr align="center"><td>GORR%</td> <td>*</td> <td>Prod</td>    <td>*</td> <td>II</td> <td>*</td> <td>Val</td> <td>=</td> <td>R$</td>  <td>=</td> <td>Rvol</td></tr>
+<br>
+<tr align="center"><td>{{ calc.GorrRoyaltyRate }}</td> <td>*</td> <td>{{ '{:.2f}'.format(m.ProdVol) }}</td> <td>*</td> <td>{{ well.IndianInterest }}</td>
+    <td>*</td> <td>{{ '{:.6f}'.format(calc.RoyaltyPrice) }}</td> <td>=</td> <td>{{ '{:.2f}'.format(calc.GorrRoyaltyValue) }}</td> <td>=</td> <td> {{ '{:>10,.2f}'.format(calc.GorrRoyaltyVolume) }} </td></tr>
+{% endif %}
+</table>
+
+<table width="56%" align="center">
+    <col width="7%">
+	<col width="7%">
+	<col width="7%">
+	<col width="7%">
+    <col width="7%">
+    <col width="7%">
+	<col width="7%">
+	<col width="7%">
+{% if calc.RoyaltyValuePreDeductions != calc.RoyaltyValue %}
+<tr><td align="left" colspan="2">Royalty Pre Deductions:</td> <td colspan="6" align="right">{{ '{:.2f}'.format(calc.RoyaltyValuePreDeductions) }}</td></tr>
+<br>
+{% endif %}
+{% if calc.RoyaltyTransportation > 0 %}
+<tr align="center"><td colspan="2">Less Transportation:</td> <td>{{calc.RoyaltyVolume }}</td> <td>*</td> <td>{{ m.TransRate }}</td> <td>=</td> <td>{{ '{:.2f}'.format(calc.RoyaltyTransportation) }}</td></tr>
+<br>
+{% endif %}
+{% if calc.RoyaltyProcessing > 0 %}
+<tr align="Center"><td colspan="2">Less Processing:</td> <td>{{ calc.RoyaltyVolume }}</td> <td>*</td> <td>{{ m.ProcessingRate }}</td> <td>=</td> <td>{{ '{:.2f}'.format(calc.RoyaltyProcessing) }}</td></tr>
+<br>
+{% endif %}
+{% if calc.RoyaltyDeductions > 0 %}
+<tr align="Center"><td colspan="2">Total Deductions:</td><td> &nbsp; </td> <td> &nbsp; </td> <td> &nbsp; </td> <td> &nbsp; </td> <td align="center">{{ '{:.2f}'.format(calc.RoyaltyDeductions) }}</td></tr>
+<br>
+{% endif %}
+<tr align="left"><td colspan="4"> {*** Note: Handle Incentives} </td></tr>
+<tr><td align="left" colspan="2"> Royalty Amount:</td> <td colspan="6" align="right">{{ '{:.2f}'.format(calc.RoyaltyValue) }}</td></tr>
+<tr align="left"><td colspan="4"> {*** Note: Handle Previous Paid Amount?} </td></tr>
+</table>
+
+<table align="center" width="50%">
+    <col width="4%">
+	<col width="4%">
+	<col width="4%">
+	<col width="4%">
+    <col width="4%">
+    <col width="4%">
+	<col width="4%">
+	<col width="4%">
+	<col width="4%">
+    <col width="4%">
+    <col width="4%">
+    <col width="4%">
+    <col width="4%">
+{% if calc.CommencementPeriod <= 5 %}
+<tr align="center"><td>S</td> <td>=</td> <td>(T</td> <td>-</td> <td>B)</td> <td>*</td> <td>0.50</td> <td>*</td> <td>(P</td> <td>-</td> <td>R)</td></tr>
+<br>
+<tr align="center"><td>{{ calc.SupplementaryRoyalties }}</td> <td>=</td> <td>({{ m.ProdVol }}</td> <td>-</td> <td>{{ calc.RoyaltyRegulation }})</td> <td>*</td>
+<td>0.50</td> <td>*</td> <td>({{ m.WellHeadPrice }}</td> <td>-</td> <td>{{ well.ReferencePrice }})</td></tr>
+{% endif %}
+</table>
+
+</p1>
+
+</body>
+</html>
+
