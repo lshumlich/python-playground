@@ -28,28 +28,28 @@ class DataStructure(object):
             lid = self.LeaseID
         else:
             lid = self.ID
-        return '{}-{:04d}'.format(self.LeaseType,lid)
+        return '{}-{:04d}'.format(self.LeaseType, lid)
 
 """
-Formatter: formats the attrabutes for various reports. 
+Formatter: formats the attributes for various reports.
 """
 
 class Formatter(object):
     
-    def __init__(self, dataObj):
-        self.dataObj = dataObj
+    def __init__(self, data_obj):
+        self.data_obj = data_obj
     
     @property
     def Lease(self):
-        if hasattr(self.dataObj, 'LeaseID'):
-            lid = self.dataObj.LeaseID
+        if hasattr(self.data_obj, 'LeaseID'):
+            lid = self.data_obj.LeaseID
         else:
-            lid = self.dataObj.ID
-        return '{}-{:04d}'.format(self.dataObj.LeaseType,lid)
+            lid = self.data_obj.ID
+        return '{}-{:04d}'.format(self.data_obj.LeaseType, lid)
 
     @property
     def ProdMonth(self):
-        dts = str(self.dataObj.ProdMonth)
+        dts = str(self.data_obj.ProdMonth)
         return dts[0:4]+'-'+dts[4:6]
 
     def yyyy_mm_dd(self, dt):

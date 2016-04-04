@@ -14,10 +14,10 @@ class Database(object):
         self.dbi = config.get_database_instance()
     
     def sql_to_object(self, table_name, input_list):
-        header_row = self.dbi.get_column_names() # must run after the select statement
+        header_row = self.dbi.get_column_names()  # must run after the select statement
         result = []
         for row in input_list:
-            ds=self.get_data_structure(table_name)
+            ds = self.get_data_structure(table_name)
             setattr(ds, "_table_name", table_name)
             result.append(ds)
             i = 0
@@ -32,7 +32,7 @@ class Database(object):
 #         else:
 #             return result
 
-    def get_data_structure(self,table_name):
+    def get_data_structure(self, table_name):
         """ This method must be called to create a valid database data structure. """ 
         ds = DataStructure()
         ds._table_name = table_name
@@ -58,17 +58,17 @@ class Database(object):
         result = self.select(table, **kwargs)
         if len(result) != 1:
             raise AppError("sqlite_database.select1 should have only found 1, but we found " + str(len(result)) + " in table: " + table +
-            ". We are only looking for "+ str(kwargs))
+            ". We are only looking for " + str(kwargs))
         return result[0]
 
-    def to_db_value (self,value):
+    def to_db_value(self, value):
 
         if type(value) is str:
-            return '"' + value +'"'
+            return '"' + value + '"'
         elif type(value) is int or type(value) is float:
             return str(value)
         elif type(value) is bool:
-            return '1' if (value) else '0'
+            return '1' if value else '0'
         elif not value:
             return 'null'
         
@@ -78,7 +78,7 @@ class Database(object):
         dic = ds.__dict__
         
         to_insert_attr = '('
-        to_insert_value  = '('
+        to_insert_value = '('
         
         for attr in dic:
             # This logic is to ignore attributes that start with _ and if the 
@@ -121,17 +121,17 @@ class Database(object):
         orig_dict = orig_ds[0].__dict__
         new_dict = ds.__dict__
         to_update = ''
-        for attr in  orig_dict:
+        for attr in orig_dict:
             if not attr.startswith('_'):
                 if orig_dict[attr] != new_dict[attr]:
-                    #todo: Do that audit of the records right here.
-#                     print('difference:',attr,orig_dict[attr])
+                    # todo: Do that audit of the records right here.
+                    # print('difference:',attr,orig_dict[attr])
                     if len(to_update) > 0:
                         to_update += ','
                     to_update += attr + '=' + self.to_db_value(new_dict[attr])
                     
         if len(to_update) > 0:
-            statement = 'UPDATE ' +  ds._table_name + ' SET ' + to_update + ' where ID = ' + str(ds.ID)
+            statement = 'UPDATE ' + ds._table_name + ' SET ' + to_update + ' where ID = ' + str(ds.ID)
             self.dbi.execute(statement)
             self.dbi.commit()
 
@@ -142,4 +142,3 @@ class Database(object):
         
     def commit(self):
         self.dbi.commit()
-        

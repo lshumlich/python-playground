@@ -22,21 +22,21 @@ class DatabaseCreate(object):
         
     def create_all(self):
         tables = self.dbi.get_table_names()
-        if not 'Config' in tables:
+        if 'Config' not in tables:
             self.Config()
-        if not 'Well' in tables:
+        if 'Well' not in tables:
             self.Well()
-        if not 'Royaltymaster' in tables:
+        if 'Royaltymaster' not in tables:
             self.RoyaltyMaster()
-        if not 'Lease' in tables:
+        if 'Lease' not in tables:
             self.Lease()
-        if not 'Monthly' in tables:
+        if 'Monthly' not in tables:
             self.Monthly()
-        if not 'Calc' in tables:
+        if 'Calc' not in tables:
             self.Calc()
-        if not 'ECONData' in tables:
+        if 'ECONData' not in tables:
             self.ECONdata()
-        if not 'LinkTab' in tables:
+        if 'LinkTab' not in tables:
             self.Linktab()
         
     def Config(self):
@@ -46,8 +46,8 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
         
-        insertStatement = "insert into Config (Version, CreateDate) values(" + str(DatabaseCreate.DATABASE_VERSION) + ",'" + str(datetime.datetime.now()) + "');"
-        self.dbi.execute(insertStatement)
+        insert_statement = "insert into Config (Version, CreateDate) values(" + str(DatabaseCreate.DATABASE_VERSION) + ",'" + str(datetime.datetime.now()) + "');"
+        self.dbi.execute(insert_statement)
 
     def Well(self):
         statement = """

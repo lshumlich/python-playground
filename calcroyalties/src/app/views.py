@@ -1,16 +1,37 @@
 #!/bin/env python3
 
-import json
-import sys, traceback
-from flask import render_template, request, redirect, url_for, flash
+import sys
+import traceback
+
+from flask import render_template, request, redirect, url_for, session
 
 import config
 from src.app import app
 
 
+# @app.before_request
+# def before_request():
+#     if not hasattr(g, 'user'):
+#         return redirect(url_for('login'))
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        print(request.form['username'])
+        session['user'] = request.form['username']
+        print(session['user'])
+        return redirect(url_for('index'))
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    if 'user' in session:
+        session.pop('user')
+    return redirect(url_for('index'))
 
 @app.route('/well/index')
 def well_index():
@@ -71,20 +92,19 @@ def facility_info():
 def worksheet():
     if request.args:
         db = config.get_database()
-        wellIds = request.args["WellId"]
-        well_id = int(wellIds)
-        prodMonth = 201501
+        well_id = int(request.args["WellId"])
+        prod_month = 201501
         product = "Oil"
         well = db.select1('Well', ID=well_id)
         royalty = db.select1('Royaltymaster', ID=well.LeaseID)
         lease = db.select1('Lease', ID=well.LeaseID)
-        monthly = db.select1('Monthly', WellID = well_id, prodMonth = prodMonth, product = product)
-        calc_array = db.select('Calc', WellID=well_id, prodMonth = prodMonth)
+        monthly = db.select1('Monthly', WellID = well_id, prodMonth = prod_month, product = product)
+        calc_array = db.select('Calc', WellID=well_id, prodMonth = prod_month)
         calc = calc_array[0]
         print(monthly)
+        return render_template('worksheet.html', well=well, rm=royalty, m=monthly, lease=lease, calc=calc)
     else:
-        print("No monthly data for this well")
-    return render_template('worksheet.html', well=well, rm=royalty, m=monthly,  lease=lease, calc=calc)
+        return "No monthly data for this well"
 
 @app.errorhandler(404)
 def not_found(error):
