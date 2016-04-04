@@ -326,7 +326,8 @@ class ProcessRoyalties(object):
                                                       royalty_calc.IOGR1995RoyaltyVolume *
                                                       indian_interest *
                                                       royalty_calc.RoyaltyPrice , 2)
-        
+
+        royalty_calc.SupplementaryRoyalties = self.calcSupplementaryRoyaltiesIOGR1995(commencement_period, well_head_price, prod_vol, royalty_regulation, reference_price)
         return
 
     def calcSaskOilRegulationSubsection2(self,mop):
