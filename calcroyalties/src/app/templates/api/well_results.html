@@ -34,7 +34,11 @@
     <td>{{ row.IndianInterest }}</td>
     <td>{{ row.CommencementDate or "" }}</td>
     <td>{{ row.ReferencePrice or "" }}</td>
-    <td><a href="#" onclick=openInfo({{ row.ID }})>Edit</a></td>
+    <td>
+    <a href="#" title="Edit" class="icon icon-edit" onclick=openInfo({{ row.ID }})></a>
+    &nbsp;
+    <a href="/worksheet?WellId={{ row.ID }}" title="Worksheet" class="icon icon-text-document"></a>
+    </td>
   </tr>
   {% endfor %}
 </table>
