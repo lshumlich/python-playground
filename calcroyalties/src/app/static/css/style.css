@@ -25,3 +25,17 @@ tr {
 .wellmodal input {
   width: 100%;
 }
+
+.icon {
+    background-image: url("../img/mini-icons-white.png");
+	background-repeat: no-repeat;
+	margin-top: -2px;
+	padding-left: 6px;
+	float: left;
+	width: 20px;
+	height: 20px;
+    -webkit-filter: invert(100%); filter: invert(100%);
+}
+
+.icon-edit{ background-position: -32px -96px;  } 
+.icon-text-document{ background-position: -64px 0;  } 
