@@ -396,7 +396,7 @@ class Obfuscator(object):
         else:
             f = self.facLicences[v]
         
-        row[i].value = f.facility
+        row[i].value = f.facLicence
 
         i = self.getIndex("Licensee")
         v = row[i].value
@@ -542,8 +542,10 @@ class Obfuscator(object):
             row[i].value = f.facility
             
         if not handled:
-            row[i].value = '??????'
-        
+            f = Facility(v)
+            self.facilities[v] = f
+            row[i].value = f.facility
+
     def processProrationFactorRow(self,row):
 
         i = self.getIndex("Facility")
