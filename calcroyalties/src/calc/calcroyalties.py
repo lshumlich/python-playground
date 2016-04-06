@@ -153,6 +153,7 @@ class ProcessRoyalties(object):
 # Adrienne - Write this method...
     def calcSaskOilProvCrownRoyaltyRate(self,calc,econOilData,
                 wellRoyaltyClassification,wellClassification,mop,src):
+
     #ADD COMMENCEMENT
      #   econOilData = self.db.getECONOilData(monthly.ProdMonth)
      #   mop = monthly.ProdVol
