@@ -52,9 +52,20 @@ class ProcessRoyalties(object):
         self.db = config.get_database()
 
     """
-    The place where the calculations begin.
+    Process all the royalties that have monthly data
+    """
+    def process_all(self):
+        errorCount = 0
+        log = open(config.get_temp_dir() + 'log.txt', 'w')
+        log.write("Hello World.\n")
+        for monthlyData in self.db.select('Monthly'):
+            self.process_one(monthlyData.WellID, monthlyData.ProdMonth, monthlyData.Product)
+
+    """
+    Process a single royalty
     """
     def process_one(self, well_id, prod_month, product):
+        print('**** Processing ***', well_id, prod_month, product)
         errorCount = 0
         log = open(config.get_temp_dir() + 'log.txt','w')
         log.write ("Hello World.\n")
@@ -75,68 +86,12 @@ class ProcessRoyalties(object):
         else:
             self.db.update(calc)
 
-    #
-    # Royalty Calculation
-    #
-    def zero_royalty_calc(self, month, wellID, rc):
-        if rc == None:
-            rc = self.db.get_data_structure('Calc')
-#         rc.ID = 0
-        rc.ProdMonth = month
-        rc.WellID = wellID
-
-        setattr(rc, 'K', 0.0)
-        setattr(rc, 'X', 0.0)
-        setattr(rc, 'C', 0.0)
-        setattr(rc, 'D', 0.0)
-
-        setattr(rc, 'RoyaltyPrice', 0.0)
-        setattr(rc, 'RoyaltyVolume', 0.0)
-
-        setattr(rc, 'ProvCrownRoyaltyRate', 0.0)
-        setattr(rc, 'ProvCrownUsedRoyaltyRate', 0.0)
-        setattr(rc, 'IOGR1995RoyaltyRate', 0.0)
-        setattr(rc, 'GorrRoyaltyRate', 0.0)
-        
-        setattr(rc, 'ProvCrownRoyaltyVolume', 0.0)
-        setattr(rc, 'GorrRoyaltyVolume', 0.0)
-        setattr(rc, 'IOGR1995RoyaltyVolume', 0.0)
-        
-        setattr(rc, 'ProvCrownRoyaltyValue', 0.0)
-        setattr(rc, 'IOGR1995RoyaltyValue', 0.0)
-        setattr(rc, 'GorrRoyaltyValue', 0.0)
-        
-        setattr(rc, 'RoyaltyValuePreDeductions', 0.0)
-        setattr(rc, 'RoyaltyTransportation', 0.0)
-        setattr(rc, 'RoyaltyProcessing', 0.0)
-        setattr(rc, 'RoyaltyDeductions', 0.0)
-        setattr(rc, 'RoyaltyValue', 0.0)
-        setattr(rc, 'SupplementaryRoyalties', 0.0)
-        setattr(rc, 'RoyaltyRegulation', 0.0)
-
-        setattr(rc, 'CommencementPeriod', None)
-        setattr(rc, 'Message', None)
-        setattr(rc, 'GorrMessage', None)
-        
-        return rc
-
-
-
-    def process_all(self):
-        errorCount = 0
-        log = open(config.get_temp_dir() + 'log.txt','w')
-        log.write ("Hello World.\n")
-        for monthlyData in self.db.select('Monthly'):
-            print('**** Processing ***', monthlyData.WellID)
-            self.process_one(monthlyData.WellID, monthlyData.ProdMonth, monthlyData.Product)
-
     def calc_royalties(self, well, royalty, lease, calc, monthly):
         try:
             if monthly.Product == 'Oil' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
                 self.calcSaskOilProvCrown(monthly, well, royalty, lease, calc)
             elif monthly.Product == 'Oil' and 'IOGR1995' in royalty.RoyaltyScheme:
                 self.calcSaskOilIOGR1995(well.CommencementDate, royalty.ValuationMethod, royalty.CrownMultiplier, well.IndianInterest, monthly, calc)
-                self.calcSaskOilProvCrownRoyaltyRate(calc, econdata, well.RoyaltyClassification, well.Classification, monthly.ProdVol, well.SRC)
 
             # self.calcSaskOilIOGR1995(monthly, well, royalty, lease, calc)
         except AppError:
@@ -476,6 +431,50 @@ class ProcessRoyalties(object):
                                             royalty.MinRoyalty, royalty.CrownMultiplier,
                                             calc.RoyaltyPrice)
 
+    #
+    # Royalty Calculation
+    #
+    def zero_royalty_calc(self, month, wellID, rc):
+        if rc == None:
+            rc = self.db.get_data_structure('Calc')
+            #         rc.ID = 0
+        rc.ProdMonth = month
+        rc.WellID = wellID
+
+        setattr(rc, 'K', 0.0)
+        setattr(rc, 'X', 0.0)
+        setattr(rc, 'C', 0.0)
+        setattr(rc, 'D', 0.0)
+
+        setattr(rc, 'RoyaltyPrice', 0.0)
+        setattr(rc, 'RoyaltyVolume', 0.0)
+
+        setattr(rc, 'ProvCrownRoyaltyRate', 0.0)
+        setattr(rc, 'ProvCrownUsedRoyaltyRate', 0.0)
+        setattr(rc, 'IOGR1995RoyaltyRate', 0.0)
+        setattr(rc, 'GorrRoyaltyRate', 0.0)
+
+        setattr(rc, 'ProvCrownRoyaltyVolume', 0.0)
+        setattr(rc, 'GorrRoyaltyVolume', 0.0)
+        setattr(rc, 'IOGR1995RoyaltyVolume', 0.0)
+
+        setattr(rc, 'ProvCrownRoyaltyValue', 0.0)
+        setattr(rc, 'IOGR1995RoyaltyValue', 0.0)
+        setattr(rc, 'GorrRoyaltyValue', 0.0)
+
+        setattr(rc, 'RoyaltyValuePreDeductions', 0.0)
+        setattr(rc, 'RoyaltyTransportation', 0.0)
+        setattr(rc, 'RoyaltyProcessing', 0.0)
+        setattr(rc, 'RoyaltyDeductions', 0.0)
+        setattr(rc, 'RoyaltyValue', 0.0)
+        setattr(rc, 'SupplementaryRoyalties', 0.0)
+        setattr(rc, 'RoyaltyRegulation', 0.0)
+
+        setattr(rc, 'CommencementPeriod', None)
+        setattr(rc, 'Message', None)
+        setattr(rc, 'GorrMessage', None)
+
+        return rc
 
     """
 # Where is lease used in this method? - Adrienne
