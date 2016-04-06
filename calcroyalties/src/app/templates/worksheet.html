@@ -428,7 +428,7 @@ table, th, td {
 <tr align="left"><td colspan="4"> {*** Note: Handle Previous Paid Amount?} </td></tr>
 </table>
 
-<table align="center" width="50%">
+<table align="center" width="40%">
     <col width="4%">
 	<col width="4%">
 	<col width="4%">
@@ -443,16 +443,14 @@ table, th, td {
     <col width="4%">
     <col width="4%">
 {% if calc.CommencementPeriod <= 5 %}
+    <br>
 <tr align="center"><td>S</td> <td>=</td> <td>(T</td> <td>-</td> <td>B)</td> <td>*</td> <td>0.50</td> <td>*</td> <td>(P</td> <td>-</td> <td>R)</td></tr>
 <tr align="center"><td>S</td> <td>=</td> <td>({{ m.ProdVol }}</td> <td>-</td> <td>{{ calc.RoyaltyRegulation }})</td> <td>*</td>
-<td>0.50</td> <td>*</td> <td>({{ m.WellHeadPrice }}</td> <td>-</td> <td>{{ well.ReferencePrice }})</td></tr>
-<tr align="center"><td>S</td> <td>=</td> {{ calc.SupplementaryRoyalties }}</td></tr>
+<td>0.50</td> <td>*</td> <td>({{ m.WellHeadPrice }}</td> <td>-</td> <td> 25.13)</td></tr>
+<tr align="center"><td>S</td> <td>=</td> <td>{{ calc.SupplementaryRoyalties }}</td></tr>
 {% endif %}
 </table>
-
-<!--</p1>-->
 </div>
-
 </body>
 </html>
 
