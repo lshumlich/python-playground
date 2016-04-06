@@ -60,6 +60,7 @@ target/
 *~*
 *.swp
 *.swo
+*.lnk
 log.txt
 .idea/
 Royalty\ Worksheet.txt
@@ -76,4 +77,5 @@ venv
 /calcroyalties/.project
 /calcroyalties/tempfiles/*.db
 /calcroyalties/tempfiles/*.json
+/calcroyalties/tempfiles/*.xlsx
 /calcroyalties/.pydevproject
