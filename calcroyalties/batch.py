@@ -38,17 +38,6 @@ def runTestModule():
     unittest.main(module='database.calcroyalties_test')
 #    unittest.main(module='database.sqlite_load_excel_test')
 
-def load_excel_to_sql():
-    """ The database is configured in config.json in the tempfiles directory """
-#     drop_create_tables()
-    excelSheet = r'd:\$temp\Onion Lake SK wells.xlsx'
-#     excelSheet = config.get_file_dir() +  'database new.xlsx'
-    loader = Loader()
-    loader.connect()
-    loader.open_excel(excelSheet)
-    loader.load_all_sheets()
-    loader.close()
-    
 def load_tests(loader, tests, pattern):
     suite = TestSuite()
     for all_test_suite in unittest.defaultTestLoader.discover('.', pattern='*_test.py'):
@@ -72,10 +61,9 @@ def load_sample_data():
 print('-- Runing Batch')
 if __name__ == "__main__":
 #    drop_create_tables()
-#    load_excel_to_sql()
 #     load_sample_data()
 #     browser_app()
-     run_royalties_and_worksheet()
+#      run_royalties_and_worksheet()
 #    unittest.main()
 #     runTestModule()
      print("Goodbye world!")
