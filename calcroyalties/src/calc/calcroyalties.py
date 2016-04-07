@@ -85,14 +85,12 @@ class ProcessRoyalties(object):
             self.db.insert(calc)
         else:
             self.db.update(calc)
-
     def calc_royalties(self, well, royalty, lease, calc, monthly):
         try:
             if monthly.Product == 'Oil' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
                 self.calcSaskOilProvCrown(monthly, well, royalty, lease, calc)
             elif monthly.Product == 'Oil' and 'IOGR1995' in royalty.RoyaltyScheme:
                 self.calcSaskOilIOGR1995(well.CommencementDate, royalty.ValuationMethod, royalty.CrownMultiplier, well.IndianInterest, monthly, calc)
-
             # self.calcSaskOilIOGR1995(monthly, well, royalty, lease, calc)
         except AppError:
             print('Royalty Scheme not yet developed: ',  royalty.RoyaltyScheme,  ' ',  monthly.Product)
@@ -122,7 +120,7 @@ class ProcessRoyalties(object):
                 calc.RoyaltyDeductions += calc.RoyaltyProcessing
                 calc.RoyaltyValue -= calc.RoyaltyProcessing
                 print("this is commencement period", calc.CommencementPeriod)
-                calc.SupplementaryRoyalties = self.calcSupplementaryRoyaltiesIOGR1995(calc.CommencementPeriod, monthly.WellHeadPrice, monthly.ProdVol, calc.RoyaltyPrice, self.reference_price['Sawridge Indian'])
+                #calc.SupplementaryRoyalties = self.calcSupplementaryRoyaltiesIOGR1995(calc.CommencementPeriod, monthly.WellHeadPrice, monthly.ProdVol, calc.RoyaltyPrice, self.reference_price['Sawridge Indian'])
                 #print(calcSupplementaryRoyaltiesIOGR1995)
                 #Royalty Price for Royalty Deduction???
 #            self.ws.printSaskOilRoyaltyRate(monthly, well, royalty, lease, calc)
@@ -236,32 +234,33 @@ class ProcessRoyalties(object):
         return calc.ProvCrownRoyaltyRate
 
 
-    def calcSaskOilProvCrownRoyaltyVolumeValue(self, ProvCrownUsedRoyaltyRate, mop, indianInterest, MinRoyalty, crownMultiplier, RoyaltyPrice):
+    def calcSaskOilProvCrownRoyaltyVolumeValue(self, ProvCrownUsedRoyaltyRate, mop, indianInterest, MinRoyalty, crownMultiplier, RoyaltyPrice, calc):
         # Note: If there is no sales. Use last months sales value... Not included in this code
 
         #calc.RoyaltyPrice = self.determineRoyaltyprice(royalty.ValuationMethod, econOilData)
 
-  #      ProvCrownUsedRoyaltyRate = calc.ProvCrownRoyaltyRate
+        calc.ProvCrownUsedRoyaltyRate = calc.ProvCrownRoyaltyRate
+        print("THIS IS PROVCROWNUSEDROYALTYRATE", calc.ProvCrownUsedRoyaltyRate)
 
-        if ProvCrownUsedRoyaltyRate < 0:
-            ProvCrownUsedRoyaltyRate = 0
+        if calc.ProvCrownUsedRoyaltyRate < 0:
+            calc.ProvCrownUsedRoyaltyRate = 0
 
         if MinRoyalty != None:
-            if MinRoyalty > ProvCrownUsedRoyaltyRate:
-                ProvCrownUsedRoyaltyRate = MinRoyalty
+            if MinRoyalty > calc.ProvCrownUsedRoyaltyRate:
+                calc.ProvCrownUsedRoyaltyRate = MinRoyalty
+
         #
         # This was done this way so precision was not lost.
         #
-        ProvCrownRoyaltyVolume = ((ProvCrownUsedRoyaltyRate / 100) *
+        calc.ProvCrownRoyaltyVolume = ((calc.ProvCrownUsedRoyaltyRate / 100) *
                                                       crownMultiplier *
                                                       mop * indianInterest)
 
-        ProvCrownRoyaltyValue = round((ProvCrownUsedRoyaltyRate / 100) *
+        calc.ProvCrownRoyaltyValue = round((calc.ProvCrownUsedRoyaltyRate / 100) *
                                                crownMultiplier *
                                                mop * indianInterest *
                                                RoyaltyPrice , 2)
 
-        return ProvCrownRoyaltyVolume, ProvCrownRoyaltyValue
 
 
     def calcSaskOilIOGR1995(self, commencement_date, valuation_method, crown_multiplier, indian_interest, m, royalty_calc):
@@ -286,6 +285,7 @@ class ProcessRoyalties(object):
                                                       royalty_calc.RoyaltyPrice , 2)
 
         royalty_calc.SupplementaryRoyalties = self.calcSupplementaryRoyaltiesIOGR1995(royalty_calc.CommencementPeriod, m.WellHeadPrice, m.ProdVol, royalty_calc.RoyaltyRegulation, self.reference_price['Sawridge Indian'])
+        print("THIS IS SUPP ROYALTIES", royalty_calc.SupplementaryRoyalties)
         return
 
     def calcSaskOilRegulationSubsection2(self,mop):
@@ -430,7 +430,7 @@ class ProcessRoyalties(object):
         self.calcSaskOilProvCrownRoyaltyVolumeValue(calc.ProvCrownUsedRoyaltyRate,
                                             monthly.ProdVol, well.IndianInterest,
                                             royalty.MinRoyalty, royalty.CrownMultiplier,
-                                            calc.RoyaltyPrice)
+                                            calc.RoyaltyPrice, calc)
 
     #
     # Royalty Calculation

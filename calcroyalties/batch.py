@@ -24,8 +24,8 @@ import config
 
 def run_royalties_and_worksheet():
     pr = ProcessRoyalties()
-    pr.process_all()
-#    pr.process_one(6, 201501, 'Oil')
+#    pr.process_all()
+    pr.process_one(2001, 201501, 'Oil')
 
 #    pr.process(config.get_file_dir() + 'database.xlsx')
 #     pr.process('d:/$temp/sample.xlsx')
