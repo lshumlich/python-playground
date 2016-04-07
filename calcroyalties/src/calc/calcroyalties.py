@@ -249,9 +249,9 @@ class ProcessRoyalties(object):
             if MinRoyalty > calc.ProvCrownUsedRoyaltyRate:
                 calc.ProvCrownUsedRoyaltyRate = MinRoyalty
 
-        #
+
         # This was done this way so precision was not lost.
-        #
+
         calc.ProvCrownRoyaltyVolume = ((calc.ProvCrownUsedRoyaltyRate / 100) *
                                                       crownMultiplier *
                                                       mop * indianInterest)
