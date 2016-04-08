@@ -59,7 +59,10 @@ class ProcessRoyalties(object):
         log = open(config.get_temp_dir() + 'log.txt', 'w')
         log.write("Hello World.\n")
         for monthlyData in self.db.select('Monthly'):
-            self.process_one(monthlyData.WellID, monthlyData.ProdMonth, monthlyData.Product)
+            try:
+                self.process_one(monthlyData.WellID, monthlyData.ProdMonth, monthlyData.Product)
+            except:
+                print("some kind of error occured")
 
     """
     Process a single royalty
@@ -237,7 +240,7 @@ class ProcessRoyalties(object):
     def calcSaskOilProvCrownRoyaltyVolumeValue(self, ProvCrownUsedRoyaltyRate, mop, indianInterest, MinRoyalty, crownMultiplier, RoyaltyPrice, calc):
         # Note: If there is no sales. Use last months sales value... Not included in this code
 
-        #calc.RoyaltyPrice = self.determineRoyaltyprice(royalty.ValuationMethod, econOilData)
+        calc.RoyaltyPrice = self.determineRoyaltyprice(royalty.ValuationMethod, econOilData)
 
         calc.ProvCrownUsedRoyaltyRate = calc.ProvCrownRoyaltyRate
         print("THIS IS PROVCROWNUSEDROYALTYRATE", calc.ProvCrownUsedRoyaltyRate)
