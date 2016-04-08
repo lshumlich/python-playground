@@ -1,0 +1,44 @@
+<div id="modal">
+</div>
+
+<table style="width:100%">
+  <tr>
+    <th>Login</th>
+    <th>User name</th>
+    <th>Email</th>
+    <th>Permissions</th>
+    <th>Actions</th>
+  </tr>
+  {% for user in users %}
+  <tr>
+    <td>{{ user.Login }}</td>
+    <td>{{ user.Name }}</td>
+    <td>{{ user.Email }}</td>
+    <td>{{ user.Permissions }}</td>
+    <td>
+    <a href="#" class="icon icon-edit" onclick=openInfo({{ user.ID }})></a>
+    &nbsp;
+    <a href="#" class="icon icon-delete"></a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+<br>
+<button id="adduser" onclick="openInfo(0)">Add user</button>
+
+<script>
+function openInfo(id) {
+  var idObject = {ID:id}
+  console.log(idObject);
+  $.ajax({
+    url: "/api/userinfo",
+    data: idObject,
+  })
+  .done(function(data){
+    $('#modal').html(data)});
+  }
+
+$(document).ready(function(){
+  $("tr:even").css("background-color", "lightgray");
+})
+</script>
