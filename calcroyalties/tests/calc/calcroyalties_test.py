@@ -145,13 +145,16 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, IndianInterest, MinRoyalty, RoyaltyPr
 """
 
     def test_calcSaskOilProvCrownRoyaltyVolumeValue(self):
+ProvCrownUsedRoyaltyRate, m, indianInterest, MinRoyalty, crownMultiplier, RoyaltyPrice, calc, valuation_method
         pr = ProcessRoyalties()
         calc = DataStructure()
-        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(2, 100, 1, 20, 1,100, calc), (20.0, 2000.0))
-        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(-1, 100 ,1 ,20, 1, 100, calc), (20.0, 2000.0))
-        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(2, 100 ,1, 5, 1,100, calc), (5, 500.0))
-        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(2, 100 ,1, None, 1,100, calc), (2.0, 200.0))
-        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(10, 120 ,1, 2, 1,120, calc), (12, 1440.0))
+        m = DataStructure()
+        #need to fix these tests now that m is being used as a paramater instead of prodvol......
+        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(2, m, 1, 20, 1,100, calc, 'SaskWellHead'), (20.0, 2000.0))
+        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(-1, m ,1 ,20, 1, 100, calc, 'ActSales'), (20.0, 2000.0))
+        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(2, m ,1, 5, 1,100, calc, 'SaskWellHead'), (5, 500.0))
+        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(2, m ,1, None, 1,100, calc, 'ActSales'), (2.0, 200.0))
+        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(10, m ,1, 2, 1,120, calc, 'ActSales'), (12, 1440.0))
 
         return
 

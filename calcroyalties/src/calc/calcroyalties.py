@@ -59,10 +59,7 @@ class ProcessRoyalties(object):
         log = open(config.get_temp_dir() + 'log.txt', 'w')
         log.write("Hello World.\n")
         for monthlyData in self.db.select('Monthly'):
-            try:
-                self.process_one(monthlyData.WellID, monthlyData.ProdMonth, monthlyData.Product)
-            except:
-                print("some kind of error occured")
+            self.process_one(monthlyData.WellID, monthlyData.ProdMonth, monthlyData.Product)
 
     """
     Process a single royalty
@@ -94,9 +91,9 @@ class ProcessRoyalties(object):
                 self.calcSaskOilProvCrown(monthly, well, royalty, lease, calc)
             elif monthly.Product == 'Oil' and 'IOGR1995' in royalty.RoyaltyScheme:
                 self.calcSaskOilIOGR1995(well.CommencementDate, royalty.ValuationMethod, royalty.CrownMultiplier, well.IndianInterest, monthly, calc)
-            # self.calcSaskOilIOGR1995(monthly, well, royalty, lease, calc)
         except AppError:
-            print('Royalty Scheme not yet developed: ',  royalty.RoyaltyScheme,  ' ',  monthly.Product)
+            print(AppError)
+            # self.calcSaskOilIOGR1995(monthly, well, royalty, lease, calc)
 
 
         if monthly.Product == 'Oil' and 'GORR' in royalty.RoyaltyScheme:
@@ -237,10 +234,10 @@ class ProcessRoyalties(object):
         return calc.ProvCrownRoyaltyRate
 
 
-    def calcSaskOilProvCrownRoyaltyVolumeValue(self, ProvCrownUsedRoyaltyRate, mop, indianInterest, MinRoyalty, crownMultiplier, RoyaltyPrice, calc):
+    def calcSaskOilProvCrownRoyaltyVolumeValue(self, ProvCrownUsedRoyaltyRate, m, indianInterest, MinRoyalty, crownMultiplier, RoyaltyPrice, calc, valuation_method):
         # Note: If there is no sales. Use last months sales value... Not included in this code
 
-        calc.RoyaltyPrice = self.determineRoyaltyprice(royalty.ValuationMethod, econOilData)
+        calc.RoyaltyPrice = self.determineRoyaltyPrice(valuation_method, m)
 
         calc.ProvCrownUsedRoyaltyRate = calc.ProvCrownRoyaltyRate
         print("THIS IS PROVCROWNUSEDROYALTYRATE", calc.ProvCrownUsedRoyaltyRate)
@@ -257,11 +254,11 @@ class ProcessRoyalties(object):
 
         calc.ProvCrownRoyaltyVolume = ((calc.ProvCrownUsedRoyaltyRate / 100) *
                                                       crownMultiplier *
-                                                      mop * indianInterest)
+                                                      m.ProdVol * indianInterest)
 
         calc.ProvCrownRoyaltyValue = round((calc.ProvCrownUsedRoyaltyRate / 100) *
                                                crownMultiplier *
-                                               mop * indianInterest *
+                                               m.ProdVol * indianInterest *
                                                RoyaltyPrice , 2)
 
 
@@ -431,9 +428,9 @@ class ProcessRoyalties(object):
         calc.RoyaltyPrice = self.determineRoyaltyPrice(royalty.ValuationMethod, monthly)
 
         self.calcSaskOilProvCrownRoyaltyVolumeValue(calc.ProvCrownUsedRoyaltyRate,
-                                            monthly.ProdVol, well.IndianInterest,
+                                            monthly, well.IndianInterest,
                                             royalty.MinRoyalty, royalty.CrownMultiplier,
-                                            calc.RoyaltyPrice, calc)
+                                            calc.RoyaltyPrice, calc, royalty.ValuationMethod)
 
     #
     # Royalty Calculation
