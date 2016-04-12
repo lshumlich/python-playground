@@ -46,6 +46,9 @@ class SqliteDatabaseTest(unittest.TestCase):
         self.assertEqual(len(self.db.select('Lease')), 3)
         self.assertEqual(len(self.db.select('Lease', Prov='SK')), 3)
         self.assertEqual(len(self.db.select('Well', ID=1000)),0)
+
+
+        #WRITE TEST FOR SELECT1
         
     def test_update(self):
         self.dbu.create_some_test_wells()
