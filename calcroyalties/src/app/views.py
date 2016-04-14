@@ -94,7 +94,7 @@ def worksheet():
         if request.args:
             db = config.get_database()
             well_id = int(request.args["WellId"])
-            prod_month = 201501
+            prod_month = 201503
             product = "Oil"
             well = db.select1('Well', ID=well_id)
             royalty = db.select1('Royaltymaster', ID=well.LeaseID)

@@ -56,11 +56,14 @@ class Database(object):
 
     def select1(self, table, **kwargs):
         result = self.select(table, **kwargs)
-        if len(result) == 1:
-            return result[0]
-        else:
-            raise AppError("sqlite_database.select1 should have only found 1, but we found " + str(len(result)) + " in table: " + table +
-            ". We are only looking for " + str(kwargs))
+        try:
+            if len(result) == 1:
+                return result[0]
+            else:
+                raise AppError("sqlite_database.select1 should have only found 1, but we found " + str(len(result)) + " in table: " + table +
+                ". We are only looking for " + str(kwargs))
+        except AppError:
+            print(AppError)
 
     def to_db_value(self, value):
 

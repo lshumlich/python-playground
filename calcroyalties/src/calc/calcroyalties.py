@@ -252,9 +252,9 @@ class ProcessRoyalties(object):
 
         # This was done this way so precision was not lost.
 
-        calc.ProvCrownRoyaltyVolume = ((calc.ProvCrownUsedRoyaltyRate / 100) *
+        calc.ProvCrownRoyaltyVolume = round((calc.ProvCrownUsedRoyaltyRate / 100) *
                                                       crownMultiplier *
-                                                      m.ProdVol * indianInterest)
+                                                      m.ProdVol * indianInterest, 1)
 
         calc.ProvCrownRoyaltyValue = round((calc.ProvCrownUsedRoyaltyRate / 100) *
                                                crownMultiplier *
@@ -270,10 +270,10 @@ class ProcessRoyalties(object):
         # Calculate the Comensment Date
         royalty_calc.CommencementPeriod = self.determineCommencementPeriod(m.ProdMonth, commencement_date)
         if royalty_calc.CommencementPeriod < 5:
-            royalty_calc.IOGR1995RoyaltyVolume = self.calcSaskOilRegulationSubsection2(m.ProdVol)
+            royalty_calc.IOGR1995RoyaltyVolume = round(self.calcSaskOilRegulationSubsection2(m.ProdVol),2)
             royalty_calc.RoyaltyRegulation = self.calcSaskOilRegulationSubsection2(m.ProdVol)
         else:
-            royalty_calc.IOGR1995RoyaltyVolume = self.calcSaskOilRegulationSubsection3(m.ProdVol)
+            royalty_calc.IOGR1995RoyaltyVolume = round(self.calcSaskOilRegulationSubsection3(m.ProdVol),2)
             royalty_calc.RoyaltyRegulation = self.calcSaskOilRegulationSubsection3(m.ProdVol)
 
         
@@ -427,10 +427,7 @@ class ProcessRoyalties(object):
 
         calc.RoyaltyPrice = self.determineRoyaltyPrice(royalty.ValuationMethod, monthly)
 
-        self.calcSaskOilProvCrownRoyaltyVolumeValue(calc.ProvCrownUsedRoyaltyRate,
-                                            monthly, well.IndianInterest,
-                                            royalty.MinRoyalty, royalty.CrownMultiplier,
-                                            calc.RoyaltyPrice, calc, royalty.ValuationMethod)
+        self.calcSaskOilProvCrownRoyaltyVolumeValue(calc.ProvCrownUsedRoyaltyRate, monthly, well.IndianInterest, royalty.MinRoyalty, royalty.CrownMultiplier, calc.RoyaltyPrice, calc, royalty.ValuationMethod)
 
     #
     # Royalty Calculation
