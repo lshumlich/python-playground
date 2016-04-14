@@ -85,14 +85,16 @@ class ProcessRoyalties(object):
             self.db.insert(calc)
         else:
             self.db.update(calc)
+
     def calc_royalties(self, well, royalty, lease, calc, monthly):
+        print('    -->',well.ID,monthly)
         try:
             if monthly.Product == 'Oil' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
                 self.calcSaskOilProvCrown(monthly, well, royalty, lease, calc)
             elif monthly.Product == 'Oil' and 'IOGR1995' in royalty.RoyaltyScheme:
                 self.calcSaskOilIOGR1995(well.CommencementDate, royalty.ValuationMethod, royalty.CrownMultiplier, well.IndianInterest, monthly, calc)
         except AppError:
-            print(AppError)
+            print("***** Big Friken Error:",str(AppError))
             # self.calcSaskOilIOGR1995(monthly, well, royalty, lease, calc)
 
 

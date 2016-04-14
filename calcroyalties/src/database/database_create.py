@@ -26,7 +26,7 @@ class DatabaseCreate(object):
             self.Config()
         if 'Well' not in tables:
             self.Well()
-        if 'Royaltymaster' not in tables:
+        if 'RoyaltyMaster' not in tables:
             self.RoyaltyMaster()
         if 'Lease' not in tables:
             self.Lease()
