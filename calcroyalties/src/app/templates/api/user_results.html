@@ -1,7 +1,7 @@
 <div id="modal">
 </div>
 
-<table style="width:100%">
+<table style="width:100%" class="table-striped">
   <tr>
     <th>Login</th>
     <th>User name</th>
@@ -16,29 +16,55 @@
     <td>{{ user.Email }}</td>
     <td>{{ user.Permissions }}</td>
     <td>
-    <a href="#" class="icon icon-edit" onclick=openInfo({{ user.ID }})></a>
+    <a href="#" class="icon icon-edit" onclick=getUser({{ user.ID }})></a>
     &nbsp;
-    <a href="#" class="icon icon-delete"></a>
+    <a href="#" class="icon icon-delete" onclick=confirmDelete({{ user.ID }})></a>
     </td>
   </tr>
   {% endfor %}
 </table>
 <br>
-<button id="adduser" onclick="openInfo(0)">Add user</button>
+<button id="adduser" onclick="createUser()">Add user</button>
 
 <script>
-function openInfo(id) {
-  var idObject = {ID:id}
-  console.log(idObject);
+function getUser(id) {
+  var idObject = {ID:id};
   $.ajax({
-    url: "/api/userinfo",
+    url: "/api/user",
+    method: "GET",
     data: idObject,
   })
   .done(function(data){
-    $('#modal').html(data)});
-  }
+    $('#modal').html(data)
+  });
+  };
 
-$(document).ready(function(){
-  $("tr:even").css("background-color", "lightgray");
-})
+function createUser() {
+  $.ajax({
+    url: "/api/user",
+    method: "PATCH",
+  })
+  .done(function(data){
+    $('#modal').html(data)
+  });
+  };
+
+function confirmDelete(id){
+  var r = confirm('Are you sure you want to delete this user?');
+  if (r == true) {deleteUser(id)}
+  else {};
+  };
+
+function deleteUser(id) {
+  var idObject = {ID:id};
+  $.ajax({
+    url: "/api/user",
+    method: "DELETE",
+    data: idObject,
+  })
+  .done(function(data){
+    console.log('User deleted');
+    updateUsers();
+  });
+  };
 </script>

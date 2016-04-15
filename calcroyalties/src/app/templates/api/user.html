@@ -1,0 +1,105 @@
+<div id="dialog">
+  <form name="form_user">
+    <fieldset>
+      <legend>User</legend>
+      <table class="wellmodal" cellpadding=5>
+        <tr>
+          <td><label for="Login">Login</label></td>
+          <td><input type="text" id="Login" name="Login" value="{{user.Login}}"></td>
+        </tr>
+        <tr>
+          <td><label for="Name">Full Name</label></td>
+          <td><input type="text" id="Name" name="Name" value="{{user.Name}}"></td>
+        </tr>
+        <tr>
+          <td><label for="Email">Email</label></td>
+          <td><input type="text" id="Email" name="Email" value="{{user.Email}}"></td>
+        </tr>
+        <tr>
+          <td><label for="Permissions">Permissions</label></td>
+          <td><input type="text" id="Permissions" name="Permissions" value="{{user.Permissions}}"></td>
+        </tr>  
+      </table>
+      <!-- allows to submit a form by pressing enter; actual submission is handled in JS-->
+      <input type="hidden" id="ID" name="ID" value="{{user.ID}}">
+      <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+    </fieldset>
+  </form>
+</div>
+
+<script>
+$(function(){
+  // creates a modal window
+  dialog = $("#dialog").dialog({
+    autoOpen: true,
+    height: 400,
+    width: 800,
+    modal: true,
+    title: "Edit user",
+    close: function() {form[0].reset(); dialog.remove()},
+    buttons: {
+      Cancel: function() {dialog.dialog("close"); dialog.remove()},
+      "Save": function() {formSave(); dialog.dialog("close"); dialog.remove()}
+    }
+  });
+
+  // handles form submission with traditional methods, i.e. pressing enter
+  form = dialog.find( "form" ).on( "submit", function( event ) {
+    event.preventDefault();
+    formSave();
+    dialog.dialog("close");
+    dialog.remove();
+  });
+
+  function formSave(){
+    if ($("#ID").attr("value") != "") {
+      console.log('id exists, post request');
+      var ajax_method = "POST";
+    } else {
+      console.log('id doesnt exist, put request');
+      var ajax_method = "PUT";
+    }
+
+    $.ajax({
+      url: "/api/user",
+      method: ajax_method,
+      contentType: "application/json",
+      data: JSON.stringify(formToDict(document.forms["form_user"])),
+    })
+    .done(function(data){
+    });
+    updateUsers();
+  };
+
+  function formToDict(oForm) {
+      var dict = {};
+      for (i = 0; i < oForm.length; i++) {
+          if (oForm.elements[i].name != '') {
+              if (oForm.elements[i].type == 'text' || oForm.elements[i].type == 'hidden') {
+                  dict[oForm.elements[i].name] = oForm.elements[i].value;
+              } else if (oForm.elements[i].type == 'checkbox') {
+                  dict[oForm.elements[i].name] = oForm.elements[i].checked;
+              } else {
+                  console.log('*** did not handle: ' + oForm.elements[i].name + "," + oForm.elements[i].value + "," + oForm.elements[i].type)
+              };
+          }
+      }
+      return dict
+  }
+
+  // unused here
+  function dictToForm(dict,oForm) {
+      for (i = 0; i < oForm.length; i++) {
+          if (oForm.elements[i].name != '') {
+              if (oForm.elements[i].type == 'text' || oForm.elements[i].type == 'hidden') {
+                  oForm.elements[i].value = dict[oForm.elements[i].name];
+              } else if (oForm.elements[i].type == 'checkbox') {
+                  oForm.elements[i].checked = (dict[oForm.elements[i].name] ==1)
+              } else {
+                  console.log('*** did not handle: ' + oForm.elements[i].name + "," + oForm.elements[i].value + "," + oForm.elements[i].type)
+              }
+          }
+      }
+  }
+})
+</script>

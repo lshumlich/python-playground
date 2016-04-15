@@ -38,13 +38,14 @@ $(document).ready(function($){
     Welcome {{ session['name'] }}, you can access: {{ session['permissions'] }}
     <br>
     Production date: {{ session['prod_month'] }} <br>
+      <a href="/logout">Logout</a>
   {% else %}
     <br>
     <br>
   {% endif %}
     FAQ
     My Account
-    <a href="/logout">Logout</a>
+
   </div>
 </div>
 

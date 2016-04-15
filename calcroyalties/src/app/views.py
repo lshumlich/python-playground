@@ -10,61 +10,53 @@ from flask import render_template, request, redirect, url_for, session, abort
 import config
 from src.app import app
 
-USERS = """
-    [
-    { "username": "larry",
-      "allowed": [],
-      "prod_month": 201501
-    },
-    { "username": "adrienne",
-      "allowed": ["well_search", "well_index"],
-      "prod_month": 201502
-    }
-    ]
-"""
 
-def login_handler(f):
-    @wraps(f)
-    def wrapper(*args, **kwds):
-        # if 'login' in session and f.__name__ in session['permissions']:
-        #     return f(*args, **kwds)
-        # else:
-        #     return "You don't have sufficient permissions"
-        if 'login' not in session:
-            # you need to log in first
-            return redirect(url_for('login'))
-        else:
-            if f.__name__ not in session['permissions']:
-                return "You don't have sufficient permissions"
+class PermissionHandler():
+    ''' Checks for permissions. Works both as a decorator (easy to apply to endpoints)
+        and as a context manager (for more fine-grained control).
+        Checks to see if a user is logged in, then if the user has the necessary permission'''
+    def __init__(self, perm):
+        self.perm = perm
+
+    def __call__(self, f):
+        # decorator implementation
+        @wraps(f)
+        def wrapper(*args, **kwds):
+            if 'login' not in session: return redirect(url_for('login'))
+            if self.perm not in session['permissions']:
+                abort(403)
             else:
                 return f(*args, **kwds)
-    return wrapper
+        return wrapper
+
+    def __enter__(self):
+        # context manager implementation
+        if 'login' not in session: return redirect(url_for('login'))
+        if not self.perm in session['permissions']:
+            abort(403)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        return False
+
 
 @app.route('/')
-@login_handler
 def index():
+    if 'login' not in session: return redirect(url_for('login'))
     return render_template('index.html')
-
-def user_helper(login):
-    try:
-        db = config.get_database()
-        result = db.select1('Users', Login=login)
-        return result
-    except:
-        print('Can\'t get the user "%s" from the database' % login)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user = user_helper(request.form['login'])
-        if user:
-            print(user)
-            session['login'] = user.Login
-            session['name'] = user.Name
-            session['prod_month'] = user.ProdMonth
-            session['permissions'] = user.Permissions
-            return redirect(url_for('index'))
-        else:
+        try:
+            db = config.get_database()
+            user = db.select1('Users', Login=request.form['login'])
+            if user:
+                session['login'] = user.Login
+                session['name'] = user.Name
+                session['prod_month'] = user.ProdMonth
+                session['permissions'] = user.Permissions
+                return redirect(url_for('index'))
+        except:
             return "No such user was found in the system"
     return render_template('login.html')
 
@@ -91,30 +83,52 @@ def admin_user_results():
     except:
         abort(404)
 
-@app.route('/api/userinfo')
+@app.route('/api/user', methods=['GET', 'DELETE', 'POST', 'PUT', 'PATCH'])
 def admin_user_info():
-    abort()
-    # db = config.get_database()
-    # results = db.select1('Users', ID=request.args.get('ID'))
-    # return render_template('api/user_info.html', user=results)
-    # if request.method == 'POST':
-    #     db = config.get_database()
-    #     if request.args.get('action') == 'get':
-    #         try:
-    #             results = db.select1('Users', ID=request.args.get('ID'))
-    #             return render_template('api/user_info.html', user=results)
-    #         except:
-    #             return "<h2>No results found</h2>"
-    #     elif request.args.get('action') == 'delete':
-    #         try:
-    #             None
-    #     elif request.args.get('action') == 'update':
-    #         None
+    if not request.is_xhr: abort(404)
+    db = config.get_database()
+    if request.method == 'GET':
+        """ get info for a user """
+        results = db.select1('Users', ID=request.args.get('ID'))
+        return render_template('api/user.html', user=results)
+    elif request.method == 'DELETE':
+        """ delete user """
+        db.delete('Users', int(request.form['ID']))
+        return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+    elif request.method == 'POST':
+        """ update info for a user """
+        req_data = request.get_json()
+        user = db.select1('Users', ID=req_data['ID'])
+        user.Login = req_data['Login']
+        user.Name = req_data['Name']
+        user.Email = req_data['Email']
+        user.Permissions = req_data['Permissions']
+        db.update(user)
+        return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+    elif request.method == 'PATCH':
+        """ get an empty form to create a new user """
+        return render_template('api/user.html', user=None)
+    elif request.method == 'PUT':
+        """ create new user """
+        class User():
+            None
+        req_data = request.get_json()
+        user = User()
+        user._table_name = 'Users'
+        user.Login = req_data['Login']
+        user.Name = req_data['Name']
+        user.Email = req_data['Email']
+        user.Permissions = req_data['Permissions']
+        db.insert(user)
+        return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+    else:
+        abort(400)
 
 @app.route('/well/search')
-@login_handler
+# @login_handler
+@PermissionHandler('well_search')
 def well_search():
-    return render_template('well_search.html')
+        return render_template('well_search.html')
 
 @app.route('/api/wellresults')
 def well_results():
@@ -137,7 +151,7 @@ def well_info():
         abort(404)
 
 @app.route('/facility/search')
-@login_handler
+@PermissionHandler('facility_search')
 def facility_search():
     return render_template('facility_search.html')
 
@@ -168,7 +182,7 @@ def facility_info():
         return "<h2>Facility details not found</h2>"
 
 @app.route('/worksheet')
-@login_handler
+@PermissionHandler('worksheet')
 def worksheet():
     if request.args:
         try:
@@ -185,7 +199,7 @@ def worksheet():
             print(monthly)
             return render_template('worksheet.html', well=well, rm=royalty, m=monthly, lease=lease, calc=calc)
         except BaseException as e:
-            return "3Something went wrong displaying worksheet for well %i:<br>%s" % (well_id, str(e))
+            return "Something went wrong displaying worksheet for well %i:<br>%s" % (well_id, str(e))
     else:
         return "No monthly data for this well"
 
@@ -195,6 +209,21 @@ def not_found(error):
 
 
 """
-1. Admin page to manage user permissions
-2. Production date editable on every search, entry, etc.
+1. Authentication system
+    a. Checkboxes for permissions (names like well_edit, on server added to a list if checked, then list = permissions in db)
+    b. Flash messages for all actions (how to use flash from JS?)
+2. Production month
+    a. Stored in DB for every user or just set as a cookie, reset on logout?
+    b. In case of cookies, set in JS instead of server side?
+3. New view
+    a. Start by designing url structure!
+
+CREATE TABLE `Users` (
+	`ID`	INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
+	`Login`	TEXT UNIQUE,
+	`Name`	TEXT,
+	`Email`	TEXT,
+	`ProdMonth`	INTEGER,
+	`Permissions`	TEXT
+)
 """

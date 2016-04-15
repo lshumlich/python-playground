@@ -26,6 +26,10 @@ tr {
   width: 100%;
 }
 
+.table-striped tbody tr:nth-child(even) {
+  background-color: lightgray;
+}
+
 .icon {
     background-image: url("../img/mini-icons-white.png");
 	background-repeat: no-repeat;
