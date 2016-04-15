@@ -25,6 +25,7 @@
       <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
     </fieldset>
   </form>
+  <p class="errors" style="color:red"></p>
 </div>
 
 <script>
@@ -39,7 +40,7 @@ $(function(){
     close: function() {form[0].reset(); dialog.remove()},
     buttons: {
       Cancel: function() {dialog.dialog("close"); dialog.remove()},
-      "Save": function() {formSave(); dialog.dialog("close"); dialog.remove()}
+      "Save": function() {formSave()}
     }
   });
 
@@ -47,59 +48,57 @@ $(function(){
   form = dialog.find( "form" ).on( "submit", function( event ) {
     event.preventDefault();
     formSave();
-    dialog.dialog("close");
-    dialog.remove();
   });
+
+  // relies on verifyform.js included in layout.html
+  function formVerify(){
+    var valid = true;
+
+    valid = valid && checkLength($( "#Login" ),  3, 16);
+    valid = valid && checkEntered($( "#Name" ));
+    valid = valid && checkRegexp($( "#Email" ), emailRegexp);
+    if (valid) {
+      return true;
+    }
+  }
 
   function formSave(){
     if ($("#ID").attr("value") != "") {
-      console.log('id exists, post request');
       var ajax_method = "POST";
     } else {
-      console.log('id doesnt exist, put request');
       var ajax_method = "PUT";
     }
 
-    $.ajax({
-      url: "/api/users",
-      method: ajax_method,
-      contentType: "application/json",
-      data: JSON.stringify(formToDict(document.forms["form_user"])),
-    })
-    .done(function(data){
-    });
-    updateUsers();
+    if (formVerify()){
+      $.ajax({
+        url: "/api/users",
+        method: ajax_method,
+        contentType: "application/json",
+        data: JSON.stringify(formToDict(document.forms["form_user"])),
+      })
+      .done(function(data){
+      });
+      updateUsers();
+      dialog.dialog("close");
+      dialog.remove();
+    }
   };
 
   function formToDict(oForm) {
-      var dict = {};
-      for (i = 0; i < oForm.length; i++) {
-          if (oForm.elements[i].name != '') {
-              if (oForm.elements[i].type == 'text' || oForm.elements[i].type == 'hidden') {
-                  dict[oForm.elements[i].name] = oForm.elements[i].value;
-              } else if (oForm.elements[i].type == 'checkbox') {
-                  dict[oForm.elements[i].name] = oForm.elements[i].checked;
-              } else {
-                  console.log('*** did not handle: ' + oForm.elements[i].name + "," + oForm.elements[i].value + "," + oForm.elements[i].type)
-              };
-          }
+    var dict = {};
+    for (i = 0; i < oForm.length; i++) {
+      if (oForm.elements[i].name != '') {
+        if (oForm.elements[i].type == 'text' || oForm.elements[i].type == 'hidden') {
+          dict[oForm.elements[i].name] = oForm.elements[i].value;
+        } else if (oForm.elements[i].type == 'checkbox') {
+          dict[oForm.elements[i].name] = oForm.elements[i].checked;
+        } else {
+          console.log('*** did not handle: ' + oForm.elements[i].name + "," + oForm.elements[i].value + "," + oForm.elements[i].type)
+        };
       }
-      return dict
+    }
+    return dict
   }
 
-  // unused here
-  function dictToForm(dict,oForm) {
-      for (i = 0; i < oForm.length; i++) {
-          if (oForm.elements[i].name != '') {
-              if (oForm.elements[i].type == 'text' || oForm.elements[i].type == 'hidden') {
-                  oForm.elements[i].value = dict[oForm.elements[i].name];
-              } else if (oForm.elements[i].type == 'checkbox') {
-                  oForm.elements[i].checked = (dict[oForm.elements[i].name] ==1)
-              } else {
-                  console.log('*** did not handle: ' + oForm.elements[i].name + "," + oForm.elements[i].value + "," + oForm.elements[i].type)
-              }
-          }
-      }
-  }
 })
 </script>
