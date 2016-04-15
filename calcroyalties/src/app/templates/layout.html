@@ -27,18 +27,25 @@ $(document).ready(function($){
 
 <div class="header" style="width:100%; height:60px; float:left; margin-top:8px">
   <div class="header_left" style="width:25%; float:left">
-    <img src="{{url_for("static", filename="img/logo.png")}}" style="height:40px">
+    <a href="/"><img src="{{url_for("static", filename="img/logo.png")}}" style="height:40px"></a>
   </div>
   <div class="header_center" style="width:50%; text-align:center; float:left">
     <div style="font-size:2em; font-weight:bold">The Solution Stack</div>
     <div style="font-size:1.5em">Information Management System</div>
   </div>
   <div class="header_right" style="width:25%; float:right; text-align:right">
-    Welcome
-    <br><br>
-    <a href="#">FAQ</a>    
-    <a href="#">My Account</a>
-    <a href="#">Logout</a>    
+  {% if session['login'] %}
+    Welcome {{ session['name'] }}, you can access: {{ session['permissions'] }}
+    <br>
+    Production date: {{ session['prod_month'] }} <br>
+      <a href="/logout">Logout</a>
+  {% else %}
+    <br>
+    <br>
+  {% endif %}
+    FAQ
+    My Account
+
   </div>
 </div>
 
@@ -55,8 +62,8 @@ $(document).ready(function($){
                 <div class="dropdown_container dropdown_fullwidth"> 
                     <div class="col_6">
                         <ul>
-                            <li><a href="/well/search">Wells</a></li>
-                            <li><a href="/facility/search">Facilities</a></li>
+                            {% if 'well_search' in session['permissions'] %}<li><a href="/well/search">Wells</a></li>{% endif %}
+                            {% if 'facility_search' in session['permissions'] %}<li><a href="/facility/search">Facilities</a></li>{% endif %}
                         </ul>
                     </div>   
                 </div>  
@@ -67,6 +74,7 @@ $(document).ready(function($){
                     <div class="col_6">
                         <ul>
                             <li><a href="/admin/data">Data Browser</a></li>
+                            <li><a href="/admin/users">User Management</a></li>
                         </ul>
                     </div>   
                 </div>  

@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<div id="results-container">
+</div>
+
+<script>
+function updateUsers(){
+    console.log('Updated!')
+    $.ajax({
+    url: "/api/userresults",
+    dataType: "html"
+  })
+    .done(function(msg){
+      $('#results-container').html(msg);
+    })
+}
+
+$(document).ready(function(){
+  updateUsers();
+  
+})
+</script>
+{% endblock %}

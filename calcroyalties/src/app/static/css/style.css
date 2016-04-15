@@ -26,6 +26,10 @@ tr {
   width: 100%;
 }
 
+.table-striped tbody tr:nth-child(even) {
+  background-color: lightgray;
+}
+
 .icon {
     background-image: url("../img/mini-icons-white.png");
 	background-repeat: no-repeat;
@@ -39,3 +43,4 @@ tr {
 
 .icon-edit{ background-position: -32px -96px;  } 
 .icon-text-document{ background-position: -64px 0;  } 
+.icon-delete{ background-position: -224px -32px;  } 
