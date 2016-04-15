@@ -73,21 +73,16 @@ def logout():
 def admin_users():
     return render_template('users.html')
 
-@app.route('/api/userresults')
-def admin_user_results():
-    if not request.is_xhr: abort(404)
-    try:
-        db = config.get_database()
-        results = db.select('Users')
-        return render_template('api/user_results.html', users=results)
-    except:
-        abort(404)
-
-@app.route('/api/user', methods=['GET', 'DELETE', 'POST', 'PUT', 'PATCH'])
-def admin_user_info():
+@app.route('/api/users', methods=['GET', 'DELETE', 'POST', 'PUT', 'PATCH'])
+def admin_user():
+    """ handles all user-related ajax calls, both for user list and individual users """
     if not request.is_xhr: abort(404)
     db = config.get_database()
-    if request.method == 'GET':
+    if request.method == 'GET' and not request.args:
+        """ get an entire user list """
+        results = db.select('Users')
+        return render_template('api/user_results.html', users=results)
+    elif request.method == 'GET':
         """ get info for a user """
         results = db.select1('Users', ID=request.args.get('ID'))
         return render_template('api/user.html', user=results)
@@ -214,6 +209,7 @@ def not_found(error):
 1. Authentication system
     a. Checkboxes for permissions (names like well_edit, on server added to a list if checked, then list = permissions in db)
     b. Flash messages for all actions (how to use flash from JS?)
+    c. JS-based form verification before submitting (use jQuery dialog demo for example)
 2. Production month
     a. Stored in DB for every user or just set as a cookie, reset on logout?
     b. In case of cookies, set in JS instead of server side?

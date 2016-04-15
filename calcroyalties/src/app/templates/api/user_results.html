@@ -30,7 +30,7 @@
 function getUser(id) {
   var idObject = {ID:id};
   $.ajax({
-    url: "/api/user",
+    url: "/api/users",
     method: "GET",
     data: idObject,
   })
@@ -41,7 +41,7 @@ function getUser(id) {
 
 function createUser() {
   $.ajax({
-    url: "/api/user",
+    url: "/api/users",
     method: "PATCH",
   })
   .done(function(data){
@@ -58,7 +58,7 @@ function confirmDelete(id){
 function deleteUser(id) {
   var idObject = {ID:id};
   $.ajax({
-    url: "/api/user",
+    url: "/api/users",
     method: "DELETE",
     data: idObject,
   })
