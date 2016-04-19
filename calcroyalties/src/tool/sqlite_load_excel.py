@@ -30,6 +30,7 @@ class Loader(object):
 
     def load_worksheet(self, tab_name):
         record_no = 0
+        row = None
         try:
             ws = self.wb[tab_name]
             table_name = tab_name.replace(' ', '')
@@ -119,7 +120,7 @@ if __name__ == '__main__':
     #
     # Note: Set the new database in config.json
     #
-    worksheet = config.get_temp_dir() + 'new.xlsx'
+    worksheet = config.get_temp_dir() + 'WellLeaseLink.xlsx'
     loader = Loader()
     loader.open_excel(worksheet)
     loader.load_all_sheets()
