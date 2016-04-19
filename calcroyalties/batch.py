@@ -66,7 +66,7 @@ if __name__ == "__main__":
 #     load_sample_data()
 #     browser_app()
     create_tables()
-    run_royalties_and_worksheet()
+    # run_royalties_and_worksheet()
 #    unittest.main()
 #     runTestModule()
     print("Goodbye world!")

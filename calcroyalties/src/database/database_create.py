@@ -30,6 +30,8 @@ class DatabaseCreate(object):
             self.RoyaltyMaster()
         if 'Lease' not in tables:
             self.Lease()
+        if 'WellLeaseLink' not in tables:
+            self.WellLeaseLink()
         if 'Monthly' not in tables:
             self.Monthly()
         if 'Calc' not in tables:
@@ -77,6 +79,13 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
         
+    def WellLeaseLink(self):
+        statement = """
+            CREATE TABLE WellLeaseLink ('ID' integer primary key autoincrement,
+            "WellEvent" text, "LeaseID" int, "IndianInterest" float);
+        """
+        self.dbi.execute_statement(statement)
+
     def Monthly(self):
         statement = """
             CREATE TABLE Monthly ('ID' integer primary key autoincrement, 
