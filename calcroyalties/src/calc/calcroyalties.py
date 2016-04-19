@@ -59,8 +59,11 @@ class ProcessRoyalties(object):
         log = open(config.get_temp_dir() + 'log.txt', 'w')
         log.write("Hello World.\n")
         for monthlyData in self.db.select('Monthly'):
-            self.process_one(monthlyData.WellID, monthlyData.ProdMonth, monthlyData.Product)
+            try:
+                self.process_one(monthlyData.WellID, monthlyData.ProdMonth, monthlyData.Product)
 
+            except AppError as e:
+                print(e)
     """
     Process a single royalty
     """
@@ -88,13 +91,14 @@ class ProcessRoyalties(object):
 
     def calc_royalties(self, well, royalty, lease, calc, monthly):
         print('    -->',well.ID,monthly)
-        try:
-            if monthly.Product == 'Oil' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
-                self.calcSaskOilProvCrown(monthly, well, royalty, lease, calc)
-            elif monthly.Product == 'Oil' and 'IOGR1995' in royalty.RoyaltyScheme:
-                self.calcSaskOilIOGR1995(well.CommencementDate, royalty.ValuationMethod, royalty.CrownMultiplier, well.IndianInterest, monthly, calc)
-        except AppError:
-            print("***** Big Friken Error:",str(AppError))
+
+        if monthly.Product == 'Oil' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
+            self.calcSaskOilProvCrown(monthly, well, royalty, lease, calc)
+        elif monthly.Product == 'Oil' and 'IOGR1995' in royalty.RoyaltyScheme:
+            self.calcSaskOilIOGR1995(well.CommencementDate, royalty.ValuationMethod, royalty.CrownMultiplier, well.IndianInterest, monthly, calc)
+        else:
+            raise AppError("No calculation for" + str(well.ID) + str(monthly.ProdMonth) + str(monthly.Product) + str(royalty.RoyaltyScheme))
+
             # self.calcSaskOilIOGR1995(monthly, well, royalty, lease, calc)
 
 
@@ -236,10 +240,10 @@ class ProcessRoyalties(object):
         return calc.ProvCrownRoyaltyRate
 
 
-    def calcSaskOilProvCrownRoyaltyVolumeValue(self, ProvCrownUsedRoyaltyRate, m, indianInterest, MinRoyalty, crownMultiplier, RoyaltyPrice, calc, valuation_method):
+    def calcSaskOilProvCrownRoyaltyVolumeValue(self, m, indian_interest, royalty, calc):
         # Note: If there is no sales. Use last months sales value... Not included in this code
 
-        calc.RoyaltyPrice = self.determineRoyaltyPrice(valuation_method, m)
+        calc.RoyaltyPrice = self.determineRoyaltyPrice(royalty.ValuationMethod, m)
 
         calc.ProvCrownUsedRoyaltyRate = calc.ProvCrownRoyaltyRate
         print("THIS IS PROVCROWNUSEDROYALTYRATE", calc.ProvCrownUsedRoyaltyRate)
@@ -247,21 +251,21 @@ class ProcessRoyalties(object):
         if calc.ProvCrownUsedRoyaltyRate < 0:
             calc.ProvCrownUsedRoyaltyRate = 0
 
-        if MinRoyalty != None:
-            if MinRoyalty > calc.ProvCrownUsedRoyaltyRate:
-                calc.ProvCrownUsedRoyaltyRate = MinRoyalty
+        if royalty.MinRoyalty != None:
+            if royalty.MinRoyalty > calc.ProvCrownUsedRoyaltyRate:
+                calc.ProvCrownUsedRoyaltyRate = royalty.MinRoyalty
 
 
         # This was done this way so precision was not lost.
 
         calc.ProvCrownRoyaltyVolume = round((calc.ProvCrownUsedRoyaltyRate / 100) *
-                                                      crownMultiplier *
-                                                      m.ProdVol * indianInterest, 1)
+                                                      royalty.CrownMultiplier *
+                                                      m.ProdVol * indian_interest, 1)
 
         calc.ProvCrownRoyaltyValue = round((calc.ProvCrownUsedRoyaltyRate / 100) *
                                                crownMultiplier *
-                                               m.ProdVol * indianInterest *
-                                               RoyaltyPrice , 2)
+                                               m.ProdVol * indian_interest *
+                                               calc.RoyaltyPrice , 2)
 
 
 
@@ -429,8 +433,7 @@ class ProcessRoyalties(object):
 
         calc.RoyaltyPrice = self.determineRoyaltyPrice(royalty.ValuationMethod, monthly)
 
-        self.calcSaskOilProvCrownRoyaltyVolumeValue(calc.ProvCrownUsedRoyaltyRate, monthly, well.IndianInterest, royalty.MinRoyalty, royalty.CrownMultiplier, calc.RoyaltyPrice, calc, royalty.ValuationMethod)
-
+        self.calcSaskOilProvCrownRoyaltyVolumeValue(monthly, well.IndianInterest, royalty, calc)
     #
     # Royalty Calculation
     #
