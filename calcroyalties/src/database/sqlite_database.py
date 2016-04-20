@@ -41,6 +41,7 @@ class Database(object):
     def select(self, table, **kwargs):
         statement = "SELECT * FROM %s " % table
         if kwargs:
+            kwargs = dict((k, v) for k, v in kwargs.items() if v)  # this is to get rid of empty values coming from forms
             statement += "WHERE"
             i = len(kwargs)
             for arg in kwargs:
