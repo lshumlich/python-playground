@@ -1,0 +1,105 @@
+{% extends "layout.html" %}
+{% block body %}
+<script>
+  $(function() {
+  	$('#tabs').tabs();
+    $('#accordion').accordion({
+      collapsible:true,
+      heightStyle:'content',
+    });
+    $('#search-basic, #search-advanced').button({
+      icons: {primary: 'ui-icon-search'}
+    });
+  });
+</script>
+
+<h2>Lease Search</h2>
+
+<div id="accordion">
+  <h3>Search Criteria</h3>
+  <div>
+  	<div id="tabs">
+  	  <ul>
+  	    <li><a href="#tabs-basic">Basic search</a></li>
+  	    <li><a href="#tabs-advanced">Advanced search</a></li>
+  	  </ul>
+
+  	  <div id="tabs-basic">
+      <form name="search-basic">
+  	    Lease ID
+        <br>
+        <input id='ID' name="ID"></input>
+        <br>
+        <br>
+        Province
+        <br>
+        <input id='Prov' name="Prov"></input>
+        <br>
+        <br>
+        <button type="submit" id='search-basic'>Search</button>
+       </form>
+  	  </div>
+
+  	  <div id="tabs-advanced">
+      <form name="search-advanced">
+  	    Province
+        <br>
+        <input id='well-search-prov' name="Province"></input>
+        <br>
+        <br>
+        Well Type
+        <br>
+        <input id='well-search-type' name="WellType"></input>
+        <br>
+        <br>
+        <button type="submit" id='search-advanced'>Search</button>
+      </form>
+  	  </div>
+
+  	</div>
+  </div>
+</div>
+
+<div id='results-table'>
+</div>
+
+<script>
+$('form[name="search-basic"]').submit(function() {
+  event.preventDefault();
+  $.ajax({
+    url: "/api/leaseresults",
+    dataType: "html",
+    method: "POST",
+    contentType: "application/json",
+    data: JSON.stringify(formToDict(document.forms["search-basic"])),
+  })
+  .done(function(msg) {
+    $('#results-table').html(msg);
+    $("#accordion").accordion("option", "active", false)
+  })
+  .fail(function() {
+    $('#results-table').html('No results were found');
+  })
+  });
+
+  function formToDict(oForm) {
+    var dict = {};
+    for (i = 0; i < oForm.length; i++) {
+      if (oForm.elements[i].name != '') {
+        if (oForm.elements[i].type == 'text' || oForm.elements[i].type == 'hidden') {
+          dict[oForm.elements[i].name] = oForm.elements[i].value;
+        } else if (oForm.elements[i].type == 'checkbox') {
+          dict[oForm.elements[i].name] = oForm.elements[i].checked;
+        } else {
+          console.log('*** did not handle: ' + oForm.elements[i].name + "," + oForm.elements[i].value + "," + oForm.elements[i].type)
+        };
+      }
+    }
+    return dict
+  }
+
+</script>
+
+</html>
+
+{% endblock %}

@@ -31,7 +31,8 @@ Hello
     <td>{{ row.Range or "" }}</td>
     <td>{{ row.Township or "" }}</td>
     <td>{{ row.LSD or "" }}</td>
-    <td><a href="#" onclick=openInfo({{"'" + row.Facility + "'" }})>Edit</a></td>
+    <td><a href="#" onclick=openInfo({{"'" + row.Facility + "'" }})>Details</a></td>
+    <!--<td>Details</td>-->
   </tr>
   {% endfor %}
 </table>

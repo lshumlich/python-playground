@@ -56,6 +56,8 @@ def login():
                 session['prod_month'] = user.ProdMonth
                 session['permissions'] = user.Permissions
                 return redirect(url_for('index'))
+            else:
+                return "User not found"
         except:
             return "No such user was found in the system"
     return render_template('login.html')
@@ -93,6 +95,7 @@ def admin_user():
     elif request.method == 'POST':
         """ update info for a user """
         req_data = request.get_json()
+        print(req_data)
         user = db.select1('Users', ID=req_data['ID'])
         user.Login = req_data['Login']
         user.Name = req_data['Name']
@@ -119,11 +122,34 @@ def admin_user():
     else:
         abort(400)
 
+@app.route('/lease/search')
+def lease_search():
+    return render_template('lease_search.html')
+
+@app.route('/lease/<lease_num>')
+def lease_info(lease_num):
+    if not lease_num: abort(404)
+    db = config.get_database()
+    result_lease = db.select1('Lease', ID=lease_num)
+    result_royaltymaster = db.select1('RoyaltyMaster', ID=lease_num)
+    return render_template('lease_info.html', lease = result_lease, royaltymaster = result_royaltymaster)
+
+@app.route('/api/leaseresults', methods=['GET', 'POST'])
+def api_lease_results():
+    if not request.is_xhr: abort(404)
+    try:
+        db = config.get_database()
+        req_data = request.get_json()
+        results = db.select('Lease', **req_data)
+        print(results)
+        return render_template('api/lease_results.html', results = results)
+    except:
+        return json.dumps({'success': False}), 404, {'ContentType': 'application/json'}
+
 @app.route('/well/search')
-# @login_handler
-@PermissionHandler('well_search')
+@PermissionHandler('well_view')
 def well_search():
-        return render_template('well_search.html')
+    return render_template('well_search.html')
 
 @app.route('/api/wellresults')
 def well_results():
@@ -146,7 +172,7 @@ def well_info():
         abort(404)
 
 @app.route('/facility/search')
-@PermissionHandler('facility_search')
+@PermissionHandler('facility_view')
 def facility_search():
     return render_template('facility_search.html')
 
@@ -177,7 +203,7 @@ def facility_info():
         return "<h2>Facility details not found</h2>"
 
 @app.route('/worksheet')
-@PermissionHandler('worksheet')
+@PermissionHandler('worksheet_view')
 def worksheet():
     try:
         if request.args:
@@ -200,21 +226,38 @@ def worksheet():
         print('views.worksheet: ***Error:',e)
         traceback.print_exc(file=sys.stdout)
         return "<h2>Error displaying worksheet</h2><br>" + str(e)
+
 @app.errorhandler(404)
 def not_found(error):
     return render_template('404.html')
 
 
 """
-1. Authentication system
-    a. Checkboxes for permissions (names like well_edit, on server added to a list if checked, then list = permissions in db)
-    b. Flash messages for all actions (how to use flash from JS?)
-    c. JS-based form verification before submitting (use jQuery dialog demo for example)
-2. Production month
-    a. Stored in DB for every user or just set as a cookie, reset on logout?
-    b. In case of cookies, set in JS instead of server side?
-3. New view
-    a. Start by designing url structure!
+V 1. Authentication system
+    V a. Checkboxes for permissions (names like well_edit, on server added to a list if checked, then list = permissions in db)
+    V b. JS-based form verification before submitting (use jQuery dialog demo for example)
+    V c. If permissions not set, default them to Disabled
+2. Well event view
+    a. Search by well event only
+    b. Search results based on Lorraine's table
+    c. Details page - show entire record
+    d. Details page - show related wells
+3. Lease view
+    V a. Start by designing url structure!
+    b. No search for now
+    c. Search results - show entire record
+    d. Details page - show entire record
+    e. Details page - show related wells
+3. Larry's data view
+    a. Make sure it's working
+4. Production month
+    a. Store in cookies, make sure persistent for user on this computer
+    b. Prompt a user if it's not set
+    c. Write a function that would get it consistently
+5. Misc
+    a. Implement flash messages (how to make it work from JS?)
+    b. Change all endpoints to make use of GET parameters: /lease/search?ID=1&Prov=AB, then populate the form if these were passed on:
+       value = {{ lease.ID or "" }}
 
 CREATE TABLE `Users` (
 	`ID`	INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,

@@ -1,0 +1,45 @@
+<div id="modal">
+</div>
+
+<table style="width:100%" class="results_table">
+  <tr>
+    <td colspan=13><b>{{results|length}}</b> results found</td>
+  </tr>
+  <tr>
+    <th>Lease ID</th>
+    <th>Province</th>
+    <th>FN Reserve</th>
+    <th>Lessor</th>
+    <th>Actions</th>
+  </tr>
+  {% for row in results %}
+  <tr>
+    <td>{{ row.ID or "" }}</td>
+    <td>{{ row.Prov or "" }}</td>
+    <td>{{ row.FNReservce or "" }}</td>
+    <td>{{ row.Lessor or "" }}</td>
+    <td>
+      <a href="{{ url_for('lease_info', lease_num = row.ID) }}">Details</a>
+    <!--  Edit / view icons from wells
+    <a href="#" title="Edit" class="icon icon-edit" onclick=openInfo({{ row.ID }})></a>
+    &nbsp;
+    <a href="/worksheet?WellId={{ row.ID }}" title="Worksheet" class="icon icon-text-document"></a>
+    -->
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+
+<script>
+function openInfo(id) {
+  var idObject = {ID:id}
+  console.log(idObject);
+  $.ajax({
+    url: "/api/lease",
+    data: idObject,
+  })
+  .done(function(data){
+    $('#modal').html(data)});
+  }
+</script>

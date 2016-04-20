@@ -8,7 +8,7 @@
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <script src={{ url_for('static', filename='js/mgmenu_plugins.js') }}></script>
 <script src={{ url_for('static', filename='js/mgmenu.js') }}></script>
-<script src={{ url_for('static', filename='js/verifyform.js') }}></script>
+<script src={{ url_for('static', filename='js/formtools.js') }}></script>
 
 <script>
 $(document).ready(function($){
@@ -37,7 +37,7 @@ $(document).ready(function($){
   </div>
   <div class="header_right" style="width:25%; float:right; text-align:right">
   {% if session['login'] %}
-    Welcome {{ session['name'] }}, you can access: {{ session['permissions'] }}
+    Welcome {{ session['name'] }} <!-- , you can access: {{ session['permissions'] }} -->
     <br>
     Production date: {{ session['prod_month'] }} <br>
       <a href="/logout">Logout</a>
@@ -64,8 +64,9 @@ $(document).ready(function($){
                 <div class="dropdown_container dropdown_fullwidth"> 
                     <div class="col_6">
                         <ul>
-                            {% if 'well_search' in session['permissions'] %}<li><a href="/well/search">Wells</a></li>{% endif %}
-                            {% if 'facility_search' in session['permissions'] %}<li><a href="/facility/search">Facilities</a></li>{% endif %}
+                            {% if 'well_view' in session['permissions'] %}<li><a href="/well/search">Wells</a></li>{% endif %}
+                            {% if 'facility_view' in session['permissions'] %}<li><a href="/facility/search">Facilities</a></li>{% endif %}
+                            {% if 'lease_view' in session['permissions'] %}<li><a href="/lease/search">Leases</a></li>{% endif %}
                         </ul>
                     </div>   
                 </div>  

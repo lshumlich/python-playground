@@ -1,7 +1,9 @@
+
 <div id="dialog">
+  <p class="errors" style="color:red"></p>
   <form name="form_user">
     <fieldset>
-      <legend>User</legend>
+      <legend>User Information</legend>
       <table class="wellmodal" cellpadding=5>
         <tr>
           <td><label for="Login">Login</label></td>
@@ -24,16 +26,134 @@
       <input type="hidden" id="ID" name="ID" value="{{user.ID}}">
       <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
     </fieldset>
+    <fieldset>
+      <legend>Permissions</legend>
+      <table style="width:100%">
+        <col width="40%">
+	    <col width="20%">
+	    <col width="20%">
+	    <col width="20%">
+        <tr>
+          <th>Functionality</th>
+          <th>View</th>
+          <th>Edit</th>
+          <th>Disabled</th>
+        </tr>
+        <tr>
+          <td>Well</td>
+          <td style="text-align:center;"><input type="radio" name="well" id="view" /></td>
+          <td style="text-align:center;"><input type="radio" name="well" id="edit" /></td>
+          <td style="text-align:center;"><input type="radio" name="well" id="disable" /></td>
+        </tr>
+        <tr>
+          <td>Facility</td>
+          <td style="text-align:center;"><input type="radio" name="facility" id="view" /></td>
+          <!--<td style="text-align:center;"><input type="radio" name="facility" id="edit" /></td>-->
+          <td></td>
+          <td style="text-align:center;"><input type="radio" name="facility" id="disable" /></td>
+        </tr>
+        <tr>
+          <td>Lease</td>
+          <td style="text-align:center;"><input type="radio" name="lease" id="view" /></td>
+          <td style="text-align:center;"><input type="radio" name="lease" id="edit" /></td>
+          <td style="text-align:center;"><input type="radio" name="lease" id="disable" /></td>
+        </tr>
+        <tr>
+          <td>Well-Lease Link</td>
+          <td style="text-align:center;"><input type="radio" name="welllease" id="view" /></td>
+          <td style="text-align:center;"><input type="radio" name="welllease" id="edit" /></td>
+          <td style="text-align:center;"><input type="radio" name="welllease" id="disable" /></td>
+        </tr>
+        <tr>
+          <td>Royalty Worksheet</td>
+          <td style="text-align:center;"><input type="radio" name="worksheet" id="view" /></td>
+          <!--<td style="text-align:center;"><input type="radio" name="worksheet" id="edit" /></td>-->
+          <td></td>
+          <td style="text-align:center;"><input type="radio" name="worksheet" id="disable" /></td>
+        </tr>
+        <tr>
+          <td>Data Browser</td>
+          <td style="text-align:center;"><input type="radio" name="data" id="view" /></td>
+          <td style="text-align:center;"><input type="radio" name="data" id="edit" /></td>
+          <td style="text-align:center;"><input type="radio" name="data" id="disable" /></td>
+        </tr>
+        <tr>
+          <td>User Management</td>
+          <td style="text-align:center;"><input type="radio" name="users" id="view" /></td>
+          <td style="text-align:center;"><input type="radio" name="users" id="edit" /></td>
+          <td style="text-align:center;"><input type="radio" name="users" id="disable" /></td>
+        </tr>
+      </table>
+    </fieldset>
   </form>
-  <p class="errors" style="color:red"></p>
 </div>
 
 <script>
 $(function(){
+  var permissions = [];
+
+  function parsePermissions(){
+    permissions = "{{user.Permissions}}".split(",");
+    if (permissions.length <= 1) {
+      // set all radio buttons to 'disabled' if no permissions are set (i.e. a new user)
+      sel = $("input#disable");
+      sel.prop('checked', true);
+    } else {
+      for (i in permissions) {
+        perm = permissions[i];
+        perm_name = perm.split("_")[0];
+        perm_id = perm.split("_")[1];
+        sel = $("input[name=" + perm_name + "]").filter("#" + perm_id);
+        sel.prop('checked', true);
+      }
+    }
+  }
+
+  parsePermissions();
+
+  //handling the permission radio buttons on click
+  function arrayAddUnique(array, item){
+    var found = jQuery.inArray(item, array);
+      if (found < 0) {
+        array.push(item);
+      }
+  }
+
+  function arrayRemove(array, item){
+    var found = jQuery.inArray(item, array);
+    if (found >= 0) {
+      array.splice(found, 1);
+    }
+  }
+
+  $("[type=radio]").on('click', function(){
+    if (event.target.id == "view") {
+      itemView = event.target.name + "_" + "view";
+      itemEdit = event.target.name + "_" + "edit";
+      arrayAddUnique(permissions, itemView);
+      arrayRemove(permissions, itemEdit);
+    } else if (event.target.id == "edit") {
+      itemView = event.target.name + "_" + "view";
+      itemEdit = event.target.name + "_" + "edit";
+      arrayAddUnique(permissions, itemView);
+      arrayAddUnique(permissions, itemEdit);
+    } else if (event.target.id == "disable") {
+      itemView = event.target.name + "_" + "view";
+      itemEdit = event.target.name + "_" + "edit";
+      itemDisable = event.target.name + "_" + "disable";
+      arrayRemove(permissions, itemView);
+      arrayRemove(permissions, itemEdit);
+      arrayAddUnique(permissions, itemDisable);
+    }
+    $("#Permissions").attr("value", permissions);
+  }
+  );
+
+
   // creates a modal window
   dialog = $("#dialog").dialog({
     autoOpen: true,
-    height: 400,
+    height: 600,
     width: 800,
     modal: true,
     title: "Edit user",
@@ -44,13 +164,15 @@ $(function(){
     }
   });
 
+
   // handles form submission with traditional methods, i.e. pressing enter
   form = dialog.find( "form" ).on( "submit", function( event ) {
     event.preventDefault();
     formSave();
   });
 
-  // relies on verifyform.js included in layout.html
+
+  // verifies form before submission; relies on formtools.js included in layout.html
   function formVerify(){
     var valid = true;
 

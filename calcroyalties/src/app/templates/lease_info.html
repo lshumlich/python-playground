@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+{% block body %}
+
+<h3>Lease {{ lease.ID }}</h3>
+
+<table class="wellmodal table-striped">
+    <tr>
+        <th>ID</th>
+        <th>Lease Type</th>
+        <th>Rights Granted</th>
+        <th>Royalty Scheme</th>
+        <th>Crown Multiplier</th>
+        <th>Province</th>
+        <th>Lessor</th>
+    </tr>
+    <tr>
+        <td>{{ lease.ID }} </td>
+        <td>{{ lease.LeaseType }} </td>
+        <td>{{ royaltymaster.RightsGranted }} </td>
+        <td>{{ royaltymaster.RoyaltyScheme }} </td>
+        <td>{{ royaltymaster.CrownMultiplier }} </td>
+        <td>{{ lease.Province }} </td>
+        <td>{{ lease.Lessor }} </td>
+    </tr>
+</table>
+
+{% endblock %}

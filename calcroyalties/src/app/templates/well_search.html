@@ -68,7 +68,6 @@
     })
       .done(function (msg){
         $('#results-table').html(msg);
-        $("tr:even").css("background-color", "lightgray");
         $("#accordion").accordion("option", "active", false)
     });
   });
@@ -77,10 +76,3 @@
 </html>
 
 {% endblock %}
-<!--
-When searching, send the search parameters from this form as a post request to the server.
-When displaying results, display the same template (this page) but also pass on the search results. Then, if search results are passed:
-- collapse the search parameters accordion;
-- unhide results table
-- prepopulate results table with results
--->
