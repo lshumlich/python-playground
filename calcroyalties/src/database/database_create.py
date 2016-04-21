@@ -40,7 +40,11 @@ class DatabaseCreate(object):
             self.ECONdata()
         if 'LinkTab' not in tables:
             self.Linktab()
-        
+        if 'Users' not in tables:
+            self.Users()
+
+        self.dbi.commit()
+
     def Config(self):
         statement = """
             CREATE TABLE Config ('ID' integer primary key autoincrement, 
@@ -137,3 +141,21 @@ class DatabaseCreate(object):
             TabName text, AttrName text, LinkName text, BaseTab boolean, ShowAttrs text);
         """
         self.dbi.execute_statement(statement)
+
+
+    def Users(self):
+        statement = """
+            CREATE TABLE `Users` (
+                `ID`	INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
+                `Login`	TEXT UNIQUE,
+                `Name`	TEXT,
+                `Email`	TEXT,
+                `ProdMonth`	INTEGER,
+                `Permissions`	TEXT
+            )
+        """
+        self.dbi.execute_statement(statement)
+
+        insert_statement = "insert into Users values(1,'admin','Admin Admin','info@thesolutionstack.com',201604, \
+                           ' ');"
+        self.dbi.execute(insert_statement)
