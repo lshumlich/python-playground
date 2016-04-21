@@ -48,7 +48,7 @@ by code coverage.
 class ProcessRoyalties(object):
 
     def __init__(self):
-        self.reference_price = {'Pigeon Lake Indian': 24.04, 'Reserve no.138A': 25.37, 'Sawridge Indian': 25.13, 'Stony Plain Indian': 24.64}
+        self.reference_price = {'Pigeon Lake Indian': 24.04, 'Reserve no.138A': 25.37, 'Sawridge Indian': 25.13, 'Stony Plain Indian': 24.64, 'Onion Lake': 25}
         self.db = config.get_database()
 
     """
@@ -258,14 +258,14 @@ class ProcessRoyalties(object):
 
         # This was done this way so precision was not lost.
 
-        calc.ProvCrownRoyaltyVolume = round((calc.ProvCrownUsedRoyaltyRate / 100) *
+        calc.ProvCrownRoyaltyVolume = ((calc.ProvCrownUsedRoyaltyRate / 100) *
                                                       royalty.CrownMultiplier *
-                                                      m.ProdVol * indian_interest, 1)
+                                                      m.ProdVol * indian_interest)
 
-        calc.ProvCrownRoyaltyValue = round((calc.ProvCrownUsedRoyaltyRate / 100) *
-                                               crownMultiplier *
+        calc.ProvCrownRoyaltyValue = ((calc.ProvCrownUsedRoyaltyRate / 100) *
+                                               royalty.CrownMultiplier *
                                                m.ProdVol * indian_interest *
-                                               calc.RoyaltyPrice , 2)
+                                               calc.RoyaltyPrice)
 
 
 
@@ -290,7 +290,7 @@ class ProcessRoyalties(object):
                                                       indian_interest *
                                                       royalty_calc.RoyaltyPrice , 2)
 
-        royalty_calc.SupplementaryRoyalties = self.calcSupplementaryRoyaltiesIOGR1995(royalty_calc.CommencementPeriod, m.WellHeadPrice, m.ProdVol, royalty_calc.RoyaltyRegulation, self.reference_price['Sawridge Indian'])
+        royalty_calc.SupplementaryRoyalties = self.calcSupplementaryRoyaltiesIOGR1995(royalty_calc.CommencementPeriod, m.WellHeadPrice, m.ProdVol, royalty_calc.RoyaltyRegulation, self.reference_price['Onion Lake'])
         print("THIS IS SUPP ROYALTIES", royalty_calc.SupplementaryRoyalties)
         return
 
@@ -408,13 +408,13 @@ class ProcessRoyalties(object):
                 gorrPercent = float(s)
 #                 print('gorrPercent:', gorrPercent)
                 if evalVol == 0:
-                    gorrExplain += ' for an RR of ' + str(gorrPercent) +'%'
+                    gorrExplain += ' for a RoyRate of ' + str(gorrPercent) +'%'
                     return gorrPercent, gorrExplain
                 elif gorrMaxVol == 0:
-                    gorrExplain += ' is greater than ' + str(lastGorrMaxVol) + ' for an RR of ' + str(gorrPercent) +'%'
+                    gorrExplain += ' is greater than ' + str(lastGorrMaxVol) + ' for a RoyRate of ' + str(gorrPercent) +'%'
                     return gorrPercent, gorrExplain
                 elif evalVol <= gorrMaxVol:
-                    gorrExplain += ' is greater than ' + str(lastGorrMaxVol) + ' and less than or equal to ' + str(gorrMaxVol) + ' for an RR of ' + str(gorrPercent) +'%'
+                    gorrExplain += ' is greater than ' + str(lastGorrMaxVol) + ' and less than or equal to ' + str(gorrMaxVol) + ' for a RoyRate of ' + str(gorrPercent) +'%'
                     return gorrPercent, gorrExplain
 
 
