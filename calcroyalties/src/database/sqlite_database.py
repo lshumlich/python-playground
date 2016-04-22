@@ -38,6 +38,16 @@ class Database(object):
         ds._table_name = table_name
         return ds
 
+    def select_sql(self, statement):
+        if not statement.startswith('SELECT'): raise AppError('Only SELECT statements are allowed, this is not one: %s' % statement)
+        # try:
+        self.dbi.execute(statement)
+        result = self.dbi.cursor.fetchall()
+        result = self.sql_to_object('join', result)
+        return result
+        # except:
+        #     raise AppError('Failed to run SQL statement %s' % statement)
+
     def select(self, table, **kwargs):
         statement = "SELECT * FROM %s " % table
         if kwargs:
