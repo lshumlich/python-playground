@@ -1,0 +1,103 @@
+{% extends "layout.html" %}
+{% block body %}
+<script>
+  $(function() {
+  	$('#tabs').tabs();
+    $('#accordion').accordion({
+      collapsible:true,
+      heightStyle:'content',
+    });
+    $('#search-basic, #search-advanced').button({
+      icons: {primary: 'ui-icon-search'}
+    });
+  });
+</script>
+
+<h2>Well Event Search</h2>
+
+<div id="accordion">
+  <h3>Search Criteria</h3>
+  <div>
+  	<div id="tabs">
+  	  <ul>
+  	    <li><a href="#tabs-basic">Basic search</a></li>
+  	    <li><a href="#tabs-advanced">Advanced search</a></li>
+  	  </ul>
+
+  	  <div id="tabs-basic">
+      <form name="search-basic" action="/wellevent/search" method="get">
+  	    Well Event
+        <br>
+        <input id='ID' name="WellEvent" value="{% if search_terms %}{{ search_terms['WellEvent'] }}{% endif%}" />
+        <br>
+        <br>
+        Meridian
+        <br>
+        <input id='Prov' name="Meridian" value="{% if search_terms %}{{ search_terms['Meridian'] }}{% endif%}" />
+        <br>
+        <br>
+        <button type="submit" id='search-basic'>Search</button>
+       </form>
+  	  </div>
+
+  	  <div id="tabs-advanced">
+      <form name="search-advanced">
+  	    Province
+        <br>
+        <input id='well-search-prov' name="Province" />
+        <br>
+        <br>
+        Well Type
+        <br>
+        <input id='well-search-type' name="WellType" />
+        <br>
+        <br>
+        <button type="submit" id='search-advanced'>Search</button>
+      </form>
+  	  </div>
+
+  	</div>
+  </div>
+</div>
+
+{% if results %}
+<div id='results-table'>
+<table style="width:100%" class="results_table table-striped">
+  <tr>
+    <td colspan=13><b>{{results|length}}</b> results found</td>
+  </tr>
+  <tr>
+    <th>Well Event</th>
+    <th>Start Date</th>
+    <th>End Date</th>
+    <th>Well</th>
+    <th>Pool Name</th>
+    <th>Meridian</th>
+    <th>Actions</th>
+  </tr>
+  {% for row in results %}
+  <tr>
+    <td>{{ row.WellEvent or "" }}</td>
+    <td>{{ row.StartDate or "" }}</td>
+    <td>{{ row.EndDate or "" }}</td>
+    <td>{{ row.Well or "" }}</td>
+    <td>{{ row.PoolName or "" }}</td>
+    <td>{{ row.Meridian or "" }}</td>
+    <td>
+      <a href="{{ url_for('wellevent.details', wellevent_num = row.WellEvent) }}">Details</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+</div>
+<script>
+$(function(){
+  $("#accordion").accordion("option", "active", false);
+}
+)
+</script>
+{% endif %}
+
+</html>
+
+{% endblock %}

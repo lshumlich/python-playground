@@ -5,7 +5,7 @@ import traceback
 import json
 from functools import wraps
 
-from flask import render_template, request, redirect, url_for, session, abort
+from flask import render_template, request, redirect, url_for, session, abort, flash
 
 import config
 from src.app import app
@@ -59,7 +59,8 @@ def login():
             else:
                 return "User not found"
         except:
-            return "No such user was found in the system"
+            flash("No such user was found in the system.")
+            return redirect(url_for('index'))
     return render_template('login.html')
 
 @app.route('/logout')
@@ -127,12 +128,15 @@ def lease_search():
     return render_template('lease_search.html')
 
 @app.route('/lease/<lease_num>')
-def lease_info(lease_num):
+def lease_details(lease_num):
     if not lease_num: abort(404)
-    db = config.get_database()
-    result_lease = db.select1('Lease', ID=lease_num)
-    result_royaltymaster = db.select1('RoyaltyMaster', ID=lease_num)
-    return render_template('lease_info.html', lease = result_lease, royaltymaster = result_royaltymaster)
+    try:
+        db = config.get_database()
+        result_lease = db.select1('Lease', ID=lease_num)
+        result_royaltymaster = db.select1('RoyaltyMaster', ID=lease_num)
+        return render_template('lease_details.html', lease = result_lease, royaltymaster = result_royaltymaster)
+    except:
+        abort(404)
 
 @app.route('/api/leaseresults', methods=['GET', 'POST'])
 def api_lease_results():
@@ -141,10 +145,41 @@ def api_lease_results():
         db = config.get_database()
         req_data = request.get_json()
         results = db.select('Lease', **req_data)
-        print(results)
         return render_template('api/lease_results.html', results = results)
     except:
         return json.dumps({'success': False}), 404, {'ContentType': 'application/json'}
+
+@app.route('/wellevent/search', methods=['GET'])
+def wellevent_search():
+    if not request.args: return render_template('wellevent_search.html')
+    db = config.get_database()
+    results = db.select('WellEventInfo', **request.args.to_dict())
+    # sql select ideas:
+    # results = []
+    # for wellevent in wellevents:
+    #     result = db.select_sql('SELECT * FROM RTAWellsinPE WHERE WellEvent="%s"' % wellevent.WellEvent)
+    #     if result: results.append(result)
+    if results:
+        print(results)
+        return render_template('wellevent_search.html', results=results, search_terms=request.args.to_dict())
+    else:
+        flash('No results found.')
+        return render_template('wellevent_search.html')
+
+@app.route('/wellevent')
+def wellevent_redirect():
+    return redirect(url_for('wellevent_search'))
+
+@app.route('/wellevent/<wellevent_num>')
+def wellevent_details(wellevent_num):
+    if not wellevent_num: redirect(url_for('wellevent_search'))
+    try:
+        db = config.get_database()
+        req_data = request.get_json()
+        results = db.select('WellEventInfo', **req_data)
+        return render_template('api/wellevent_details.html', results=results)
+    except:
+        abort(404)
 
 @app.route('/well/search')
 @PermissionHandler('well_view')
@@ -258,13 +293,4 @@ V 1. Authentication system
     a. Implement flash messages (how to make it work from JS?)
     b. Change all endpoints to make use of GET parameters: /lease/search?ID=1&Prov=AB, then populate the form if these were passed on:
        value = {{ lease.ID or "" }}
-
-CREATE TABLE `Users` (
-	`ID`	INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
-	`Login`	TEXT UNIQUE,
-	`Name`	TEXT,
-	`Email`	TEXT,
-	`ProdMonth`	INTEGER,
-	`Permissions`	TEXT
-)
 """
