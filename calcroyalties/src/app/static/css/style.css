@@ -43,4 +43,11 @@ tr {
 
 .icon-edit{ background-position: -32px -96px;  } 
 .icon-text-document{ background-position: -64px 0;  } 
-.icon-delete{ background-position: -224px -32px;  } 
+.icon-delete{ background-position: -224px -32px;  }
+
+.flashes {
+    width:100%;
+    background-color:lightblue;
+    min-height: 50px;
+    font-size: 14px;
+}
