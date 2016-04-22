@@ -95,7 +95,7 @@ class ProcessRoyalties(object):
         if monthly.Product == 'Oil' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
             self.calcSaskOilProvCrown(monthly, well, royalty, lease, calc)
         elif monthly.Product == 'Oil' and 'IOGR1995' in royalty.RoyaltyScheme:
-            self.calcSaskOilIOGR1995(well.CommencementDate, royalty.ValuationMethod, royalty.CrownMultiplier, well.IndianInterest, monthly, calc)
+            self.calcSaskOilIOGR1995(well.CommencementDate, royalty.ValuationMethod, royalty.CrownMultiplier, well.PEFNInterest, monthly, calc)
         else:
             raise AppError("No calculation for" + str(well.ID) + str(monthly.ProdMonth) + str(monthly.Product) + str(royalty.RoyaltyScheme))
 
@@ -104,8 +104,8 @@ class ProcessRoyalties(object):
 
         if monthly.Product == 'Oil' and 'GORR' in royalty.RoyaltyScheme:
             calc.GorrRoyaltyRate, calc.GorrMessage = self.calcGorrPercent(monthly.ProdVol,monthly.ProdHours,royalty.Gorr)
-            calc.GorrRoyaltyValue = monthly.ProdVol * well.IndianInterest * calc.GorrRoyaltyRate / 100.0 * calc.RoyaltyPrice
-            calc.GorrRoyaltyVolume = monthly.ProdVol * well.IndianInterest * calc.GorrRoyaltyRate / 100.0
+            calc.GorrRoyaltyValue = monthly.ProdVol * well.PEFNInterest * calc.GorrRoyaltyRate / 100.0 * calc.RoyaltyPrice
+            calc.GorrRoyaltyVolume = monthly.ProdVol * well.PEFNInterest * calc.GorrRoyaltyRate / 100.0
 
             calc.RoyaltyValuePreDeductions = (calc.ProvCrownRoyaltyValue +
                                                         calc.IOGR1995RoyaltyValue +
@@ -433,7 +433,7 @@ class ProcessRoyalties(object):
 
         calc.RoyaltyPrice = self.determineRoyaltyPrice(royalty.ValuationMethod, monthly)
 
-        self.calcSaskOilProvCrownRoyaltyVolumeValue(monthly, well.IndianInterest, royalty, calc)
+        self.calcSaskOilProvCrownRoyaltyVolumeValue(monthly, well.PEFNInterest, royalty, calc)
     #
     # Royalty Calculation
     #
@@ -582,12 +582,12 @@ class ProcessRoyalties(object):
         royaltyCalc.ProvCrownRoyaltyVolume = ((royaltyCalc.ProvCrownUsedRoyaltyRate / 100) *
                                                       royalty.CrownMultiplier *
                                                       monthlyData.ProdVol *
-                                                      well.IndianInterest)
+                                                      well.PEFNInterest)
 
         royaltyCalc.ProvCrownRoyaltyValue = round((royaltyCalc.ProvCrownUsedRoyaltyRate / 100) *
                                                royalty.CrownMultiplier *
                                                monthlyData.ProdVol *
-                                               well.IndianInterest *
+                                               well.PEFNInterest *
                                                royaltyCalc.RoyaltyPrice , 2)
 
         return
@@ -610,7 +610,7 @@ class ProcessRoyalties(object):
 
         royaltyCalc.IOGR1995RoyaltyValue = round(royalty.CrownMultiplier *
                                                       royaltyCalc.IOGR1995RoyaltyVolume *
-                                                      well.IndianInterest *
+                                                      well.PEFNInterest *
                                                       royaltyCalc.RoyaltyPrice , 2)
 
         return
@@ -765,7 +765,7 @@ class ProcessRoyalties(object):
 #                 if monthlyData.Product == 'Oil' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
 #                     self.calcSaskOilProvCrown(monthlyData, well, royalty, lease, royaltyCalc)
 #                 elif monthlyData.Product == 'Oil' and 'IOGR1995' in royalty.RoyaltyScheme:
-#                     self.calcSaskOilIOGR1995(well.CommencementDate, royalty.ValuationMethod, royalty.CrownMultiplier, well.IndianInterest, monthlyData, royaltyCalc)
+#                     self.calcSaskOilIOGR1995(well.CommencementDate, royalty.ValuationMethod, royalty.CrownMultiplier, well.PEFNInterest, monthlyData, royaltyCalc)
 # #                    self.calcSaskOilIOGR1995(monthlyData, well, royalty, lease, royaltyCalc)
 #                 else:
 #                     raise AppError('Royalty Scheme not yet developed: ' + lease.Prov + ' ' + monthlyData.Product)
@@ -773,8 +773,8 @@ class ProcessRoyalties(object):
 #
 #                 if monthlyData.Product == 'Oil' and 'GORR' in royalty.RoyaltyScheme:
 #                     royaltyCalc.GorrRoyaltyRate, royaltyCalc.GorrMessage = self.calcGorrPercent(monthlyData.ProdVol,monthlyData.ProdHours,royalty.Gorr)
-#                     royaltyCalc.GorrRoyaltyValue = monthlyData.ProdVol * well.IndianInterest * royaltyCalc.GorrRoyaltyRate / 100.0 * royaltyCalc.RoyaltyPrice
-#                     royaltyCalc.GorrRoyaltyVolume = monthlyData.ProdVol * well.IndianInterest * royaltyCalc.GorrRoyaltyRate / 100.0
+#                     royaltyCalc.GorrRoyaltyValue = monthlyData.ProdVol * well.PEFNInterest * royaltyCalc.GorrRoyaltyRate / 100.0 * royaltyCalc.RoyaltyPrice
+#                     royaltyCalc.GorrRoyaltyVolume = monthlyData.ProdVol * well.PEFNInterest * royaltyCalc.GorrRoyaltyRate / 100.0
 #
 #                 royaltyCalc.RoyaltyValuePreDeductions = (royaltyCalc.ProvCrownRoyaltyValue +
 #                                                         royaltyCalc.IOGR1995RoyaltyValue +
@@ -909,7 +909,7 @@ class ProcessRoyalties(object):
 #         return royaltyCalc.ProvCrownRoyaltyRate
 #
 #
-#     def calcSaskOilProvCrownRoyaltyVolumeValue(self, ProvCrownUsedRoyaltyRate, mop, indianInterest, MinRoyalty, crownMultiplier, RoyaltyPrice):
+#     def calcSaskOilProvCrownRoyaltyVolumeValue(self, ProvCrownUsedRoyaltyRate, mop, PEFNInterest, MinRoyalty, crownMultiplier, RoyaltyPrice):
 #         # Note: If there is no sales. Use last months sales value... Not included in this code
 #
 #         #royaltyCalc.RoyaltyPrice = self.determineRoyaltyprice(royalty.ValuationMethod, econOilData)
@@ -927,11 +927,11 @@ class ProcessRoyalties(object):
 #         #
 #         ProvCrownRoyaltyVolume = ((ProvCrownUsedRoyaltyRate / 100) *
 #                                                       crownMultiplier *
-#                                                       mop * indianInterest)
+#                                                       mop * PEFNInterest)
 #
 #         ProvCrownRoyaltyValue = round((ProvCrownUsedRoyaltyRate / 100) *
 #                                                crownMultiplier *
-#                                                mop * indianInterest *
+#                                                mop * PEFNInterest *
 #                                                RoyaltyPrice , 2)
 #
 #         return ProvCrownRoyaltyVolume, ProvCrownRoyaltyValue
@@ -1094,7 +1094,7 @@ class ProcessRoyalties(object):
 #         royaltyCalc.RoyaltyPrice = self.determineRoyaltyPrice(royalty.ValuationMethod, monthlyData)
 #
 #         self.calcSaskOilProvCrownRoyaltyVolumeValue(royaltyCalc.ProvCrownUsedRoyaltyRate,
-#                                             monthlyData.ProdVol, well.IndianInterest,
+#                                             monthlyData.ProdVol, well.PEFNInterest,
 #                                             royalty.MinRoyalty, royalty.CrownMultiplier,
 #                                             royaltyCalc.RoyaltyPrice)
 #
@@ -1202,12 +1202,12 @@ class ProcessRoyalties(object):
 #         royaltyCalc.ProvCrownRoyaltyVolume = ((royaltyCalc.ProvCrownUsedRoyaltyRate / 100) *
 #                                                       royalty.CrownMultiplier *
 #                                                       monthlyData.ProdVol *
-#                                                       well.IndianInterest)
+#                                                       well.PEFNInterest)
 #
 #         royaltyCalc.ProvCrownRoyaltyValue = round((royaltyCalc.ProvCrownUsedRoyaltyRate / 100) *
 #                                                royalty.CrownMultiplier *
 #                                                monthlyData.ProdVol *
-#                                                well.IndianInterest *
+#                                                well.PEFNInterest *
 #                                                royaltyCalc.RoyaltyPrice , 2)
 #
 #         return
@@ -1230,7 +1230,7 @@ class ProcessRoyalties(object):
 #
 #         royaltyCalc.IOGR1995RoyaltyValue = round(royalty.CrownMultiplier *
 #                                                       royaltyCalc.IOGR1995RoyaltyVolume *
-#                                                       well.IndianInterest *
+#                                                       well.PEFNInterest *
 #                                                       royaltyCalc.RoyaltyPrice , 2)
 #
 #         return

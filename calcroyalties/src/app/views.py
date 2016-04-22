@@ -203,7 +203,7 @@ def facility_info():
         return "<h2>Facility details not found</h2>"
 
 @app.route('/worksheet')
-@PermissionHandler('worksheet_view')
+#@PermissionHandler('worksheet_view')
 def worksheet():
     try:
         if request.args:

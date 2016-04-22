@@ -60,7 +60,7 @@ class DatabaseCreate(object):
             CREATE TABLE Well ('ID' integer primary key autoincrement, 
             'UWI' text, 'Prov' text, 'WellType' text, 'LeaseType' text, 
             'LeaseID' int, 'RoyaltyClassification' text, 
-            'Classification' text, 'SRC' int, 'IndianInterest' float, 
+            'Classification' text, 'SRC' int, 'PEFNInterest' float,
             'CommencementDate' timestamp, 'ReferencePrice' int);
         """
         self.dbi.execute_statement(statement)
@@ -86,7 +86,7 @@ class DatabaseCreate(object):
     def WellLeaseLink(self):
         statement = """
             CREATE TABLE WellLeaseLink ('ID' integer primary key autoincrement,
-            "WellEvent" text, "LeaseID" int, "IndianInterest" float);
+            "WellEvent" text, "LeaseID" int, "PEFNInterest" float);
         """
         self.dbi.execute_statement(statement)
 

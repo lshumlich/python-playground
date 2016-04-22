@@ -128,7 +128,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
     def test_calcSaskOilProvCrownRoyaltyVolumeValue(self):
         royStringData = \
 
-ProvCrownUsedRoyaltyRate, CrownMultiplier, IndianInterest, MinRoyalty, RoyaltyPrice
+ProvCrownUsedRoyaltyRate, CrownMultiplier, PEFNInterest, MinRoyalty, RoyaltyPrice
 6.31, 1, 1, 3.21,
 
         royOilData = DataStructure()
