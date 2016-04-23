@@ -68,20 +68,18 @@
   </tr>
   <tr>
     <th>Well Event</th>
-    <th>Start Date</th>
-    <th>End Date</th>
-    <th>Well</th>
-    <th>Pool Name</th>
+    <th>RTPOperator</th>
+    <th>Status</th>
+    <th>Operator Short Name</th>
     <th>Meridian</th>
     <th>Actions</th>
   </tr>
   {% for row in results %}
   <tr>
     <td>{{ row.WellEvent or "" }}</td>
-    <td>{{ row.StartDate or "" }}</td>
-    <td>{{ row.EndDate or "" }}</td>
-    <td>{{ row.Well or "" }}</td>
-    <td>{{ row.PoolName or "" }}</td>
+    <td>{{ row.RTPOperator or "" }}</td>
+    <td>{{ row.Status or "" }}</td>
+    <td>{{ row.CorpShortName or "" }}</td>
     <td>{{ row.Meridian or "" }}</td>
     <td>
       <a href="{{ url_for('wellevent.details', wellevent_num = row.WellEvent) }}">Details</a>

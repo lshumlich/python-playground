@@ -18,7 +18,6 @@ class Database(object):
         result = []
         for row in input_list:
             ds = self.get_data_structure(table_name)
-            setattr(ds, "_table_name", table_name)
             result.append(ds)
             i = 0
             for cell in header_row:
@@ -40,13 +39,10 @@ class Database(object):
 
     def select_sql(self, statement):
         if not statement.startswith('SELECT'): raise AppError('Only SELECT statements are allowed, this is not one: %s' % statement)
-        # try:
         self.dbi.execute(statement)
         result = self.dbi.cursor.fetchall()
         result = self.sql_to_object('join', result)
         return result
-        # except:
-        #     raise AppError('Failed to run SQL statement %s' % statement)
 
     def select(self, table, **kwargs):
         statement = "SELECT * FROM %s " % table

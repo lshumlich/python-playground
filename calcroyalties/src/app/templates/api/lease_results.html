@@ -19,7 +19,7 @@
     <td>{{ row.FNReservce or "" }}</td>
     <td>{{ row.Lessor or "" }}</td>
     <td>
-      <a href="{{ url_for('lease_info', lease_num = row.ID) }}">Details</a>
+      <a href="{{ url_for('lease.details', lease_num = row.ID) }}">Details</a>
     <!--  Edit / view icons from wells
     <a href="#" title="Edit" class="icon icon-edit" onclick=openInfo({{ row.ID }})></a>
     &nbsp;
