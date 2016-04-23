@@ -94,38 +94,46 @@ class ProcessRoyalties(object):
 
         if monthly.Product == 'Oil' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
             self.calcSaskOilProvCrown(monthly, well, royalty, lease, calc)
+            calc.RoyaltyValuePreDeductions = calc.ProvCrownRoyaltyValue
+            calc.RoyaltyValue = calc.RoyaltyValuePreDeductions
+
         elif monthly.Product == 'Oil' and 'IOGR1995' in royalty.RoyaltyScheme:
             self.calcSaskOilIOGR1995(well.CommencementDate, royalty.ValuationMethod, royalty.CrownMultiplier, well.PEFNInterest, monthly, calc)
+            calc.RoyaltyValuePreDeductions = calc.IOGR1995RoyaltyValue + calc.SupplementaryRoyalties
+            calc.RoyaltyValue = calc.RoyaltyValuePreDeductions
+
         else:
             raise AppError("No calculation for" + str(well.ID) + str(monthly.ProdMonth) + str(monthly.Product) + str(royalty.RoyaltyScheme))
-
-            # self.calcSaskOilIOGR1995(monthly, well, royalty, lease, calc)
 
 
         if monthly.Product == 'Oil' and 'GORR' in royalty.RoyaltyScheme:
             calc.GorrRoyaltyRate, calc.GorrMessage = self.calcGorrPercent(monthly.ProdVol,monthly.ProdHours,royalty.Gorr)
-            calc.GorrRoyaltyValue = monthly.ProdVol * well.PEFNInterest * calc.GorrRoyaltyRate / 100.0 * calc.RoyaltyPrice
-            calc.GorrRoyaltyVolume = monthly.ProdVol * well.PEFNInterest * calc.GorrRoyaltyRate / 100.0
-
-            calc.RoyaltyValuePreDeductions = (calc.ProvCrownRoyaltyValue +
-                                                        calc.IOGR1995RoyaltyValue +
-                                                        calc.GorrRoyaltyValue)
+            calc.GorrRoyaltyValue = round(monthly.ProdVol * well.PEFNInterest * calc.GorrRoyaltyRate / 100.0 * calc.RoyaltyPrice, 6)
+            calc.GorrRoyaltyVolume = round(monthly.ProdVol * well.PEFNInterest * calc.GorrRoyaltyRate / 100.0, 2)
+            calc.RoyaltyValuePreDeductions = calc.RoyaltyValuePreDeductions + calc.GorrRoyaltyValue
             calc.RoyaltyValue = calc.RoyaltyValuePreDeductions
+
+            # calc.RoyaltyValuePreDeductions = (calc.ProvCrownRoyaltyValue +
+            #                                             calc.IOGR1995RoyaltyValue +
+            #                                             calc.GorrRoyaltyValue)
+            # calc.RoyaltyValue = calc.RoyaltyValuePreDeductions
 
             calc.RoyaltyVolume = (calc.ProvCrownRoyaltyVolume +
                                                         calc.IOGR1995RoyaltyVolume +
                                                         calc.GorrRoyaltyVolume)
 
-            if (royalty.TruckingDeducted == 'Y'):
-                calc.RoyaltyTransportation = calc.RoyaltyVolume * monthly.TransRate
-                calc.RoyaltyDeductions += calc.RoyaltyTransportation
-                calc.RoyaltyValue -= calc.RoyaltyTransportation
 
-            if (royalty.ProcessingDeducted == 'Y'):
-                calc.RoyaltyProcessing = calc.RoyaltyVolume * monthly.ProcessingRate
-                calc.RoyaltyDeductions += calc.RoyaltyProcessing
-                calc.RoyaltyValue -= calc.RoyaltyProcessing
-                print("this is commencement period", calc.CommencementPeriod)
+        if (royalty.TruckingDeducted == 'Y'):
+            calc.RoyaltyTransportation = calc.RoyaltyVolume * monthly.TransRate
+            calc.RoyaltyDeductions += calc.RoyaltyTransportation
+            calc.RoyaltyValue -= calc.RoyaltyTransportation
+
+        if (royalty.ProcessingDeducted == 'Y'):
+            calc.RoyaltyProcessing = calc.RoyaltyVolume * monthly.ProcessingRate
+            calc.RoyaltyDeductions += calc.RoyaltyProcessing
+            calc.RoyaltyValue -= calc.RoyaltyProcessing
+            print("this is commencement period", calc.CommencementPeriod)
+
                 #calc.SupplementaryRoyalties = self.calcSupplementaryRoyaltiesIOGR1995(calc.CommencementPeriod, monthly.WellHeadPrice, monthly.ProdVol, calc.RoyaltyPrice, self.reference_price['Sawridge Indian'])
                 #print(calcSupplementaryRoyaltiesIOGR1995)
                 #Royalty Price for Royalty Deduction???
@@ -258,14 +266,11 @@ class ProcessRoyalties(object):
 
         # This was done this way so precision was not lost.
 
-        calc.ProvCrownRoyaltyVolume = ((calc.ProvCrownUsedRoyaltyRate / 100) *
+        calc.ProvCrownRoyaltyVolume = round(((calc.ProvCrownUsedRoyaltyRate / 100) *
                                                       royalty.CrownMultiplier *
-                                                      m.ProdVol * indian_interest)
+                                                      m.ProdVol * indian_interest), 2)
 
-        calc.ProvCrownRoyaltyValue = ((calc.ProvCrownUsedRoyaltyRate / 100) *
-                                               royalty.CrownMultiplier *
-                                               m.ProdVol * indian_interest *
-                                               calc.RoyaltyPrice)
+        calc.ProvCrownRoyaltyValue = calc.ProvCrownRoyaltyVolume * calc.RoyaltyPrice
 
 
 
@@ -283,14 +288,14 @@ class ProcessRoyalties(object):
             royalty_calc.RoyaltyRegulation = self.calcSaskOilRegulationSubsection3(m.ProdVol)
 
         
-        royalty_calc.RoyaltyPrice = self.determineRoyaltyPrice(valuation_method, m)
+        royalty_calc.RoyaltyPrice = round(self.determineRoyaltyPrice(valuation_method, m), 6)
         
         royalty_calc.IOGR1995RoyaltyValue = round(crown_multiplier *
                                                       royalty_calc.IOGR1995RoyaltyVolume *
                                                       indian_interest *
                                                       royalty_calc.RoyaltyPrice , 2)
 
-        royalty_calc.SupplementaryRoyalties = self.calcSupplementaryRoyaltiesIOGR1995(royalty_calc.CommencementPeriod, m.WellHeadPrice, m.ProdVol, royalty_calc.RoyaltyRegulation, self.reference_price['Onion Lake'])
+        royalty_calc.SupplementaryRoyalties = round(self.calcSupplementaryRoyaltiesIOGR1995(royalty_calc.CommencementPeriod, m.WellHeadPrice, m.ProdVol, royalty_calc.RoyaltyRegulation, self.reference_price['Onion Lake']), 2)
         print("THIS IS SUPP ROYALTIES", royalty_calc.SupplementaryRoyalties)
         return
 
@@ -374,6 +379,7 @@ class ProcessRoyalties(object):
             supplementary_royalty = (prod_vol - royalty_regulation)*0.5*(well_head_price - reference_price)
         else:
             supplementary_royalty = (prod_vol - royalty_regulation)*(0.75*(well_head_price - reference_price - 12.58) + 6.29)
+
         return round(supplementary_royalty, 2)
 
     def calcGorrPercent(self,vol,hours,gorr):
@@ -390,11 +396,14 @@ class ProcessRoyalties(object):
             i += 1
             if i == 1:
                 if s == 'dprod':
-                    evalVol = vol / hours
-                    gorrExplain = 'dprod = ' + '{:.6f}'.format(evalVol) + ' = ' + str(vol) + ' / ' + str(hours)
+                    evalVol = round(vol / 30.5, 2)
+                    gorrExplain = 'dprod = mprod / 30.5 days; ' + '{:.2f}'.format(evalVol)
                 elif s == 'mprod':
                     evalVol = vol
                     gorrExplain = 'mprod = ' + str(evalVol)
+                elif s =='hprod':
+                    evalVol = round(vol / hours, 2)
+                    gorrExplain = 'hprod = mprod / hours; ' + '{:.2f}'.format(evalVol)
                 elif s == 'fixed':
                     gorrExplain = 'fixed'
                 else:
@@ -409,13 +418,13 @@ class ProcessRoyalties(object):
 #                 print('gorrPercent:', gorrPercent)
                 if evalVol == 0:
                     gorrExplain += ' for a RoyRate of ' + str(gorrPercent) +'%'
-                    return gorrPercent, gorrExplain
+                    return round(gorrPercent, 6), gorrExplain
                 elif gorrMaxVol == 0:
-                    gorrExplain += ' is greater than ' + str(lastGorrMaxVol) + ' for a RoyRate of ' + str(gorrPercent) +'%'
-                    return gorrPercent, gorrExplain
+                    gorrExplain += ' is > ' + str(lastGorrMaxVol) + ' for a RoyRate of ' + str(gorrPercent) +'%'
+                    return round(gorrPercent, 6), gorrExplain
                 elif evalVol <= gorrMaxVol:
-                    gorrExplain += ' is greater than ' + str(lastGorrMaxVol) + ' and less than or equal to ' + str(gorrMaxVol) + ' for a RoyRate of ' + str(gorrPercent) +'%'
-                    return gorrPercent, gorrExplain
+                    gorrExplain += ' is > ' + str(lastGorrMaxVol) + ' and <= ' + str(gorrMaxVol) + ' for a RoyRate of ' + str(gorrPercent) +'%'
+                    return round(gorrPercent, 6), gorrExplain
 
 
     #
