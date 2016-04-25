@@ -1,33 +1,45 @@
 {% extends "layout.html" %}
 {% block body %}
+<script>
+  $(function() {
+  	$('#tabs').tabs();
+  });
+</script>
 
 <h3>Well Event {{ wellevent.WellEvent }}</h3>
 
-<table class="table-results table-striped">
-    <tr>
-        <th>Horizon Pool</th>
-        <th>Pool Name</th>
-        <th>Meridian</th>
-        <th>Range</th>
-        <th>Township</th>
-        <th>Section</th>
-        <th>LSD</th>
-    </tr>
-    <tr>
-        <td>{{ wellevent.HorizonPool }} </td>
-        <td>{{ wellevent.PoolName }} </td>
-        <td>{{ wellevent.Meridian }} </td>
-        <td>{{ wellevent.Range }} </td>
-        <td>{{ wellevent.Township }} </td>
-        <td>{{ wellevent.Section }} </td>
-        <td>{{ wellevent.LSD }} </td>
-    </tr>
-</table>
-
-&nbsp;
+<div id="tabs">
+    <ul>
+        <li><a href="#tabs-wellevent">Well Event</a></li>
+        <li><a href="#tabs-leases">Leases</a></li>
+        <li><a href="#tabs-facilities">Facilities</a></li>
+    </ul>
+    <div id="tabs-wellevent">
+        <table class="table-results table-striped">
+            <tr>
+                <th>Horizon Pool</th>
+                <th>Pool Name</th>
+                <th>Meridian</th>
+                <th>Range</th>
+                <th>Township</th>
+                <th>Section</th>
+                <th>LSD</th>
+            </tr>
+            <tr>
+                <td>{{ wellevent.HorizonPool }} </td>
+                <td>{{ wellevent.PoolName }} </td>
+                <td>{{ wellevent.Meridian }} </td>
+                <td>{{ wellevent.Range }} </td>
+                <td>{{ wellevent.Township }} </td>
+                <td>{{ wellevent.Section }} </td>
+                <td>{{ wellevent.LSD }} </td>
+            </tr>
+        </table>
+    </div>
 
 {% if leases %}
-    <table class="table-striped" style="width:50%">
+<div id="tabs-leases">
+    <table class="table-results table-striped">
         <tr>
             <td colspan=3><b>{{leases|length}}</b> leases attached:</td>
         </tr>
@@ -44,6 +56,29 @@
         </tr>
         {% endfor %}
     </table>
+</div>
 {% endif %}
 
+{% if facilities %}
+<div id="tabs-facilities">
+    <table class="table-results table-striped">
+        <tr>
+            <td colspan=3><b>{{facilities|length}}</b> facilities attached:</td>
+        </tr>
+        <tr>
+            <th>Facility</th>
+            <th>Name</th>
+            <th>License</th>
+        </tr>
+        {% for facility in facilities %}
+        <tr>
+            <td>{{ facility.Facility }} </td>
+            <td>{{ facility.Name }} </td>
+            <td>{{ facility.FacLicence }} </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endif %}
+</div>
 {% endblock %}
