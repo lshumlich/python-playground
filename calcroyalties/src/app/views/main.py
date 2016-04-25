@@ -55,6 +55,7 @@ V 1. Authentication system
     b. Search results based on Lorraine's table
     c. Details page - show entire record
     d. Details page - show related wells
+    e. Search fields verification; get rid of empty fields in JS
 3. Lease view
     V a. Start by designing url structure!
     b. No search for now

@@ -26,6 +26,10 @@ tr {
   width: 100%;
 }
 
+.table-results {
+width: 100%
+}
+
 .table-striped tbody tr:nth-child(even) {
   background-color: lightgray;
 }

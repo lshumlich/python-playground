@@ -24,4 +24,26 @@
     </tr>
 </table>
 
+&nbsp;
+
+{% if wellevents %}
+    <table class="table-striped" style="width:50%">
+        <tr>
+            <td colspan=3><b>{{wellevents|length}}</b> well events attached:</td>
+        </tr>
+        <tr>
+            <th>Well Event</th>
+            <th>Pool Name</th>
+            <th>Meridian</th>
+        </tr>
+        {% for wellevent in wellevents %}
+        <tr>
+            <td><a href="/wellevent/{{ wellevent.WellEvent }}">{{ wellevent.WellEvent }}</a></td>
+            <td>{{ wellevent.PoolName }} </td>
+            <td>{{ wellevent.Meridian }} </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+
 {% endblock %}

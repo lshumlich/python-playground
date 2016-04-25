@@ -54,24 +54,23 @@ input {
       </table>
     </fieldset>
   </form>
-<h2>Is there well data or not?</h2>
+
+&nbsp;
 
 <table style="width:100%">
   <tr>
-    <td colspan=12><b>{{wells|length}}</b> wells attached</td>
+    <td colspan=12><b>{{wells|length}}</b> wells attached:</td>
   </tr>
   <tr>
     <th>WellEvent</th>
     <th>Start Date</th>
     <th>End Date</th>
-    <th>Actions</th>
   </tr>
   {% for row in wells %}
   <tr>
-    <td>{{ row.WellEvent or "" }}</td>
+    <td><a href="/wellevent/{{ row.WellEvent }}">{{ row.WellEvent or "" }}</a></td>
     <td>{{ row.StartDate or "" }}</td>
     <td>{{ row.EndDate or "" }}</td>
-    <td><a href="#" onclick=openInfo({{"'" + row.WellEvent + "'" }})>Edit</a></td>
   </tr>
   {% endfor %}
 </table>

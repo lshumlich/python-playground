@@ -1,5 +1,4 @@
 <div id="modal">
-Hello
 </div>
 
 <table style="width:100%">
@@ -43,7 +42,7 @@ function openInfo(id) {
   var idObject = {ID:id}
   console.log(idObject);
   $.ajax({
-    url: "/api/facilityinfo",
+    url: "/api/facility_details",
     data: idObject,
   })
   .done(function(data){

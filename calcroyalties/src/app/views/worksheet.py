@@ -7,7 +7,7 @@ from .permission_handler import PermissionHandler
 worksheet = Blueprint('worksheet', __name__)
 
 @worksheet.route('/worksheet')
-def ws():
+def calc_worksheet():
     try:
         if request.args:
             db = config.get_database()
@@ -21,7 +21,7 @@ def ws():
             calc_array = db.select('Calc', WellID=well_id, prodMonth = prod_month)
             calc = calc_array[0]
             print(monthly)
-            return render_template('worksheet.html', well=well, rm=royalty, m=monthly, lease=lease, calc=calc)
+            return render_template('worksheet/calc_worksheet.html', well=well, rm=royalty, m=monthly, lease=lease, calc=calc)
         else:
             return "No monthly data for this well"
 

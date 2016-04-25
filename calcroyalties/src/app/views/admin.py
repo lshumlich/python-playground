@@ -1,26 +1,28 @@
 from flask import Blueprint, render_template, request, abort, json
+
 import config
 from .permission_handler import PermissionHandler
 
 admin = Blueprint('admin', __name__)
 
 @admin.route('/admin/users')
-def admin_users():
-    return render_template('users.html')
+def user_list():
+    """ display user search form"""
+    return render_template('admin/users_search.html')
 
 @admin.route('/api/users', methods=['GET', 'DELETE', 'POST', 'PUT', 'PATCH'])
-def admin_user():
+def user_details():
     """ handles all user-related ajax calls, both for user list and individual users """
     if not request.is_xhr: abort(404)
     db = config.get_database()
     if request.method == 'GET' and not request.args:
         """ get an entire user list """
         results = db.select('Users')
-        return render_template('api/user_results.html', users=results)
+        return render_template('admin/users_search_results.html', users=results)
     elif request.method == 'GET':
         """ get info for a user """
         results = db.select1('Users', ID=request.args.get('ID'))
-        return render_template('api/user.html', user=results)
+        return render_template('admin/users_details.html', user=results)
     elif request.method == 'DELETE':
         """ delete user """
         db.delete('Users', int(request.form['ID']))
@@ -38,7 +40,7 @@ def admin_user():
         return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
     elif request.method == 'PATCH':
         """ get an empty form to create a new user """
-        return render_template('api/user.html', user=None)
+        return render_template('admin/users_details.html', user=None)
     elif request.method == 'PUT':
         """ create new user """
         class User():

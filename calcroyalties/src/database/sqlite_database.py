@@ -38,7 +38,7 @@ class Database(object):
         return ds
 
     def select_sql(self, statement):
-        if not statement.startswith('SELECT'): raise AppError('Only SELECT statements are allowed, this is not one: %s' % statement)
+        if not statement.startswith('SELECT'): raise AppError('Only SELECT statements are allowed, this is not one: "%s"' % statement)
         self.dbi.execute(statement)
         result = self.dbi.cursor.fetchall()
         result = self.sql_to_object('join', result)

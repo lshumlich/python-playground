@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<h3>Well Event {{ wellevent.WellEvent }}</h3>
+
+<table class="table-results table-striped">
+    <tr>
+        <th>Horizon Pool</th>
+        <th>Pool Name</th>
+        <th>Meridian</th>
+        <th>Range</th>
+        <th>Township</th>
+        <th>Section</th>
+        <th>LSD</th>
+    </tr>
+    <tr>
+        <td>{{ wellevent.HorizonPool }} </td>
+        <td>{{ wellevent.PoolName }} </td>
+        <td>{{ wellevent.Meridian }} </td>
+        <td>{{ wellevent.Range }} </td>
+        <td>{{ wellevent.Township }} </td>
+        <td>{{ wellevent.Section }} </td>
+        <td>{{ wellevent.LSD }} </td>
+    </tr>
+</table>
+
+&nbsp;
+
+{% if leases %}
+    <table class="table-striped" style="width:50%">
+        <tr>
+            <td colspan=3><b>{{leases|length}}</b> leases attached:</td>
+        </tr>
+        <tr>
+            <th>Lease</th>
+            <th>Province</th>
+            <th>Notes</th>
+        </tr>
+        {% for lease in leases %}
+        <tr>
+            <td><a href="/lease/{{ lease.ID }}">{{ lease.Lease }}</a></td>
+            <td>{{ lease.Prov }} </td>
+            <td>{{ lease.Notes }} </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+
+{% endblock %}
