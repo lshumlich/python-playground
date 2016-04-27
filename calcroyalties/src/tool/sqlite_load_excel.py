@@ -126,15 +126,15 @@ if __name__ == '__main__':
     #
     # Note: Set the new database in config.json
     #
-    db_create = DatabaseCreate()
-    db_create.create_all()
+    # db_create = DatabaseCreate()
+    # db_create.create_all()
 
-    worksheet = config.get_temp_dir() + 'SampleData.xlsx'
-    loader = Loader()
-    loader.open_excel(worksheet)
-    loader.load_all_sheets()
+    # worksheet = config.get_temp_dir() + 'WellLeaseLink.xlsx'
+    # loader = Loader()
+    # loader.open_excel(worksheet)
+    # loader.load_all_sheets()
 
-    worksheet = config.get_temp_dir() + 'new.xlsx'
+    worksheet = config.get_temp_dir() + 'WellLeaseLink.xlsx'
     loader = Loader()
     loader.open_excel(worksheet)
     loader.load_all_sheets()
