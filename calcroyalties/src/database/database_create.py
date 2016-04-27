@@ -58,35 +58,43 @@ class DatabaseCreate(object):
     def Well(self):
         statement = """
             CREATE TABLE Well ('ID' integer primary key autoincrement, 
-            'UWI' text, 'Prov' text, 'WellType' text, 'LeaseType' text, 
-            'LeaseID' int, 'RoyaltyClassification' text, 
-            'Classification' text, 'SRC' int, 'PEFNInterest' float,
-            'CommencementDate' timestamp, 'ReferencePrice' int);
+             "StartDate" timestamp,
+             "EndDate" timestamp,
+             'WellEvent' text, 'Prov' text, 'WellType' text, 'LeaseType' text,
+             'LeaseID' int, 'RoyaltyClassification' text,
+             'Classification' text, 'SRC' int, 'PEFNInterest' float,
+             'CommencementDate' timestamp, 'ReferencePrice' int);
         """
         self.dbi.execute_statement(statement)
         
     def RoyaltyMaster(self):
         statement = """
             CREATE TABLE RoyaltyMaster ('ID' integer primary key autoincrement,
-            "LeaseType" text, "RightsGranted" text, "RoyaltyScheme" text, 
-            "CrownMultiplier" float, "MinRoyalty" int, "ValuationMethod" text,
-            "TruckingDeducted" text, "ProcessingDeducted" text, "Gorr" text,
+             "StartDate" timestamp,
+             "EndDate" timestamp,
+             "RightsGranted" text, "RoyaltyScheme" text,
+             "CrownMultiplier" float, "MinRoyalty" int, "ValuationMethod" text,
+             "TruckingDeducted" text, "ProcessingDeducted" text, "Gorr" text,
              "Notes" text);
         """
         self.dbi.execute_statement(statement)
         
     def Lease(self):
         statement = """
-            CREATE TABLE Lease ('ID' integer primary key autoincrement, 
-            "LeaseType" text, "Prov" text, "FNReserve" int, "Lessor" int, 
-            "Notes" text);
+            CREATE TABLE Lease ('ID' integer primary key autoincrement,
+             "StartDate" timestamp,
+             "EndDate" timestamp,
+             "LeaseType" text, "Prov" text, "FNReserve" int, "FNBandID" int, "Lessor" text,
+             "Notes" text);
         """
         self.dbi.execute_statement(statement)
         
     def WellLeaseLink(self):
         statement = """
             CREATE TABLE WellLeaseLink ('ID' integer primary key autoincrement,
-            "WellEvent" text, "LeaseID" int, "PEFNInterest" float);
+             "StartDate" timestamp,
+             "EndDate" timestamp,
+             "WellEvent" text, "LeaseID" int, "PEFNInterest" float);
         """
         self.dbi.execute_statement(statement)
 

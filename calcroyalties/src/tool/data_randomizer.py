@@ -103,8 +103,7 @@ class BA(object):
         
 
 class DataStruc(object):
-    def __init__(self):
-        None
+    pass
 
 
 class Obfuscator(object):
@@ -120,6 +119,10 @@ class Obfuscator(object):
         self.wellLicences = dict()
         self.facilities = dict()
         self.facLicences = dict()
+        self.leases = dict()
+        self.fnreserves = dict()
+        self.fnbands = dict()
+        self.lessors = dict()
         self.words = Words()
         self.header_row = None
 
@@ -142,6 +145,13 @@ class Obfuscator(object):
         self.process_tab('Proration Factor', self.process_proration_factor_row)
         self.process_tab('OVRTP Facility', self.process_ovrtp_facility_row)
         self.process_tab('OVRTP Unit', self.process_ovrtp_unit_row)
+        self.process_tab('WellLeaseLink', self.process_well_lease_row)
+        self.process_tab('Lease', self.process_lease_row)
+        self.process_tab('RoyaltyMaster', self.process_royalty_master_row)
+        self.process_tab('Well', self.process_well_row)
+        # self.process_tab('Monthly', self.process_monthl_row)
+        self.process_tab('FNBand', self.process_fnband_row)
+        self.process_tab('FNReserve', self.process_fnreserve_row)
 
         self.wb.save(config.get_temp_dir() + self.new_worksheet_name)
 
@@ -642,13 +652,108 @@ class Obfuscator(object):
         
         rand = random.randint(1222, 2222) / 1000
         row[i].value = round(v*rand, 2)
-        
+
     def process_ovrtp_unit_row(self, row):
         
         print("No Logic to handle processOVRRTPUnit:", row)
 
+    def process_well_lease_row(self, row):
+        self.lookup_well_event(row,'WellEvent')
+        self.lookup_lease(row,'LeaseID')
+
+    def process_lease_row(self, row):
+        self.lookup_lease(row, 'ID')
+        self.lookup_fnreserve(row,'FNReserveID')
+        self.lookup_fnband(row,'FNBandID')
+        self.lookup_lessor(row,'Lessor')
+
+    def process_royalty_master_row(self, row):
+        self.lookup_lease(row, 'ID')
+
+    def process_well_row(self, row):
+        self.lookup_well_event(row, 'WellEvent')
+
+    def process_fnband_row(self, row):
+        self.lookup_fnband(row, 'ID')
+
+        name = words.random_string(random.randint(15, 40))
+        i = self.get_index("FNBandName")
+        row[i].value = name
+
+    def process_fnreserve_row(self, row):
+        self.lookup_fnreserve(row, 'ID')
+        self.lookup_fnband(row, 'FNBandID')
+
+        name = words.random_string(random.randint(15, 40))
+        i = self.get_index("FNReserveName")
+        row[i].value = name
+
+        # self.process_tab('WellLeaseLink', self.process_well_lease_row)
+# self.process_tab('Lease', self.process_lease_row)
+# self.process_tab('RoyaltyMaster', self.process_royalty_master_row)
+# self.process_tab('Well', self.process_well_row)
+# self.process_tab('Monthly', self.process_monthl_row)
+# self.process_tab('FNBand', self.process_fn_band_row)
+# self.process_tab('FNReserve', self.process_fn_reserve_row)
+
+
+    def lookup_well_event(self, row, name):
+        i = self.get_index(name)
+        v = row[i].value
+        # well_event = None
+        if v in self.wellEvents:
+            well_event = self.wellEvents[v]
+        else:
+            well_event = UWI(v)
+            self.wellEvents[v] = well_event
+
+        row[i].value = well_event.wellEvent
+
+    def lookup_lease(self, row, name):
+        i = self.get_index(name)
+        v = row[i].value
+        if v in self.leases:
+            lease = self.leases[v]
+        else:
+            lease = rand = random.randint(1, 8999)
+            self.leases[v] = lease
+
+        row[i].value = lease
+
+    def lookup_fnreserve(self, row, name):
+        i = self.get_index(name)
+        v = row[i].value
+        if v in self.fnreserves:
+            n = self.fnreserves[v]
+        else:
+            n = rand = random.randint(70000, 79999)
+            self.fnreserves[v] = n
+
+        row[i].value = n
+
+    def lookup_fnband(self, row, name):
+        i = self.get_index(name)
+        v = row[i].value
+        if v in self.fnbands:
+            n = self.fnbands[v]
+        else:
+            n = rand = random.randint(7000, 7999)
+            self.fnbands[v] = n
+
+        row[i].value = n
+
+    def lookup_lessor(self, row, name):
+        i = self.get_index(name)
+        v = row[i].value
+        if v in self.lessors:
+            n = self.lessors[v]
+        else:
+            n = rand = random.randint(700000, 799999)
+            self.lessors[v] = n
+
+        row[i].value = n
 
 print('Hello World!')
-o = Obfuscator(config.get_temp_dir() + 'sample.xlsx')
+o = Obfuscator(config.get_temp_dir() + 'Pnx IOGC Onion Lake SK wells.xlsx')
 o.process()
 print('Catch you on the flip side!')

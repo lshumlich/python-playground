@@ -53,32 +53,37 @@ class Loader(object):
 
     def create_table(self, table_name, header_row, data_row):
 
-        table_create = 'CREATE TABLE ' + table_name + ' ('
-        cols = ""
-        i = 0
-        for cell in header_row:
-            name = cell.value.replace('#', '')
-            name = '"' + name + '"'
-            if type(data_row[i].value) is str:
-                cols = cols + name + ' text, '
-            elif type(data_row[i].value) is int:
-                cols = cols + str(name) + ' int, '
-            elif type(data_row[i].value) is float:
-                cols = cols + str(name) + ' float, '
-            elif type(data_row[i].value) is datetime.datetime:
-                cols = cols + str(name) + ' timestamp, '
-            else:
-                cols = cols + name + ' text, '
-            # print('*** Null first line so defaulting to str',cell.value,type(dataRow[i].value))
-            i += 1
+        try:
+            table_create = 'CREATE TABLE ' + table_name + ' ('
+            cols = ""
+            i = 0
+            for cell in header_row:
+                name = cell.value.replace('#', '')
+                name = '"' + name + '"'
+                if type(data_row[i].value) is str:
+                    cols = cols + name + ' text, '
+                elif type(data_row[i].value) is int:
+                    cols = cols + str(name) + ' int, '
+                elif type(data_row[i].value) is float:
+                    cols = cols + str(name) + ' float, '
+                elif type(data_row[i].value) is datetime.datetime:
+                    cols = cols + str(name) + ' timestamp, '
+                else:
+                    cols = cols + name + ' text, '
+                # print('*** Null first line so defaulting to str',cell.value,type(dataRow[i].value))
+                i += 1
 
-        cols += ')'
-        cols = cols.replace(', )', ')')
+            cols += ')'
+            cols = cols.replace(', )', ')')
 
-        table_create += cols
+            table_create += cols
 
-        self.dbi.execute(table_create)
-        self.dbi.commit()
+            self.dbi.execute(table_create)
+            self.dbi.commit()
+
+        except Exception as e:
+            print('*** sqlite_load_excel.creat_table  -- Table:', table_name, ' row:', header_row, data_row)
+            raise e
 
     def insert_data(self, table_name, row, header_row):
         insert = 'INSERT INTO ' + table_name + ' VALUES ('
@@ -115,12 +120,21 @@ class Loader(object):
     def close(self):
         self.dbi.close()
 
+from src.database.database_create import DatabaseCreate
 
 if __name__ == '__main__':
     #
     # Note: Set the new database in config.json
     #
-    worksheet = config.get_temp_dir() + 'WellLeaseLink.xlsx'
+    db_create = DatabaseCreate()
+    db_create.create_all()
+
+    worksheet = config.get_temp_dir() + 'SampleData.xlsx'
+    loader = Loader()
+    loader.open_excel(worksheet)
+    loader.load_all_sheets()
+
+    worksheet = config.get_temp_dir() + 'new.xlsx'
     loader = Loader()
     loader.open_excel(worksheet)
     loader.load_all_sheets()
