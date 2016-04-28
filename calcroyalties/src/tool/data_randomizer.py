@@ -654,18 +654,17 @@ class Obfuscator(object):
         row[i].value = round(v*rand, 2)
 
     def process_ovrtp_unit_row(self, row):
-        
         print("No Logic to handle processOVRRTPUnit:", row)
 
     def process_well_lease_row(self, row):
-        self.lookup_well_event(row,'WellEvent')
-        self.lookup_lease(row,'LeaseID')
+        self.lookup_well_event(row, 'WellEvent')
+        self.lookup_lease(row, 'LeaseID')
 
     def process_lease_row(self, row):
         self.lookup_lease(row, 'ID')
-        self.lookup_fnreserve(row,'FNReserveID')
-        self.lookup_fnband(row,'FNBandID')
-        self.lookup_lessor(row,'Lessor')
+        self.lookup_fnreserve(row, 'FNReserveID')
+        self.lookup_fnband(row, 'FNBandID')
+        self.lookup_lessor(row, 'Lessor')
 
     def process_royalty_master_row(self, row):
         self.lookup_lease(row, 'ID')
@@ -688,14 +687,7 @@ class Obfuscator(object):
         i = self.get_index("FNReserveName")
         row[i].value = name
 
-        # self.process_tab('WellLeaseLink', self.process_well_lease_row)
-# self.process_tab('Lease', self.process_lease_row)
-# self.process_tab('RoyaltyMaster', self.process_royalty_master_row)
-# self.process_tab('Well', self.process_well_row)
-# self.process_tab('Monthly', self.process_monthl_row)
-# self.process_tab('FNBand', self.process_fn_band_row)
-# self.process_tab('FNReserve', self.process_fn_reserve_row)
-
+# Lookups
 
     def lookup_well_event(self, row, name):
         i = self.get_index(name)
@@ -715,7 +707,7 @@ class Obfuscator(object):
         if v in self.leases:
             lease = self.leases[v]
         else:
-            lease = rand = random.randint(1, 8999)
+            lease = random.randint(1, 8999)
             self.leases[v] = lease
 
         row[i].value = lease
@@ -726,7 +718,7 @@ class Obfuscator(object):
         if v in self.fnreserves:
             n = self.fnreserves[v]
         else:
-            n = rand = random.randint(70000, 79999)
+            n = random.randint(70000, 79999)
             self.fnreserves[v] = n
 
         row[i].value = n
@@ -737,7 +729,7 @@ class Obfuscator(object):
         if v in self.fnbands:
             n = self.fnbands[v]
         else:
-            n = rand = random.randint(7000, 7999)
+            n = random.randint(7000, 7999)
             self.fnbands[v] = n
 
         row[i].value = n
@@ -748,7 +740,7 @@ class Obfuscator(object):
         if v in self.lessors:
             n = self.lessors[v]
         else:
-            n = rand = random.randint(700000, 799999)
+            n = random.randint(700000, 799999)
             self.lessors[v] = n
 
         row[i].value = n

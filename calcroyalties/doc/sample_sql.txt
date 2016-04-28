@@ -1,0 +1,15 @@
+
+
+Select with left outer join
+
+select  we.wellevent ,wll.leaseid 
+	from welleventinfo we left outer join wellleaselink wll 
+	on we.wellevent = wll.wellevent;
+
+
+select  we.wellevent ,wll.leaseid 
+	from welleventinfo we left outer join wellleaselink wll 
+	on we.wellevent = wll.wellevent
+	where wll.leaseid is NULL;
+
+
