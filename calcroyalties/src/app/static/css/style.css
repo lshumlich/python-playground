@@ -5,6 +5,16 @@ body {
 	margin: 0px;
 }
 
+a {
+    color: #222222;
+}
+
+input[type="text"]:disabled {
+    background: #eaeaea;
+    outline: #7d7d7d solid 1px;
+    border: 0px
+}
+
 th {
 	background-color: dimgray;
 	color: white;
@@ -50,8 +60,13 @@ width: 100%
 .icon-delete{ background-position: -224px -32px;  }
 
 .flashes {
-    width:100%;
-    background-color:lightblue;
-    min-height: 50px;
+    color: #31708f;
+    background-color:#d9edf7;
+    border-color:#bce8f1;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding:15px;
+    margin-bottom: 20px;
     font-size: 14px;
+    font-weight: bold;
 }

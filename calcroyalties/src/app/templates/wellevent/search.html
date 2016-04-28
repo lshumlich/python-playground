@@ -67,23 +67,21 @@
     <td colspan=13><b>{{results|length}}</b> results found</td>
   </tr>
   <tr>
-    <th>Well Event</th>
-    <th>RTPOperator</th>
-    <th>Status</th>
-    <th>Operator Short Name</th>
-    <th>Meridian</th>
-    <th>Actions</th>
+    <th>WellEventInfo: Well Event</th>
+    <th>WellEventStatus: Status</th>
+    <th>RTAHeader: RTPOperator</th>
+    <th>BAInfo: Operator Short Name</th>
+    <th>WellFacilitylink: Facility Number</th>
+    <th>FacilityInfo: Facility Name</th>
   </tr>
   {% for row in results %}
   <tr>
-    <td>{{ row.WellEvent or "" }}</td>
-    <td>{{ row.RTPOperator or "" }}</td>
+    <td><a href="{{ url_for('wellevent.details', wellevent_num = row.WellEvent) }}">{{ row.WellEvent or "" }}</a></td>
     <td>{{ row.Status or "" }}</td>
+    <td>{{ row.RTPOperator or "" }}</td>
     <td>{{ row.CorpShortName or "" }}</td>
-    <td>{{ row.Meridian or "" }}</td>
-    <td>
-      <a href="{{ url_for('wellevent.details', wellevent_num = row.WellEvent) }}">Details</a>
-    </td>
+    <td>{{ row.Facility or "" }}</td>
+    <td>{{ row.Name or "" }}</td>
   </tr>
   {% endfor %}
 </table>

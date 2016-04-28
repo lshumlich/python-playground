@@ -7,15 +7,11 @@
   </tr>
   <tr>
     <th>Well ID</th>
-    <th>UWI</th>
+    <th>Well Event</th>
     <th>Province</th>
     <th>Well Type</th>
-    <th>Lease Type</th>
-    <th>Lease ID</th>
     <th>Royalty Classification</th>
     <th>Classification</th>
-    <th>SRC</th>
-    <th>Indian Interest</th>
     <th>Commencement Date</th>
     <th>Reference Price</th>
     <th>Actions</th>
@@ -23,15 +19,11 @@
   {% for row in results %}
   <tr>
     <td>{{ row.ID or "" }}</td>
-    <td>{{ row.UWI or "" }}</td>
+    <td>{{ row.WellEvent or "" }}</td>
     <td>{{ row.Prov or "" }}</td>
     <td>{{ row.WellType or "" }}</td>
-    <td>{{ row.LeaseType or "" }}</td>
-    <td>{{ row.LeaseID or "" }}</td>
     <td>{{ row.RoyaltyClassification or "" }}</td>
     <td>{{ row.Classification or "" }}</td>
-    <td>{{ row.SRC or "" }}</td>
-    <td>{{ row.IndianInterest }}</td>
     <td>{{ row.CommencementDate or "" }}</td>
     <td>{{ row.ReferencePrice or "" }}</td>
     <td>

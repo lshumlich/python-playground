@@ -1,84 +1,89 @@
 {% extends "layout.html" %}
 {% block body %}
+
+<!--<h3>Well Event {{ result.WellEvent }}</h3>-->
 <script>
-  $(function() {
-  	$('#tabs').tabs();
-  });
+$(document).ready(function(){
+    });
 </script>
-
-<h3>Well Event {{ wellevent.WellEvent }}</h3>
-
-<div id="tabs">
-    <ul>
-        <li><a href="#tabs-wellevent">Well Event</a></li>
-        <li><a href="#tabs-leases">Leases</a></li>
-        <li><a href="#tabs-facilities">Facilities</a></li>
-    </ul>
-    <div id="tabs-wellevent">
-        <table class="table-results table-striped">
+<form>
+    <fieldset>
+        <legend><h3>Well Event {{ result.WellEvent }}</h3></legend>
+        <table cellpadding="5">
             <tr>
-                <th>Horizon Pool</th>
-                <th>Pool Name</th>
-                <th>Meridian</th>
-                <th>Range</th>
-                <th>Township</th>
-                <th>Section</th>
-                <th>LSD</th>
+                <td><label for="HorizonPool">Horizon Pool</label></td>
+                <td><input type="text" id="HorizonPool" value="{{ result.HorizonPool }}" disabled /></td>
+                <td><label for="PoolName">Pool Name</label></td>
+                <td><input type="text" id="PoolName" value="{{ result.PoolName }}" disabled /></td>
             </tr>
             <tr>
-                <td>{{ wellevent.HorizonPool }} </td>
-                <td>{{ wellevent.PoolName }} </td>
-                <td>{{ wellevent.Meridian }} </td>
-                <td>{{ wellevent.Range }} </td>
-                <td>{{ wellevent.Township }} </td>
-                <td>{{ wellevent.Section }} </td>
-                <td>{{ wellevent.LSD }} </td>
+                <td><label for="Meridian">Meridian</label></td>
+                <td><input type="text" id="Meridian" value="{{ result.Meridian }}" disabled /></td>
+                <td><label for="Range">Range</label></td>
+                <td><input type="text" id="Range" value="{{ result.Range }}" disabled /></td>
+            </tr>
+            <tr>
+                <td><label for="Township">Township</label></td>
+                <td><input type="text" id="Township" value="{{ result.Township }}" disabled /></td>
+                <td><label for="Section">Section</label></td>
+                <td><input type="text" id="Section" value="{{ result.Section }}" disabled /></td>
+            </tr>
+            <tr>
+                <td><la bel for="LSD">LSD</label></td>
+                <td><input type="text" id="LSD" value="{{ result.LSD }}" disabled /></td>
+                <td><label for="GCIStatus">GCI Status</label></td>
+                <td><input type="text" id="GCIStatus" value="{{ result.GCIStatus }}" disabled /></td>
+            </tr>
+            <tr>
+                <td><label for="Product">RTAMineralOwnership: Product</label></td>
+                <td><input type="text" id="Product" value="{{ result.Product }}" disabled /></td>
+                <!--<td><label for="Volume">Volume</label></td>-->
+                <!--<td><input type="text" id="Volume" value="{{ result.Volume }}" disabled /></td>-->
             </tr>
         </table>
-    </div>
+    </fieldset>
+</form>
 
 {% if leases %}
-<div id="tabs-leases">
-    <table class="table-results table-striped">
-        <tr>
-            <td colspan=3><b>{{leases|length}}</b> leases attached:</td>
-        </tr>
-        <tr>
-            <th>Lease</th>
-            <th>Province</th>
-            <th>Notes</th>
-        </tr>
-        {% for lease in leases %}
-        <tr>
-            <td><a href="/lease/{{ lease.ID }}">{{ lease.Lease }}</a></td>
-            <td>{{ lease.Prov }} </td>
-            <td>{{ lease.Notes }} </td>
-        </tr>
-        {% endfor %}
-    </table>
-</div>
+<h3><b>{{leases|length}}</b> leases attached:</h3>
+    <ul>
+    {% for lease in leases %}
+    <li><a href="/lease/{{ lease.LeaseID }}">{{ lease.LeaseID }}</a></li>
+    {% endfor %}
+    </ul>
 {% endif %}
 
 {% if facilities %}
-<div id="tabs-facilities">
-    <table class="table-results table-striped">
-        <tr>
-            <td colspan=3><b>{{facilities|length}}</b> facilities attached:</td>
-        </tr>
-        <tr>
-            <th>Facility</th>
-            <th>Name</th>
-            <th>License</th>
-        </tr>
-        {% for facility in facilities %}
-        <tr>
-            <td>{{ facility.Facility }} </td>
-            <td>{{ facility.Name }} </td>
-            <td>{{ facility.FacLicence }} </td>
-        </tr>
-        {% endfor %}
-    </table>
-</div>
+<h3><b>{{facilities|length}}</b> facilities attached:</h3>
+    <ul>
+    {% for facility in facilities %}
+    <li><a href="/facility/{{ facility.Facility }}">{{ facility.Facility }}</a></li>
+    {% endfor %}
+    </ul>
 {% endif %}
-</div>
+
+{% if volumetric %}
+<table style="width:50%" class="table-results table-striped">
+  <tr>
+    <td colspan=12><h3><b>{{volumetric|length}}</b> volumetric records:</h3></td>
+  </tr>
+  <tr>
+    <th>Production Month</th>
+    <th>Activity</th>
+    <th>Product</th>
+    <th>Volume</th>
+    <th>Energy</th>
+  </tr>
+  {% for row in volumetric %}
+  <tr>
+    <td>{{ row.ProdMonth or "" }}</td>
+    <td>{{ row.Activity or "" }}</td>
+    <td>{{ row.Product or "" }}</td>
+    <td>{{ row.Volume or "" }}</td>
+    <td>{{ row.Energy or "" }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+
 {% endblock %}

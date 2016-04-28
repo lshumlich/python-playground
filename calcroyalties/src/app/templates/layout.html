@@ -11,6 +11,40 @@
 <script src={{ url_for('static', filename='js/formtools.js') }}></script>
 
 <script>
+proddateCookie = getCookie("proddate");
+
+function setCookie(cname,cvalue,exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires=" + d.toGMTString();
+    document.cookie = cname+"="+cvalue+"; "+expires+"; path=/";
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+function updateCookie() {
+    setCookie("proddate", $("#proddate-input").val());
+    updateProddateText();
+}
+
+function updateProddateText() {
+    $("#proddate-header").text(proddateCookie);
+    $("#proddate-input").attr("value", proddateCookie);
+}
+
 $(document).ready(function($){
     $('#mgmenu1').universalMegaMenu({
         menu_speed_show: 300,
@@ -22,6 +56,35 @@ $(document).ready(function($){
         menubar_hide : false,
         menu_responsive: false
     });
+
+proddateModal = $("#proddate-modal").dialog({
+    autoOpen: false,
+    height:300,
+    width:350,
+    modal:true,
+    beforeClose: function() {
+      if (!checkRegexp($( "#proddate-input" ), /(\d{4})(\d{2})/ )) {$("#proddate-error").text('Please enter a valid date in the YYYYMM format'); return false} else {updateCookie();}
+    },
+    buttons: {
+        "Save": function() {proddateModal.dialog("close");}
+    },
+    close: function() {form[ 0 ].reset(); $("#proddate-error").text("");},
+    });
+
+form = proddateModal.find( "form" ).on( "submit", function( event ) {
+  event.preventDefault();
+  proddateModal.dialog("close");
+  });
+
+
+updateProddateText();
+
+{% if session %}
+if (!proddateCookie){
+    proddateModal.dialog("open");
+}
+{% endif %}
+
 });
 </script>
 </head>
@@ -49,7 +112,7 @@ $(document).ready(function($){
   {% if session['login'] %}
     Welcome {{ session['name'] }} <!-- , you can access: {{ session['permissions'] }} -->
     <br>
-    Production date: {{ session['prod_month'] }} <br>
+    <a href="#"onclick="proddateModal.dialog('open')">Production date:</a>&nbsp;<span id="proddate-header"></span> <br>
       <a href="/logout">Logout</a>
   {% else %}
     <br>
@@ -366,6 +429,15 @@ $(document).ready(function($){
         </ul><!-- End Mega Menu -->
     </div><!-- End Mega Menu Container -->
     <!-- THE MENU ENDS HERE -->
+
+<div id="proddate-modal" title="Set production date">
+    <p>Please set the production date:</p>
+    <form>
+        <input id="proddate-input" type="text" />
+        <button type="submit" tabindex="-1" style="position:absolute; top:-1000px"></button>
+    </form>
+    <p id="proddate-error" style="color:red"></p>
+</div>
 
 <div class="body" style="padding:10px">
 {% block body %}

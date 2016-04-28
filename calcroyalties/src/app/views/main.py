@@ -4,6 +4,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 import config
 from src.app import app
 from .permission_handler import PermissionHandler
+from src.util.apperror import AppError
 
 main = Blueprint('main', __name__)
 
@@ -44,6 +45,11 @@ def logout():
 def not_found(error):
     return render_template('404.html')
 
+def get_proddate():
+    cookie = request.cookies['proddate']
+    if not cookie: raise AppError('Proddate cookie not set for some reason')
+    proddate = cookie[0:4] + "-" + cookie[4:6] + "-01"
+    return proddate
 
 """
 V 1. Authentication system
@@ -72,4 +78,12 @@ V 1. Authentication system
     a. Implement flash messages (how to make it work from JS?)
     b. Change all endpoints to make use of GET parameters: /lease/search?ID=1&Prov=AB, then populate the form if these were passed on:
        value = {{ lease.ID or "" }}
+
+Questions to Larry:
+1. select_sql when expecting just one result? if result.len==1 return result[0]?
+2. No leases in Lease table matching the WellLeaseLink lookup results
+3. Almost no results when taking into account production date.
+
+1. Try outer joins for dates to have fields empty where date doesn't match
+2. If available, include results from Well in WellEvent details
 """
