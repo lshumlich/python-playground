@@ -63,6 +63,9 @@ $(document).ready(function(){
                 <td><label for="RoyaltyClassification">Royalty Classification</label></td>
                 <td><input type="text" id="RoyaltyClassification" value="{{ well.RoyaltyClassification }}" disabled /></td>
             </tr>
+            <tr>
+                <td colspan="2"><a href="{{ url_for('worksheet.calc_worksheet', WellId = well.ID) }}">Calculated worksheet</a></td>
+            </tr>
         </table>
     </fieldset>
 </form>
