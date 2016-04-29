@@ -53,7 +53,7 @@ def get_proddate():
 
 def get_proddate_int():
     try:
-        return request.cookies['proddate']
+        return int(request.cookies['proddate'])
     except:
         raise AppError('Proddate cookie not set for some reason')
 

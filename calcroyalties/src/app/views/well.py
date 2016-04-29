@@ -2,6 +2,7 @@ from flask import Blueprint, request, render_template, abort
 
 import config
 from .permission_handler import PermissionHandler
+from .main import get_proddate_int
 
 well = Blueprint('well', __name__)
 
@@ -36,7 +37,7 @@ def calculate():
     pr = ProcessRoyalties()
     well_id = request.args.get('WellId')
     try:
-        pr.process_one(well_id, 201501, 'Oil')
-        return 'Calculation successful'
+        pr.process_one(well_id, get_proddate_int(), 'Oil')
+        return 'Calculation successful for %s, %i, %s' % (well_id, get_proddate_int(), 'Oil')
     except Exception as e:
-        return 'Something went wrong during calculation: %s' % e
+        return 'Something went wrong during calculation for %s, %i, %s:<br />%s' % (well_id, get_proddate_int(), 'Oil', e)
