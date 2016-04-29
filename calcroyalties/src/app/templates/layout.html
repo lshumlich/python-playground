@@ -79,7 +79,7 @@ form = proddateModal.find( "form" ).on( "submit", function( event ) {
 
 updateProddateText();
 
-{% if session %}
+{% if session['login'] %}
 if (!proddateCookie){
     proddateModal.dialog("open");
 }

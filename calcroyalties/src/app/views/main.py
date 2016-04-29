@@ -1,5 +1,5 @@
 #!/bin/env python3
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash, make_response
 
 import config
 from src.app import app
@@ -34,12 +34,12 @@ def login():
 
 @app.route('/logout')
 def logout():
+    resp = make_response(redirect(url_for('index')))
     if 'login' in session:
-        session.pop('login')
-        session.pop('name')
-        session.pop('prod_month')
-        session.pop('permissions')
-    return redirect(url_for('index'))
+        session.clear()
+        resp.set_cookie('proddate', expires=0)
+    return resp
+    # return redirect(url_for('index'))
 
 @app.errorhandler(404)
 def not_found(error):
