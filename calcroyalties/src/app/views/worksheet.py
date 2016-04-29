@@ -3,6 +3,7 @@ from flask import Blueprint, request, config, render_template
 
 import config
 from .permission_handler import PermissionHandler
+from .main import get_proddate_int
 
 worksheet = Blueprint('worksheet', __name__)
 
@@ -12,12 +13,15 @@ def calc_worksheet():
         if request.args:
             db = config.get_database()
             well_id = int(request.args["WellId"])
-            prod_month = 201501
+            prod_month = get_proddate_int()
             product = "Oil"
             well = db.select1('Well', ID=well_id)
-            royalty = db.select1('Royaltymaster', ID=well.LeaseID)
-            well_lease_link = db.select1('WellLeaseLink', WellEvent=well.WellEvent)
-            lease = db.select1('Lease', ID=well.LeaseID)
+            well_lease_link_array = db.select('WellLeaseLink', WellEvent=well.WellEvent)
+            if len(well_lease_link_array) == 0:
+                raise AppError("There were no well_lease_link records for ", well_id, prod_month)
+            well_lease_link = well_lease_link_array[0]
+            royalty = db.select1('RoyaltyMaster', ID=well_lease_link.LeaseID)
+            lease = db.select1('Lease', ID=well_lease_link.LeaseID)
             monthly = db.select1('Monthly', WellID = well_id, prodMonth = prod_month, product = product)
             calc_array = db.select('Calc', WellID=well_id, prodMonth = prod_month)
             calc = calc_array[0]

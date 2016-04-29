@@ -70,7 +70,7 @@ th{
       PE FN Interest:
       </b></td>
 
-      <TD align="left">{{ well.Lease }}<br>
+      <TD align="left">{{ lease.Lease }}<br>
       {{ rm.RightsGranted }}<br>
       {{ well.Prov }}<br>
       {{ rm.RoyaltyScheme }}<br>
@@ -245,7 +245,6 @@ table, th, td {
     <tr><td align ="right">MOP < 80: RVol</td> <td align="center">=</td> <td align="left">10% * MOP</td></tr>
     <tr><td align="right"> RVol</td><td align="center">=</td><td align="left">10% * {{ '{:.2f}'.format(m.ProdVol) }}</td></tr>
         <tr><td align ="right">RVol</td> <td align="center">=</td> <td align="left">{{ calc.IOGR1995RoyaltyVolume }}</td></tr>
-
 {% elif m.ProdVol < 160 %}
    <tr><td align="right"> MOP 80 to 160: RVol</td> <td align="center">=</td> <td align="left">8 + [20% * (MOP - 80)]</td></TR>
    <tr><td align="right"> RVol</td><td align="center">=</td><td align="left">8 + [20% * ({{ '{:.2f}'.format(m.ProdVol) }} - 80)]</td></tr>
