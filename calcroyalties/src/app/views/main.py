@@ -51,6 +51,12 @@ def get_proddate():
     proddate = cookie[0:4] + "-" + cookie[4:6] + "-01"
     return proddate
 
+def get_proddate_int():
+    try:
+        return request.cookies['proddate']
+    except:
+        raise AppError('Proddate cookie not set for some reason')
+
 """
 V 1. Authentication system
     V a. Checkboxes for permissions (names like well_edit, on server added to a list if checked, then list = permissions in db)
