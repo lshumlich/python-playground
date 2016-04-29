@@ -86,4 +86,7 @@ Questions to Larry:
 
 1. Try outer joins for dates to have fields empty where date doesn't match
 2. If available, include results from Well in WellEvent details
+3. Change the Facility details view to a separate page a-lá WellEvent
+
+Idea: change all db.select functions to take into account the production date (to avoid setting it manually on every query)
 """

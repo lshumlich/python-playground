@@ -1,50 +1,75 @@
 {% extends "layout.html" %}
 {% block body %}
 
-<!--<h3>Well Event {{ result.WellEvent }}</h3>-->
+<!--<h3>Well Event {{ wellevent.WellEvent }}</h3>-->
 <script>
 $(document).ready(function(){
     });
 </script>
+
 <form>
     <fieldset>
-        <legend><h3>Well Event {{ result.WellEvent }}</h3></legend>
+        <legend><h3>Well Event {{ wellevent.WellEvent }}</h3></legend>
         <table cellpadding="5">
             <tr>
                 <td><label for="HorizonPool">Horizon Pool</label></td>
-                <td><input type="text" id="HorizonPool" value="{{ result.HorizonPool }}" disabled /></td>
+                <td><input type="text" id="HorizonPool" value="{{ wellevent.HorizonPool }}" disabled /></td>
                 <td><label for="PoolName">Pool Name</label></td>
-                <td><input type="text" id="PoolName" value="{{ result.PoolName }}" disabled /></td>
+                <td><input type="text" id="PoolName" value="{{ wellevent.PoolName }}" disabled /></td>
             </tr>
             <tr>
                 <td><label for="Meridian">Meridian</label></td>
-                <td><input type="text" id="Meridian" value="{{ result.Meridian }}" disabled /></td>
+                <td><input type="text" id="Meridian" value="{{ wellevent.Meridian }}" disabled /></td>
                 <td><label for="Range">Range</label></td>
-                <td><input type="text" id="Range" value="{{ result.Range }}" disabled /></td>
+                <td><input type="text" id="Range" value="{{ wellevent.Range }}" disabled /></td>
             </tr>
             <tr>
                 <td><label for="Township">Township</label></td>
-                <td><input type="text" id="Township" value="{{ result.Township }}" disabled /></td>
+                <td><input type="text" id="Township" value="{{ wellevent.Township }}" disabled /></td>
                 <td><label for="Section">Section</label></td>
-                <td><input type="text" id="Section" value="{{ result.Section }}" disabled /></td>
+                <td><input type="text" id="Section" value="{{ wellevent.Section }}" disabled /></td>
             </tr>
             <tr>
                 <td><la bel for="LSD">LSD</label></td>
-                <td><input type="text" id="LSD" value="{{ result.LSD }}" disabled /></td>
+                <td><input type="text" id="LSD" value="{{ wellevent.LSD }}" disabled /></td>
                 <td><label for="GCIStatus">GCI Status</label></td>
-                <td><input type="text" id="GCIStatus" value="{{ result.GCIStatus }}" disabled /></td>
+                <td><input type="text" id="GCIStatus" value="{{ wellevent.GCIStatus }}" disabled /></td>
             </tr>
             <tr>
-                <td><label for="Product">RTAMineralOwnership: Product</label></td>
-                <td><input type="text" id="Product" value="{{ result.Product }}" disabled /></td>
+                <td><label for="Product">Product</label></td>
+                <td><input type="text" id="Product" value="{{ wellevent.Product }}" disabled /></td>
                 <!--<td><label for="Volume">Volume</label></td>-->
-                <!--<td><input type="text" id="Volume" value="{{ result.Volume }}" disabled /></td>-->
+                <!--<td><input type="text" id="Volume" value="{{ wellevent.Volume }}" disabled /></td>-->
             </tr>
         </table>
     </fieldset>
 </form>
 
+{% if well %}
+<br />
+<form>
+    <fieldset>
+        <legend><h3>Well {{ well.ID }}</h3></legend>
+        <table cellpadding="5">
+            <tr>
+                <td><label for="Province">Province</label></td>
+                <td><input type="text" id="Province" value="{{ well.Prov }}" disabled /></td>
+                <td><label for="WellType">Well Type</label></td>
+                <td><input type="text" id="WellType" value="{{ well.WellType }}" disabled /></td>
+            </tr>
+            <tr>
+                <td><label for="Classification">Classification</label></td>
+                <td><input type="text" id="Classification" value="{{ well.Classification }}" disabled /></td>
+                <td><label for="RoyaltyClassification">Royalty Classification</label></td>
+                <td><input type="text" id="RoyaltyClassification" value="{{ well.RoyaltyClassification }}" disabled /></td>
+            </tr>
+        </table>
+    </fieldset>
+</form>
+{% endif %}
+
 {% if leases %}
+<br />
 <h3><b>{{leases|length}}</b> leases attached:</h3>
     <ul>
     {% for lease in leases %}
@@ -54,19 +79,25 @@ $(document).ready(function(){
 {% endif %}
 
 {% if facilities %}
-<h3><b>{{facilities|length}}</b> facilities attached:</h3>
+<br/>
+<fieldset>
+<legend><h3><b>{{facilities|length}}</b> facilities attached:</h3></legend>
     <ul>
     {% for facility in facilities %}
     <li><a href="/facility/{{ facility.Facility }}">{{ facility.Facility }}</a></li>
     {% endfor %}
     </ul>
+</fieldset>
 {% endif %}
 
 {% if volumetric %}
+<br />
+<fieldset>
+<legend><h3><b>{{volumetric|length}}</b> volumetric records:</h3></legend>
 <table style="width:50%" class="table-results table-striped">
-  <tr>
-    <td colspan=12><h3><b>{{volumetric|length}}</b> volumetric records:</h3></td>
-  </tr>
+  <!--<tr>-->
+    <!--<td colspan=12><h3><b>{{volumetric|length}}</b> volumetric records:</h3></td>-->
+  <!--</tr>-->
   <tr>
     <th>Production Month</th>
     <th>Activity</th>
@@ -84,6 +115,7 @@ $(document).ready(function(){
   </tr>
   {% endfor %}
 </table>
+</fieldset>
 {% endif %}
 
 {% endblock %}
