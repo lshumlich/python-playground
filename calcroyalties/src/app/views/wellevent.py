@@ -63,8 +63,8 @@ def details(wellevent_num):
 
     well = db.select1('Well', WellEvent=wellevent_num)
 
-    # statement_leases = """SELECT Lease.* FROM Lease, WellLeaseLink WHERE WellLeaseLink.WellEvent="%s" AND Lease.ID=WellLeaseLink.LeaseID"""
-    statement_leases = """SELECT LeaseID FROM WellLeaseLink WHERE WellEvent='%s'"""
+    statement_leases = """SELECT Lease.* FROM Lease, WellLeaseLink WHERE WellLeaseLink.WellEvent="%s" AND Lease.ID=WellLeaseLink.LeaseID"""
+    # statement_leases = """SELECT LeaseID FROM WellLeaseLink WHERE WellEvent='%s'"""
     leases = db.select_sql(statement_leases % wellevent_num)
 
     statement_facilities = """SELECT FacilityInfo.* FROM FacilityInfo, WellFacilitylink WHERE FacilityInfo.Facility=WellFacilitylink.Facility AND WellFacilitylink.WellEvent="%s" """
