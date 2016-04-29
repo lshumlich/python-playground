@@ -237,7 +237,7 @@ class ProcessRoyalties(object):
         return calc.ProvCrownRoyaltyRate
 
 
-    def calcSaskOilProvCrownRoyaltyVolumeValue(self, m, indian_interest, royalty, calc):
+    def calcSaskOilProvCrownRoyaltyVolumeValue(self, m, fn_interest, royalty, calc):
         # Note: If there is no sales. Use last months sales value... Not included in this code
 
         calc.RoyaltyPrice = self.determineRoyaltyPrice(royalty.ValuationMethod, m)
@@ -253,11 +253,11 @@ class ProcessRoyalties(object):
 
         calc.ProvCrownRoyaltyVolume = round(((calc.ProvCrownUsedRoyaltyRate / 100) *
                                                       royalty.CrownMultiplier *
-                                                      m.ProdVol * indian_interest), 2)
+                                                      m.ProdVol * fn_interest), 2)
 
         calc.ProvCrownRoyaltyValue = calc.ProvCrownRoyaltyVolume * calc.RoyaltyPrice
 
-    def calcSaskOilIOGR1995(self, commencement_date, valuation_method, crown_multiplier, indian_interest, m, calc):
+    def calcSaskOilIOGR1995(self, commencement_date, valuation_method, crown_multiplier, fn_interest, m, calc):
         """
         Calculated Based on regulations described: http://laws-lois.justice.gc.ca/eng/regulations/SOR-94-753/page-16.html#h-35
         """
@@ -275,7 +275,7 @@ class ProcessRoyalties(object):
         
         calc.IOGR1995RoyaltyValue = round(crown_multiplier *
                                                       calc.IOGR1995RoyaltyVolume *
-                                                      indian_interest *
+                                                      fn_interest *
                                                       calc.RoyaltyPrice , 2)
 
         calc.SupplementaryRoyalties = round(self.calcSupplementaryRoyaltiesIOGR1995(calc.CommencementPeriod, m.WellHeadPrice, m.ProdVol, calc.RoyaltyRegulation, self.reference_price['Onion Lake']), 2)

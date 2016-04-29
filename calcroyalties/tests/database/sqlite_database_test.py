@@ -18,7 +18,7 @@ class SqliteDatabaseTest(unittest.TestCase):
         self.db = config.get_database()
         self.dbu = DatabaseUtilities()
         self.db_create = DatabaseCreate()
-        
+
         self.dbu.delete_all_tables()
         
     def test_to_db_value(self):
@@ -43,8 +43,8 @@ class SqliteDatabaseTest(unittest.TestCase):
         self.assertRaises(AppError, self.db.select, 'WrongTable')
         self.assertRaises(AppError, self.db.select, 'WrongTable',WrongAttr='WhoCares')
         self.assertRaises(AppError, self.db.select, 'Well', Foo='bar')
-        self.assertEqual(len(self.db.select('Lease')), 3)
-        self.assertEqual(len(self.db.select('Lease', Prov='SK')), 3)
+        self.assertEqual(len(self.db.select('Lease')), 4)
+        self.assertEqual(len(self.db.select('Lease', Prov='SK')), 4)
         self.assertEqual(len(self.db.select('Well', ID=1000)),0)
 
 
@@ -55,17 +55,17 @@ class SqliteDatabaseTest(unittest.TestCase):
 
         # change all types of attributes, read another record and then read the record again to make sure the changes were made.
         well = self.db.select('Well', ID=2)
-        well[0].UWI = 'Changed'
+        well[0].WellEvent = 'Changed'
         well[0].LeaseID = 100
         well[0].CommencementDate = '2016-02-01 00:00:00'
         well[0].WellType = None
         self.db.update(well[0])
         well = self.db.select('Well', ID=1)
         self.assertEqual(well[0].ID, 1)
-        self.assertEqual(well[0].UWI, 'SKWI111062705025W300')
+        self.assertEqual(well[0].WellEvent, 'SKWI111062705025W300')
         well = self.db.select('Well', ID=2)
         self.assertEqual(well[0].ID, 2)
-        self.assertEqual(well[0].UWI, 'Changed')
+        self.assertEqual(well[0].WellEvent, 'Changed')
         self.assertEqual(well[0].LeaseID, 100)
         self.assertEqual(well[0].CommencementDate, datetime(2016,2,1,0,0))
         self.assertEqual(well[0].WellType, None)
@@ -82,39 +82,39 @@ class SqliteDatabaseTest(unittest.TestCase):
         self.db_create.Well()
         
         well = DataStructure()
-        well.UWI = 'UWI for this well'
+        well.WellEvent = 'WellEvent for this well'
         # Should raise this error since we need to get the structure from the database
         self.assertRaises(TypeError, self.db.insert)
 
         well = self.db.get_data_structure('Well')
-        well.UWI = 'UWI for this well'
+        well.WellEvent = 'WellEvent for this well'
         self.db.insert(well)
         self.assertEqual(well.ID, 1)
         
         well = self.db.get_data_structure('Well')
-        well.UWI = 'Different UWI for this well'
+        well.WellEvent = 'Different WellEvent for this well'
         self.db.insert(well)
         self.assertEqual(well.ID, 2)
         
         well = self.db.select('Well', ID=1)
         self.assertEqual(well[0].ID, 1)
-        self.assertEqual(well[0].UWI, 'UWI for this well')
+        self.assertEqual(well[0].WellEvent, 'WellEvent for this well')
         
         well = self.db.get_data_structure('Well')
-        well.UWI = 'Next Well UWI'
+        well.WellEvent = 'Next Well WellEvent'
         well.ID = 10
         self.db.insert(well)
         
         well = self.db.select('Well', ID=1)
         self.assertEqual(well[0].ID, 1)
-        self.assertEqual(well[0].UWI, 'UWI for this well')
+        self.assertEqual(well[0].WellEvent, 'WellEvent for this well')
         
         well = self.db.select('Well', ID=10)
         self.assertEqual(well[0].ID, 10)
-        self.assertEqual(well[0].UWI, 'Next Well UWI')
+        self.assertEqual(well[0].WellEvent, 'Next Well WellEvent')
 
         well = self.db.get_data_structure('Well')
-        well.UWI = 'Just One More'
+        well.WellEvent = 'Just One More'
         self.db.insert(well)
         self.assertEqual(well.ID, 11)
         
@@ -126,7 +126,7 @@ class SqliteDatabaseTest(unittest.TestCase):
         # if the ID is None,Blank,or zero we shold still be able to insert a record
         well = self.db.get_data_structure('Well')
         well.ID = None
-        well.UWI = 'Just One More'
+        well.WellEvent = 'Just One More'
         self.db.insert(well)
         self.assertEqual(well.ID, 12)
         well.ID = 0

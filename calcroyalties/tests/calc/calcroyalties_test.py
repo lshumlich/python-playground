@@ -152,14 +152,22 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, PEFNInterest, MinRoyalty, RoyaltyPric
         m.ProdVol = 100
         royalty.MinRoyalty = 5
         royalty.CrownMultiplier = 1
+        royalty.ValuationMethod = 'ActSales'
         calc.ProvCrownUsedRoyaltyRate = 25
+        calc.ProvCrownRoyaltyRate = 25
         calc.RoyaltyPrice = 210
+        m.WellHeadPrice = 221.123456
+        m.TransRate = 2.123455
+        m.ProcessingRate = 0.123455
 
 
 
 #        monthly.WellHeadPrice + monthly.TransRate + monthly.ProcessingRate
         #need to fix these tests now that m is being used as a paramater instead of prodvol......
-        self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(m, 2, royalty, calc), (20.0, 2000.0))
+        pr.calcSaskOilProvCrownRoyaltyVolumeValue(m, 1, royalty, calc)
+        self.assertEqual(calc.ProvCrownRoyaltyVolume, 25.0)
+        self.assertEqual(calc.ProvCrownRoyaltyValue, 5584.259150000001)
+
         # self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(m, 1, royalty, calc), (20.0, 2000.0))
         # self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(m, 2, royalty, calc), (5, 500.0))
         # self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(2, m ,1, None, 1,100, calc, 'ActSales'), (2.0, 200.0))
@@ -263,26 +271,24 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, PEFNInterest, MinRoyalty, RoyaltyPric
         self.assertRaises(AttributeError, pr.calcGorrPercent, 400, 10, gorr)
 
         gorr = "dprod,250,2,300,3,400,4,500,5,0,6"
-        self.assertEqual(pr.calcGorrPercent(600, 10, gorr), (2.0, 'dprod = 60.000000 = 600 / 10 is greater than 0.0 and less than or equal to 250.0 for an RR of 2.0%'))
-        self.assertEqual(pr.calcGorrPercent(1008, 4, gorr), (3.0, 'dprod = 252.000000 = 1008 / 4 is greater than 250.0 and less than or equal to 300.0 for an RR of 3.0%'))
-        self.assertEqual(pr.calcGorrPercent(400, 1, gorr), (4.0, 'dprod = 400.000000 = 400 / 1 is greater than 300.0 and less than or equal to 400.0 for an RR of 4.0%'))
-        self.assertEqual(pr.calcGorrPercent(990, 2, gorr), (5.0, 'dprod = 495.000000 = 990 / 2 is greater than 400.0 and less than or equal to 500.0 for an RR of 5.0%'))
-        self.assertEqual(pr.calcGorrPercent(10000, 17, gorr), (6.0,'dprod = 588.235294 = 10000 / 17 is greater than 500.0 for an RR of 6.0%'))
+        self.assertEqual(pr.calcGorrPercent(600, 10, gorr), (2.0, 'dprod = mprod / 30.5 days; 19.67 is > 0.0 and <= 250.0 for a RoyRate of 2.0%'))
+        self.assertEqual(pr.calcGorrPercent(8235, 3, gorr), (3.0, 'dprod = mprod / 30.5 days; 270.00 is > 250.0 and <= 300.0 for a RoyRate of 3.0%'))
+        self.assertEqual(pr.calcGorrPercent(10065, 4, gorr), (4.0, 'dprod = mprod / 30.5 days; 330.00 is > 300.0 and <= 400.0 for a RoyRate of 4.0%'))
+        self.assertEqual(pr.calcGorrPercent(13725, 5, gorr), (5.0, 'dprod = mprod / 30.5 days; 450.00 is > 400.0 and <= 500.0 for a RoyRate of 5.0%'))
 
         self.assertRaises(TypeError, pr.calcGorrPercent, None, 10, gorr)
 
         gorr = "mprod,250,2,300,3,400,4,500,5,0,6"
-        self.assertEqual(pr.calcGorrPercent(200, 10, gorr), (2.0, 'mprod = 200 is greater than 0.0 and less than or equal to 250.0 for an RR of 2.0%'))
-        self.assertEqual(pr.calcGorrPercent(300, 4, gorr), (3.0, 'mprod = 300 is greater than 250.0 and less than or equal to 300.0 for an RR of 3.0%'))
-        self.assertEqual(pr.calcGorrPercent(350.6, 1, gorr), (4.0, 'mprod = 350.6 is greater than 300.0 and less than or equal to 400.0 for an RR of 4.0%'))
-        self.assertEqual(pr.calcGorrPercent(410, 2, gorr), (5.0, 'mprod = 410 is greater than 400.0 and less than or equal to 500.0 for an RR of 5.0%'))
-        self.assertEqual(pr.calcGorrPercent(10000, 17, gorr), (6.0,'mprod = 10000 is greater than 500.0 for an RR of 6.0%'))
+        self.assertEqual(pr.calcGorrPercent(200, 10, gorr), (2.0, 'mprod = 200 is > 0.0 and <= 250.0 for a RoyRate of 2.0%'))
+        self.assertEqual(pr.calcGorrPercent(300, 4, gorr), (3.0, 'mprod = 300 is > 250.0 and <= 300.0 for a RoyRate of 3.0%'))
+        self.assertEqual(pr.calcGorrPercent(350.6, 1, gorr), (4.0, 'mprod = 350.6 is > 300.0 and <= 400.0 for a RoyRate of 4.0%'))
+        self.assertEqual(pr.calcGorrPercent(410, 2, gorr), (5.0, 'mprod = 410 is > 400.0 and <= 500.0 for a RoyRate of 5.0%'))
+        self.assertEqual(pr.calcGorrPercent(10000, 17, gorr), (6.0,'mprod = 10000 is > 500.0 for a RoyRate of 6.0%'))
 
         gorr = "fixed,0,2"
-        self.assertEqual(pr.calcGorrPercent(200, 10, gorr), (2.0, 'fixed for an RR of 2.0%'))
-        self.assertEqual(pr.calcGorrPercent(10000, 4, gorr), (2.0, 'fixed for an RR of 2.0%'))
-        #In future make this raise an error:
-        self.assertEqual(pr.calcGorrPercent(None, 10, gorr), (2.0, 'fixed for an RR of 2.0%'))
+        self.assertEqual(pr.calcGorrPercent(200, 10, gorr), (2.0, 'fixed for a RoyRate of 2.0%'))
+        self.assertEqual(pr.calcGorrPercent(10000, 4, gorr), (2.0, 'fixed for a RoyRate of 2.0%'))
+        self.assertEqual(pr.calcGorrPercent(None, 10, gorr), (2.0, 'fixed for a RoyRate of 2.0%'))
 
     def test_calcSupplementaryRoyaltiesIOGR1995(self):
         reference_price = {'Pigeon Lake Indian': 24.04, 'Reserve no.138A': 25.37, 'Sawridge Indian': 25.13, 'Stony Plain Indian': 24.64}
@@ -305,6 +311,7 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, PEFNInterest, MinRoyalty, RoyaltyPric
         self.dbu.create_some_test_wells()
         self.dbu.create_some_test_royalties()
         self.dbu.create_some_test_leases()
+        self.dbu.create_some_test_well_lease_link()
         self.dbu.create_some_test_monthly()
         self.dbu.create_some_test_econdata()
         self.dbu.create_calc()

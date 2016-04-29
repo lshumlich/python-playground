@@ -109,7 +109,7 @@ class DatabaseCreate(object):
         
     def Calc(self):
         statement = """
-            CREATE TABLE Calc ('ID' integer primary key autoincrement, 
+            CREATE TABLE Calc ('ID' integer primary key autoincrement,
             "ProdMonth" int, "WellID" int, 
             "K" int, "X" int, "C" int, "D" int, 
             "RoyaltyPrice" float, "RoyaltyVolume" int, "ProvCrownRoyaltyRate" int, 
@@ -150,17 +150,15 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
 
-
     def Users(self):
         statement = """
-            CREATE TABLE `Users` (
-                `ID`	INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
-                `Login`	TEXT UNIQUE,
-                `Name`	TEXT,
-                `Email`	TEXT,
-                `ProdMonth`	INTEGER,
-                `Permissions`	TEXT
-            )
+            CREATE TABLE Users (
+                "ID"	INTEGER PRIMARY KEY AUTOINCREMENT,
+                "Login"	TEXT,
+                "Name"	TEXT,
+                "Email"	TEXT,
+                "ProdMonth"	INTEGER,
+                "Permissions"	TEXT)
         """
         self.dbi.execute_statement(statement)
 

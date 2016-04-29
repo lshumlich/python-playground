@@ -14,6 +14,7 @@ class Test(unittest.TestCase):
     def test_all(self):
         dbu = DatabaseUtilities()
         dbc = DatabaseCreate()
-        
+
         dbu.delete_all_tables()
         dbc.create_all()
+

@@ -55,10 +55,10 @@ class DatabaseUtilities(object):
             self.db_create.Well()
             
         statement = """
-            INSERT INTO Well VALUES(1,'SKWI111062705025W300','SK','Oil','OL',1,'New Oil','Heavy',0,0.25,'2014-12-01 00:00:00',1);
-            INSERT INTO Well VALUES(2,'SKWI112062705025W300','SK','Oil','OL',2,'Third Tier Oil','Southwest',0,0.95,'2014-12-01 00:00:00',1);
-            INSERT INTO Well VALUES(3,'SKWI113062705025W300','SK','Oil','OL',2,'Fourth Tier Oil','Other',0,1.0,NULL,NULL);
-            INSERT INTO Well VALUES(4,'SKWI114062705025W300','SK','Oil','OL',3,'Old Oil','Other',0,1.0,NULL,NULL);
+            INSERT INTO Well VALUES(1, '2010-01-01 00:00:00', '9999-12-31 23:59:59.000005', 'SKWI111062705025W300','SK','Oil','OL',1,'New Oil','Heavy',0,0.25,'2014-12-01 00:00:00',1);
+            INSERT INTO Well VALUES(2, '2011-11-01 00:00:00', '9999-12-31 23:59:59.000005', 'SKWI112062705025W300','SK','Oil','OL',2,'Third Tier Oil','Southwest',0,0.95,'2014-12-01 00:00:00',1);
+            INSERT INTO Well VALUES(3, '2004-10-01 00:00:00', '9999-12-31 23:59:59.000005', 'SKWI113062705025W300','SK','Oil','OL',2,'Fourth Tier Oil','Other',0,1.0,NULL,NULL);
+            INSERT INTO Well VALUES(4, '2013-01-01 00:00:00', '9999-12-31 23:59:59.000005', 'SKWI114062705025W300','SK','Oil','OL',3,'Old Oil','Other',0,1.0,NULL,NULL);
         """
         
         self.db_instance.execute_statement(statement)
@@ -68,7 +68,20 @@ class DatabaseUtilities(object):
             self.db_create.RoyaltyMaster()
 
         statement = """
-            INSERT INTO RoyaltyMaster VALUES(3, 'OL', 'All', 'SKProvCrownVar, GORR', 1.2, 50, 'SaskWellHead', 'Y', 'Y', 'mprod,250,2,300,3,400,4,500,5,0,6', NULL)
+            INSERT INTO RoyaltyMaster VALUES(1, '2001-01-08 00:00:00', '2016-01-07 00:00:00', 'All', 'SKProvCrownVar, GORR', 1.2, 50, 'SaskWellHead', 'Y', 'Y', 'mprod,250,2,300,3,400,4,500,5,0,6', NULL)
+        """
+
+        self.db_instance.execute_statement(statement)
+
+    def create_some_test_well_lease_link(self):
+        if not 'WellLeaseLink' in self.db_instance.get_table_names():
+            self.db_create.WellLeaseLink()
+        statement = """
+            INSERT INTO WellLeaseLink VALUES(1, '2001-01-08 00:00:00', '2016-01-07 00:00:00', 'SKWI111062705025W300', 1, 1.0);
+            INSERT INTO WellLeaseLink VALUES(2, '2001-01-08 00:00:00', '2016-01-07 00:00:00', 'SKWI112062705025W300', 1, 1.0);
+            INSERT INTO WellLeaseLink VALUES(3, '2001-01-08 00:00:00', '2016-01-07 00:00:00', 'SKWI113062705025W300', 1, 1.0);
+            INSERT INTO WellLeaseLink VALUES(4, '2001-01-08 00:00:00', '2015-01-01 00:00:00', 'SKWI114062705025W300', 1, 1.0);
+
         """
 
         self.db_instance.execute_statement(statement)
@@ -91,9 +104,10 @@ class DatabaseUtilities(object):
         if not 'Lease' in self.db_instance.get_table_names():
             self.db_create.Lease()
         statement = """
-            INSERT INTO Lease VALUES(1,'OL','SK',123,2345,NULL);
-            INSERT INTO Lease VALUES(2,'OL','SK',123,2346,NULL);
-            INSERT INTO Lease VALUES(3,'OL','SK',123,2347,NULL);
+            INSERT INTO Lease VALUES(1,'2001-01-08 00:00:00', '2016-01-07 00:00:00', 'OL', 'SK', 7022,123,2345,NULL);
+            INSERT INTO Lease VALUES(2,'1994-07-09 00:00:00', '2014-07-08 00:00:00', 'OL', 'SK', 7332, 123,2346,NULL);
+            INSERT INTO Lease VALUES(3,'1998-06-18 00:00:00', '2014-03-31 00:00:00', 'OL', 'SK', 7022, 123,2347,NULL);
+            INSERT INTO Lease VALUES(4,'1998-06-18 00:00:00', '2015-01-01 00:00:00', 'OL', 'SK', 7022, 123,2347,NULL);
         """
         self.db_instance.execute_statement(statement)
 
