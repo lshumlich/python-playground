@@ -30,6 +30,7 @@ def results():
         db = config.get_database()
         req_data = request.get_json()
         results = db.select('Lease', **req_data)
+        print(req_data, results)
         return render_template('lease/results.html', results = results)
     except Exception as e:
         print(e)

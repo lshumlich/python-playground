@@ -1,12 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
 
-<!--<h3>Well Event {{ wellevent.WellEvent }}</h3>-->
-<script>
-$(document).ready(function(){
-    });
-</script>
-
 <form>
     <fieldset>
         <legend><h3>Well Event {{ wellevent.WellEvent }}</h3></legend>
@@ -30,7 +24,7 @@ $(document).ready(function(){
                 <td><input type="text" id="Section" value="{{ wellevent.Section }}" disabled /></td>
             </tr>
             <tr>
-                <td><la bel for="LSD">LSD</label></td>
+                <td><label for="LSD">LSD</label></td>
                 <td><input type="text" id="LSD" value="{{ wellevent.LSD }}" disabled /></td>
                 <td><label for="GCIStatus">GCI Status</label></td>
                 <td><input type="text" id="GCIStatus" value="{{ wellevent.GCIStatus }}" disabled /></td>
@@ -73,12 +67,14 @@ $(document).ready(function(){
 
 {% if leases %}
 <br />
-<h3><b>{{leases|length}}</b> leases attached:</h3>
+<fieldset>
+<legend><h3><b>{{leases|length}}</b> leases attached:</h3></legend>
     <ul>
     {% for lease in leases %}
-    <li><a href="/lease/{{ lease.LeaseID }}">{{ lease.LeaseID }}</a></li>
+    <li><a href="/lease/{{ lease.ID }}">{{ lease.ID }}</a></li>
     {% endfor %}
     </ul>
+</fieldset>
 {% endif %}
 
 {% if facilities %}

@@ -86,7 +86,7 @@ $('form[name="search-basic"]').submit(function() {
     var dict = {};
     for (i = 0; i < oForm.length; i++) {
       if (oForm.elements[i].name != '') {
-        if (oForm.elements[i].type == 'text' || oForm.elements[i].type == 'hidden') {
+        if ((oForm.elements[i].type == 'text' || oForm.elements[i].type == 'hidden') && (oForm.elements[i].value != "")) {
           dict[oForm.elements[i].name] = oForm.elements[i].value;
         } else if (oForm.elements[i].type == 'checkbox') {
           dict[oForm.elements[i].name] = oForm.elements[i].checked;
