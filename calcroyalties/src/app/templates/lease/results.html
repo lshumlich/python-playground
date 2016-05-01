@@ -6,26 +6,21 @@
     <td colspan=13><b>{{results|length}}</b> results found</td>
   </tr>
   <tr>
+    <th>Lease Type</th>
     <th>Lease ID</th>
     <th>Province</th>
     <th>FN Reserve</th>
+    <th>FN Band ID</th>
     <th>Lessor</th>
-    <th>Actions</th>
   </tr>
   {% for row in results %}
   <tr>
-    <td>{{ row.ID or "" }}</td>
+    <td>{{ row.LeaseType }}</td>
+    <td><a href="{{ url_for('lease.details', lease_num = row.ID) }}">{{ row.ID or "" }}</a></td>
     <td>{{ row.Prov or "" }}</td>
-    <td>{{ row.FNReservce or "" }}</td>
+    <td>{{ row.FNReserve or "" }}</td>
+    <td>{{ row.FNBandID or "" }}</td>
     <td>{{ row.Lessor or "" }}</td>
-    <td>
-      <a href="{{ url_for('lease.details', lease_num = row.ID) }}">Details</a>
-    <!--  Edit / view icons from wells
-    <a href="#" title="Edit" class="icon icon-edit" onclick=openInfo({{ row.ID }})></a>
-    &nbsp;
-    <a href="/worksheet?WellId={{ row.ID }}" title="Worksheet" class="icon icon-text-document"></a>
-    -->
-    </td>
   </tr>
   {% endfor %}
 </table>

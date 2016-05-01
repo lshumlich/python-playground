@@ -71,7 +71,7 @@
 <legend><h3><b>{{leases|length}}</b> leases attached:</h3></legend>
     <ul>
     {% for lease in leases %}
-    <li><a href="/lease/{{ lease.ID }}">{{ lease.ID }}</a></li>
+    <li><a href="/lease/{{ lease.ID }}">{{ lease.ID }} &mdash; {{lease.PEFNInterest }}</a></li>
     {% endfor %}
     </ul>
 </fieldset>

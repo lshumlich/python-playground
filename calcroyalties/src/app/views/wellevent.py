@@ -58,15 +58,13 @@ def details(wellevent_num):
     AND WellEventInfo.WellEvent = '{wellevent}'""".format(proddate=get_proddate(), wellevent=wellevent_num)
     wellevent = db.select_sql(statement)[0]
 
-    statement_volumetric = """SELECT * From VolumetricInfo WHERE FromTo = '{wellevent}' AND ProdMonth = DATE('{proddate}')""".format(wellevent=wellevent_num, proddate=get_proddate())
+    statement_volumetric = """SELECT * From VolumetricInfo WHERE FromTo = '{wellevent}' AND DATE(ProdMonth) = DATE('{proddate}')""".format(wellevent=wellevent_num, proddate=get_proddate())
     volumetric = db.select_sql(statement_volumetric)
 
     well = db.select1('Well', WellEvent=wellevent_num)
 
-    statement_leases = """SELECT Lease.* FROM Lease, WellLeaseLink WHERE WellLeaseLink.WellEvent="%s" AND Lease.ID=WellLeaseLink.LeaseID"""
-    # statement_leases = """SELECT LeaseID FROM WellLeaseLink WHERE WellEvent='%s'"""
+    statement_leases = """SELECT Lease.*, WellLeaseLink.PEFNInterest FROM Lease, WellLeaseLink WHERE WellLeaseLink.WellEvent="%s" AND Lease.ID=WellLeaseLink.LeaseID"""
     leases = db.select_sql(statement_leases % wellevent_num)
-    print('leases: ', leases)
 
     statement_facilities = """SELECT FacilityInfo.* FROM FacilityInfo, WellFacilitylink WHERE FacilityInfo.Facility=WellFacilitylink.Facility AND WellFacilitylink.WellEvent="%s" """
     facilities = db.select_sql(statement_facilities % wellevent_num)
