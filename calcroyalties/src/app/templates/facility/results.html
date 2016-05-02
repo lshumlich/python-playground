@@ -16,11 +16,10 @@
     <th>Range</th>
     <th>TWP</th>
     <th>LSD</th>
-    <th>Actions</th>
   </tr>
   {% for row in results %}
   <tr>
-    <td>{{ row.Facility or "" }}</td>
+    <td><a href="{{url_for('facility.details', facility_num=row.Facility)}}">{{ row.Facility or "" }}</a></td>
     <td>{{ row.StartDate or "" }}</td>
     <td>{{ row.EndDate or "" }}</td>
     <td>{{ row.Name or "" }}</td>
@@ -30,7 +29,6 @@
     <td>{{ row.Range or "" }}</td>
     <td>{{ row.Township or "" }}</td>
     <td>{{ row.LSD or "" }}</td>
-    <td><a href="#" onclick=openInfo({{"'" + row.Facility + "'" }})>Details</a></td>
     <!--<td>Details</td>-->
   </tr>
   {% endfor %}

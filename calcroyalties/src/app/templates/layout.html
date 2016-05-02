@@ -11,7 +11,7 @@
 <script src={{ url_for('static', filename='js/formtools.js') }}></script>
 
 <script>
-proddateCookie = getCookie("proddate");
+var proddateCookie = getCookie("proddate");
 
 function setCookie(cname,cvalue,exdays) {
     var d = new Date();
@@ -41,6 +41,7 @@ function updateCookie() {
 }
 
 function updateProddateText() {
+    proddateCookie = getCookie("proddate");
     $("#proddate-header").text(proddateCookie);
     $("#proddate-input").attr("value", proddateCookie);
 }
@@ -76,9 +77,9 @@ form = proddateModal.find( "form" ).on( "submit", function( event ) {
   proddateModal.dialog("close");
   });
 
-
 updateProddateText();
 
+// stupid workaround: we can't access the 'session' cookie from JS, so we have to check if it's set on the server
 {% if session['login'] %}
 if (!proddateCookie){
     proddateModal.dialog("open");

@@ -3,6 +3,8 @@ from flask import Blueprint, render_template, request, abort
 
 import config
 from .permission_handler import PermissionHandler
+from src.util.apperror import AppError
+from .main import get_proddate
 
 facility = Blueprint('facility', __name__)
 
@@ -23,8 +25,15 @@ def results():
         traceback.print_exc(file=sys.stdout)
         return "<h2>No results found</h2>"
 
+@facility.route('/facility/<facility_num>')
+def details(facility_num):
+    db = config.get_database()
+    facility = db.select1('FacilityInfo', Facility=facility_num)
+    wellevents = db.select('WellFacilityLink', Facility=facility_num)
+    return render_template('facility/details.html', facility = facility, wellevents = wellevents)
+
 @facility.route('/api/facility_details')
-def details():
+def old_details():
     if not request.is_xhr: abort(404)
     try:
         db = config.get_database()

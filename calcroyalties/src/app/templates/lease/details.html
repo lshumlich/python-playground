@@ -3,13 +3,13 @@
 
 <form>
     <fieldset>
-        <legend><h3>Lease {{ lease.LeaseID }}</h3></legend>
+        <legend><h3>Lease {{ lease.Lease }}</h3></legend>
         <table cellpadding="5">
             <tr>
-                <td><label for="ID">ID</label></td>
-                <td><input type="text" id="ID" value="{{ lease.ID }}" disabled /></td>
                 <td><label for="LeaseType">Lease Type</label></td>
                 <td><input type="text" id="LeaseType" value="{{ lease.LeaseType }}" disabled /></td>
+                <td><label for="ID">ID</label></td>
+                <td><input type="text" id="ID" value="{{ lease.ID }}" disabled /></td>
             </tr>
             <tr>
                 <td><label for="Province">Province</label></td>
