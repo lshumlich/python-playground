@@ -6,7 +6,7 @@
     <th>Login</th>
     <th>User name</th>
     <th>Email</th>
-    <th>Permissions</th>
+    <!--<th>Permissions</th>-->
     <th>Actions</th>
   </tr>
   {% for user in users %}
@@ -14,7 +14,7 @@
     <td>{{ user.Login }}</td>
     <td>{{ user.Name }}</td>
     <td>{{ user.Email }}</td>
-    <td>{{ user.Permissions }}</td>
+    <!--<td>{{ user.Permissions }}</td>-->
     <td>
     <a href="#" class="icon icon-edit" onclick=getUser({{ user.ID }})></a>
     &nbsp;
