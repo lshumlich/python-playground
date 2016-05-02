@@ -1,0 +1,159 @@
+
+table.Sel, th.Sel, td.Sel {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+table.Norm, th.Norm, td.Norm {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+
+th.Sel:after {
+    content: url('/static/img/pencil.png');
+}
+
+.save {
+    content: 'after';
+    text-align: right;
+    float:right;
+
+}
+
+a:hover.topnav {
+  color:#6E9A06;
+}
+
+a.active {
+  color:green;
+}
+
+a.topnav {
+  color:white;
+}
+
+
+ul.topnav {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+    position: static;
+    top: 0;
+    width: 100%;
+}
+
+li.topnav {
+    float: left;
+}
+
+
+li.topnav a {
+    text-align: center;
+    padding: 1px 10px;
+    text-decoration: none;
+}
+
+td:hover.Sel {background-color: #6E9A06}
+
+td:hover .plain {}
+
+td:hover .plainxxx {background-color: #8080c0}
+
+tr:nth-child(even).Sel {background-color: #c0c0c0}
+
+tr:nth-child.save(even) {background-color: #f2f2f2}
+
+tr {
+    white-space: nowrap;
+}
+
+body {margin:20;padding:20}
+
+body
+{
+ margin-top:30px;
+ margin-left:30px;
+ margin-right:30px;
+ margin-bottom:30px;
+}
+
+div.center {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+.linkDialog {
+    position: absolute;
+    top: 200px;
+    left: 200px;
+    opacity: 0;
+    z-index: -1;
+    background: rgba(100,100,100,0.9);
+    padding: 5px 25px 5px 25px;
+    border-radius: 10px;
+    border: 3px solid #73AD21;
+}
+
+.lfsDialog {
+	position: absolute;
+	font-family: Arial, Helvetica, sans-serif;
+	background: rgba(0,0,0,0.8);
+	z-index: 99999;
+	opacity:0;
+	-webkit-transition: opacity 800ms ease-in;
+	-moz-transition: opacity 800ms ease-in;
+	transition: opacity 400ms ease-in;
+	pointer-events: none;
+}
+.lfsDialog:target {
+	opacity:1;
+	pointer-events: auto;
+}
+
+.lfsDialog > div {
+	position: absolute;
+	top: 100px;
+	left: 100px;
+	bottom: 100px;
+	right: 100px;
+	width: 200px;
+	margin: 10% auto;
+	padding: 5px 2px 13px 3px;
+	border-radius: 10px;
+	border: 3px solid #73AD21;
+	background: #fff;
+	background: -moz-linear-gradient(#fff, #999);
+	background: -webkit-linear-gradient(#fff, #999);
+	background: -o-linear-gradient(#fff, #999);
+}
+.image:before {
+    content:url('/static/hyperlink.jpg');
+    display: block;
+    height: 30px;
+    width: 10px;
+    max-width: 50px;
+    max-height: 50px;
+    position: relative;
+    right: 0px;
+}
+
+.write .icon {
+    background-image: url('/static/contact-us-sprite.png');
+    background-repeat: no-repeat;
+    background-position: right top;
+}
+/*
+background:url(/i/hp/v14/gfx/contact-us-sprite.png) 0 -30px no-repeat
+.icon {
+    background-image: url('/static/contact-us-sprite.png');
+    background-repeat: no-repeat;
+    background-position: right top;
+    clip-path: inset(30px 30px 30px 10px);
+    display: block;
+    position: absolute;
+}
+
+*/

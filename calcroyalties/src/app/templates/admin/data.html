@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<title>Table Display</title>
+<link type="text/css" rel="stylesheet" href={{url_for("static", filename="css/data.css")}}>
+</head>
+
+<body id="body">
+
+	<ul class="topnav">
+    {% for item in tables %}
+        <li class="topnav"> <a class="{%if item == table%}active{% else %}topnav{% endif %}" href="?table={{ item }}"> {{ item }} </a> </li>
+    {% endfor %}
+	</ul>
+
+ <div style="padding:10px;margin-top:25px;">
+    {% if header %}
+    	<table id="SelTableId" class="Sel">
+    	<tr class="Sel">
+        {% for h in header %}
+        	<th class="Sel"> <a href=?table={{table}}&attr={{ h }}>{{ h }}</a> </th>
+        {% endfor %}
+    	</tr>
+	    {% if rows %}
+
+	        {% for r in rows %}
+		    	<tr class="Sel">
+	        	{% for c in r %}
+	        		<td class="Sel">{{ c }} {% if header[loop.index0] in links %} <a href="{{links[header[loop.index0]]}}{{c}} ">-</a>  {% endif %}</td>
+		        {% endfor %}
+		    	</tr>
+	        {% endfor %}
+	    {% endif %}
+	    </table>
+    {% endif %}
+</div>
+<br>
+
+<div id="ConsoleID"></div>
+
+<div id="LinkFormId" class="linkDialog center">
+    <h3>Link Attributes</h3>
+    <form name="linkform" action="#" method='POST'>
+    <table align="center" border="0">
+        <tr><td><input type="hidden" name=ID></tr></td>
+        <tr><td>Table</tr></td>
+        <tr><td><input type="text" name=TabName></tr></td>
+        <tr><td>Attribute</tr></td>
+        <tr><td><input type="text" name=AttrName></tr></td>
+        <tr><td>Link Name</tr></td>
+        <tr><td><input type="text" name=LinkName></tr></td>
+        <tr><td><input type="checkbox" name="BaseTab"> Base Table?</tr></td>
+        <tr><td>Attributes To Show</tr></td>
+        <tr><td><input type="textarea" name=ShowAttrs rows="2"></tr></td>
+        <tr><td>&nbsp;</td></tr>
+        <tr><td><button id="SubmitLinkFormID" type="button">Submit</button>
+        <button id="CancelLinkFormID" type="button">Cancel</button></tr></td>
+     </table>
+     <br>
+    </form>
+</div>
+
+<div id="LinkDataId" class="linkDialog center">
+    <h3>Link Data</h3>
+    <div id="LinkData"></div>
+</div>
+
+<ul>
+<li><a id="ConsAppendID" href="#">Append</a></li>
+<li><a id="ConsClearID" href="#">Clear</a></li>
+</ul>
+<h4>v11</h4>
+
+<script>
+
+function tableListener(event) {
+
+	var data = {}
+    var e1 = event.target;
+    var col = e1.cellIndex;
+    var p1 = e1.parentNode;
+    var row = p1.rowIndex;
+    var tab = document.getElementById('SelTableId');
+    var hRow = tab.rows[0];
+    var hcell = hRow.getElementsByTagName("th")[col];
+    var AttrName = hcell.textContent.trim();
+    var AttrValue = '';
+    if (row !== 0) {
+        AttrValue = e1.textContent
+    }
+    var TabName = '{{table}}';
+
+    data['TabName'] = TabName;
+    data['AttrName'] = AttrName;
+    data['AttrValue'] = AttrValue;
+
+    if (row == 0) {
+    	talkToServerJson('/data/getLinkRow.json',data,linkFormShow,event)
+    } else {
+    	talkToServerJson('/data/getLinkData.json',data,linkDataShow,event)
+    }
+}
+
+//-------- key display -----------
+
+
+function linkDataShow(data,event) {
+
+//    dictToForm(data, document.forms["linkform"]);
+	el = document.getElementById('LinkData')
+	var s = [];
+//	for (var key in data) {
+//		s.push('<br>' + key + '=' + data[key]);
+//	}
+	if ('BaseData' in data) {
+		s.push('<br> we have base data');
+	    var bd = data['BaseData'];
+	    s.push('<table id="SelTableId" align="center" class="Norm">');
+	    for (var i = 0; i < bd.length; i++) {
+	    	s.push('<tr class="Norm">');
+	    	for (var j = 0; j < bd[i].length; j++) {
+	    		s.push('<td class="Norm">' + bd[i][j] + '</td>');
+	    	}
+	    	s.push("</tr>");
+	    }
+	    s.push("</table>");
+	}
+
+	if ('Links' in data) {
+		s.push('<br> we have links');
+	    var bd = data['Links'];
+	    s.push('<table id="SelTableId" align="center" class="Norm">');
+	    for (var i = 0; i < bd.length; i++) {
+	    	s.push('<tr class="Norm">');
+	    	for (var j = 0; j < bd[i].length; j++) {
+	    		s.push('<td class="Norm">' + bd[i][j] + '</td>');
+	    	}
+	    	s.push("</tr>");
+	    }
+	    s.push("</table>");
+	}
+	if ('Message' in data) {
+		s.push('<br><b>' + data['Message'] + '</b><br>');
+	}
+
+    el.innerHTML = s.join('');
+
+    showAndLocate(document.getElementById('LinkDataId'),event);
+}
+
+function linkDataHide(event) {
+	hideElement(document.getElementById('LinkDataId'));
+}
+
+
+//-------- link form logic -----------
+
+function linkFormShow(data,event) {
+    dictToForm(data, document.forms["linkform"]);
+    showAndLocate(document.getElementById('LinkFormId'),event);
+}
+
+function linkFormHide(event) {
+	hideElement(document.getElementById('LinkFormId'));
+}
+
+function linkFormSubmit(event) {
+    var dict = formToDict(document.forms["linkform"]);
+    talkToServerJson('/data/updateLinkRow.json',dict,linkFormResponse,event)
+}
+
+function linkFormResponse(data,event) {
+	if (data['StatusCode'] == 0) {
+		linkFormHide(event)
+	} else {
+		consAppend('*** We have a problem ***:' + data['Message'])
+	}
+}
+
+// -------- Common Functions -----------
+
+//
+// move the form attributes to a dict object to transfer to the server
+//
+function formToDict(oForm) {
+
+    var dict = {};
+    for (i = 0; i < oForm.length; i++) {
+//    	consAppend('---' + oForm.elements[i].name + "," + oForm.elements[i].value + "," + oForm.elements[i].type )
+    	if (oForm.elements[i].name != '') {
+    		if (oForm.elements[i].type == 'text' || oForm.elements[i].type == 'hidden') {
+    			dict[oForm.elements[i].name] = oForm.elements[i].value;
+    		} else if (oForm.elements[i].type == 'checkbox') {
+                dict[oForm.elements[i].name] = oForm.elements[i].checked;
+    		} else {
+    			consAppend('*** did not handle: ' + oForm.elements[i].name + "," + oForm.elements[i].value + "," + oForm.elements[i].type)
+    		}
+    	}
+    }
+
+	return dict
+}
+
+//
+//move the form attributes to a dict object to transfer to the server
+//
+function dictToForm(dict,oForm) {
+
+	for (i = 0; i < oForm.length; i++) {
+	//	consAppend('---' + oForm.elements[i].name + "," + oForm.elements[i].value + "," + oForm.elements[i].type )
+		if (oForm.elements[i].name != '') {
+			if (oForm.elements[i].type == 'text' || oForm.elements[i].type == 'hidden') {
+				oForm.elements[i].value = dict[oForm.elements[i].name];
+			} else if (oForm.elements[i].type == 'checkbox') {
+				oForm.elements[i].checked = (dict[oForm.elements[i].name] ==1)
+			} else {
+				consAppend('*** did not handle: ' + oForm.elements[i].name + "," + oForm.elements[i].value + "," + oForm.elements[i].type)
+			}
+		}
+	}
+}
+
+function showAndLocate(el,event) {
+
+    el.style.opacity = 0;
+    el.style.top = event.clientY + 'px';
+    el.style.left = event.clientX + 'px';
+    el.style.zIndex = "0";
+    el.style.opacity = 1;
+
+}
+
+function hideElement(el) {
+    el.style.opacity = 0;
+    el.style.zIndex = "-1";
+}
+
+
+function talkToServerJson(location,data,functionToExecute,event) {
+
+    xhr = new XMLHttpRequest();
+    xhr.open('POST',location,true);
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.onload = function() {
+        if (xhr.status == 200) {
+//            consAppend(xhr.responseText);
+            data = JSON.parse(xhr.responseText);
+//            consAppend(data);
+            functionToExecute(data,event);
+        } else {
+        	functionToExecute(data);
+        	consAppend('*** We have a bad response from server: ' + xhr.status)
+            consAppend('    url: ' + location)
+            consAppend('    data: ' + JSON.stringify(data))
+        }
+    }
+
+    xhr.send(JSON.stringify(data));
+}
+
+function consAppend(msg) {
+	el = document.getElementById('ConsoleID')
+    el.innerHTML = el.innerHTML + msg +'<br>'
+}
+
+function consClear() {
+	el = document.getElementById('ConsoleID')
+    el.innerHTML = ""
+}
+
+function userConsAppend(e){
+	consAppend('---------------------')
+}
+
+document.getElementById('SubmitLinkFormID').addEventListener('click', linkFormSubmit, false)
+document.getElementById('CancelLinkFormID').addEventListener('click', linkFormHide, false)
+document.getElementById('SelTableId').addEventListener('click', tableListener, false)
+document.getElementById('LinkDataId').addEventListener('click', linkDataHide, false)
+document.getElementById('ConsAppendID').addEventListener('click', userConsAppend, false)
+document.getElementById('ConsClearID').addEventListener('click', consClear, false)
+
+</script>
+
+</body>
+</html>
