@@ -1,0 +1,74 @@
+ <html>
+
+ <head>
+
+
+ <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+ <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+
+
+ </head>
+
+ <body>
+
+ <div style="height: 400px;" id="map"></div>
+
+
+<script>
+accessToken = 'pk.eyJ1IjoidGhlc29sdXRpb25zdGFjayIsImEiOiJjaW50YWc2ZHMxMTNtdWFtM2tiYWh6ZTRwIn0.ZNafhnb0UAamLVQaHwwfqg';
+// Replace 'mapbox.streets' with your map id.
+
+var mapboxTiles = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=' + accessToken, {
+    attribution: '© <a href="https://www.mapbox.com/map-feedback/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 18,
+    id: 'mapbox.streets',
+    accessToken: accessToken
+});
+
+var map = L.map('map')
+    .addLayer(mapboxTiles)
+    .setView([51.477811, -0.001475], 1);
+
+
+function onEachFeature(feature, layer) {
+    // does this feature have a property named popupContent?
+    if (feature.properties && feature.properties.popupContent) {
+        layer.bindPopup(feature.properties.popupContent);
+    }
+}
+
+var geojsonFeature = [
+{
+    "type": "Feature",
+    "properties": {
+        "name": "Coors Field",
+        "amenity": "Baseball Stadium",
+        "popupContent": "This is where the Rockies play!"
+    },
+    "geometry": {
+        "type": "Point",
+        "coordinates": [51.477811, -0.001475]
+    }
+},
+{
+    "type": "Feature",
+    "properties": {
+        "name": "Adrienne's home",
+        "popupContent": "This is where <a href='www.adrienne.com'>Adrienne</a> plays!"
+    },
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-114.13374499999998, 51.129138]
+    }
+},
+];
+
+L.geoJson(geojsonFeature, {
+    onEachFeature: onEachFeature
+}).addTo(map);
+
+
+</script>
+ </body>
+
+ </html>

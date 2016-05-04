@@ -41,6 +41,10 @@ def logout():
     return resp
     # return redirect(url_for('index'))
 
+@app.route('/map')
+def map():
+    return render_template('map.html')
+
 @app.errorhandler(404)
 def not_found(error):
     return render_template('404.html')
