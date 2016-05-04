@@ -19,7 +19,7 @@ def calc_worksheet():
             well = db.select1('Well', ID=well_id)
             well_lease_link_array = db.select('WellLeaseLink', WellEvent=well.WellEvent)
             if len(well_lease_link_array) == 0:
-                raise AppError("There were no well_lease_link records for ", well_id, prod_month)
+                raise AppError("There were no well_lease_link records for " + str(well_id) + str(prod_month))
             well_lease_link = well_lease_link_array[0]
             royalty = db.select1('RoyaltyMaster', ID=well_lease_link.LeaseID)
             lease = db.select1('Lease', ID=well_lease_link.LeaseID)

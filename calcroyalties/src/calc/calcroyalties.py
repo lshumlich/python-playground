@@ -358,7 +358,6 @@ class ProcessRoyalties(object):
             return round(diff.days/365,2)
 
     def calcSupplementaryRoyaltiesIOGR1995(self, commencement_period, well_head_price, prod_vol, royalty_regulation, reference_price):
-        print("This is the commencement_period", commencement_period)
         if commencement_period <= 5:
             supplementary_royalty = (prod_vol - royalty_regulation)*0.5*(well_head_price - reference_price)
         else:
