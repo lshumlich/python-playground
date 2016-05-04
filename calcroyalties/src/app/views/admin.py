@@ -59,16 +59,20 @@ def user_details():
         abort(400)
 
 
+# Data Browser below:
+from src.database.data_structure import DataStructure
+
 class Shower(object):
 
     LINK_TABLE = "LinkTab"
+
     def __init__(self):
         self.dbi = config.get_database_instance()
 
     def connect(self):
         self.dbi = config.get_database_instance()
 
-    def show_table(self,tableName,attr=None,key=None):
+    def show_table(self,tableName, attr=None, key=None):
         stmt = 'select * from ' + tableName
         if key:
             ctype = self.column_type(tableName, attr)
@@ -108,7 +112,6 @@ class Shower(object):
         return (None)
 
 
-from src.database.data_structure import DataStructure
 class Utils(object):
 
     def obj_to_dict(self,obj,dic = None):
@@ -120,7 +123,7 @@ class Utils(object):
             dic = dict()
         for attr in obj.__dict__:
             if not attr.startswith('_'):
-                dic[attr] =obj. __dict__[attr]
+                dic[attr] = obj. __dict__[attr]
         return dic
 
     def dict_to_obj(self,dic,obj=None):
@@ -145,7 +148,7 @@ class Utils(object):
         return json.loads(reqDataString)
 
 
-@admin.route("/data/", methods=['GET', 'POST'])
+@admin.route("/admin/data/", methods=['GET', 'POST'])
 def data():
     html = ""
     try:
@@ -172,7 +175,7 @@ def data():
         traceback.print_exc(file=sys.stdout)
     return html
 
-@admin.route("/data/updateLinkRow.json", methods=['POST'])
+@admin.route("/admin/data/updateLinkRow.json", methods=['POST'])
 def update_link_row():
     utils = Utils()
     db = config.get_database()
@@ -199,7 +202,7 @@ def update_link_row():
         return_data['Message'] = str(e)
         return json.dumps(return_data)
 
-@admin.route("/data/getLinkRow.json", methods=['POST'])
+@admin.route("/admin/data/getLinkRow.json", methods=['POST'])
 def get_link_row():
     utils = Utils()
     db = config.get_database()
@@ -227,7 +230,7 @@ def get_link_row():
         print('AppServer.link: ***Error:', e)
         traceback.print_exc(file=sys.stdout)
 
-@admin.route("/data/getLinkData.json", methods=['POST'])
+@admin.route("/admin/data/getLinkData.json", methods=['POST'])
 def get_link_data():
     utils = Utils()
     db = config.get_database()

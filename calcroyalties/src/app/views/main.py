@@ -43,7 +43,24 @@ def logout():
 
 @app.route('/map')
 def map():
-    return render_template('map.html')
+    import random, json
+    db = config.get_database()
+    statement_wellevents = "SELECT * FROM WellEventInfo LIMIT 5"
+    wellevents = db.select_sql(statement_wellevents)
+
+    results = []
+    for wellevent in wellevents:
+        json_obj = {}
+        json_obj['type'] = 'Feature'
+        json_obj['properties'] = {}
+        json_obj['properties']['name'] = wellevent.WellEvent
+        json_obj['properties']['popupContent'] = '<b>%s</b> <br> Pool Name: %s<br><a href="/wellevent/%s">Details</a>' % (wellevent.WellEvent, wellevent.PoolName, wellevent.WellEvent)
+        json_obj['geometry'] = {}
+        json_obj['geometry']['type'] = 'Point'
+        json_obj['geometry']['coordinates'] = [random.randint(1, 50), random.randint(1, 100)]
+        results.append(json_obj)
+    print(results)
+    return render_template('map.html', results=json.dumps(results))
 
 @app.errorhandler(404)
 def not_found(error):

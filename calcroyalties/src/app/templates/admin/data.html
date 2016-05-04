@@ -96,9 +96,9 @@ function tableListener(event) {
     data['AttrValue'] = AttrValue;
 
     if (row == 0) {
-    	talkToServerJson('/data/getLinkRow.json',data,linkFormShow,event)
+    	talkToServerJson('/admin/data/getLinkRow.json',data,linkFormShow,event)
     } else {
-    	talkToServerJson('/data/getLinkData.json',data,linkDataShow,event)
+    	talkToServerJson('/admin/data/getLinkData.json',data,linkDataShow,event)
     }
 }
 
@@ -167,7 +167,7 @@ function linkFormHide(event) {
 
 function linkFormSubmit(event) {
     var dict = formToDict(document.forms["linkform"]);
-    talkToServerJson('/data/updateLinkRow.json',dict,linkFormResponse,event)
+    talkToServerJson('/admin/data/updateLinkRow.json',dict,linkFormResponse,event)
 }
 
 function linkFormResponse(data,event) {
