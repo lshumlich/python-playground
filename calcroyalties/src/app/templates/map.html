@@ -6,15 +6,13 @@
 <div style="height: 400px;" id="mymap"></div>
 
 <script>
-accessToken = 'pk.eyJ1IjoidGhlc29sdXRpb25zdGFjayIsImEiOiJjaW50YWc2ZHMxMTNtdWFtM2tiYWh6ZTRwIn0.ZNafhnb0UAamLVQaHwwfqg';
-
 function onEachFeature(feature, layer) {
-    console.log('adding new feature: ');
-    console.log(feature.properties, feature.geometry);
     if (feature.properties && feature.properties.popupContent) {
         layer.bindPopup(feature.properties.popupContent);
     }
 }
+
+var accessToken = 'pk.eyJ1IjoidGhlc29sdXRpb25zdGFjayIsImEiOiJjaW50YWc2ZHMxMTNtdWFtM2tiYWh6ZTRwIn0.ZNafhnb0UAamLVQaHwwfqg';
 
 var mapboxTiles = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=' + accessToken, {
     attribution: '© <a href="https://www.mapbox.com/map-feedback/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -25,32 +23,7 @@ var mapboxTiles = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.
 
 var map = L.map('mymap')
     .addLayer(mapboxTiles)
-    .setView([51.477811, -0.001475], 1);
-
-var geojsonFeature = [
-{
-    "type": "Feature",
-    "properties": {
-        "name": "Coors Field",
-        "popupContent": "This is where the Rockies play!"
-    },
-    "geometry": {
-        "type": "Point",
-        "coordinates": [51.477811, -0.001475]
-    }
-},
-{
-    "type": "Feature",
-    "properties": {
-        "name": "Adrienne's home",
-        "popupContent": "This is where <a href='www.adrienne.com'>Adrienne</a> plays!"
-    },
-    "geometry": {
-        "type": "Point",
-        "coordinates": [-114.13374499999998, 51.129138]
-    }
-},
-];
+    .setView([0, 0], 1);
 
 var flaskFeature = {{results|safe}}
 

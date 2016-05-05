@@ -80,11 +80,17 @@ form = proddateModal.find( "form" ).on( "submit", function( event ) {
 updateProddateText();
 
 // stupid workaround: we can't access the 'session' cookie from JS, so we have to check if it's set on the server
+{#
 {% if session['login'] %}
 if (!proddateCookie){
     proddateModal.dialog("open");
 }
 {% endif %}
+#}
+
+if (!proddateCookie){
+    proddateModal.dialog("open");
+}
 
 });
 </script>
