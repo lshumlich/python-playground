@@ -10,8 +10,29 @@ wellevent = Blueprint('wellevent', __name__)
 @wellevent.route('/wellevent/search', methods=['GET'])
 def search():
     if not request.args: return render_template('wellevent/search.html')
-
     statement = """SELECT WellEventInfo.WellEvent, RTAHeader.RTPOperator, WellEventStatus.Status, BAInfo.CorpShortName, WellFacilitylink.Facility, FacilityInfo.Name
+    FROM WellEventInfo
+    LEFT OUTER JOIN RTAHeader ON WellEventInfo.WellEvent = RTAHeader.WellEvent
+    LEFT OUTER JOIN WellEventStatus ON WellEventInfo.WellEvent = WellEventStatus.WellEvent
+    LEFT OUTER JOIN BAInfo ON RTAHeader.RTPOperator = BAInfo.BAid
+    LEFT OUTER JOIN WellFacilityLink ON WellEventInfo.WellEvent = WellFacilityLink.WellEvent
+    LEFT OUTER JOIN FacilityInfo ON FacilityInfo.Facility = WellFacilityLink.Facility
+    WHERE (DATE('{proddate}') BETWEEN WellEventInfo.StartDate AND WellEventInfo.EndDate OR WellEventInfo.StartDate IS NULL OR WellEventInfo.StartDate = '')
+    AND (DATE('{proddate}') BETWEEN RTAHeader.StartDate AND RTAHeader.EndDate OR RTAHeader.StartDate IS NULL OR RTAHeader.StartDate = '')
+    AND (DATE('{proddate}') BETWEEN WellEventStatus.StartDate AND WellEventStatus.EndDate OR WellEventStatus.StartDate IS NULL OR WellEventStatus.StartDate = '')
+    AND (DATE('{proddate}') BETWEEN BAInfo.StartDate AND BAInfo.EndDate OR BAInfo.StartDate IS NULL OR BAInfo.StartDate = '')
+    AND (DATE('{proddate}') BETWEEN WellFacilityLink.StartDate AND WellFacilityLink.EndDate OR WellFacilityLink.StartDate IS NULL OR WellFacilityLink.StartDate = '')
+    AND (DATE('{proddate}') BETWEEN FacilityInfo.StartDate AND FacilityInfo.EndDate OR FacilityInfo.StartDate IS NULL OR FacilityInfo.StartDate = '')""".format(proddate=get_proddate())
+
+    temp = """
+    WHERE (WellEventInfo.StartDate <= DATE('{proddate}') AND WellEventInfo.EndDate >= DATE('{proddate}') OR WellEventInfo.StartDate IS NULL)
+    AND (RTAHeader.StartDate <= DATE('{proddate}') AND RTAHeader.EndDate >= DATE('{proddate}') OR RTAHeader.StartDate IS NULL)
+    AND (WellEventStatus.StartDate <= DATE('{proddate}') AND WellEventStatus.EndDate >= DATE('{proddate}') OR WellEventStatus.StartDate IS NULL)
+    AND (BAInfo.StartDate <= DATE('{proddate}') AND BAInfo.EndDate >= DATE('{proddate}') OR BAInfo.StartDate IS NULL)
+    AND (WellFacilityLink.StartDate <= DATE('{proddate}') AND WellFacilityLink.EndDate >= DATE('{proddate}') OR WellFacilityLink.StartDate IS NULL)
+    AND (FacilityInfo.StartDate <= DATE('{proddate}') AND FacilityInfo.EndDate >= DATE('{proddate}') OR FacilityInfo.StartDate IS NULL)""".format(proddate=get_proddate())
+
+    statement_old = """SELECT WellEventInfo.WellEvent, RTAHeader.RTPOperator, WellEventStatus.Status, BAInfo.CorpShortName, WellFacilitylink.Facility, FacilityInfo.Name
 	FROM WellEventInfo, RTAHeader, WellEventStatus, BAInfo, WellFacilitylink, FacilityInfo
 	WHERE DATE('{proddate}') BETWEEN WellEventInfo.StartDate AND WellEventInfo.EndDate
 	AND DATE('{proddate}') BETWEEN RTAHeader.StartDate AND RTAHeader.EndDate
