@@ -23,7 +23,11 @@ var mapboxTiles = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.
 
 var map = L.map('mymap')
     .addLayer(mapboxTiles)
-    .setView([0, 0], 1);
+{% if center %}
+    .setView([{{center[1]}}, {{center[0]}}], 10);
+{% else %}
+    .setView([51.7, -108], 6);
+{% endif %}
 
 var flaskFeature = {{results|safe}}
 
@@ -34,3 +38,5 @@ L.geoJson(flaskFeature, {
 </script>
 
 {% endblock %}
+
+    .setView([0, 0], 1);

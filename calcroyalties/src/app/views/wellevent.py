@@ -1,4 +1,5 @@
 from flask import Blueprint, request, config, redirect, url_for, abort, render_template, flash
+import json, random
 
 import config
 from .permission_handler import PermissionHandler
@@ -10,13 +11,16 @@ wellevent = Blueprint('wellevent', __name__)
 @wellevent.route('/wellevent/search', methods=['GET'])
 def search():
     if not request.args: return render_template('wellevent/search.html')
-    statement = """SELECT WellEventInfo.WellEvent, RTAHeader.RTPOperator, WellEventStatus.Status, BAInfo.CorpShortName, WellFacilitylink.Facility, FacilityInfo.Name
+    statement = """SELECT WellEventInfo.WellEvent, RTAHeader.RTPOperator, WellEventStatus.Status,
+        BAInfo.CorpShortName, WellFacilitylink.Facility, FacilityInfo.Name,
+        WellEventLoc.Lat, WellEventLoc.Long
     FROM WellEventInfo
     LEFT OUTER JOIN RTAHeader ON WellEventInfo.WellEvent = RTAHeader.WellEvent
     LEFT OUTER JOIN WellEventStatus ON WellEventInfo.WellEvent = WellEventStatus.WellEvent
     LEFT OUTER JOIN BAInfo ON RTAHeader.RTPOperator = BAInfo.BAid
     LEFT OUTER JOIN WellFacilityLink ON WellEventInfo.WellEvent = WellFacilityLink.WellEvent
     LEFT OUTER JOIN FacilityInfo ON FacilityInfo.Facility = WellFacilityLink.Facility
+    LEFT OUTER JOIN WellEventLoc ON WellEventInfo.WellEvent = WellEventLoc.WellEvent
     WHERE (DATE('{proddate}') BETWEEN WellEventInfo.StartDate AND WellEventInfo.EndDate OR WellEventInfo.StartDate IS NULL OR WellEventInfo.StartDate = '')
     AND (DATE('{proddate}') BETWEEN RTAHeader.StartDate AND RTAHeader.EndDate OR RTAHeader.StartDate IS NULL OR RTAHeader.StartDate = '')
     AND (DATE('{proddate}') BETWEEN WellEventStatus.StartDate AND WellEventStatus.EndDate OR WellEventStatus.StartDate IS NULL OR WellEventStatus.StartDate = '')
@@ -57,8 +61,40 @@ def search():
             search_arguments += " AND " + compound
 
     results = db.select_sql(statement + search_arguments)
+    d = request.args.to_dict()
+    output = 'browse'
+    print('The Request is:',request.args.to_dict())
+    if 'Output' in d:
+        if d['Output'] == 'map':
+            output = "map"
+        elif d['Output'] == 'excel':
+            output = "excel"
+    print('The output is:',output)
     if results:
-        return render_template('wellevent/search.html', results=results, search_terms=request.args.to_dict())
+        if output == 'map':
+            points = []
+            for result in results:
+                if result.Long:
+                    json_obj = {}
+                    json_obj['type'] = 'Feature'
+                    json_obj['properties'] = {}
+                    json_obj['properties']['name'] = result.WellEvent
+                    json_obj['properties'][
+                        'popupContent'] = '<b>%s</b> <br> Pool Name: %s<br><a href="/wellevent/%s">Details</a>' % (
+                        result.WellEvent, result.RTPOperator, result.WellEvent)
+                    json_obj['geometry'] = {}
+                    json_obj['geometry']['type'] = 'Point'
+                    json_obj['geometry']['coordinates'] = [round(result.Long * -1, 5), round(result.Lat, 5)]
+                    points.append(json_obj)
+            print('***** points: ', json.dumps(points))
+            print('Center is...:',center_point(points))
+            return render_template('map.html', results=json.dumps(points), center=center_point(points))
+
+            # return "A map will show up here one day...."
+        elif output == 'excel':
+            return "Excel will show up here one day..."
+        else:
+            return render_template('wellevent/search.html', results=results, search_terms=request.args.to_dict())
     else:
         flash('No results found.')
         return render_template('wellevent/search.html')
@@ -90,3 +126,22 @@ def details(wellevent_num):
     statement_facilities = """SELECT FacilityInfo.* FROM FacilityInfo, WellFacilitylink WHERE FacilityInfo.Facility=WellFacilitylink.Facility AND WellFacilitylink.WellEvent="%s" """
     facilities = db.select_sql(statement_facilities % wellevent_num)
     return render_template('wellevent/details.html', wellevent=wellevent, leases=leases, facilities=facilities, volumetric=volumetric, well=well)
+
+def center_point(points):
+    x,y  = points[0]['geometry']['coordinates']
+    ux = x
+    lx = x
+    uy = y
+    ly = y
+    # print('---start',x,y)
+    for point in points:
+        x,y = point['geometry']['coordinates']
+        if x > ux : ux = x
+        if x < lx : lx = x
+        if y > uy : uy = y
+        if y < ly : ly = y
+        # print('---',point['geometry']['coordinates'])
+
+    # print('+++', ux, lx)
+    # print('+++', uy, ly)
+    return (lx + ((ux - lx) / 2)), (ly + ((uy - ly) / 2))

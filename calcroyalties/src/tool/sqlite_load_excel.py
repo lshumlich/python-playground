@@ -122,10 +122,7 @@ class Loader(object):
 
 from src.database.database_create import DatabaseCreate
 
-if __name__ == '__main__':
-    #
-    # Note: Set the new database in config.json
-    #
+def load_all_from_scratch():
     db_create = DatabaseCreate()
     db_create.create_all()
 
@@ -139,3 +136,15 @@ if __name__ == '__main__':
     loader.open_excel(worksheet)
     loader.load_all_sheets()
     loader.close()
+
+def load_sheet():
+    worksheet = config.get_temp_dir() + 'NewGIS.xlsx'
+    loader = Loader()
+    loader.open_excel(worksheet)
+    loader.load_all_sheets()
+
+if __name__ == '__main__':
+    #
+    # Note: Set the new database in config.json
+    #
+    load_sheet()

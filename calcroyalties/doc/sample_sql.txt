@@ -12,4 +12,39 @@ select  we.wellevent ,wll.leaseid
 	on we.wellevent = wll.wellevent
 	where wll.leaseid is NULL;
 
+*** Show all WellEventInfo records that do not have a Lease
 
+select we.wellevent,wll.LeaseID
+	from welleventinfo we left outer join WellLeaseLink wll
+	on we.wellevent = wll.wellevent
+	where (we.startdate <= '2015-01-01' and we.enddate >= '2015-01-01')
+	and (wll.startdate <= '2015-01-01' and wll.enddate >= '2015-01-01' or wll.startdate is null)
+	and wll.LeaseID is NULL;
+
+*** Show all WellEventInfo records that do not have an RTPOperator
+
+select we.wellevent,rta.name
+	from welleventinfo we left outer join rtaheader rta
+	on we.wellevent = rta.wellevent
+	where (we.startdate <= '2015-01-01' and we.enddate >= '2015-01-01')
+	and (rta.startdate <= '2015-01-01' and rta.enddate >= '2015-01-01' or rta.startdate is null)
+	and rta.name is NULL;
+
+*** Show all the RTA Header rows that do not have BAInfo (None found in this set of data)
+
+select rta.wellevent,ba.CorpShortName
+	from rtaheader rta left outer join BAInfo ba
+	on rta.RTPOperator = ba.BAid
+	where (rta.startdate <= '2015-01-01' and rta.enddate >= '2015-01-01')
+	and (ba.startdate <= '2015-01-01' and ba.enddate >= '2015-01-01' or ba.startdate is null)
+	and ba.CorpShortName is NULL;
+
+
+
+*** Possible solution missing data when join does not find a match
+
+select *
+    from well left outer join ba
+    on well.ba = ba.baid
+    where (ba.startdate <= '2000-02-01' and ba.enddate >= '2000-02-02' or ba.startdate is null)
+    and wellid = 2

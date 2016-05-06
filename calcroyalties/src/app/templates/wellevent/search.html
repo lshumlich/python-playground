@@ -53,6 +53,11 @@
         <br>
         <br>
         <button type="submit" id='search-advanced'>Search</button>
+          <select name="Output">
+            <option value="browse">Browse</option>
+            <option value="excel">Excel</option>
+            <option value="map">Map</option>
+          </select>
       </form>
   	  </div>
 
@@ -73,6 +78,8 @@
     <th>BAInfo: Operator Short Name</th>
     <th>WellFacilitylink: Facility Number</th>
     <th>FacilityInfo: Facility Name</th>
+    <th>WellEventLoc: Lat</th>
+    <th>WellEventLoc: Long</th>
   </tr>
   {% for row in results %}
   <tr>
@@ -82,6 +89,8 @@
     <td>{{ row.CorpShortName or "" }}</td>
     <td>{{ row.Facility or "" }}</td>
     <td>{{ row.Name or "" }}</td>
+    <td>{{ row.Lat or "" }}</td>
+    <td>{{ row.Long or "" }}</td>
   </tr>
   {% endfor %}
 </table>
