@@ -52,7 +52,7 @@ def search():
 
     db = config.get_database()
     # the following allows us to check incoming arguments against a dictionary of allowed ones and match them with a relevant table name:
-    argument_tables = {'Meridian': 'WellEventInfo', 'WellEvent': 'WellEventInfo'}
+    argument_tables = {'WellEvent': 'WellEventInfo', 'LSD': 'WellEventInfo', 'Section': 'WellEventInfo', 'Township': 'WellEventInfo', 'Meridian': 'WellEventInfo'}
     kwargs = dict((k, v) for k, v in request.args.items() if v)  # this is to get rid of empty values coming from forms
     search_arguments = ""
     for arg in kwargs:
@@ -106,14 +106,18 @@ def handle_redirect():
 @wellevent.route('/wellevent/<wellevent_num>')
 def details(wellevent_num):
     if not wellevent_num: redirect(url_for('wellevent.search'))
-    db = config.get_database()
-    statement = """SELECT WellEventInfo.*, RTAMineralOwnership.Product
-    FROM WellEventInfo, RTAMineralOwnership
-    WHERE DATE('{proddate}') BETWEEN WellEventInfo.StartDate AND WellEventInfo.EndDate
-    AND DATE('{proddate}') BETWEEN RTAMineralOwnership.StartDate AND RTAMineralOwnership.EndDate
-    AND WellEventInfo.WellEvent = RTAMineralOwnership.WellEvent
-    AND WellEventInfo.WellEvent = '{wellevent}'""".format(proddate=get_proddate(), wellevent=wellevent_num)
-    wellevent = db.select_sql(statement)[0]
+    try:
+        db = config.get_database()
+        statement = """SELECT WellEventInfo.*, RTAMineralOwnership.Product
+        FROM WellEventInfo
+        LEFT OUTER JOIN RTAMineralOwnership ON WellEventInfo.WellEvent = RTAMineralOwnership.WellEvent
+        WHERE (DATE('{proddate}') BETWEEN WellEventInfo.StartDate AND WellEventInfo.EndDate OR WellEventInfo.StartDate IS NULL)
+        AND (DATE('{proddate}') BETWEEN RTAMineralOwnership.StartDate AND RTAMineralOwnership.EndDate OR RTAMineralOwnership.StartDate IS NULL)
+        AND WellEventInfo.WellEvent = '{wellevent}'""".format(proddate=get_proddate(), wellevent=wellevent_num)
+        wellevent = db.select_sql(statement)[0]
+    except Exception as e:
+        print(e)
+        abort(404)
 
     statement_volumetric = """SELECT * From VolumetricInfo WHERE FromTo = '{wellevent}' AND DATE(ProdMonth) = DATE('{proddate}')""".format(wellevent=wellevent_num, proddate=get_proddate())
     volumetric = db.select_sql(statement_volumetric)

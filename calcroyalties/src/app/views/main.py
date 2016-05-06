@@ -80,4 +80,6 @@ def get_proddate_int():
 1. Well event view - search field verification
 2. Make flash messages work from JS (i.e. on AJAX request status)
 3. Idea: change all db.select functions to take into account the production date (to avoid setting it manually on every query)
+
+PRWI101010610825W300; 199001
 """
