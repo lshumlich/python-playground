@@ -28,7 +28,7 @@ def search():
 
     db = config.get_database()
     # the following allows us to check incoming arguments against a dictionary of allowed ones and match them with a relevant table name:
-    argument_tables = {'WellEvent': 'WellEventInfo', 'LSD': 'WellEventInfo', 'Section': 'WellEventInfo', 'Township': 'WellEventInfo', 'Meridian': 'WellEventInfo'}
+    argument_tables = {'WellEvent': 'WellEventInfo', 'LSD': 'WellEventInfo', 'Section': 'WellEventInfo', 'Township': 'WellEventInfo', 'Range': 'WellEventInfo', 'Meridian': 'WellEventInfo'}
     kwargs = dict((k, v) for k, v in request.args.items() if v)  # this is to get rid of empty values coming from forms
     search_arguments = ""
     for arg in kwargs:
@@ -55,8 +55,7 @@ def search():
                     json_obj['type'] = 'Feature'
                     json_obj['properties'] = {}
                     json_obj['properties']['name'] = result.WellEvent
-                    json_obj['properties'][
-                        'popupContent'] = '<b>%s</b> <br> Pool Name: %s<br><a href="/wellevent/%s">Details</a>' % (
+                    json_obj['properties']['popupContent'] = '<b>%s</b> <br> Pool Name: %s<br><a href="/wellevent/%s">Details</a>' % (
                         result.WellEvent, result.RTPOperator, result.WellEvent)
                     json_obj['geometry'] = {}
                     json_obj['geometry']['type'] = 'Point'
@@ -73,7 +72,7 @@ def search():
             return render_template('wellevent/search.html', results=results, search_terms=request.args.to_dict())
     else:
         flash('No results found.')
-        return render_template('wellevent/search.html')
+        return render_template('wellevent/search.html', search_terms=request.args.to_dict())
 
 @wellevent.route('/wellevent')
 def handle_redirect():
