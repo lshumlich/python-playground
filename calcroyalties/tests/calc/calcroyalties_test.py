@@ -144,6 +144,37 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, PEFNInterest, MinRoyalty, RoyaltyPric
         pr = ProcessRoyalties()
 """
 
+    def test_process_one(self):
+        pr = ProcessRoyalties()
+        well_id = 6
+        prod_month = 201501
+        product = "Oil"
+        well = DataStructure()
+        well_lease_link_array = DataStructure()
+        self.assertRaises(AppError, pr.process_one, well_id, prod_month, product)
+
+
+    def calc_royalties(self):
+        pr = ProcessRoyalties()
+        well, royalty, lease, calc, monthly, well_lease_link
+        well = DataStructure()
+        royalty = DataStructure()
+        lease = DataStructure()
+        calc = DataStructure()
+        monthly = DataStructure()
+        well_lease_link = DataStructure()
+        monthly.Product = 'Oil'
+        royalty.RoyaltyScheme = 'IOGR1995'
+       # self.assertEqual(pr.calcSaskOilIOGR1995(well.CommencementDate, royalty.ValuationMethod, royalty.CrownMultiplier,
+                                     #well_lease_link.PEFNInterest, monthly, calc)
+
+
+        """How do i do this?? """
+
+        royalty.RoyaltyScheme = 'BadString'
+        self.assertRaises(AppError, well, royalty, lease, calc, monthly, well_lease_link)
+
+
     def test_calcSaskOilProvCrownRoyaltyVolumeValue(self):
         pr = ProcessRoyalties()
         calc = DataStructure()
@@ -167,6 +198,14 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, PEFNInterest, MinRoyalty, RoyaltyPric
         pr.calcSaskOilProvCrownRoyaltyVolumeValue(m, 1, royalty, calc)
         self.assertEqual(calc.ProvCrownRoyaltyVolume, 25.0)
         self.assertEqual(calc.ProvCrownRoyaltyValue, 5584.259150000001)
+
+        calc.ProvCrownRoyaltyRate = -1
+        calc.ProvCrownUsedRoyaltyRate = -1
+        royalty.MinRoyalty = None
+
+        pr.calcSaskOilProvCrownRoyaltyVolumeValue(m, 1, royalty, calc)
+
+        self.assertEqual(calc.ProvCrownUsedRoyaltyRate, 0)
 
         # self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(m, 1, royalty, calc), (20.0, 2000.0))
         # self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(m, 2, royalty, calc), (5, 500.0))

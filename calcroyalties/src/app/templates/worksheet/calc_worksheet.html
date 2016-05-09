@@ -182,9 +182,9 @@ table, th, td {
 	   <TD>{{ m.AmendNo }}</TD>
 	   <TD>{{ m.Product }}</TD>
 	   <TD>{{ '{:.2f}'.format(m.ProdVol) }}</TD>
-	   <TD>{{ '{:.6f}'.format(m.WellHeadPrice) }}</TD>
-	   <TD>{{ '{:.6f}'.format(m.TransRate) }}</TD>
-	   <TD>{{ '{:.6f}'.format(m.ProcessingRate) }}</TD>
+	   <TD>{{ '{:>10,.6f}\n'.format(m.WellHeadPrice) }}</TD>
+	   <TD>{{ '{:>10,.6f}\n'.format(m.TransRate) }}</TD>
+	   <TD>{{ '{:>10,.6f}\n'.format(m.ProcessingRate) }}</TD>
     </TR>
 
 </TABLE>
@@ -310,8 +310,8 @@ table, th, td {
     <br>
     <tr align="center"> <td colspan="7">Valuation Method is ActSales:</tr></tr>
     <tr align="center"><td>RVal =</td> <td>WellHeadPrice</td> <td>+</td> <td>TransRate</td> <td>+</td> <td>ProcessingRate</td></tr>
-    <tr align="center"><td>RVal =</td> <td>{{ '{:.6f}'.format(m.WellHeadPrice) }}</td> <td>+</td> <td>{{ '{:.6f}'.format(m.TransRate) }}</td> <td>+</td> <td>{{ '{:.6f}'.format(m.ProcessingRate) }}</td></tr>
-    <tr align="center"><td>RVal =</td> <td>{{ '{:.6f}'.format(calc.RoyaltyPrice) }}</td></tr>
+    <tr align="center"><td>RVal =</td> <td>{{ '{:>10,.6f}\n'.format(m.WellHeadPrice) }}</td> <td>+</td> <td>{{ '{:>10,.6f}\n'.format(m.TransRate) }}</td> <td>+</td> <td>{{ '{:>10,.6f}\n'.format(m.ProcessingRate) }}</td></tr>
+    <tr align="center"><td>RVal =</td> <td>{{ '{:>10,.6f}\n'.format(calc.RoyaltyPrice) }}</td></tr>
 {% endif %}
 
     <table align="center" width="200">
@@ -323,14 +323,15 @@ table, th, td {
 {% if m.Product == 'Oil' and 'SKProvCrownVar' in rm.RoyaltyScheme %}
 <br>
 <tr align="center"><td>R$ =  </td><td>RVol</td><td> * </td><td>RVal</td></tr>
-<tr align="center"><td>R$ =  </td><td>{{ '{:.2f}'.format(calc.ProvCrownRoyaltyVolume) }}</td><td> * </td><td>{{ '{:.6f}'.format(calc.RoyaltyPrice) }}</td></tr>
-<tr align="center"><td>R$ =  </td><td>{{'{:.2f}'.format(calc.ProvCrownRoyaltyValue)}}</td></tr>
+<tr align="center"><td>R$ =  </td><td>{{ '{:.2f}'.format(calc.ProvCrownRoyaltyVolume) }}</td><td> * </td><td>{{ '{:>10,.6f}\n'.format(calc.RoyaltyPrice) }}</td></tr>
+<tr align="center"><td>R$ =  </td><td>{{ '{:>10,.2f}\n'.format(calc.ProvCrownRoyaltyValue)}}</td></tr>
 {% endif %}
 
 {% if m.Product == 'Oil' and 'IOGR1995' in rm.RoyaltyScheme %}
 <tr align="center"><td>R$</td><td>=</td><td>CrownMult</td> <td>*</td> <td>RVol</td> <td>*</td> <td>PE FN %</td> <td>*</td> <td>RVal</td></tr>
-<tr align="center"><td>R$</td><td>=</td><td>{{ rm.CrownMultiplier }}</td> <td>*</td> <td>{{ '{:.2f}'.format(calc.IOGR1995RoyaltyVolume) }}</td> <td>*</td> <td>{{ '{:.6f}'.format(well_lease_link.PEFNInterest*100) }}%</td> <td>*</td><td>{{ '{:.6f}'.format(calc.RoyaltyPrice) }}</td></tr>
-<tr align="center"><td>R$</td><td>=</td><td>{{ '{:.2f}'.format(calc.IOGR1995RoyaltyValue) }}</td></tr>
+<tr align="center"><td>R$</td><td>=</td><td>{{ rm.CrownMultiplier }}</td> <td>*</td> <td>{{ '{:.2f}'.format(calc.IOGR1995RoyaltyVolume) }}</td>
+    <td>*</td> <td>{{ '{:.6f}'.format(well_lease_link.PEFNInterest*100) }}%</td> <td>*</td><td>{{ '{:>10,.6f}\n'.format(calc.RoyaltyPrice) }}</td></tr>
+<tr align="center"><td>R$</td><td>=</td><td>{{ '{:>10,.2f}\n'.format(calc.IOGR1995RoyaltyValue) }}</td></tr>
 
 
     <br>
@@ -355,8 +356,8 @@ table, th, td {
 <br>
 <tr align="center"><td>S$</td> <td>=</td> <td>(T</td> <td>-</td> <td>B)</td> <td>*</td> <td>0.50</td> <td>*</td> <td>(P</td> <td>-</td> <td>R)</td></tr>
 <tr align="center"><td>S$</td> <td>=</td> <td>({{ '{:.2f}'.format(m.ProdVol) }}</td> <td>-</td> <td>{{ '{:.2f}'.format(calc.RoyaltyRegulation) }})</td> <td>*</td>
-<td>0.50</td> <td>*</td> <td>({{ '{:.6f}'.format(m.WellHeadPrice) }}</td> <td>-</td> <td> 25.00)</td></tr>
-<tr align="center"><td>S$</td> <td>=</td> <td>{{ '{:.2f}'.format(calc.SupplementaryRoyalties) }}</td></tr>
+<td>0.50</td> <td>*</td> <td>({{ '{:>10,.6f}\n'.format(m.WellHeadPrice) }}</td> <td>-</td> <td> 25.00)</td></tr>
+<tr align="center"><td>S$</td> <td>=</td> <td>{{ '{:>10,.2f}\n'.format(calc.SupplementaryRoyalties) }}</td></tr>
 </table>
 {% endif %}
 {% endif %}
@@ -396,20 +397,20 @@ table, th, td {
 	<col width="7%">
 
 {% if calc.RoyaltyValuePreDeductions != calc.RoyaltyValue %}
-<tr><td align="left" colspan="2">Royalty Pre Deductions:</td> <td colspan="6" align="right">${{ '{:.2f}'.format(calc.RoyaltyValuePreDeductions) }}</td></tr>
+<tr><td align="left" colspan="2">Royalty Pre Deductions:</td> <td colspan="6" align="right">${{ '{:>10,.2f}\n'.format(calc.RoyaltyValuePreDeductions) }}</td></tr>
 {% endif %}
 {% if calc.RoyaltyTransportation > 0 %}
-<tr align="center"><td colspan="2">Less Transportation:</td> <td>{{'{:.2f}'.format(calc.RoyaltyVolume) }}</td> <td>*</td> <td>{{ '{:.6f}'.format(m.TransRate) }}</td> <td>=</td> <td>${{ '{:.2f}'.format(calc.RoyaltyTransportation) }}</td></tr>
+<tr align="center"><td colspan="2">Less Transportation:</td> <td>{{'{:.2f}'.format(calc.RoyaltyVolume) }}</td> <td>*</td> <td>{{ '{:>10,.6f}\n'.format(m.TransRate) }}</td> <td>=</td> <td>${{ '{:>10,.2f}\n'.format(calc.RoyaltyTransportation) }}</td></tr>
 {% endif %}
 {% if calc.RoyaltyProcessing > 0 %}
-<tr align="Center"><td colspan="2">Less Processing:</td> <td>{{ '{:.2f}'.format(calc.RoyaltyVolume) }}</td> <td>*</td> <td>{{ '{:.6f}'.format(m.ProcessingRate) }}</td> <td>=</td> <td>${{ '{:.2f}'.format(calc.RoyaltyProcessing) }}</td></tr>
+<tr align="Center"><td colspan="2">Less Processing:</td> <td>{{ '{:.2f}'.format(calc.RoyaltyVolume) }}</td> <td>*</td> <td>{{ '{:>10,.6f}\n'.format(m.ProcessingRate) }}</td> <td>=</td> <td>${{ '{:>10,.2f}\n'.format(calc.RoyaltyProcessing) }}</td></tr>
 {% endif %}
 {% if calc.RoyaltyDeductions > 0 %}
-<tr align="Center"><td colspan="2">Total Deductions:</td><td> &nbsp; </td> <td> &nbsp; </td> <td> &nbsp; </td> <td> &nbsp; </td> <td align="center">${{ '{:.2f}'.format(calc.RoyaltyDeductions) }}</td></tr>
+<tr align="Center"><td colspan="2">Total Deductions:</td><td> &nbsp; </td> <td> &nbsp; </td> <td> &nbsp; </td> <td> &nbsp; </td> <td align="center">${{ '{:>10,.2f}\n'.format(calc.RoyaltyDeductions) }}</td></tr>
 {% endif %}
 <br>
 <tr align="left"><td colspan="8"> {*** Note: Handle Incentives} </td></tr>
-<tr><td align="left" colspan="2"> Royalty Amount:</td><td colspan="6" align="right">${{ '{:.2f}'.format(calc.RoyaltyValue) }}</td></tr>
+<tr><td align="left" colspan="2"> Royalty Amount:</td><td colspan="6" align="right">${{ '{:>10,.2f}\n'.format(calc.RoyaltyValue) }}</td></tr>
 <tr align="left"><td colspan="8"> {*** Note: Handle Previous Paid Amount?} </td></tr>
 </table>
 

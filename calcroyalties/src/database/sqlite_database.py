@@ -32,7 +32,7 @@ class Database(object):
 #             return result
 
     def get_data_structure(self, table_name):
-        """ This method must be called to create a valid database data structure. """ 
+        """ This method must be called to create a valid database data structure. """
         ds = DataStructure()
         ds._table_name = table_name
         return ds
