@@ -28,7 +28,7 @@ def search():
 
     db = config.get_database()
     # the following allows us to check incoming arguments against a dictionary of allowed ones and match them with a relevant table name:
-    argument_tables = {'WellEvent': 'WellEventInfo', 'LSD': 'WellEventInfo', 'Section': 'WellEventInfo', 'Township': 'WellEventInfo', 'Range': 'WellEventInfo', 'Meridian': 'WellEventInfo'}
+    argument_tables = {'WellEvent': 'WellEventInfo', 'Licencee': 'WellLicence', 'LSD': 'WellEventInfo', 'Section': 'WellEventInfo', 'Township': 'WellEventInfo', 'Range': 'WellEventInfo', 'Meridian': 'WellEventInfo'}
     kwargs = dict((k, v) for k, v in request.args.items() if v)  # this is to get rid of empty values coming from forms
     search_arguments = ""
     for arg in kwargs:
@@ -74,7 +74,7 @@ def search():
             writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
             writer.writerow([i[0] for i in db.dbi.cursor.description])
             writer.writerows(db.dbi.cursor)
-            return Response(output.getvalue(), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=myplot.csv"})
+            return Response(output.getvalue(), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=WellEvent_export.csv"})
 
         else:
             return render_template('wellevent/search.html', results=results, search_terms=request.args.to_dict())
@@ -95,7 +95,7 @@ def details(wellevent_num):
         FROM WellEventInfo
         LEFT OUTER JOIN RTAMineralOwnership ON WellEventInfo.WellEvent = RTAMineralOwnership.WellEvent
         AND (DATE('{proddate}') BETWEEN RTAMineralOwnership.StartDate AND RTAMineralOwnership.EndDate)
-        WHERE (DATE('1990-01-01') BETWEEN WellEventInfo.StartDate AND WellEventInfo.EndDate)
+        WHERE (DATE('{proddate}') BETWEEN WellEventInfo.StartDate AND WellEventInfo.EndDate)
         AND WellEventInfo.WellEvent = '{wellevent}'""".format(proddate=get_proddate(), wellevent=wellevent_num)
         wellevent = db.select_sql(statement)[0]
     except Exception as e:
