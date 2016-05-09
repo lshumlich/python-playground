@@ -1,5 +1,4 @@
 '''
-
 variables in monthly:
 ID (add 1 to previous)
 ExtractMonth	(where is this from?)
@@ -22,16 +21,23 @@ db = config.get_database()
 volumetric = db.select('VolumetricInfo', Activity='PROD', Amendment=0)
 wells = db.select('Well')
 counter = 0
+not_found = 0
 well_counter = 0
 for a in volumetric:
     counter += 1
     ds = db.get_data_structure('Monthly')
     oldprod = a.ProdMonth.isoformat()[0:7]
     ds.ProdMonth = oldprod.replace('-', '')
+    ds.WellID = None
     for well in wells:
         if well.WellEvent == a.FromTo:
             ds.WellID = well.ID
             well_counter += 1
+            break
+
+    if not ds.WellID:
+        not_found +=1
+
     if a.Hours == 'NULL':
         ds.ProdHours = None
     else:
@@ -41,6 +47,8 @@ for a in volumetric:
     ds.AmendNo = a.Amendment
     ds.ProdVol = a.Volume
 
-    db.insert(ds)
+    # db.insert(ds)
+    print(ds)
 
 print('Complete. %i records inserted' % counter)
+print ('found ', well_counter , ', Not found ' , not_found)
