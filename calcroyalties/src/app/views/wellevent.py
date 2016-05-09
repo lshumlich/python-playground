@@ -1,5 +1,5 @@
-from flask import Blueprint, request, config, redirect, url_for, abort, render_template, flash
-import json, random
+from flask import Blueprint, request, config, redirect, url_for, abort, render_template, flash, Response
+import json, io, csv
 
 import config
 from .permission_handler import PermissionHandler
@@ -65,9 +65,17 @@ def search():
             print('Center is...:',center_point(points))
             return render_template('map.html', results=json.dumps(points), center=center_point(points))
 
-            # return "A map will show up here one day...."
         elif output == 'excel':
-            return "Excel will show up here one day..."
+            """ Export relies on python's csv module to generate csv, StringIO writer to simulate a file for csv,
+                as we don't need to save it on hard drive, and dbi.execute and cursor to get raw results of a query
+                as that's what we need for csv to work properly"""
+            db.dbi.execute(statement + search_arguments)
+            output = io.StringIO()
+            writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
+            writer.writerow([i[0] for i in db.dbi.cursor.description])
+            writer.writerows(db.dbi.cursor)
+            return Response(output.getvalue(), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=myplot.csv"})
+
         else:
             return render_template('wellevent/search.html', results=results, search_terms=request.args.to_dict())
     else:
