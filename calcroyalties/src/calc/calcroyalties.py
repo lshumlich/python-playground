@@ -106,6 +106,10 @@ class ProcessRoyalties(object):
             calc.RoyaltyValuePreDeductions = calc.IOGR1995RoyaltyValue + calc.SupplementaryRoyalties
             calc.RoyaltyValue = calc.RoyaltyValuePreDeductions
 
+       elif monthly.Product == 'Gas' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
+            return 0
+
+
         else:
             raise AppError("No calculation for" + str(well.ID) + str(monthly.ProdMonth) + str(monthly.Product) + str(royalty.RoyaltyScheme))
 
@@ -156,6 +160,65 @@ class ProcessRoyalties(object):
 # #         log.close()
 # #
 # #         del self.ws
+
+    def calcSaskGasProvCrownRoyaltyRate(self,calc,econ_gas_data,
+                well_royalty_classification,well_classification,mgp,src,well_type):
+
+        if well_royalty_classification == 'Fourth Tier Gas'
+            if well_type == 'GasWells':
+                if mgp <= 25:
+                    calc.ProvCrownRoyaltyRate = 0
+                    calc.Message = 'MOP < 25 - RR = 0.'
+                elif mgp <= 115.4:
+                    calc.C = econ_gas_data.G4T_C
+                    calc.D = econ_gas_data.G4T_D
+                    calc.ProvCrownRoyaltyRate =
+                else:
+                    calc.K = econ_gas_data.G4T_K
+                    calc.X = econ_gas_data.G4T_X
+
+            elif well_type == 'OilWells':
+                if mgp <= 64.7:
+                    calc.ProvCrownRoyaltyRate = 0
+                    calc.Message = 'MOP < 64.7 - RR = 0.'
+                else:
+                    calc.K = econ_gas_data.G4T_K
+                    calc.X = econ_gas_data.G4T_X
+
+            else:
+                raise AppError('Well Type: ' + well_type + ' not known for ' + well_royalty_classification + ' Royalty not calculated.')
+                calc.ProvCrownRoyaltyRate = (calc.C * mop) - calc.D
+
+
+        elif well_royalty_classification == 'Third Tier Gas':
+            if mgp < 115.4:
+                calc.C = econ_gas_data.G3T_C
+                #SRC ?? - ProdDate
+            else:
+                calc.K = econ_gas_data.G3T_K
+                calc.X = econ_gas_data.G3T_X
+                #SRC ?? - ProdDate
+
+        elif well_royalty_classification == 'New Gas':
+            if mgp < 115.4:
+                calc.C = econ_gas_data.GNEW_C
+                #SRC ?? - ProdDate
+            else:
+                calc.K = econ_gas_data.GNEW_K
+                calc.X = econ_gas_data.GNEW_X
+                #SRC ?? - ProdDate
+
+        elif well_royalty_classification == 'Old Gas':
+            if mgp < 115.4:
+                calc.C = econ_gas_data.GOLD_C
+                #SRC ?? - ProdDate
+            else:
+                calc.K = econ_gas_data.GOLD_K
+                calc.X = econ_gas_data.GOLD_X
+                #SRC ?? - ProdDate
+        else:
+            raise AppError('Royalty Classification: ' + well_royalty_classification + ' not known for ' + well_type + ' Royalty not calculated.')
+                calc.ProvCrownRoyaltyRate = (calc.C * mgp) - calc.D
 
     def calcSaskOilProvCrownRoyaltyRate(self,calc,econ_oil_data,
                 well_royalty_classification,well_classification,mop,src):
@@ -422,10 +485,14 @@ class ProcessRoyalties(object):
         self.calcSaskOilProvCrownRoyaltyRate(calc,econ_oil_data, well.RoyaltyClassification,
                                              well.Classification, monthly.ProdVol, well.SRC)
 
+    def calcSaskGasProvCrown(self, monthly, well, royalty, lease, calc, well_lease_link):
+        calc.CommencementPeriod = self.determineCommencementPeriod(monthly.ProdMonth, well.CommencementDate)
+        econ_oil_data = self.db.select1("ECONData",ProdMonth = monthly.ProdMonth)
+        #We need econ oil data
         # Note: If there is no sales. Use last months sales value... Not included in this code
         calc.RoyaltyPrice = self.determineRoyaltyPrice(royalty.ValuationMethod, monthly)
 
-        self.calcSaskOilProvCrownRoyaltyVolumeValue(monthly, well_lease_link.PEFNInterest, royalty, calc)
+        self.calcSaskGasProvCrownRoyaltyVolumeValue(monthly, well_lease_link.PEFNInterest, royalty, calc)
 
     '''
     Royalty Calculation

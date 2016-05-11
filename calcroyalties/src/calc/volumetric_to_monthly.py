@@ -15,6 +15,7 @@ ProcessingRate: (need)
 '''
 
 import config
+from src.util.apperror import AppError
 from src.database.data_structure import DataStructure
 
 db = config.get_database()
@@ -26,31 +27,35 @@ updated_counter = 0
 inserted_counter = 0
 
 for a in volumetric:
-    ds = db.get_data_structure('Monthly')
-    oldprod = a.ProdMonth.isoformat()[0:7]
-    ds.ProdMonth = oldprod.replace('-', '')
-    ds.WellID = a.ID
+    old_prod = a.ProdMonth.isoformat()[0:7]
+    new_prod = old_prod.replace('-', '')
 
-    if a.Hours == 'NULL':
-        ds.ProdHours = None
-    else:
-        ds.ProdHours = a.Hours
-
-    ds.Product = a.Product
-    ds.AmendNo = a.Amendment
-    ds.ProdVol = a.Volume
-
-    try:
-        existing = db.select1('Monthly', AmendNo=0, Product=ds.Product, WellId=ds.WellID, ProdMonth=ds.ProdMonth)
+    existing = db.select('Monthly', AmendNo=0, Product=a.Product, WellId=a.ID, ProdMonth=new_prod)
+    if len(existing) == 1:
         print('Already in the table: ', existing)
-        existing.ProdHours = a.Hours
-        existing.ProdVol = a.Volume
-        db.update(existing)
+        existing[0].ProdHours = a.Hours
+        existing[0].ProdVol = a.Volume
+        db.update(existing[0])
         updated_counter += 1
-    except Exception as e:
+    elif len(existing) == 0:
+        ds = db.get_data_structure('Monthly')
+        ds.ProdMonth = new_prod
+        ds.WellID = a.ID
+
+        if a.Hours == 'NULL':
+            ds.ProdHours = None
+        else:
+            ds.ProdHours = a.Hours
+
+        ds.Product = a.Product
+        ds.AmendNo = a.Amendment
+        ds.ProdVol = a.Volume
         print(e)
         print('Inserting ', ds.WellID)
         db.insert(ds)
         inserted_counter += 1
+
+    else:
+        raise AppError(len(existing), " records found in table Monthly for ", a)
 
 print('Complete. %i records inserted, %i records updated' % (inserted_counter, updated_counter))
