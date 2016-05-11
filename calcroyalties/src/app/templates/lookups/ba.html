@@ -1,0 +1,73 @@
+<script>
+  $(function() {
+    $('#lookup-accordion').accordion({
+      collapsible:true,
+      heightStyle:'content',
+    });
+
+    $('#search').button({
+      icons: {primary: 'ui-icon-search'}
+    });
+  });
+</script>
+
+<div id="dialog">
+<div id="lookup-accordion">
+<h3>Search parameters</h3>
+  <form id="lookup-form" action="/wellevent/search" method="get">
+    <table>
+      <tr>
+        <td>
+          <b>Name:</b>
+          <br>
+          <input name="CorpLegalName"/>
+        </td>
+        <td>
+          <b>Type:</b>
+          <br>
+          <!--<input name="BAType" />-->
+          <select name="BAType">
+            <option value="COMPANY">Company</option>
+            <option value="INDIVIDUAL">Individual</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <b>ID:</b>
+          <br>
+          <input name="BAid" />
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <button type="submit" id="lookup-search">Search</button>
+        </td>
+      </tr>
+    </table>
+   </form>
+</div>
+</div>
+<br>
+<div id="lookup-results">
+
+</div>
+<script>
+  $('#lookup-search').click(function() {
+    event.preventDefault();
+    $.ajax({
+      type: "GET",
+      url: "/lookup/ba_results",
+      dataType: "html",
+      data: $('#lookup-form').serialize()
+    })
+    .done(function (msg){
+        if (msg) {
+          $('#lookup-results').html(msg);
+          $("#lookup-accordion").accordion("option", "active", false)
+        } else {
+          $('#lookup-results').html('<span style="color:red">No results found</span>');
+        }
+    });
+  });
+</script>
