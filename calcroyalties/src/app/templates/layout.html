@@ -80,17 +80,11 @@ form = proddateModal.find( "form" ).on( "submit", function( event ) {
 updateProddateText();
 
 // stupid workaround: we can't access the 'session' cookie from JS, so we have to check if it's set on the server
-{#
 {% if session['login'] %}
 if (!proddateCookie){
     proddateModal.dialog("open");
 }
 {% endif %}
-#}
-
-if (!proddateCookie){
-    proddateModal.dialog("open");
-}
 
 });
 </script>
@@ -108,14 +102,14 @@ if (!proddateCookie){
 {% endwith %}
 
 <div class="header" style="width:100%; height:60px; float:left; margin-top:8px">
-  <div class="header_left" style="width:25%; float:left">
+  <div class="header_left" style="width:23%; float:left; padding-left:1%; padding-right:1%; padding-top:5px">
     <a href="/"><img src="{{url_for("static", filename="img/logo.png")}}" style="height:40px"></a>
   </div>
   <div class="header_center" style="width:50%; text-align:center; float:left">
     <div style="font-size:2em; font-weight:bold">The Solution Stack</div>
     <div style="font-size:1.5em">Information Management System</div>
   </div>
-  <div class="header_right" style="width:25%; float:right; text-align:right">
+  <div class="header_right" style="width:23%; float:right; text-align:right; padding-left:1%; padding-right:1%">
   {% if session['login'] %}
     Welcome {{ session['name'] }} <!-- , you can access: {{ session['permissions'] }} -->
     <br>
@@ -185,14 +179,14 @@ if (!proddateCookie){
                     <div class="col_4">
                         <a href="http://www.economy.gov.sk.ca/factor-circulars">
                             <h4>Oil Formulas</h4>
-                            <img src="http://www.albertaefp.com/images/logo-gov-saskatchewan.png" width="220" height="140" alt="" class="inline_img" />
+                            <!--<img src="http://www.albertaefp.com/images/logo-gov-saskatchewan.png" width="220" height="140" alt="" class="inline_img" />-->
                             <p>Crude oil royalty/tax formulas</p>
                         </a>
                     </div>
                     <div class="col_4">
                         <a href="http://www.economy.gov.sk.ca/oil-factors">
                             <h4>Oil Factors</h4>
-                            <img src="http://www.albertaefp.com/images/logo-gov-saskatchewan.png" width="220" height="140" alt="" class="inline_img" />
+                            <!--<img src="http://www.albertaefp.com/images/logo-gov-saskatchewan.png" width="220" height="140" alt="" class="inline_img" />-->
                             <p>Monthly Crude Oil Royalty/Tax Factor History</p>
                         </a>
 

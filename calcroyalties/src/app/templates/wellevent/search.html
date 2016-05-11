@@ -1,19 +1,48 @@
 {% extends "layout.html" %}
 {% block body %}
 <script>
-  $(function() {
-  	$('#tabs').tabs();
-    $('#accordion').accordion({
-      collapsible:true,
-      heightStyle:'content',
-    });
-    $('#search-basic, #search-advanced').button({
-      icons: {primary: 'ui-icon-search'}
-    });
+function setValue(){
+  value = $('#lookupResults').val();
+  $('#Licencee').val(value);
+}
+
+$(function() {
+  $('#tabs').tabs();
+
+  $('#accordion').accordion({
+    collapsible:true,
+    heightStyle:'content',
   });
+
+  $('#search-basic, #search-advanced').button({
+    icons: {primary: 'ui-icon-search'}
+  });
+
+  var lookupDialog = $('#lookupDialog')
+  .load('/lookup/ba')
+  .dialog({
+      autoOpen: false,
+      modal: true,
+      title: 'Business associate lookup',
+      width: 600,
+      height: 400,
+      buttons:{
+        Cancel: function() {$('#Licensee').val(""); lookupDialog.dialog('close')},
+        "Save": function() {setValue(); lookupDialog.dialog('close');  }
+      },
+  });
+
+});
+
+function lookupBA(){
+  $('#lookupDialog').dialog('open');
+  return false
+}
 </script>
 
 <h2>Well Event Search</h2>
+
+<div id="lookupDialog"></div>
 
 <div id="accordion">
   <h3>Search Criteria</h3>
@@ -28,7 +57,12 @@
       <form name="search-basic" action="/wellevent/search" method="get">
   	    <b>Well Event:</b>
         <br>
-        <input id='WellEvent' name="WellEvent" value="{% if search_terms %}{{ search_terms['WellEvent'] }}{% endif%}" />
+        <input id='WellEvent' name="WellEvent" value="{% if search_terms %}{{ search_terms['WellEvent'] }}{% endif %}" />
+        <br>
+        <br>
+        <b>Licensee:</b>
+        <br>
+        <input id='Licencee' name="Licensee" value="{% if search_terms %}{{ search_terms['Licensee'] }}{% endif %}" /><input type="button" onclick="lookupBA()" value="..."/>
         <br>
         <br>
         <b>Location:</b>
@@ -117,10 +151,10 @@
 </table>
 </div>
 <script>
+// collapses the accordion if there are search results
 $(function(){
   $("#accordion").accordion("option", "active", false);
-}
-)
+})
 </script>
 {% endif %}
 

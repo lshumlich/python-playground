@@ -24,11 +24,15 @@ def search():
     LEFT OUTER JOIN FacilityInfo ON FacilityInfo.Facility = WellFacilityLink.Facility
     AND (DATE('{proddate}') BETWEEN FacilityInfo.StartDate AND FacilityInfo.EndDate OR FacilityInfo.StartDate IS NULL OR FacilityInfo.StartDate = '')
     LEFT OUTER JOIN WellEventLoc ON WellEventInfo.WellEvent = WellEventLoc.WellEvent
+    LEFT OUTER JOIN WellInfo ON WellEventInfo.Well = WellInfo.Well
+    AND (DATE('{proddate}') BETWEEN WellInfo.StartDate AND WellInfo.EndDate OR WellInfo.StartDate IS NULL OR WellInfo.StartDate = '')
+    LEFT OUTER JOIN WellLicence ON WellLicence.WellLicence = WellInfo.WellLicence
+    AND (DATE('{proddate}') BETWEEN WellLicence.StartDate AND WellLicence.EndDate OR WellLicence.StartDate IS NULL OR WellLicence.StartDate = '')
     WHERE (DATE('{proddate}') BETWEEN WellEventInfo.StartDate AND WellEventInfo.EndDate OR WellEventInfo.StartDate IS NULL OR WellEventInfo.StartDate = '')""".format(proddate=get_proddate())
 
     db = config.get_database()
     # the following allows us to check incoming arguments against a dictionary of allowed ones and match them with a relevant table name:
-    argument_tables = {'WellEvent': 'WellEventInfo', 'Licencee': 'WellLicence', 'LSD': 'WellEventInfo', 'Section': 'WellEventInfo', 'Township': 'WellEventInfo', 'Range': 'WellEventInfo', 'Meridian': 'WellEventInfo'}
+    argument_tables = {'WellEvent': 'WellEventInfo', 'Licensee': 'WellLicence', 'LSD': 'WellEventInfo', 'Section': 'WellEventInfo', 'Township': 'WellEventInfo', 'Range': 'WellEventInfo', 'Meridian': 'WellEventInfo'}
     kwargs = dict((k, v) for k, v in request.args.items() if v)  # this is to get rid of empty values coming from forms
     search_arguments = ""
     for arg in kwargs:

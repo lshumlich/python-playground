@@ -12,6 +12,7 @@ from src.app.views.lease import lease
 from src.app.views.well import well
 from src.app.views.facility import facility
 from src.app.views.worksheet import worksheet
+from src.app.views.lookups import lookup
 
 app.register_blueprint(main)
 app.register_blueprint(wellevent)
@@ -20,3 +21,4 @@ app.register_blueprint(lease)
 app.register_blueprint(well)
 app.register_blueprint(facility)
 app.register_blueprint(worksheet)
+app.register_blueprint(lookup)
