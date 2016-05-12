@@ -1,20 +1,37 @@
 <script>
-  $(function() {
-    $('#lookup-accordion').accordion({
-      collapsible:true,
-      heightStyle:'content',
-    });
+$(function() {
+  $('#ba-lookup-accordion').accordion({
+    collapsible:true,
+    heightStyle:'content',
+  });
 
-    $('#search').button({
-      icons: {primary: 'ui-icon-search'}
+  $('#lookup-search')
+  .button({
+    icons: {primary: 'ui-icon-search'}
+  })
+  .click(function() {
+    event.preventDefault();
+    $.ajax({
+      type: "GET",
+      url: "/lookup/ba_results",
+      dataType: "html",
+      data: $('#ba-lookup-form').serialize()
+    })
+    .done(function (msg){
+        if (msg) {
+          $('#ba-lookup-results').html(msg);
+          $("#ba-lookup-accordion").accordion("option", "active", false)
+        } else {
+          $('#ba-lookup-results').html('<span style="color:red">No results found</span>');
+        }
     });
   });
+});
 </script>
-
-<div id="dialog">
-<div id="lookup-accordion">
+<div id="ba-lookup-modal">
+<div id="ba-lookup-accordion">
 <h3>Search parameters</h3>
-  <form id="lookup-form" action="/wellevent/search" method="get">
+  <form id="ba-lookup-form" action="/wellevent/search" method="get">
     <table>
       <tr>
         <td>
@@ -47,27 +64,9 @@
     </table>
    </form>
 </div>
-</div>
-<br>
-<div id="lookup-results">
 
+<br>
+
+<div id="ba-lookup-results">
 </div>
-<script>
-  $('#lookup-search').click(function() {
-    event.preventDefault();
-    $.ajax({
-      type: "GET",
-      url: "/lookup/ba_results",
-      dataType: "html",
-      data: $('#lookup-form').serialize()
-    })
-    .done(function (msg){
-        if (msg) {
-          $('#lookup-results').html(msg);
-          $("#lookup-accordion").accordion("option", "active", false)
-        } else {
-          $('#lookup-results').html('<span style="color:red">No results found</span>');
-        }
-    });
-  });
-</script>
+</div>

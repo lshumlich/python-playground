@@ -1,53 +1,77 @@
 {% extends "layout.html" %}
 {% block body %}
 <script>
-function setValue(){
-  value = $('#lookupResults').val();
-  $('#Licencee').val(value);
-}
+<!--var licenseeLookupDialog = $('#licensee-lookup-dialog')-->
+<!--var operatorlookupDialog = $('#operator-lookup-dialog')-->
 
-$(function() {
-  $('#tabs').tabs();
-
-  $('#accordion').accordion({
-    collapsible:true,
-    heightStyle:'content',
-  });
-
-  $('#search-basic, #search-advanced').button({
-    icons: {primary: 'ui-icon-search'}
-  });
-
-  var lookupDialog = $('#lookupDialog')
+function showLicenseeLookupDialog() {
+  var licenseeLookupDialog = $('#licensee-lookup-dialog')
   .load('/lookup/ba')
   .dialog({
-      autoOpen: false,
-      modal: true,
+      autoOpen: true,
+      modal: false,
       title: 'Business associate lookup',
       width: 600,
       height: 400,
       buttons:{
-        Cancel: function() {$('#Licensee').val(""); lookupDialog.dialog('close')},
-        "Save": function() {setValue(); lookupDialog.dialog('close');  }
+        Cancel: function() {$(licenseeLookupDialog.dialog('close')); $('#ba-lookup-modal').remove()},
+        "Save": function() {$('#Licensee').val($('#ba-lookup-results-select').val()); licenseeLookupDialog.dialog('close'); $('#ba-lookup-modal').remove()}
       },
   });
+  licenseeLookupDialog.dialog('open');
+}
+
+function showOperatorLookupDialog() {
+  var operatorlookupDialog = $('#operator-lookup-dialog')
+  .load('/lookup/ba')
+  .dialog({
+      autoOpen: true,
+      modal: false,
+      title: 'RTP Operator lookup',
+      width: 600,
+      height: 400,
+      buttons:{
+        Cancel: function() {$(operatorlookupDialog.dialog('close')); $('#ba-lookup-modal').remove()},
+        "Save": function() {$('#RTPOperator').val($('#ba-lookup-results-select').val()); operatorlookupDialog.dialog('close'); $('#ba-lookup-modal').remove()}
+      },
+  });
+}
+
+$(function() {
+  $('#search-tabs').tabs();
+
+  $('#search-accordion').accordion({
+    collapsible:true,
+    heightStyle:'content',
+  });
+
+  $('#search-basic-button, #search-advanced-button').button({
+    icons: {primary: 'ui-icon-search'}
+  });
+
+  $('#licensee-lookup-button')
+  .click(function() {
+    showLicenseeLookupDialog();
+  })
+
+  $('#operator-lookup-button')
+  .click(function() {
+    showOperatorLookupDialog();
+  })
 
 });
 
-function lookupBA(){
-  $('#lookupDialog').dialog('open');
-  return false
-}
 </script>
 
 <h2>Well Event Search</h2>
 
-<div id="lookupDialog"></div>
+<div id="licensee-lookup-dialog" class="ba-lookup-dialog"></div>
+<div id="operator-lookup-dialog" class="ba-lookup-dialog"></div>
 
-<div id="accordion">
+<div id="search-accordion">
   <h3>Search Criteria</h3>
   <div>
-  	<div id="tabs">
+  	<div id="search-tabs">
   	  <ul>
   	    <li><a href="#tabs-basic">Basic search</a></li>
   	    <li><a href="#tabs-advanced">Advanced search</a></li>
@@ -62,7 +86,11 @@ function lookupBA(){
         <br>
         <b>Licensee:</b>
         <br>
-        <input id='Licencee' name="Licensee" value="{% if search_terms %}{{ search_terms['Licensee'] }}{% endif %}" /><input type="button" onclick="lookupBA()" value="..."/>
+        <input id='Licensee' name="Licensee" value="{% if search_terms %}{{ search_terms['Licensee'] }}{% endif %}" /><input type="button" id="licensee-lookup-button" value="..."/>        <br>
+        <br>
+        <b>RTP Operator:</b>
+        <br>
+        <input id='RTPOperator' name="RTPOperator" value="{% if search_terms %}{{ search_terms['RTPOperator'] }}{% endif %}" /><input type="button" id="operator-lookup-button" value="..."/>
         <br>
         <br>
         <b>Location:</b>
@@ -86,14 +114,14 @@ function lookupBA(){
         </table>
         <br>
         <br>
-        <button type="submit" id='search-basic'>Search</button>
-          <select name="Output">
-            <option value="browse">Browse</option>
-            <option value="excel">Excel</option>
-            <option value="map">Map</option>
-          </select>
-       </form>
-  	  </div>
+        <select name="Output">
+          <option value="browse">List</option>
+          <option value="map">Map</option>
+          <option value="excel">CSV</option>
+        </select>
+        <button type="submit" id="search-basic-button">Search</button>
+      </form>
+      </div>
 
   	  <div id="tabs-advanced">
       <form name="search-advanced">
@@ -107,12 +135,12 @@ function lookupBA(){
         <input id='well-search-type' name="WellType" />
         <br>
         <br>
-        <button type="submit" id='search-advanced'>Search</button>
-          <select name="Output">
-            <option value="browse">Browse</option>
-            <option value="excel">Excel</option>
-            <option value="map">Map</option>
-          </select>
+        <select name="Output">
+          <option value="browse">List</option>
+          <option value="map">Map</option>
+          <option value="excel">CSV</option>
+        </select>
+        <button type="submit" id='search-advanced-button'>Search</button>
       </form>
   	  </div>
 
@@ -129,6 +157,7 @@ function lookupBA(){
   <tr>
     <th>WellEventInfo: Well Event</th>
     <th>WellEventStatus: Status</th>
+    <th>WellLicence: Licensee</th>
     <th>RTAHeader: RTPOperator</th>
     <th>BAInfo: Operator Short Name</th>
     <th>WellFacilitylink: Facility Number</th>
@@ -140,6 +169,7 @@ function lookupBA(){
   <tr>
     <td><a href="{{ url_for('wellevent.details', wellevent_num = row.WellEvent) }}">{{ row.WellEvent or "" }}</a></td>
     <td>{{ row.Status or "" }}</td>
+    <td>{{ row.Licensee or "" }}</td>
     <td>{{ row.RTPOperator or "" }}</td>
     <td>{{ row.CorpShortName or "" }}</td>
     <td>{{ row.Facility or "" }}</td>
@@ -153,7 +183,7 @@ function lookupBA(){
 <script>
 // collapses the accordion if there are search results
 $(function(){
-  $("#accordion").accordion("option", "active", false);
+  $("#search-accordion").accordion("option", "active", false);
 })
 </script>
 {% endif %}

@@ -1,11 +1,14 @@
 {% if results %}
 
-<select id="lookupResults" size="10" style="width:100%">
+<select id="ba-lookup-results-select" size="10" style="width:100%">
   {% for row in results %}
-  <option value="{{ row. BAid }}">{{ row.BAid }} - {{ row.CorpShortName }}</option>
+  <option value="{{ row.BAid }}">{{ row.BAid }} - {{ row.CorpShortName }}</option>
   {% endfor %}
 </select>
 <script>
-  $('#lookupResults').dblclick(function() {setValue(); $('#lookupDialog').dialog('close')});
+  $('#ba-lookup-results-select').dblclick(function() {
+    $('#ba-lookup-results-select').parents('.ba-lookup-dialog').dialog('option', 'buttons')['Save']();
+    $('#ba-lookup-dialog').dialog('close');
+  });
 </script>
 {% endif %}

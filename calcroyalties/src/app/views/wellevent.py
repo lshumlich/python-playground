@@ -10,8 +10,7 @@ wellevent = Blueprint('wellevent', __name__)
 
 @wellevent.route('/wellevent/search', methods=['GET'])
 def search():
-    if not request.args: return render_template('wellevent/search.html')
-    statement = """SELECT WellEventInfo.WellEvent, RTAHeader.RTPOperator, WellEventStatus.Status, BAInfo.CorpShortName, WellFacilitylink.Facility, FacilityInfo.Name, WellEventLoc.Lat, WellEventLoc.Long
+    statement = """SELECT WellEventInfo.WellEvent, RTAHeader.RTPOperator, WellEventStatus.Status, WellLicence.Licensee, BAInfo.CorpShortName, WellFacilitylink.Facility, FacilityInfo.Name, WellEventLoc.Lat, WellEventLoc.Long
     FROM WellEventInfo
     LEFT OUTER JOIN RTAHeader ON WellEventInfo.WellEvent = RTAHeader.WellEvent
     AND (DATE('{proddate}') BETWEEN RTAHeader.StartDate AND RTAHeader.EndDate OR RTAHeader.StartDate IS NULL OR RTAHeader.StartDate = '')
@@ -32,7 +31,7 @@ def search():
 
     db = config.get_database()
     # the following allows us to check incoming arguments against a dictionary of allowed ones and match them with a relevant table name:
-    argument_tables = {'WellEvent': 'WellEventInfo', 'Licensee': 'WellLicence', 'LSD': 'WellEventInfo', 'Section': 'WellEventInfo', 'Township': 'WellEventInfo', 'Range': 'WellEventInfo', 'Meridian': 'WellEventInfo'}
+    argument_tables = {'WellEvent': 'WellEventInfo', 'Licensee': 'WellLicence', 'RTPOperator': 'RTAHeader', 'LSD': 'WellEventInfo', 'Section': 'WellEventInfo', 'Township': 'WellEventInfo', 'Range': 'WellEventInfo', 'Meridian': 'WellEventInfo'}
     kwargs = dict((k, v) for k, v in request.args.items() if v)  # this is to get rid of empty values coming from forms
     search_arguments = ""
     for arg in kwargs:
@@ -86,7 +85,7 @@ def search():
         flash('No results found.')
         return render_template('wellevent/search.html', search_terms=request.args.to_dict())
 
-@wellevent.route('/wellevent')
+@wellevent.route('/wellevent/')
 def handle_redirect():
     return redirect(url_for('wellevent.search'))
 
