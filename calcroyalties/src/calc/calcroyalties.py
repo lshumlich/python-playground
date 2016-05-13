@@ -106,7 +106,7 @@ class ProcessRoyalties(object):
             calc.RoyaltyValuePreDeductions = calc.IOGR1995RoyaltyValue + calc.SupplementaryRoyalties
             calc.RoyaltyValue = calc.RoyaltyValuePreDeductions
 
-       elif monthly.Product == 'Gas' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
+        elif monthly.Product == 'Gas' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
             return 0
 
 
@@ -162,63 +162,74 @@ class ProcessRoyalties(object):
 # #         del self.ws
 
     def calcSaskGasProvCrownRoyaltyRate(self,calc,econ_gas_data,
-                well_royalty_classification,well_classification,mgp,src,well_type):
+                well_royalty_classification,mgp,src,well_type):
 
-        if well_royalty_classification == 'Fourth Tier Gas'
+        if well_royalty_classification == 'Fourth Tier Gas':
             if well_type == 'GasWells':
                 if mgp <= 25:
                     calc.ProvCrownRoyaltyRate = 0
-                    calc.Message = 'MOP < 25 - RR = 0.'
+                    calc.Message = 'MOP <= 25 - RR = 0.'
                 elif mgp <= 115.4:
                     calc.C = econ_gas_data.G4T_C
                     calc.D = econ_gas_data.G4T_D
-                    calc.ProvCrownRoyaltyRate =
+                    calc.ProvCrownRoyaltyRate = (calc.C * mgp) - calc.D
                 else:
                     calc.K = econ_gas_data.G4T_K
                     calc.X = econ_gas_data.G4T_X
+                    calc.ProvCrownRoyaltyRate = calc.K - (calc.X / mgp)
 
             elif well_type == 'OilWells':
                 if mgp <= 64.7:
                     calc.ProvCrownRoyaltyRate = 0
-                    calc.Message = 'MOP < 64.7 - RR = 0.'
+                    calc.Message = 'MOP <= 64.7 - RR = 0.'
                 else:
                     calc.K = econ_gas_data.G4T_K
                     calc.X = econ_gas_data.G4T_X
+                    calc.ProvCrownRoyaltyRate = calc.K - (calc.X / mgp)
 
             else:
                 raise AppError('Well Type: ' + well_type + ' not known for ' + well_royalty_classification + ' Royalty not calculated.')
-                calc.ProvCrownRoyaltyRate = (calc.C * mop) - calc.D
-
 
         elif well_royalty_classification == 'Third Tier Gas':
             if mgp < 115.4:
                 calc.C = econ_gas_data.G3T_C
                 #SRC ?? - ProdDate
+                calc.ProvCrownRoyaltyRate = (calc.C * mgp) - src
+
             else:
                 calc.K = econ_gas_data.G3T_K
                 calc.X = econ_gas_data.G3T_X
                 #SRC ?? - ProdDate
+                calc.ProvCrownRoyaltyRate = calc.K - (calc.X / mgp) - src
 
         elif well_royalty_classification == 'New Gas':
             if mgp < 115.4:
                 calc.C = econ_gas_data.GNEW_C
+                calc.ProvCrownRoyaltyRate = (calc.C * mgp) - src
                 #SRC ?? - ProdDate
             else:
                 calc.K = econ_gas_data.GNEW_K
                 calc.X = econ_gas_data.GNEW_X
                 #SRC ?? - ProdDate
+                calc.ProvCrownRoyaltyRate = calc.K - (calc.X / mgp) - src
 
         elif well_royalty_classification == 'Old Gas':
             if mgp < 115.4:
                 calc.C = econ_gas_data.GOLD_C
+                calc.ProvCrownRoyaltyRate = (calc.C * mgp) - src
                 #SRC ?? - ProdDate
             else:
                 calc.K = econ_gas_data.GOLD_K
                 calc.X = econ_gas_data.GOLD_X
                 #SRC ?? - ProdDate
+                calc.ProvCrownRoyaltyRate = calc.K - (calc.X / mgp) - src
+
         else:
             raise AppError('Royalty Classification: ' + well_royalty_classification + ' not known for ' + well_type + ' Royalty not calculated.')
-                calc.ProvCrownRoyaltyRate = (calc.C * mgp) - calc.D
+
+        calc.ProvCrownRoyaltyRate = round(calc.ProvCrownRoyaltyRate, 6)
+        return calc.ProvCrownRoyaltyRate
+
 
     def calcSaskOilProvCrownRoyaltyRate(self,calc,econ_oil_data,
                 well_royalty_classification,well_classification,mop,src):

@@ -11,6 +11,7 @@ from src.util.apperror import AppError
 from tests.database.testhelper import TestHelper
 from tests.database.sqlite_utilities_test import DatabaseUtilities
 
+
 #from DataBase import DataBase,AppError,DataStructure,TestDataBase
 
 
@@ -72,7 +73,40 @@ class TestSaskRoyaltyCalc(unittest.TestCase):
 #    
     # Adrienne - write this tests
     # 110% if you can understand what all these lines of code are trying to do....
-    
+
+    def test_calcSaskGasProvCrownRoyaltyRate(self):
+        econStringData =  \
+"""
+CharMonth,ProdMonth,G4T_C,G4T_D,G4T_K,G4T_X,G3T_C,G3T_K,G3T_X,GNEW_C,GNEW_K,GNEW_X,GOLD_C,GOLD_K,GOLD_X
+Sept.,201509,0.1185,2.96,24.39,1578,0.1434,33.10,1910,0.1593,36.77,2121,0.2062,47.59,2745
+"""
+        th = TestHelper()
+        econGasData = DataStructure()
+        th.load_object_csv_style(econGasData, econStringData)
+        pr = ProcessRoyalties()
+        royaltyCalc = DataStructure()
+
+        self.assertEqual(pr.calcSaskGasProvCrownRoyaltyRate(royaltyCalc, econGasData,'Fourth Tier Gas', 0, 0, 'GasWells'), 0)
+        self.assertEqual(pr.calcSaskGasProvCrownRoyaltyRate(royaltyCalc, econGasData,'Fourth Tier Gas', 30, 0, 'GasWells'), 0.595)
+        self.assertEqual(pr.calcSaskGasProvCrownRoyaltyRate(royaltyCalc, econGasData,'Fourth Tier Gas', 200, 0, 'GasWells'), 16.5)
+
+        self.assertEqual(pr.calcSaskGasProvCrownRoyaltyRate(royaltyCalc, econGasData,'Fourth Tier Gas', 0, 0, 'OilWells'), 0)
+        self.assertEqual(pr.calcSaskGasProvCrownRoyaltyRate(royaltyCalc, econGasData,'Fourth Tier Gas', 220, 0, 'OilWells'), 17.217273)
+
+        self.assertEqual(pr.calcSaskGasProvCrownRoyaltyRate(royaltyCalc, econGasData,'Third Tier Gas', 100, 0.75, None), 13.59)
+        self.assertEqual(pr.calcSaskGasProvCrownRoyaltyRate(royaltyCalc, econGasData,'Third Tier Gas', 200, 1, None), 22.55)
+
+        self.assertEqual(pr.calcSaskGasProvCrownRoyaltyRate(royaltyCalc, econGasData,'New Gas', 50, 2.25, None), 5.715)
+        self.assertEqual(pr.calcSaskGasProvCrownRoyaltyRate(royaltyCalc, econGasData,'New Gas', 130, 0.75, None), 19.704615)
+
+        self.assertEqual(pr.calcSaskGasProvCrownRoyaltyRate(royaltyCalc, econGasData,'Old Gas', 20, 1, None), 3.124)
+        self.assertEqual(pr.calcSaskGasProvCrownRoyaltyRate(royaltyCalc, econGasData,'Old Gas', 150, 0.5, None), 28.79)
+
+        self.assertRaises(AppError, pr.calcSaskGasProvCrownRoyaltyRate, royaltyCalc, econGasData, 'Fourth Tier Gas', 20, 1, 'Bad String')
+        self.assertRaises(AppError, pr.calcSaskGasProvCrownRoyaltyRate, royaltyCalc, econGasData, 'Bad String', 20, 1, 'GasWells')
+
+
+
     def test_calcSaskOilProvCrownRoyaltyRate(self):
         econStringData = \
 """
