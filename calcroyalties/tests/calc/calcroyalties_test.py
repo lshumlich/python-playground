@@ -188,6 +188,8 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, PEFNInterest, MinRoyalty, RoyaltyPric
         self.assertRaises(AppError, pr.process_one, well_id, prod_month, product)
 
 
+
+
     def calc_royalties(self):
         pr = ProcessRoyalties()
         well, royalty, lease, calc, monthly, well_lease_link
@@ -199,13 +201,14 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, PEFNInterest, MinRoyalty, RoyaltyPric
         well_lease_link = DataStructure()
         monthly.Product = 'Oil'
         royalty.RoyaltyScheme = 'IOGR1995'
-       # self.assertEqual(pr.calcSaskOilIOGR1995(well.CommencementDate, royalty.ValuationMethod, royalty.CrownMultiplier,
-                                     #well_lease_link.PEFNInterest, monthly, calc)
+        pr.calcSaskOilIOGR1995(datetime(2015,4,2), "SaskWellHead", 0.25, 3, monthly, calc)
+        self.assertEqual(calc.IOGR1995RoyaltyValue,1990.11)
 
 
         """How do i do this?? """
 
         royalty.RoyaltyScheme = 'BadString'
+        well.WellID = 2001010202
         self.assertRaises(AppError, well, royalty, lease, calc, monthly, well_lease_link)
 
 
@@ -241,13 +244,18 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, PEFNInterest, MinRoyalty, RoyaltyPric
 
         self.assertEqual(calc.ProvCrownUsedRoyaltyRate, 0)
 
+
+        calc.ProvCrownRoyaltyRate = -1
+        calc.ProvCrownUsedRoyaltyRate = -1
+        royalty.MinRoyalty = 2
+        pr.calcSaskOilProvCrownRoyaltyVolumeValue(m, 1, royalty, calc)
+        self.assertEqual(calc.ProvCrownUsedRoyaltyRate, 2)
+
+
         # self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(m, 1, royalty, calc), (20.0, 2000.0))
         # self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(m, 2, royalty, calc), (5, 500.0))
         # self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(2, m ,1, None, 1,100, calc, 'ActSales'), (2.0, 200.0))
         # self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(10, m ,1, 2, 1,120, calc, 'ActSales'), (12, 1440.0))
-
-        return
-
 
 
     def test_calcSaskOilIOGR1995(self):
@@ -357,6 +365,9 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, PEFNInterest, MinRoyalty, RoyaltyPric
         self.assertEqual(pr.calcGorrPercent(350.6, 1, gorr), (4.0, 'mprod = 350.6 is > 300.0 and <= 400.0 for a RoyRate of 4.0%'))
         self.assertEqual(pr.calcGorrPercent(410, 2, gorr), (5.0, 'mprod = 410 is > 400.0 and <= 500.0 for a RoyRate of 5.0%'))
         self.assertEqual(pr.calcGorrPercent(10000, 17, gorr), (6.0,'mprod = 10000 is > 500.0 for a RoyRate of 6.0%'))
+
+        gorr = "hprod,250,2,300,3,400,4,500,5,0,6"
+        self.assertEqual(pr.calcGorrPercent(200, 10, gorr), (2.0, 'hprod = mprod / hours; 20.00 is > 0.0 and <= 250.0 for a RoyRate of 2.0%'))
 
         gorr = "fixed,0,2"
         self.assertEqual(pr.calcGorrPercent(200, 10, gorr), (2.0, 'fixed for a RoyRate of 2.0%'))

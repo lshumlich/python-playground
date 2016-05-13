@@ -107,7 +107,9 @@ class ProcessRoyalties(object):
             calc.RoyaltyValue = calc.RoyaltyValuePreDeductions
 
         elif monthly.Product == 'Gas' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
-            return 0
+            self.calcSaskGasProvCrown(monthly, well, royalty, lease, calc, well_lease_link)
+            calc.RoyaltyValuePreDeductions = calc.ProvCrownRoyaltyValue
+            calc.RoyaltyValue = calc.RoyaltyValuePreDeductions
 
 
         else:
@@ -495,16 +497,17 @@ class ProcessRoyalties(object):
         econ_oil_data = self.db.select1("ECONData",ProdMonth = monthly.ProdMonth)
         self.calcSaskOilProvCrownRoyaltyRate(calc,econ_oil_data, well.RoyaltyClassification,
                                              well.Classification, monthly.ProdVol, well.SRC)
+        self.calcSaskOilProvCrownRoyaltyVolumeValue(monthly, well_lease_link.PEFNInterest, royalty, calc)
+
 
     def calcSaskGasProvCrown(self, monthly, well, royalty, lease, calc, well_lease_link):
         calc.CommencementPeriod = self.determineCommencementPeriod(monthly.ProdMonth, well.CommencementDate)
-        econ_oil_data = self.db.select1("ECONData",ProdMonth = monthly.ProdMonth)
+        econ_gas_data = self.db.select1("ECONGasData",ProdMonth = monthly.ProdMonth)
         #We need econ oil data
         # Note: If there is no sales. Use last months sales value... Not included in this code
         calc.RoyaltyPrice = self.determineRoyaltyPrice(royalty.ValuationMethod, monthly)
-
-        self.calcSaskGasProvCrownRoyaltyVolumeValue(monthly, well_lease_link.PEFNInterest, royalty, calc)
-
+        self.calcSaskOilProvCrownRoyaltyRate(calc,econ_gas_data, well.RoyaltyClassification, monthly.ProdVol,
+                                             well.SRC, well.Classification)
     '''
     Royalty Calculation
     '''

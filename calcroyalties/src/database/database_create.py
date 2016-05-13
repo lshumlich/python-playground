@@ -143,6 +143,19 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
 
+
+    def ECONGasdata(self):
+        statement = """
+            CREATE TABLE ECONGasData ('ID' integer primary key autoincrement,
+            "CharMonth" text, "ProdMonth" int,
+            "G4T_C" int, "G4T_D" int, "G4T_K" int,
+            "G4T_X" float, "G3T_C" float, "G3T_K" float, "G3T_X" int,
+            "GNEW_C" float, "GNEW_K" int,
+            "GNEW_X" float, "GOLD_C" int,
+            "GOLD_K" float, "GOLD_X" float);
+        """
+        self.dbi.execute_statement(statement)
+
     def Linktab(self):
         statement = """
             create table LinkTab ('ID' integer primary key autoincrement,
