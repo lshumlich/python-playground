@@ -10,6 +10,7 @@ wellevent = Blueprint('wellevent', __name__)
 
 @wellevent.route('/wellevent/search', methods=['GET'])
 def search():
+    if not request.args: return render_template('wellevent/search.html')
     statement = """SELECT WellEventInfo.WellEvent, RTAHeader.RTPOperator, WellEventStatus.Status, WellLicence.Licensee, BAInfo.CorpShortName, WellFacilitylink.Facility, FacilityInfo.Name, WellEventLoc.Lat, WellEventLoc.Long
     FROM WellEventInfo
     LEFT OUTER JOIN RTAHeader ON WellEventInfo.WellEvent = RTAHeader.WellEvent
