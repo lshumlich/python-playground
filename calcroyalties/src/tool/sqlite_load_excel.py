@@ -138,7 +138,7 @@ def load_all_from_scratch():
     loader.close()
 
 def load_sheet():
-    worksheet = config.get_temp_dir() + 'NewGIS.xlsx'
+    worksheet = config.get_temp_dir() + 'gas_new.xlsx'
     loader = Loader()
     loader.open_excel(worksheet)
     loader.load_all_sheets()
