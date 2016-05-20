@@ -131,11 +131,11 @@ def load_all_from_scratch():
     loader.open_excel(worksheet)
     loader.load_all_sheets()
 
-    worksheet = config.get_temp_dir() + 'sample_data.xlsx'
-    loader = Loader()
-    loader.open_excel(worksheet)
-    loader.load_all_sheets()
-    loader.close()
+    # worksheet = config.get_temp_dir() + 'sample_data.xlsx'
+    # loader = Loader()
+    # loader.open_excel(worksheet)
+    # loader.load_all_sheets()
+    #loader.close()
 
 def load_sheet():
     worksheet = config.get_temp_dir() + 'gas_new.xlsx'

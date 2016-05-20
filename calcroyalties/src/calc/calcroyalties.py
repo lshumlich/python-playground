@@ -138,6 +138,11 @@ class ProcessRoyalties(object):
             calc.RoyaltyDeductions += calc.RoyaltyProcessing
             calc.RoyaltyValue -= calc.RoyaltyProcessing
 
+        if (royalty.GCADeducted == 'Y'):
+            calc.RoyaltyGCA = calc.RoyaltyVolume * monthly.GCARate
+            calc.RoyaltyDeductions += calc.RoyaltyGCA
+            calc.RoyaltyValue -= calc.RoyaltyGCA
+
 # #            self.ws.printSaskOilRoyaltyRate(monthly, well, royalty, lease, calc)
 # #                 log.write('--- Royalty Calculated: {} {} {} prod: {} Crown Rate: {}\n'.format(monthly.Row, calc.ProdMonth,
 # #                                                                                              calc.WellId, monthly.ProdVol, calc.RoyaltyRate))
@@ -543,6 +548,7 @@ class ProcessRoyalties(object):
         setattr(rc, 'RoyaltyValuePreDeductions', 0.0)
         setattr(rc, 'RoyaltyTransportation', 0.0)
         setattr(rc, 'RoyaltyProcessing', 0.0)
+        setattr(rc, 'RoyaltyGCA', 0.0)
         setattr(rc, 'RoyaltyDeductions', 0.0)
         setattr(rc, 'RoyaltyValue', 0.0)
         setattr(rc, 'SupplementaryRoyalties', 0.0)

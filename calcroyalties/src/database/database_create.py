@@ -1,7 +1,7 @@
 #!/bin/env python3
 
 """
-This is the system's only database creation script. 
+This is the system's only database creation script.
 
 To Update, do the following:
 
@@ -74,7 +74,7 @@ class DatabaseCreate(object):
              "EndDate" timestamp,
              "RightsGranted" text, "RoyaltyScheme" text,
              "CrownMultiplier" float, "MinRoyalty" int, "ValuationMethod" text,
-             "TruckingDeducted" text, "ProcessingDeducted" text, "Gorr" text,
+             "TruckingDeducted" text, "ProcessingDeducted" text, "GCADeducted" text, "Gorr" text,
              "Notes" text);
         """
         self.dbi.execute_statement(statement)
@@ -103,7 +103,7 @@ class DatabaseCreate(object):
             CREATE TABLE Monthly ('ID' integer primary key autoincrement, 
             "ExtractMonth" timestamp, "ProdMonth" int, "WellID" int, "Product" text,
             "AmendNo" int, "ProdHours" int, "ProdVol" int, "TransPrice" float, 
-            "WellHeadPrice" float, "TransRate" float, "ProcessingRate" float);
+            "WellHeadPrice" float, "TransRate" float, "ProcessingRate" float, "GCARate" float);
         """
         self.dbi.execute_statement(statement)
         
@@ -118,7 +118,7 @@ class DatabaseCreate(object):
             "GorrRoyaltyVolume" int, "IOGR1995RoyaltyVolume" int, 
             "ProvCrownRoyaltyValue" int, "IOGR1995RoyaltyValue" float, 
             "GorrRoyaltyValue" float, "RoyaltyValuePreDeductions" float, 
-            "RoyaltyTransportation" int, "RoyaltyProcessing" int,
+            "RoyaltyTransportation" int, "RoyaltyProcessing" int, "RoyaltyGCA" int,
             "SupplementaryRoyalties" int, "RoyaltyRegulation" int,
             "RoyaltyDeductions" int, "RoyaltyValue" float, 
             "CommencementPeriod" float, "Message" text, "GorrMessage" text);

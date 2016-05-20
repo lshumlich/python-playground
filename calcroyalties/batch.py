@@ -10,9 +10,10 @@ import os
 from src.calc.calcroyalties import ProcessRoyalties
 # from database.calcroyalties_test import TestSaskRoyaltyCalc
 # from database.sqlite_load_excel import Loader
+from src.tool.sqlite_load_excel import load_all_from_scratch
 # from database.sqlite_appserver import AppServer
 from src.database.database_create import DatabaseCreate
-# from src.database.sqlite_utilities_test import DatabaseUtilities
+from tests.database.sqlite_utilities_test import DatabaseUtilities
 #from database.Adrienne import calc_royalties
 #from database.Adrienne_test import test_calcSaskOilProvCrownRoyaltyRate
 
@@ -62,10 +63,12 @@ def load_sample_data():
 
 print('-- Runing Batch')
 if __name__ == "__main__":
-#    drop_create_tables()
-#     load_sample_data()
+    drop_create_tables()
+    load_all_from_scratch()
+    # load_sample_data()
+
 #     browser_app()
-    create_tables()
+#     create_tables()
     run_royalties_and_worksheet()
 #    unittest.main()
 #     runTestModule()
