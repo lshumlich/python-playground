@@ -85,7 +85,7 @@ class ProcessRoyalties(object):
             calc = None
         else:
             calc = calc_array[0]
-        calc = self.zero_royalty_calc(prod_month, well_id, calc)
+        calc = self.zero_royalty_calc(prod_month, well_id, product, calc)
         self.calc_royalties(well, royalty, lease, calc, monthly, well_lease_link)
         if len(calc_array) == 0:
             self.db.insert(calc)
@@ -500,7 +500,11 @@ class ProcessRoyalties(object):
     def calcSaskOilProvCrown(self, monthly, well, royalty, lease, calc, well_lease_link):
         calc.CommencementPeriod = self.determineCommencementPeriod(monthly.ProdMonth, well.CommencementDate)
         econ_oil_data = self.db.select1("ECONData",ProdMonth = monthly.ProdMonth)
-        self.calcSaskOilProvCrownRoyaltyRate(calc,econ_oil_data, well.RoyaltyClassification,
+        if royalty.OverrideRoyaltyClassification != None:
+            RoyaltyClassification = royalty.OverrideRoyaltyClassification
+        else:
+            RoyaltyClassification = well.RoyaltyClassification
+        self.calcSaskOilProvCrownRoyaltyRate(calc,econ_oil_data, RoyaltyClassification,
                                              well.Classification, monthly.ProdVol, well.SRC)
         self.calcSaskOilProvCrownRoyaltyVolumeValue(monthly, well_lease_link.PEFNInterest, royalty, calc)
 
@@ -508,6 +512,10 @@ class ProcessRoyalties(object):
     def calcSaskGasProvCrown(self, monthly, well, royalty, lease, calc, well_lease_link):
         calc.CommencementPeriod = self.determineCommencementPeriod(monthly.ProdMonth, well.CommencementDate)
         econ_gas_data = self.db.select1("ECONGasData",ProdMonth = monthly.ProdMonth)
+        if royalty.OverrideRoyaltyClassification != None:
+            RoyaltyClassification = royalty.OverrideRoyaltyClassification
+        else:
+            RoyaltyClassification = well.RoyaltyClassification
         #We need econ oil data
         # Note: If there is no sales. Use last months sales value... Not included in this code
         calc.RoyaltyPrice = self.determineRoyaltyPrice(royalty.ValuationMethod, monthly)
@@ -517,12 +525,13 @@ class ProcessRoyalties(object):
     Royalty Calculation
     '''
 
-    def zero_royalty_calc(self, month, wellID, rc):
+    def zero_royalty_calc(self, month, wellID, product, rc):
         if rc == None:
             rc = self.db.get_data_structure('Calc')
             #         rc.ID = 0
         rc.ProdMonth = month
         rc.WellID = wellID
+        rc.Product = product
 
         setattr(rc, 'K', 0.0)
         setattr(rc, 'X', 0.0)

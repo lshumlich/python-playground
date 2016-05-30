@@ -75,7 +75,7 @@ class DatabaseCreate(object):
              "RightsGranted" text, "RoyaltyScheme" text,
              "CrownMultiplier" float, "MinRoyalty" int, "ValuationMethod" text,
              "TruckingDeducted" text, "ProcessingDeducted" text, "GCADeducted" text, "Gorr" text,
-             "Notes" text);
+             "OverrideRoyaltyClassification" text, "Notes" text);
         """
         self.dbi.execute_statement(statement)
         
@@ -110,7 +110,7 @@ class DatabaseCreate(object):
     def Calc(self):
         statement = """
             CREATE TABLE Calc ('ID' integer primary key autoincrement,
-            "ProdMonth" int, "WellID" int, 
+            "ProdMonth" int, "WellID" int, "Product" text,
             "K" int, "X" int, "C" int, "D" int, 
             "RoyaltyPrice" float, "RoyaltyVolume" int, "ProvCrownRoyaltyRate" int, 
             "ProvCrownUsedRoyaltyRate" int, "IOGR1995RoyaltyRate" int, 
