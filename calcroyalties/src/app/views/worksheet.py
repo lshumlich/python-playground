@@ -15,7 +15,7 @@ def calc_worksheet():
             db = config.get_database()
             well_id = int(request.args["WellId"])
             prod_month = get_proddate_int()
-            product = "Gas"
+            product = "Oil"
             well = db.select1('Well', ID=well_id)
             well_lease_link_array = db.select('WellLeaseLink', WellEvent=well.WellEvent)
             if len(well_lease_link_array) == 0:

@@ -59,7 +59,8 @@ class DatabaseCreate(object):
         statement = """
             CREATE TABLE Well ('ID' integer primary key autoincrement, 
              "StartDate" timestamp,
-             "EndDate" timestamp,
+             "EndDate" timestamp, "FinishDrillDate" timestamp,
+             "HorizontalDrilllnd" text,
              'WellEvent' text, 'Prov' text, 'WellType' text, 'LeaseType' text,
              'LeaseID' int, 'RoyaltyClassification' text,
              'Classification' text, 'SRC' int, 'PEFNInterest' float,
@@ -75,7 +76,8 @@ class DatabaseCreate(object):
              "RightsGranted" text, "RoyaltyScheme" text,
              "CrownMultiplier" float, "MinRoyalty" int, "ValuationMethod" text,
              "TruckingDeducted" text, "ProcessingDeducted" text, "GCADeducted" text, "Gorr" text,
-             "OverrideRoyaltyClassification" text, "Notes" text);
+             "OverrideRoyaltyClassification" text, "MinRoyaltyRate" float,
+             "MaxRoyaltyRate" float, "Notes" text);
         """
         self.dbi.execute_statement(statement)
         
