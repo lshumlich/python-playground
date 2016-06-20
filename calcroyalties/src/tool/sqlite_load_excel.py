@@ -126,7 +126,7 @@ def load_all_from_scratch():
     db_create = DatabaseCreate()
     db_create.create_all()
 
-    worksheet = config.get_temp_dir() + 'JasonDB.xlsx'
+    worksheet = config.get_temp_dir() + 'new.xlsx'
     loader = Loader()
     loader.open_excel(worksheet)
     loader.load_all_sheets()
@@ -138,7 +138,7 @@ def load_all_from_scratch():
     #loader.close()
 
 def load_sheet():
-    worksheet = config.get_temp_dir() + 'gas_new.xlsx'
+    worksheet = config.get_temp_dir() + 'new.xlsx'
     loader = Loader()
     loader.open_excel(worksheet)
     loader.load_all_sheets()

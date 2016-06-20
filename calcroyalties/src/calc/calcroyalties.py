@@ -133,6 +133,9 @@ class ProcessRoyalties(object):
             calc.RoyaltyDeductions += calc.RoyaltyTransportation
             calc.RoyaltyValue -= calc.RoyaltyTransportation
 
+        # if (royalty.TruckingOverride != None):
+        #     calc.RoyaltyTransportation = royalty.TruckingOverride
+
         if (royalty.ProcessingDeducted == 'Y'):
             calc.RoyaltyProcessing = calc.RoyaltyVolume * monthly.ProcessingRate
             calc.RoyaltyDeductions += calc.RoyaltyProcessing
@@ -345,12 +348,11 @@ class ProcessRoyalties(object):
         # Calculate the Comensment Date
         calc.CommencementPeriod = self.determineCommencementPeriod(m.ProdMonth, commencement_date)
         if calc.CommencementPeriod < 5:
-            calc.IOGR1995RoyaltyVolume = round(self.calcSaskOilRegulationSubsection2(m.ProdVol),2)
             calc.RoyaltyRegulation = self.calcSaskOilRegulationSubsection2(m.ProdVol)
+            calc.IOGR1995RoyaltyVolume = round(calc.RoyaltyRegulation,2)
         else:
-            calc.IOGR1995RoyaltyVolume = round(self.calcSaskOilRegulationSubsection3(m.ProdVol),2)
             calc.RoyaltyRegulation = self.calcSaskOilRegulationSubsection3(m.ProdVol)
-
+            calc.IOGR1995RoyaltyVolume = round(calc.RoyaltyRegulation,2)
         
         calc.RoyaltyPrice = round(self.determineRoyaltyPrice(valuation_method, m), 6)
         

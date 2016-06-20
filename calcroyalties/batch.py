@@ -65,10 +65,10 @@ print('-- Runing Batch')
 if __name__ == "__main__":
     drop_create_tables()
     load_all_from_scratch()
-    # load_sample_data()
+#    load_sample_data()
 
 #     browser_app()
-#     create_tables()
+#    create_tables()
     run_royalties_and_worksheet()
 #    unittest.main()
 #     runTestModule()

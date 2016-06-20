@@ -75,7 +75,7 @@ class DatabaseCreate(object):
              "EndDate" timestamp,
              "RightsGranted" text, "RoyaltyScheme" text,
              "CrownMultiplier" float, "MinRoyalty" int, "ValuationMethod" text,
-             "TruckingDeducted" text, "ProcessingDeducted" text, "GCADeducted" text, "Gorr" text,
+             "TruckingDeducted" text, "TruckingOverride" text, "ProcessingDeducted" text, "GCADeducted" text, "Gorr" text,
              "OverrideRoyaltyClassification" text, "MinRoyaltyRate" float,
              "MaxRoyaltyRate" float, "Notes" text);
         """

@@ -68,7 +68,7 @@ class DatabaseUtilities(object):
             self.db_create.RoyaltyMaster()
 
         statement = """
-            INSERT INTO RoyaltyMaster VALUES(1, '2001-01-08 00:00:00', '2016-01-07 00:00:00', 'All', 'SKProvCrownVar, GORR', 1.2, 50, 'SaskWellHead', 'Y', 'Y', 'N', 'mprod,250,2,300,3,400,4,500,5,0,6', NULL, 0, 50, NULL)
+            INSERT INTO RoyaltyMaster VALUES(1, '2001-01-08 00:00:00', '2016-01-07 00:00:00', 'All', 'SKProvCrownVar, GORR', 1.2, 50, 'SaskWellHead', 'Y', 'Y', 'Y', 'N', 'mprod,250,2,300,3,400,4,500,5,0,6', NULL, 0, 50, NULL)
         """
 
         self.db_instance.execute_statement(statement)
