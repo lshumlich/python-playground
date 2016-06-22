@@ -58,7 +58,9 @@ class Loader(object):
             cols = ""
             i = 0
             for cell in header_row:
+                print(cell.value)
                 name = cell.value.replace('#', '')
+                print(cell.value)
                 name = '"' + name + '"'
                 if type(data_row[i].value) is str:
                     cols = cols + name + ' text, '
@@ -93,15 +95,16 @@ class Loader(object):
         for h in header_row:
             cell = row[i]
             if type(cell.value) is str:
-                data = data + "'" + cell.value + "',"
+                # data = data + "'" + cell.value + "',"
+                data = data + '"' + cell.value + '",'
             elif type(cell.value) is int:
-                data = data + str(cell.value) + ","
+                data = data + str(cell.value) + ','
             elif type(cell.value) is float:
-                data = data + str(cell.value) + ","
+                data = data + str(cell.value) + ','
             elif type(cell.value) is datetime.datetime:
-                data = data + "'" + str(cell.value) + "',"
+                data = data + '"' + str(cell.value) + '",'
             elif cell.value is None:
-                data += " Null,"
+                data += ' Null,'
             else:
                 raise AppError('*** Not Loaded: ' + cell.value + " " + type(cell.value))
             i += 1
@@ -124,9 +127,9 @@ from src.database.database_create import DatabaseCreate
 
 def load_all_from_scratch():
     db_create = DatabaseCreate()
-    db_create.create_all()
+    # db_create.create_all()
 
-    worksheet = config.get_temp_dir() + 'new.xlsx'
+    worksheet = config.get_temp_dir() + 'new2.xlsx'
     loader = Loader()
     loader.open_excel(worksheet)
     loader.load_all_sheets()
@@ -138,7 +141,7 @@ def load_all_from_scratch():
     #loader.close()
 
 def load_sheet():
-    worksheet = config.get_temp_dir() + 'new.xlsx'
+    worksheet = config.get_temp_dir() + 'new2.xlsx'
     loader = Loader()
     loader.open_excel(worksheet)
     loader.load_all_sheets()

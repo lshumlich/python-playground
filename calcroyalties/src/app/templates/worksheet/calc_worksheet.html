@@ -41,6 +41,11 @@ th{
    padding:1px;
 }
 
+fmath {
+    font-family: arial;
+    line-height: inherit;
+}
+
 </style>
 </head>
 
@@ -213,9 +218,9 @@ table, th, td {
 
 {% if calc.C > 0 %}
 
-    <tr><td align="left">CR% = </td><td colspan="2">(C * MOP) - D</td></tr>
-    <tr><td align="left">CR% = </td><td colspan="2">({{'{:.4f}'.format(calc.C)}} * {{ '{:.2f}'.format(m.ProdVol) }}) - {{'{:.2f}'.format(calc.D)}}</td></tr>
-    <tr><td align="left">CR% = </td><td colspan="2">{{ '{:.6f}'.format(calc.ProvCrownRoyaltyRate) }}</td></tr>
+    <tr><td align="left">$$\CR% = $$</td><td>$$(C * MOP) - D$$</td></tr>
+    <tr><td align="left">$$\CR% = $$</td><td>$$({{'{:.4f}'.format(calc.C)}} * {{ '{:.2f}'.format(m.ProdVol) }}) - {{'{:.2f}'.format(calc.D)}}$$</td></tr>
+    <tr><td align="left">$$\CR% = $$</td><td>$${{ '{:.6f}'.format(calc.ProvCrownRoyaltyRate) }}$$</td></tr>
 
 <br>
 </TABLE>

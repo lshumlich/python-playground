@@ -60,32 +60,32 @@ class ProcessRoyalties(object):
         log.write("Hello World.\n")
         for monthlyData in self.db.select('Monthly'):
             try:
-                self.process_one(monthlyData.WellID, monthlyData.ProdMonth, monthlyData.Product)
+                self.process_one(monthlyData.WellEvent, monthlyData.ProdMonth, monthlyData.Product)
 
             except AppError as e:
                 print(e)
     """
     Process a single royalty
     """
-    def process_one(self, well_id, prod_month, product):
-        print('**** Processing ***', well_id, prod_month, product)
+    def process_one(self, well_event, prod_month, product):
+        print('**** Processing ***', well_event, prod_month, product)
         errorCount = 0
         log = open(config.get_temp_dir() + 'log.txt','w')
         log.write ("Hello World.\n")
-        well = self.db.select1('Well', ID=well_id)
-        well_lease_link_array = self.db.select('WellLeaseLink', WellEvent=well.WellEvent)
+        well = self.db.select1('Well', WellEvent=well_event)
+        well_lease_link_array = self.db.select('WellLeaseLink', WellEvent=well_event)
         if len(well_lease_link_array) == 0:
             raise AppError("There were no well_lease_link records for " + str(well_id) + str(prod_month))
         well_lease_link = well_lease_link_array[0]
         royalty = self.db.select1('Royaltymaster', ID=well_lease_link.LeaseID)
         lease = self.db.select1('Lease', ID=well_lease_link.LeaseID)
-        monthly = self.db.select1('Monthly', WellID = well_id, ProdMonth = prod_month, Product = product)
-        calc_array = self.db.select('Calc', WellID=well_id, ProdMonth = prod_month)
+        monthly = self.db.select1('Monthly', WellEvent = well_event, ProdMonth = prod_month, Product = product)
+        calc_array = self.db.select('Calc', WellEvent=well_event, ProdMonth = prod_month)
         if len(calc_array) == 0:
             calc = None
         else:
             calc = calc_array[0]
-        calc = self.zero_royalty_calc(prod_month, well_id, product, calc)
+        calc = self.zero_royalty_calc(prod_month, well_event, product, calc)
         self.calc_royalties(well, royalty, lease, calc, monthly, well_lease_link)
         if len(calc_array) == 0:
             self.db.insert(calc)
@@ -93,7 +93,7 @@ class ProcessRoyalties(object):
             self.db.update(calc)
 
     def calc_royalties(self, well, royalty, lease, calc, monthly, well_lease_link):
-        print('    -->',well.ID,monthly)
+        print('    -->',well.WellEvent,monthly)
 
         if monthly.Product == 'Oil' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
             self.calcSaskOilProvCrown(monthly, well, royalty, lease, calc, well_lease_link)
@@ -113,7 +113,7 @@ class ProcessRoyalties(object):
 
 
         else:
-            raise AppError("No calculation for" + str(well.ID) + str(monthly.ProdMonth) + str(monthly.Product) + str(royalty.RoyaltyScheme))
+            raise AppError("No calculation for" + str(well.WellEvent) + str(monthly.ProdMonth) + str(monthly.Product) + str(royalty.RoyaltyScheme))
 
 
         if monthly.Product == 'Oil' and 'GORR' in royalty.RoyaltyScheme:
@@ -141,10 +141,11 @@ class ProcessRoyalties(object):
             calc.RoyaltyDeductions += calc.RoyaltyProcessing
             calc.RoyaltyValue -= calc.RoyaltyProcessing
 
-        if (royalty.GCADeducted == 'Y'):
-            calc.RoyaltyGCA = calc.RoyaltyVolume * monthly.GCARate
-            calc.RoyaltyDeductions += calc.RoyaltyGCA
-            calc.RoyaltyValue -= calc.RoyaltyGCA
+        if monthly.Product == 'Gas':
+            if (royalty.GCADeducted == 'Y'):
+                calc.RoyaltyGCA = calc.RoyaltyVolume * monthly.GCARate
+                calc.RoyaltyDeductions += calc.RoyaltyGCA
+                calc.RoyaltyValue -= calc.RoyaltyGCA
 
 # #            self.ws.printSaskOilRoyaltyRate(monthly, well, royalty, lease, calc)
 # #                 log.write('--- Royalty Calculated: {} {} {} prod: {} Crown Rate: {}\n'.format(monthly.Row, calc.ProdMonth,
@@ -527,12 +528,12 @@ class ProcessRoyalties(object):
     Royalty Calculation
     '''
 
-    def zero_royalty_calc(self, month, wellID, product, rc):
+    def zero_royalty_calc(self, month, well_event, product, rc):
         if rc == None:
             rc = self.db.get_data_structure('Calc')
             #         rc.ID = 0
         rc.ProdMonth = month
-        rc.WellID = wellID
+        rc.WellEvent = well_event
         rc.Product = product
 
         setattr(rc, 'K', 0.0)

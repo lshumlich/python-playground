@@ -23,8 +23,8 @@ def calc_worksheet():
             well_lease_link = well_lease_link_array[0]
             royalty = db.select1('RoyaltyMaster', ID=well_lease_link.LeaseID)
             lease = db.select1('Lease', ID=well_lease_link.LeaseID)
-            monthly = db.select1('Monthly', WellID = well_id, prodMonth = prod_month, product = product)
-            calc_array = db.select('Calc', WellID=well_id, prodMonth = prod_month)
+            monthly = db.select1('Monthly', WellEvent = well.WellEvent, prodMonth = prod_month, product = product)
+            calc_array = db.select('Calc', WellEvent=well.WellEvent, prodMonth = prod_month)
             calc = calc_array[0]
             print(monthly)
             return render_template('worksheet/calc_worksheet.html', well=well, rm=royalty, m=monthly, lease=lease, calc=calc, well_lease_link=well_lease_link)
