@@ -13,6 +13,7 @@ from src.app.views.well import well
 from src.app.views.facility import facility
 from src.app.views.worksheet import worksheet
 from src.app.views.lookups import lookup
+from src.app.views.reports import reports
 
 app.register_blueprint(main)
 app.register_blueprint(wellevent)
@@ -22,3 +23,4 @@ app.register_blueprint(well)
 app.register_blueprint(facility)
 app.register_blueprint(worksheet)
 app.register_blueprint(lookup)
+app.register_blueprint(reports)

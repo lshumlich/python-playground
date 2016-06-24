@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<style>
+tr.border_bottom td {
+  border-bottom:1pt solid black;
+}
+</style>
+
+<table class="table-striped" style="width:100%">
+    <tr>
+        <th>WellEvent</th>
+        <th>Royalty Volume</th>
+        <th>Royalty Value</th>
+    </tr>
+    {% for lease in result|groupby('LeaseID') %}
+        <tr style="background-color: white" class="border_bottom">
+            <td colspan="3" ><b>Lease: {{ lease.grouper }}</b></td>
+        </tr>
+        {% for r in lease.list %}
+        <tr>
+            <td>{{ r.WellEvent }}</td>
+            <td>{{ r.RoyaltyVolume }}</td>
+            <td>{{ r.RoyaltyValue }}</td>
+        </tr>
+        {% endfor %}
+    {% endfor %}
+</table>
+
+{% endblock %}
