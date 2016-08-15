@@ -63,8 +63,8 @@ def load_sample_data():
 
 print('-- Runing Batch')
 if __name__ == "__main__":
-    # drop_create_tables()
-    # load_all_from_scratch()
+    drop_create_tables()
+    load_all_from_scratch()
 #     load_sample_data()
 
 #     browser_app()

@@ -118,13 +118,13 @@ class ProcessRoyalties(object):
 
         if monthly.Product == 'Oil' and 'GORR' in royalty.RoyaltyScheme:
             calc.GorrRoyaltyRate, calc.GorrMessage = self.calcGorrPercent(monthly.ProdVol,monthly.ProdHours,royalty.Gorr)
-            calc.GorrRoyaltyValue = round(monthly.ProdVol * well_lease_link.PEFNInterest * calc.GorrRoyaltyRate / 100.0 * calc.RoyaltyPrice, 6)
-            calc.GorrRoyaltyVolume = round(monthly.ProdVol * well_lease_link.PEFNInterest * calc.GorrRoyaltyRate / 100.0, 2)
+            calc.GorrRoyaltyValue = round(monthly.ProdVol * well_lease_link.PEFNInterest/100 * calc.GorrRoyaltyRate / 100.0 * calc.RoyaltyPrice, 6)
+            calc.GorrRoyaltyVolume = round(monthly.ProdVol * well_lease_link.PEFNInterest/100 * calc.GorrRoyaltyRate / 100.0, 2)
             calc.RoyaltyValuePreDeductions = calc.RoyaltyValuePreDeductions + calc.GorrRoyaltyValue
             calc.RoyaltyValue = calc.RoyaltyValuePreDeductions
 
-            calc.RoyaltyVolume = (calc.ProvCrownRoyaltyVolume +
-                                                        calc.IOGR1995RoyaltyVolume +
+        calc.RoyaltyVolume = (calc.ProvCrownRoyaltyVolume +
+                                                    calc.IOGR1995RoyaltyVolume +
                                                         calc.GorrRoyaltyVolume)
 
 
@@ -338,7 +338,7 @@ class ProcessRoyalties(object):
 
         calc.ProvCrownRoyaltyVolume = round(((calc.ProvCrownUsedRoyaltyRate / 100) *
                                                       royalty.CrownMultiplier *
-                                                      m.ProdVol * fn_interest), 2)
+                                                      m.ProdVol * fn_interest/100), 2)
 
         calc.ProvCrownRoyaltyValue = calc.ProvCrownRoyaltyVolume * calc.RoyaltyPrice
 
@@ -359,7 +359,7 @@ class ProcessRoyalties(object):
         
         calc.IOGR1995RoyaltyValue = round(crown_multiplier *
                                                       calc.IOGR1995RoyaltyVolume *
-                                                      fn_interest *
+                                                      fn_interest/100 *
                                                       calc.RoyaltyPrice , 2)
 
         calc.SupplementaryRoyalties = round(self.calcSupplementaryRoyaltiesIOGR1995(calc.CommencementPeriod, m.WellHeadPrice, m.ProdVol, calc.RoyaltyRegulation, self.reference_price['Onion Lake']), 2)
