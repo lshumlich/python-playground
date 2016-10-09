@@ -11,7 +11,7 @@ class Loader(object):
     """ 
     Load data from execl into sql tables. The tab names are the table
     names. The first row must contain the column names. Be careful there
-    are no blank lines at the end of you sheets.
+    are no blank lines at the end of your sheets.
     """
     EXCLUDE_SHEETS = ['Roy Module Construct']
 
@@ -114,7 +114,9 @@ class Loader(object):
 
         insert += data
 
-        print(insert)
+        # if config.debug_sql():
+        #     print('>' + str(config.debug_sql()) + insert)
+
         self.dbi.execute(insert)
 
     def commit(self):
@@ -125,11 +127,11 @@ class Loader(object):
 
 from src.database.database_create import DatabaseCreate
 
-def load_all_from_scratch():
+def load_all_from_scratch(file_name):
     db_create = DatabaseCreate()
-    # db_create.create_all()
+    db_create.create_all()
 
-    worksheet = config.get_temp_dir() + 'new2.xlsx'
+    worksheet = config.get_temp_dir() + file_name
     loader = Loader()
     loader.open_excel(worksheet)
     loader.load_all_sheets()
@@ -138,16 +140,19 @@ def load_all_from_scratch():
     # loader = Loader()
     # loader.open_excel(worksheet)
     # loader.load_all_sheets()
-    #loader.close()
+    # loader.close()
 
-def load_sheet():
-    worksheet = config.get_temp_dir() + 'new2.xlsx'
+
+def load_sheet(file_name):
+    worksheet = config.get_temp_dir() + file_name
     loader = Loader()
     loader.open_excel(worksheet)
     loader.load_all_sheets()
+
 
 if __name__ == '__main__':
     #
     # Note: Set the new database in config.json
     #
-    load_sheet()
+    #load_sheet()
+    load_all_from_scratch('sample_data.xlsx')

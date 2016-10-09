@@ -8,6 +8,13 @@ To Update, do the following:
 1) Update the database version #
 2) Make whatever updates you need
 
+Database Change Log: Must be maintained so we can keep the database in sink:
+
+2016-10-07
+- WellLeaseLink change WellEvent to WellID
+- Monthly change WellEvent to WellID
+- Calc change WellEvent to WellID
+
 """
 import datetime
 
@@ -59,25 +66,41 @@ class DatabaseCreate(object):
         statement = """
             CREATE TABLE Well ('ID' integer primary key autoincrement, 
              "StartDate" timestamp,
-             "EndDate" timestamp, "FinishDrillDate" timestamp,
-             "HorizontalDrilllnd" text,
-             'WellEvent' text, 'Prov' text, 'WellType' text, 'LeaseType' text,
-             'LeaseID' int, 'RoyaltyClassification' text,
-             'Classification' text, 'SRC' int, 'PEFNInterest' float,
-             'CommencementDate' timestamp, 'ReferencePrice' int);
+             "EndDate" timestamp,
+             'WellEvent' text,
+             'Prov' text,
+             'WellType' text,
+             'LeaseType' text,
+             'LeaseID' int,
+             'RoyaltyClassification' text,
+             'Classification' text,
+             'SRC' int,
+             'PEFNInterest' float,
+             'CommencementDate' timestamp,
+             'ReferencePrice' int,
+             "FinishDrillDate" timestamp,
+             "HorizontalDrilllnd" text);
         """
         self.dbi.execute_statement(statement)
         
     def RoyaltyMaster(self):
         statement = """
-            CREATE TABLE RoyaltyMaster ('LeaseType' text, 'ID' integer primary key autoincrement,
+            CREATE TABLE RoyaltyMaster ('ID' integer primary key autoincrement,
              "StartDate" timestamp,
              "EndDate" timestamp,
-             "RightsGranted" text, "RoyaltyScheme" text,
-             "CrownMultiplier" float, "MinRoyalty" int, "ValuationMethod" text,
-             "TruckingDeducted" text, "ProcessingDeducted" text, "GCADeducted" text, "Gorr" text,
-             "OverrideRoyaltyClassification" text, "MinRoyaltyRate" float,
-             "MaxRoyaltyRate" float, "Notes" text);
+             "RightsGranted" text,
+             "RoyaltyScheme" text,
+             "CrownMultiplier" float,
+             "MinRoyalty" int,
+             "ValuationMethod" text,
+             "TruckingDeducted" text,
+             "ProcessingDeducted" text,
+             "GCADeducted" text,
+             "Gorr" text,
+             "OverrideRoyaltyClassification" text,
+             "MinRoyaltyRate" float,
+             "MaxRoyaltyRate" float,
+             "Notes" text);
         """
         self.dbi.execute_statement(statement)
         
@@ -86,7 +109,12 @@ class DatabaseCreate(object):
             CREATE TABLE Lease ('ID' integer primary key autoincrement,
              "StartDate" timestamp,
              "EndDate" timestamp,
-             "LeaseType" text, "Prov" text, "FNReserve" int, "FNBandID" int);
+             "LeaseType" text,
+             "Prov" text,
+             "FNReserveID" int,
+             "FNBandID" int,
+             "LessorID" int,
+             "Notes" text);
         """
         self.dbi.execute_statement(statement)
         
@@ -95,42 +123,74 @@ class DatabaseCreate(object):
             CREATE TABLE WellLeaseLink ('ID' integer primary key autoincrement,
              "StartDate" timestamp,
              "EndDate" timestamp,
-             "WellEvent" text, "LeaseType" text, "LeaseID" int, "PEFNInterest" float);
+             "WellID" int,
+             "LeaseID" int,
+             "PEFNInterest" float);
         """
         self.dbi.execute_statement(statement)
 
     def Monthly(self):
         statement = """
             CREATE TABLE Monthly ('ID' integer primary key autoincrement, 
-            "ExtractMonth" timestamp, "ProdMonth" int, "WellEvent" int, "Product" text,
-            "AmendNo" int, "ProdHours" int, "ProdVol" int, "WellHeadPrice" float, "TransPrice" float,
-            "TransRate" float, "ProcessingRate" float, "GCARate" float);
+            "ExtractMonth" timestamp,
+            "ProdMonth" int,
+            "WellID" int,
+            "Product" text,
+            "AmendNo" int,
+            "ProdHours" int,
+            "ProdVol" int,
+            "WellHeadPrice" float,
+            "TransPrice" float,
+            "TransRate" float,
+            "ProcessingRate" float,
+            "GCARate" float);
         """
         self.dbi.execute_statement(statement)
         
     def Calc(self):
         statement = """
             CREATE TABLE Calc ('ID' integer primary key autoincrement,
-            "ProdMonth" int, "WellEvent" text, "Product" text,
-            "K" int, "X" int, "C" int, "D" int, 
-            "RoyaltyPrice" float, "RoyaltyVolume" int, "ProvCrownRoyaltyRate" int, 
-            "ProvCrownUsedRoyaltyRate" int, "IOGR1995RoyaltyRate" int, 
-            "GorrRoyaltyRate" int, "ProvCrownRoyaltyVolume" int, 
-            "GorrRoyaltyVolume" int, "IOGR1995RoyaltyVolume" int, 
-            "ProvCrownRoyaltyValue" int, "IOGR1995RoyaltyValue" float, 
-            "GorrRoyaltyValue" float, "RoyaltyValuePreDeductions" float, 
-            "RoyaltyTransportation" int, "RoyaltyProcessing" int, "RoyaltyGCA" int,
-            "SupplementaryRoyalties" int, "RoyaltyRegulation" int,
-            "RoyaltyDeductions" int, "RoyaltyValue" float, 
-            "CommencementPeriod" float, "Message" text, "GorrMessage" text);
+            "ProdMonth" int,
+            "WellID" id,
+            "Product" text,
+            "K" int,
+            "X" int,
+            "C" int,
+            "D" int,
+            "RoyaltyPrice" float,
+            "RoyaltyVolume" int,
+            "ProvCrownRoyaltyRate" int,
+            "ProvCrownUsedRoyaltyRate" int,
+            "IOGR1995RoyaltyRate" int,
+            "GorrRoyaltyRate" int,
+            "ProvCrownRoyaltyVolume" int,
+            "GorrRoyaltyVolume" int,
+            "IOGR1995RoyaltyVolume" int,
+            "ProvCrownRoyaltyValue" int,
+            "IOGR1995RoyaltyValue" float,
+            "GorrRoyaltyValue" float,
+            "RoyaltyValuePreDeductions" float,
+            "RoyaltyTransportation" int,
+            "RoyaltyProcessing" int,
+            "RoyaltyGCA" int,
+            "SupplementaryRoyalties" int,
+            "RoyaltyRegulation" int,
+            "RoyaltyDeductions" int,
+            "RoyaltyValue" float,
+            "CommencementPeriod" float,
+            "Message" text,
+            "GorrMessage" text);
         """
         self.dbi.execute_statement(statement)
         
     def ECONdata(self):
         statement = """
             CREATE TABLE ECONData ('ID' integer primary key autoincrement,
-            "CharMonth" text, "Year" int, "ProdMonth" int,
-            "HOP" int, "SOP" int, "NOP" int, 
+            "CharMonth" text,
+            "ProdMonth" int,
+            "HOP" int,
+            "SOP" int,
+            "NOP" int,
             "H4T_C" float, "H4T_D" float, "H4T_K" float, "H4T_X" int, 
             "H3T_K" float, "H3T_X" int, 
             "HNEW_K" float, "HNEW_X" int, 

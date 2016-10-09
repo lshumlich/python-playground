@@ -70,7 +70,7 @@ def get_proddate():
     proddate = cookie[0:4] + "-" + cookie[4:6] + "-01"
     return proddate
 
-def get_proddate_int():
+def get_proddate_int() -> object:
     try:
         return int(request.cookies['proddate'])
     except:
