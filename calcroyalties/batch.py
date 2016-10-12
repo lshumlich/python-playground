@@ -69,7 +69,7 @@ def load_sample_data():
     dbu.create_some_test_wells()
     dbu.create_some_test_leases()
 
-print('-- Runing Batch')
+print('-- Runing Batch for --> ' + __name__)
 if __name__ == "__main__":
     drop_create_tables()
     load_sheet("sample_data.xlsx")
@@ -84,10 +84,10 @@ if __name__ == "__main__":
 
 # if __name__ == "__main__":
 #     """This runs all the tests in the module"""
-#    import sys;sys.argv = ['', 'Test.testName']
-#    unittest.main() # This works for testing the current file
+#     import sys;sys.argv = ['', 'Test.testName']
+#     unittest.main() # This works for testing the current file
 #     unittest.main(module='batch') # works
 #     unittest.main(module='database.testhelper_test')
-#      unittest.main(module='database.calcroyalties_test')
+#     unittest.main(module='database.calcroyalties_test')
 #     tst = TestSaskRoyaltyCalc()
 #     tst.test_calcSaskOilProvCrownRoyaltyRate()

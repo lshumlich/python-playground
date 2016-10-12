@@ -528,12 +528,12 @@ class ProcessRoyalties(object):
     Royalty Calculation
     '''
 
-    def zero_royalty_calc(self, month, well_event, product, rc):
+    def zero_royalty_calc(self, month, well_id, product, rc):
         if rc == None:
             rc = self.db.get_data_structure('Calc')
             #         rc.ID = 0
         rc.ProdMonth = month
-        rc.WellEvent = well_event
+        rc.WellID = well_id
         rc.Product = product
 
         setattr(rc, 'K', 0.0)
