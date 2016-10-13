@@ -79,7 +79,7 @@ class SqliteDatabaseTest(unittest.TestCase):
         self.assertRaises(AppError, self.db.update, ds)
 
     def test_insert(self):
-        self.db_create.Well()
+        self.db_create.well()
         
         well = DataStructure()
         well.WellEvent = 'WellEvent for this well'

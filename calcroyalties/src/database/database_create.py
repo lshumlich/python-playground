@@ -20,6 +20,7 @@ import datetime
 
 import config
 
+
 class DatabaseCreate(object):
     
     DATABASE_VERSION = 1.1
@@ -30,39 +31,40 @@ class DatabaseCreate(object):
     def create_all(self):
         tables = self.dbi.get_table_names()
         if 'Config' not in tables:
-            self.Config()
+            self.config()
         if 'Well' not in tables:
-            self.Well()
+            self.well()
         if 'RoyaltyMaster' not in tables:
-            self.RoyaltyMaster()
+            self.royalty_master()
         if 'Lease' not in tables:
-            self.Lease()
+            self.lease()
         if 'WellLeaseLink' not in tables:
-            self.WellLeaseLink()
+            self.well_lease_link()
         if 'Monthly' not in tables:
-            self.Monthly()
+            self.monthly()
         if 'Calc' not in tables:
-            self.Calc()
+            self.calc()
         if 'ECONData' not in tables:
-            self.ECONdata()
+            self.econ_data()
         if 'LinkTab' not in tables:
-            self.Linktab()
+            self.linktab()
         if 'Users' not in tables:
-            self.Users()
+            self.users()
 
         self.dbi.commit()
 
-    def Config(self):
+    def config(self):
         statement = """
             CREATE TABLE Config ('ID' integer primary key autoincrement, 
             'Version' int, CreateDate timestamp);
         """
         self.dbi.execute_statement(statement)
         
-        insert_statement = "insert into Config (Version, CreateDate) values(" + str(DatabaseCreate.DATABASE_VERSION) + ",'" + str(datetime.datetime.now()) + "');"
+        insert_statement = "insert into Config (Version, CreateDate) values(" + str(DatabaseCreate.DATABASE_VERSION) \
+                           + ",'" + str(datetime.datetime.now()) + "');"
         self.dbi.execute(insert_statement)
 
-    def Well(self):
+    def well(self):
         statement = """
             CREATE TABLE Well ('ID' integer primary key autoincrement, 
              "StartDate" timestamp,
@@ -83,7 +85,7 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
         
-    def RoyaltyMaster(self):
+    def royalty_master(self):
         statement = """
             CREATE TABLE RoyaltyMaster ('ID' integer primary key autoincrement,
              "StartDate" timestamp,
@@ -104,7 +106,7 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
         
-    def Lease(self):
+    def lease(self):
         statement = """
             CREATE TABLE Lease ('ID' integer primary key autoincrement,
              "StartDate" timestamp,
@@ -118,7 +120,7 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
         
-    def WellLeaseLink(self):
+    def well_lease_link(self):
         statement = """
             CREATE TABLE WellLeaseLink ('ID' integer primary key autoincrement,
              "StartDate" timestamp,
@@ -129,7 +131,7 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
 
-    def Monthly(self):
+    def monthly(self):
         statement = """
             CREATE TABLE Monthly ('ID' integer primary key autoincrement, 
             "ExtractMonth" timestamp,
@@ -147,7 +149,7 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
         
-    def Calc(self):
+    def calc(self):
         statement = """
             CREATE TABLE Calc ('ID' integer primary key autoincrement,
             "ProdMonth" int,
@@ -183,7 +185,7 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
         
-    def ECONdata(self):
+    def econ_data(self):
         statement = """
             CREATE TABLE ECONData ('ID' integer primary key autoincrement,
             "CharMonth" text,
@@ -204,8 +206,7 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
 
-
-    def ECONGasdata(self):
+    def econ_gas_data(self):
         statement = """
             CREATE TABLE ECONGasData ('ID' integer primary key autoincrement,
             "CharMonth" text, "ProdMonth" int,
@@ -217,14 +218,14 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
 
-    def Linktab(self):
+    def linktab(self):
         statement = """
             create table LinkTab ('ID' integer primary key autoincrement,
             TabName text, AttrName text, LinkName text, BaseTab boolean, ShowAttrs text);
         """
         self.dbi.execute_statement(statement)
 
-    def Users(self):
+    def users(self):
         statement = """
             CREATE TABLE Users (
                 "ID"	INTEGER PRIMARY KEY AUTOINCREMENT,

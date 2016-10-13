@@ -27,11 +27,11 @@ class Test(unittest.TestCase):
         well.LeaseType = 'OL'
         
         # If there is no attribute in the object called 'LeaseID' use the ID attribute to format the lease string
-        self.assertEqual(well.Lease,'OL-0123')
+        self.assertEqual(well.lease, 'OL-0123')
 
         well.LeaseID = 1
         # If there is an attribute in the object called 'LeaseID' use it to format the lease string
-        self.assertEqual(well.Lease,'OL-0001')
+        self.assertEqual(well.lease, 'OL-0001')
 
     def test_formatter_date(self):
         monthly = DataStructure()
@@ -46,11 +46,11 @@ class Test(unittest.TestCase):
         well.LeaseType = 'OL'
         
         # If there is no attribute in the object called 'LeaseID' use the ID attribute to format the lease string
-        self.assertEqual(well._format.Lease,'OL-0123')
+        self.assertEqual(well._format.lease, 'OL-0123')
 
         well.LeaseID = 1
         # If there is an attribute in the object called 'LeaseID' use it to format the lease string
-        self.assertEqual(well._format.Lease,'OL-0001')
+        self.assertEqual(well._format.lease, 'OL-0001')
         
     def test_formatter_prod_month(self):        
         well = DataStructure()

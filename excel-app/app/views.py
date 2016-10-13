@@ -36,14 +36,14 @@ def leases():
     if request.args:
         for l in all_leases:
 #            if l.Lease == request.args['leaseid']:
-            if (request.args['leaseid'] == "" or request.args['leaseid'] == l.Lease) and \
+            if (request.args['leaseid'] == "" or request.args['leaseid'] == l.lease) and \
                 (request.args['prov'] == "" or request.args['prov'] == l.Prov):
                     return_leases.append(l)
         if len(return_leases) == 0:
             flash('No matching leases found.')
             return redirect(url_for('searchleases'))
         elif len(return_leases) == 1:
-            return redirect(url_for('lease', leaseid=return_leases[0].Lease))
+            return redirect(url_for('lease', leaseid=return_leases[0].lease))
         else:
             return render_template('leases.html', leases=return_leases)
     else:

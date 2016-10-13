@@ -14,8 +14,8 @@ class RoyaltyWorksheet(object):
         db = DataBase(config.get_file_dir() + 'database.xlsx')
         md = db.getMonthlyDataByWellProdMonthProduct(wellID,prodDate,product)
         well = db.getWell(wellID)
-        royalty = db.getRoyaltyMaster(well.Lease)
-        lease = db.getLease(well.Lease)
+        royalty = db.getRoyaltyMaster(well.lease)
+        lease = db.getLease(well.lease)
         calc = db.getCalcDataByWellProdMonthProduct(wellID,prodDate,product)
 
         ws = RoyaltyWorksheet()
@@ -25,7 +25,7 @@ class RoyaltyWorksheet(object):
 #         print('Well:',well.wellID,lease.Lease,royaltyCalc)
         self.count += 1
         self.ws.write ('\n')
-        self.ws.write ('Well: {:<33} Lease: {}\n'.format(well.ID,lease.Lease))
+        self.ws.write ('Well: {:<33} Lease: {}\n'.format(well.ID, lease.lease))
         fs = '{:>45}: {}\n'
         self.ws.write (fs.format("Right", royalty.RightsGranted))
         self.ws.write (fs.format("Province", well.Prov))

@@ -55,7 +55,7 @@ class DataBase(object):
         stack = self.excelLoadWsTable(self.royaltyMasterTabName)
         self.royaltyMaster = dict()
         for ds in stack:
-            self.royaltyMaster[ds.Lease] = ds
+            self.royaltyMaster[ds.lease] = ds
     
     def getRoyaltyMaster(self, lease):
         try:
@@ -74,7 +74,7 @@ class DataBase(object):
         self.lease = dict()
         for ds in stack:
 #             print(ds)
-            self.lease[ds.Lease] = ds
+            self.lease[ds.lease] = ds
         
     def getLease(self, lease):
         try:
@@ -121,7 +121,7 @@ class DataBase(object):
     def getWellbyLease(self, lease):
         wl = []
         for w in self.wellList:
-            if w.Lease == lease:
+            if w.lease == lease:
                 wl.append(w)
         return wl
     def updateWell(self,well):
@@ -147,7 +147,7 @@ class DataBase(object):
         stack = self.excelLoadWsTable(self.productClausesTabName)
         self.productClauses = dict()
         for ds in stack:
-            self.royaltyMaster[ds.Lease] = ds
+            self.royaltyMaster[ds.lease] = ds
 
     #
     # Monthly Data 
