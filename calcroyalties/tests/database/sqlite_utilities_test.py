@@ -55,10 +55,10 @@ class DatabaseUtilities(object):
             self.db_create.well()
             
         statement = """
-            INSERT INTO Well VALUES(1, '2010-01-01 00:00:00', '9999-12-31 23:59:59.000005', 'SKWI111062705025W300','SK','Oil','OL',1,'New Oil','Heavy',0,0.25,'2014-12-01 00:00:00',1,'9999-12-31 23:59:59.000005', 'HORIZONTAL');
-            INSERT INTO Well VALUES(2, '2011-11-01 00:00:00', '9999-12-31 23:59:59.000005', 'SKWI112062705025W300','SK','Oil','OL',2,'Third Tier Oil','Southwest',0,0.95,'2014-12-01 00:00:00',1,'9999-12-31 23:59:59.000005', 'HORIZONTAL');
-            INSERT INTO Well VALUES(3, '2004-10-01 00:00:00', '9999-12-31 23:59:59.000005', 'SKWI113062705025W300','SK','Oil','OL',2,'Fourth Tier Oil','Other',0,1.0,NULL,NULL,'9999-12-31 23:59:59.000005', 'VERTICAL');
-            INSERT INTO Well VALUES(4, '2013-01-01 00:00:00', '9999-12-31 23:59:59.000005', 'SKWI114062705025W300','SK','Oil','OL',3,'Old Oil','Other',0,1.0,NULL,NULL,'9999-12-31 23:59:59.000005', 'VERTICAL');
+            INSERT INTO Well VALUES(1, '2010-01-01 00:00:00', '9999-12-31 23:59:59.000005', 'SKWI111062705025W300','SK','Oil','New Oil',        'Heavy',    0,'2014-12-01 00:00:00',1.0,'9999-12-31 23:59:59.000005', 'HORIZONTAL');
+            INSERT INTO Well VALUES(2, '2011-11-01 00:00:00', '9999-12-31 23:59:59.000005', 'SKWI112062705025W300','SK','Oil','Third Tier Oil', 'Southwest',0,'2014-12-01 00:00:00',1.0,'9999-12-31 23:59:59.000005', 'HORIZONTAL');
+            INSERT INTO Well VALUES(3, '2004-10-01 00:00:00', '9999-12-31 23:59:59.000005', 'SKWI113062705025W300','SK','Oil','Fourth Tier Oil','Other',    0,'2014-12-01 00:00:00',1.0,'9999-12-31 23:59:59.000005', 'VERTICAL');
+            INSERT INTO Well VALUES(4, '2013-01-01 00:00:00', '9999-12-31 23:59:59.000005', 'SKWI114062705025W300','SK','Oil','Old Oil',        'Other',    0,'2014-12-01 00:00:00',1.0,'9999-12-31 23:59:59.000005', 'VERTICAL');
         """
         
         self.db_instance.execute_statement(statement)
@@ -69,7 +69,7 @@ class DatabaseUtilities(object):
 
         statement = """
             INSERT INTO RoyaltyMaster VALUES(1, '2001-01-08 00:00:00', '2016-01-07 00:00:00', 'All', 'SKProvCrownVar,
-            GORR', 1.2, 50, 'SaskWellHead', 'Y', 'Y', 'Y', 'mprod,250,2,300,3,400,4,500,5,0,6', NULL, 0, 50, NULL)
+            GORR', 1.2, 'SaskWellHead', 'Y', 'Y', 'Y', 'mprod,250,2,300,3,400,4,500,5,0,6', NULL, 0, 50, 50, NULL)
         """
 
         self.db_instance.execute_statement(statement)

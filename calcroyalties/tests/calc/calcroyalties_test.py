@@ -12,16 +12,14 @@ from tests.database.testhelper import TestHelper
 from tests.database.sqlite_utilities_test import DatabaseUtilities
 
 
-#from DataBase import DataBase,AppError,DataStructure,TestDataBase
-
-
 class DataObj(object):
     None
+
 
 class TestSaskRoyaltyCalc(unittest.TestCase):
 
     def setUp(self):
-        self.assertEqual(config.get_environment(),'unittest') # Distructive Tests must run in unittest enviornment
+        self.assertEqual(config.get_environment(), 'unittest') # Destructive Tests must run in unittest environment
 
 
 #     def xtest_determineRoyaltyPrice (self):
@@ -37,7 +35,7 @@ class TestSaskRoyaltyCalc(unittest.TestCase):
 # 
 #         return
 
-    def test_calcSaskOilRegulationSubsection2(self):
+    def test_calc_sask_oil_regulations_subsection2(self):
         """ subsection (2) """
         pr = ProcessRoyalties()
         self.assertEqual(pr.calc_sask_oil_regulation_subsection2(70), 7)
@@ -46,7 +44,7 @@ class TestSaskRoyaltyCalc(unittest.TestCase):
         self.assertEqual(pr.calc_sask_oil_regulation_subsection2(2000), (24 + .26 * (2000 - 160)))
         return
     
-    def test_calcSaskOilRegulationSubsection3(self):
+    def test_calc_sask_oil_regulation_subsection3(self):
         """ subsection (3) """
         pr = ProcessRoyalties()
         self.assertEqual(pr.calc_sask_oil_regulation_subsection3(70), 7)
@@ -54,9 +52,8 @@ class TestSaskRoyaltyCalc(unittest.TestCase):
         self.assertEqual(pr.calc_sask_oil_regulation_subsection3(200), (24 + .26 * (200 - 160)))
         self.assertEqual(pr.calc_sask_oil_regulation_subsection3(2000), (189 + .4 * (2000 - 795)))
         return
-    
-    
-    def test_determineCommencementPeriod(self):
+
+    def test_determine_commencement_period(self):
         pr = ProcessRoyalties()
         self.assertEqual(pr.determine_commencement_period(201501, date(2014, 12, 1)), .08)
         self.assertEqual(pr.determine_commencement_period(201501, date(2014, 12, 31)), 0)
@@ -65,15 +62,10 @@ class TestSaskRoyaltyCalc(unittest.TestCase):
         self.assertEqual(pr.determine_commencement_period(201501, date(2010, 1, 1)), 5)
         self.assertEqual(pr.determine_commencement_period(201501, date(2010, 1, 31)), 4.92)
         self.assertEqual(pr.determine_commencement_period(201501, date(2010, 1, 1)), 5.0)
-        self.assertRaises(AppError, pr.determine_commencement_period, None, None)
+        self.assertEqual(pr.determine_commencement_period(None, None),5)
         self.assertEqual(pr.determine_commencement_period(201501, datetime(2003, 1, 1)), 12.01)
         return
     
-
-#    
-    # Adrienne - write this tests
-    # 110% if you can understand what all these lines of code are trying to do....
-
     def test_calcSaskGasProvCrownRoyaltyRate(self):
         econStringData =  \
 """
@@ -114,49 +106,48 @@ CharMonth,ProdMonth,HOP,SOP,NOP,H4T_C,H4T_D,H4T_K,H4T_X,H3T_K,H3T_X,HNEW_K,HNEW_
 Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,25.85,1939,31.57,729,38.54,890,0.1209,3.02,29.91,2243,36.08,833,40.79,941,52.61,1214
 """
         # All this work so we don't need to read from the database. It's a way better test.
-        econOilData = DataStructure()
+        econ_oil_data = DataStructure()
         th = TestHelper()
-        royaltyCalc = DataStructure()
+        royalty_calc = DataStructure()
 
-        th.load_object_csv_style(econOilData, econStringData)
+        th.load_object_csv_style(econ_oil_data, econStringData)
               
         pr = ProcessRoyalties()
 
-        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royaltyCalc, econOilData, 'Fourth Tier Oil', 'Heavy', 24, 0), 0)
-        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royaltyCalc, econOilData, 'Fourth Tier Oil', 'Heavy', 100, 0), 6.31)
-        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royaltyCalc, econOilData, 'Fourth Tier Oil', 'Southwest', 100, 0), 7.84)
-        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royaltyCalc, econOilData, 'Fourth Tier Oil', 'Other', 130, 0), 12.697)
-        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royaltyCalc, econOilData, 'Fourth Tier Oil', 'Heavy', 140, 0), 9.66)
-        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royaltyCalc, econOilData, 'Fourth Tier Oil', 'Southwest', 136.3, 0), 11.624028)
-        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royaltyCalc, econOilData, 'Fourth Tier Oil', 'Other', 150, 0), 14.956667)
-        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royaltyCalc, econOilData, 'Fourth Tier Oil', 'Other', 0, 0), 0)
-        self.assertRaises(AppError, pr.calc_sask_oil_prov_crown_royalty_rate, royaltyCalc, econOilData, 'Fourth Tier Oil', 'BadString', 120, 0)
-        self.assertRaises(AppError, pr.calc_sask_oil_prov_crown_royalty_rate, royaltyCalc, econOilData, 'Fourth Tier Oil', 'BadString', 140, 0)
-        self.assertRaises(AppError, pr.calc_sask_oil_prov_crown_royalty_rate, royaltyCalc, econOilData, 'Bad String', 'Heavy', 120, 0)
-        self.assertRaises(AppError, pr.calc_sask_oil_prov_crown_royalty_rate, royaltyCalc, econOilData, 'Bad String', 'Southwest', 120, 0)
-        self.assertRaises(AppError, pr.calc_sask_oil_prov_crown_royalty_rate, royaltyCalc, econOilData, 'Bad String', 'Other', 120, 0)
+        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royalty_calc, econ_oil_data, 'Fourth Tier Oil', 'Heavy', 24, 0), 0)
+        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royalty_calc, econ_oil_data, 'Fourth Tier Oil', 'Heavy', 100, 0), .0631)
+        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royalty_calc, econ_oil_data, 'Fourth Tier Oil', 'Southwest', 100, 0), .0784)
+        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royalty_calc, econ_oil_data, 'Fourth Tier Oil', 'Other', 130, 0), .12697)
+        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royalty_calc, econ_oil_data, 'Fourth Tier Oil', 'Heavy', 140, 0), .0966)
+        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royalty_calc, econ_oil_data, 'Fourth Tier Oil', 'Southwest', 136.3, 0), .11624028)
+        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royalty_calc, econ_oil_data, 'Fourth Tier Oil', 'Other', 150, 0), .14956667)
+        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royalty_calc, econ_oil_data, 'Fourth Tier Oil', 'Other', 0, 0), 0)
+        self.assertRaises(AppError, pr.calc_sask_oil_prov_crown_royalty_rate, royalty_calc, econ_oil_data, 'Fourth Tier Oil', 'BadString', 120, 0)
+        self.assertRaises(AppError, pr.calc_sask_oil_prov_crown_royalty_rate, royalty_calc, econ_oil_data, 'Fourth Tier Oil', 'BadString', 140, 0)
+        self.assertRaises(AppError, pr.calc_sask_oil_prov_crown_royalty_rate, royalty_calc, econ_oil_data, 'Bad String', 'Heavy', 120, 0)
+        self.assertRaises(AppError, pr.calc_sask_oil_prov_crown_royalty_rate, royalty_calc, econ_oil_data, 'Bad String', 'Southwest', 120, 0)
+        self.assertRaises(AppError, pr.calc_sask_oil_prov_crown_royalty_rate, royalty_calc, econ_oil_data, 'Bad String', 'Other', 120, 0)
 
-        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royaltyCalc, econOilData, 'Third Tier Oil', 'Heavy', 100, 0.75), 14.99)
-        self.assertAlmostEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royaltyCalc, econOilData, 'New Oil', 'Heavy', 100, 0.75), 19.620000)
-        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royaltyCalc, econOilData, 'New Oil', 'Heavy', 0, 0), 0)
-        self.assertRaises(AppError, pr.calc_sask_oil_prov_crown_royalty_rate, royaltyCalc, econOilData, 'Third Tier Oil', 'Bad String', 120, 0)
+        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royalty_calc, econ_oil_data, 'Third Tier Oil', 'Heavy', 100, 0.0075), .1499)
+        self.assertAlmostEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royalty_calc, econ_oil_data, 'New Oil', 'Heavy', 100, 0.0075), .19620000)
+        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royalty_calc, econ_oil_data, 'New Oil', 'Heavy', 0, 0), 0)
+        self.assertRaises(AppError, pr.calc_sask_oil_prov_crown_royalty_rate, royalty_calc, econ_oil_data, 'Third Tier Oil', 'Bad String', 120, 0)
 
-        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royaltyCalc, econOilData, 'Third Tier Oil', 'Southwest', 120, 0), 25.495000)
-        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royaltyCalc, econOilData, 'New Oil', 'Southwest', 130, 0.75), 30.943846)
-        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royaltyCalc, econOilData, 'New Oil', 'Southwest', 0, 0), 0)
-        self.assertRaises(AppError, pr.calc_sask_oil_prov_crown_royalty_rate, royaltyCalc, econOilData, 'New Oil', 'Bad String', 120, 0)
+        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royalty_calc, econ_oil_data, 'Third Tier Oil', 'Southwest', 120, 0), .25495000)
+        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royalty_calc, econ_oil_data, 'New Oil', 'Southwest', 130, 0.0075), .30943846)
+        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royalty_calc, econ_oil_data, 'New Oil', 'Southwest', 0, 0), 0)
+        self.assertRaises(AppError, pr.calc_sask_oil_prov_crown_royalty_rate, royalty_calc, econ_oil_data, 'New Oil', 'Bad String', 120, 0)
 
-        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royaltyCalc, econOilData, 'Third Tier Oil', 'Other', 120, 2.25), 26.888333)
-        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royaltyCalc, econOilData, 'New Oil', 'Other', 110, 0), 32.235455)
-        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royaltyCalc, econOilData, 'Old Oil', 'Other', 100, 0.75), 39.720000)
-        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royaltyCalc, econOilData, 'Old Oil', 'Other', 0, 0), 0)
-        self.assertRaises(AppError, pr.calc_sask_oil_prov_crown_royalty_rate, royaltyCalc, econOilData, 'Old Oil', 'Bad String', 120, 0)
+        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royalty_calc, econ_oil_data, 'Third Tier Oil', 'Other', 120, .0225), .26888333)
+        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royalty_calc, econ_oil_data, 'New Oil', 'Other', 110, 0), .32235455)
+        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royalty_calc, econ_oil_data, 'Old Oil', 'Other', 100, 0.0075), .39720000)
+        self.assertEqual(pr.calc_sask_oil_prov_crown_royalty_rate(royalty_calc, econ_oil_data, 'Old Oil', 'Other', 0, 0), 0)
+        self.assertRaises(AppError, pr.calc_sask_oil_prov_crown_royalty_rate, royalty_calc, econ_oil_data, 'Old Oil', 'Bad String', 120, 0)
 
-        self.assertRaises(AppError, pr.calc_sask_oil_prov_crown_royalty_rate, royaltyCalc, econOilData, 'Old Oil', 'Heavy', 120, 0)
-        self.assertRaises(AppError, pr.calc_sask_oil_prov_crown_royalty_rate, royaltyCalc, econOilData, 'Old Oil', 'Southwest', 120, 0)
+        self.assertRaises(AppError, pr.calc_sask_oil_prov_crown_royalty_rate, royalty_calc, econ_oil_data, 'Old Oil', 'Heavy', 120, 0)
+        self.assertRaises(AppError, pr.calc_sask_oil_prov_crown_royalty_rate, royalty_calc, econ_oil_data, 'Old Oil', 'Southwest', 120, 0)
 
         return
-
 
     """
     def test_calcSaskOilProvCrownRoyaltyVolumeValue(self):
@@ -176,7 +167,7 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, PEFNInterest, MinRoyalty, RoyaltyPric
         print(vars(royOilData).values())
 
         pr = ProcessRoyalties()
-"""
+    """
 
     def test_process_one(self):
         pr = ProcessRoyalties()
@@ -187,9 +178,7 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, PEFNInterest, MinRoyalty, RoyaltyPric
         well_lease_link_array = DataStructure()
         self.assertRaises(AppError, pr.process_one, well_id, prod_month, product)
 
-
-
-
+    """
     def calc_royalties(self):
         pr = ProcessRoyalties()
         well, royalty, lease, calc, monthly, well_lease_link
@@ -205,51 +194,53 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, PEFNInterest, MinRoyalty, RoyaltyPric
         self.assertEqual(calc.IOGR1995RoyaltyValue,1990.11)
 
 
-        """How do i do this?? """
+        ??? How do i do this??
 
         royalty.RoyaltyScheme = 'BadString'
         well.WellID = 2001010202
         self.assertRaises(AppError, well, royalty, lease, calc, monthly, well_lease_link)
+    """
 
-
-    def test_calcSaskOilProvCrownRoyaltyVolumeValue(self):
+    def test_calc_sask_oil_prov_crown_royalty_volume_value(self):
         pr = ProcessRoyalties()
         calc = DataStructure()
         m = DataStructure()
         royalty = DataStructure()
         m.ProdVol = 100
-        royalty.MinRoyalty = 5
+        royalty.MinRoyaltyRate = 0.0
+        royalty.MinRoyaltyDollar = 0.0
         royalty.CrownMultiplier = 1
         royalty.ValuationMethod = 'ActSales'
-        calc.ProvCrownUsedRoyaltyRate = 25
-        calc.ProvCrownRoyaltyRate = 25
+        calc.ProvCrownUsedRoyaltyRate = .25
+        calc.ProvCrownRoyaltyRate = .25
         calc.RoyaltyPrice = 210
         m.WellHeadPrice = 221.123456
         m.TransRate = 2.123455
         m.ProcessingRate = 0.123455
 
-
-
-#        monthly.WellHeadPrice + monthly.TransRate + monthly.ProcessingRate
-        #need to fix these tests now that m is being used as a paramater instead of prodvol......
         pr.calc_sask_oil_prov_crown_royalty_volume_value(m, 1, royalty, calc)
         self.assertEqual(calc.ProvCrownRoyaltyVolume, 25.0)
-        self.assertEqual(calc.ProvCrownRoyaltyValue, 5584.259150000001)
+        self.assertEqual(calc.ProvCrownRoyaltyValue, 5584.26)
 
-        calc.ProvCrownRoyaltyRate = -1
-        calc.ProvCrownUsedRoyaltyRate = -1
-        royalty.MinRoyalty = None
+        calc.ProvCrownRoyaltyRate = -.01
+        calc.ProvCrownUsedRoyaltyRate = -.01
+        royalty.MinRoyaltyRate = None
 
         pr.calc_sask_oil_prov_crown_royalty_volume_value(m, 1, royalty, calc)
 
         self.assertEqual(calc.ProvCrownUsedRoyaltyRate, 0)
 
-
-        calc.ProvCrownRoyaltyRate = -1
-        calc.ProvCrownUsedRoyaltyRate = -1
-        royalty.MinRoyalty = 2
+        calc.ProvCrownRoyaltyRate = -.01
+        calc.ProvCrownUsedRoyaltyRate = -.01
+        royalty.MinRoyaltyRate = .02
         pr.calc_sask_oil_prov_crown_royalty_volume_value(m, 1, royalty, calc)
-        self.assertEqual(calc.ProvCrownUsedRoyaltyRate, 2)
+        self.assertEqual(calc.ProvCrownUsedRoyaltyRate, .02)
+
+        self.assertEqual(calc.ProvCrownRoyaltyValue, 446.74)
+        royalty.MinRoyaltyDollar = 500.0
+        pr.calc_sask_oil_prov_crown_royalty_volume_value(m, 1, royalty, calc)
+        self.assertEqual(calc.ProvCrownRoyaltyValue, 500.0)
+
 
 
         # self.assertEqual(pr.calcSaskOilProvCrownRoyaltyVolumeValue(m, 1, royalty, calc), (20.0, 2000.0))
@@ -401,8 +392,3 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, PEFNInterest, MinRoyalty, RoyaltyPric
         self.dbu.create_calc()
         pr = ProcessRoyalties()
         pr.process_one(4, 201501, 'Oil')
-
-
-
-if __name__ == '__main__':
-    unittest.main()

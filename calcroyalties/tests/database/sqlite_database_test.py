@@ -66,7 +66,6 @@ class SqliteDatabaseTest(unittest.TestCase):
         well = self.db.select('Well', ID=2)
         self.assertEqual(well[0].ID, 2)
         self.assertEqual(well[0].WellEvent, 'Changed')
-        self.assertEqual(well[0].LeaseID, 100)
         self.assertEqual(well[0].CommencementDate, datetime(2016,2,1,0,0))
         self.assertEqual(well[0].WellType, None)
 

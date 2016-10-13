@@ -14,6 +14,10 @@ Database Change Log: Must be maintained so we can keep the database in sink:
 - WellLeaseLink change WellEvent to WellID
 - Monthly change WellEvent to WellID
 - Calc change WellEvent to WellID
+2016-10-13
+- Rename RoyaltyMaster.MinRoyalty to MinRoyaltyDollar
+- move MinRoyaltyDollar to the min section of RoyaltyMaster
+- remove well PEFNInterest, Lease, LeaseType
 
 """
 import datetime
@@ -72,12 +76,9 @@ class DatabaseCreate(object):
              'WellEvent' text,
              'Prov' text,
              'WellType' text,
-             'LeaseType' text,
-             'LeaseID' int,
              'RoyaltyClassification' text,
              'Classification' text,
              'SRC' int,
-             'PEFNInterest' float,
              'CommencementDate' timestamp,
              'ReferencePrice' int,
              "FinishDrillDate" timestamp,
@@ -93,7 +94,6 @@ class DatabaseCreate(object):
              "RightsGranted" text,
              "RoyaltyScheme" text,
              "CrownMultiplier" float,
-             "MinRoyalty" int,
              "ValuationMethod" text,
              "TruckingDeducted" text,
              "ProcessingDeducted" text,
@@ -102,6 +102,7 @@ class DatabaseCreate(object):
              "OverrideRoyaltyClassification" text,
              "MinRoyaltyRate" float,
              "MaxRoyaltyRate" float,
+             "MinRoyaltyDollar" float,
              "Notes" text);
         """
         self.dbi.execute_statement(statement)
