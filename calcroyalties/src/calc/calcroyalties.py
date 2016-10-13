@@ -338,7 +338,7 @@ class ProcessRoyalties(object):
 
         calc.ProvCrownRoyaltyVolume = round(((calc.ProvCrownUsedRoyaltyRate / 100) *
                                                       royalty.CrownMultiplier *
-                                                      m.ProdVol * fn_interest/100), 2)
+                                                      m.ProdVol * fn_interest), 2)
 
         calc.ProvCrownRoyaltyValue = calc.ProvCrownRoyaltyVolume * calc.RoyaltyPrice
 
@@ -359,7 +359,7 @@ class ProcessRoyalties(object):
         
         calc.IOGR1995RoyaltyValue = round(crown_multiplier *
                                                       calc.IOGR1995RoyaltyVolume *
-                                                      fn_interest/100 *
+                                                      fn_interest *
                                                       calc.RoyaltyPrice , 2)
 
         calc.SupplementaryRoyalties = round(self.calcSupplementaryRoyaltiesIOGR1995(calc.CommencementPeriod, m.WellHeadPrice, m.ProdVol, calc.RoyaltyRegulation, self.reference_price['Onion Lake']), 2)

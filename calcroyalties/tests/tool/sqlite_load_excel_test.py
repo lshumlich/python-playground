@@ -11,6 +11,9 @@ class TestLoader(unittest.TestCase):
 
     TEST_SPREADSHEET = config.get_file_dir() + 'test_database.xlsx'
 
+    #
+    # Test that the load works properly
+
     def test_run(self):
 
         self.assertEqual(config.get_environment(), 'unittest')  # Distructive Tests must run in unittest enviornment
