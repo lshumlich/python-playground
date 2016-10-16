@@ -26,8 +26,9 @@ class Test(unittest.TestCase):
         self.assertEqual(dbi1, dbi2, 'All instances must be the same.')
         
     def test_debug_sql(self):
-        print('debug_sql:',config.debug_sql())
-        
+        None
+        # print('debug_sql:',config.debug_sql())
+
     def test_set_methods(self):
         """ this tests all of the set methods since they need to work together """
         save_config_file = config.ConfigObject.CONFIG_FILE 

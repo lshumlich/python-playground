@@ -77,7 +77,7 @@ def setup_environment():
         ConfigObject.database_name = ":memory:"
 #         ConfigObject.database_name = get_temp_dir() + ConfigObject.environment + '.db'
         
-    print("config.setup_environment",ConfigObject.environment,ConfigObject.database_name)
+    # print("config.setup_environment",ConfigObject.environment,ConfigObject.database_name)
         
     ConfigObject.database_instance = SqliteInstance(ConfigObject.database_name)
     ConfigObject.database = Database()
