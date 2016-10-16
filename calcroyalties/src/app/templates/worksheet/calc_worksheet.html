@@ -72,7 +72,13 @@ fmath {
       GORR:<br>
       {%endif%}
       Crown Multiplier:<br>
-      PE FN Interest:
+      PE FN Interest:<br>
+      {% if rm.MinRoyaltyRate %}
+      Min Royalty Rate:<br>
+      {%endif%}
+      {% if rm.MinRoyaltyDollar %}
+      Min Royalty Dollar:<br>
+      {%endif%}
       </b></td>
 
       <TD align="left">{{ lease.Lease }}<br>
@@ -83,13 +89,16 @@ fmath {
       {{ rm.Gorr }}<br>
       {% endif %}
       {{  '{:.2f}'.format(rm.CrownMultiplier) }}<br>
-      {{  '{:.6%}'.format(well_lease_link.PEFNInterest)}}
+      {{  '{:.6%}'.format(well_lease_link.PEFNInterest)}}<br>
+      {% if rm.MinRoyaltyRate %}
+      {{  '{:.6%}'.format(rm.MinRoyaltyRate)}}<br>
+      {%endif%}
+      {% if rm.MinRoyaltyDollar %}
+      {{  '{:.2f}'.format(rm.MinRoyaltyDollar)}}<br>
+      {%endif%}
       </TD>
 
       <TD align=right><b>
-      {% if rm.MinRoyalty != None %}
-      Min Royalty:<br>
-      {% endif %}
       {% if well.SRC != None %}
       SRC:<br>
       {% endif %}
@@ -115,9 +124,6 @@ fmath {
 
 
       <TD align="left">
-      {% if rm.MinRoyalty != None %}
-      {{ rm.MinRoyalty }}<br>
-      {% endif %}
       {% if well.SRC != None %}
       {{ well.SRC }}<br>
       {% endif %}
@@ -206,12 +212,12 @@ table, th, td {
 	<col width="5%">
 
 {% if calc.X > 0 %}
-<tr><td align="left"> $$\CR% = $$</td> <td>$$({\K - {\X}/{\MOP} )$$</td><td>$$- {\SRC} $$ </td></tr>
+<tr><td align="left"> $$\CR% = $$</td> <td>$$({\K - {\X}/{\MOP} )$$</td><td>$$- {\ SRC} $$ </td></tr>
 
 <tr><td align="left"> $$\CR% = $$</td> <td>$$({ {{ '{:.2f}'.format(calc.K) }} } -
     { {{ calc.X }} }/{ {{ '{:.2f}'.format(m.ProdVol) }} } )$$</td><td>$$- { {{ well.SRC }} }$$ </td></tr>
 
-<tr><td align="left"> $$\CR% = $$</td><td>$$ {{ '{:.6f}'.format(calc.ProvCrownRoyaltyRate) }} $$</td></tr>
+<tr><td align="left"> $$\CR% = $$</td><td>$$ {{ '{:.6%}'.format(calc.ProvCrownRoyaltyRate) }} $$</td></tr>
 <br>
 
 {% endif %}
@@ -220,7 +226,7 @@ table, th, td {
 
     <tr><td align="left">$$\CR% = $$</td><td>$$(C * MOP) - D$$</td></tr>
     <tr><td align="left">$$\CR% = $$</td><td>$$({{'{:.4f}'.format(calc.C)}} * {{ '{:.2f}'.format(m.ProdVol) }}) - {{'{:.2f}'.format(calc.D)}}$$</td></tr>
-    <tr><td align="left">$$\CR% = $$</td><td>$${{ '{:.6f}'.format(calc.ProvCrownRoyaltyRate) }}$$</td></tr>
+    <tr><td align="left">$$\CR% = $$</td><td>$${{ '{:.6%}'.format(calc.ProvCrownRoyaltyRate) }}$$</td></tr>
 
 <br>
 </TABLE>
@@ -292,9 +298,9 @@ table, th, td {
 <tr><td align="left" style="text-align:left">RVol =</td><td style="text-align:center"> CR%</td> <td style="text-align:center">*</td>
     <td style="text-align:center">CMult</td> <td style="text-align:center">*</td> <td style="text-align:center">ProdVol</td>
     <td style="text-align:center">*</td> <td style="text-align:center">PE FN %</td></tr>
-<tr><td align="left" style="text-align:left">RVol =</td><td style="text-align:center"> {{ '{:.6f}'.format(calc.ProvCrownUsedRoyaltyRate) }}%</td>
+<tr><td align="left" style="text-align:left">RVol =</td><td style="text-align:center"> {{ '{:.6%}'.format(calc.ProvCrownUsedRoyaltyRate) }}</td>
     <td style="text-align:center">*</td> <td style="text-align:center">{{ rm.CrownMultiplier }}</td> <td style="text-align:center">*</td>
-    <td style="text-align:center">{{ '{:.2f}'.format(m.ProdVol) }}</td> <td>*</td> <td>{{ '{:.6f}'.format(well_lease_link.PEFNInterest) }}%</td></tr>
+    <td style="text-align:center">{{ '{:.2f}'.format(m.ProdVol) }}</td> <td>*</td> <td>{{ '{:.6%}'.format(well_lease_link.PEFNInterest) }}</td></tr>
 <tr align="left" style="text-align:left"><td>RVol =</td> <td style="text-align:center">{{ '{:.2f}'.format(calc.ProvCrownRoyaltyVolume) }}</td></tr>
 {% endif %}
 
@@ -384,7 +390,7 @@ table, th, td {
     <col width="8%">
     <caption><center> GORR: {{ calc.GorrMessage }} </center></caption>
 <tr align="center"><td></td><td></td><td>GORR$</td> <td>=</td> <td>ProdVol</td> <td>*</td> <td>PE FN %</td> <td>*</td> <td>GORRRoyRate</td> <td>*</td> <td>RVal</td><td></td></tr>
-<tr align="center"><td></td><td></td><td>GORR$</td><td>=</td><td>{{ '{:.2f}'.format(m.ProdVol) }}</td> <td>*</td> <td>{{ '{:.6f}'.format(well_lease_link.PEFNInterest) }}%</td><td>*</td> <td>{{ '{:.6f}'.format(calc.GorrRoyaltyRate) }}%</td><td>*</td> <td> {{ '{:>10,.6f}'.format(calc.RoyaltyPrice) }} </td><td></td></tr>
+<tr align="center"><td></td><td></td><td>GORR$</td><td>=</td><td>{{ '{:.2f}'.format(m.ProdVol) }}</td> <td>*</td> <td>{{ '{:.6%}'.format(well_lease_link.PEFNInterest) }}</td><td>*</td> <td>{{ '{:.6%}'.format(calc.GorrRoyaltyRate) }}</td><td>*</td> <td> {{ '{:>10,.6f}'.format(calc.RoyaltyPrice) }} </td><td></td></tr>
 <tr align="center"><td></td><td></td><td>GORR$</td><td>=</td><td> {{ '{:.2f}'.format(calc.GorrRoyaltyValue) }}</td></tr>
 <br>
     {% endif %}

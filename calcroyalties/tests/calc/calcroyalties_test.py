@@ -342,28 +342,28 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, PEFNInterest, MinRoyalty, RoyaltyPric
         gorr = None,"0,2"
         self.assertRaises(AttributeError, pr.calc_gorr_percent, 400, 10, gorr)
 
-        gorr = "dprod,250,2,300,3,400,4,500,5,0,6"
-        self.assertEqual(pr.calc_gorr_percent(600, 10, gorr), (2.0, 'dprod = mprod / 30.5 days; 19.67 is > 0.0 and <= 250.0 for a RoyRate of 2.0%'))
-        self.assertEqual(pr.calc_gorr_percent(8235, 3, gorr), (3.0, 'dprod = mprod / 30.5 days; 270.00 is > 250.0 and <= 300.0 for a RoyRate of 3.0%'))
-        self.assertEqual(pr.calc_gorr_percent(10065, 4, gorr), (4.0, 'dprod = mprod / 30.5 days; 330.00 is > 300.0 and <= 400.0 for a RoyRate of 4.0%'))
-        self.assertEqual(pr.calc_gorr_percent(13725, 5, gorr), (5.0, 'dprod = mprod / 30.5 days; 450.00 is > 400.0 and <= 500.0 for a RoyRate of 5.0%'))
+        gorr = "dprod,250,.02,300,.03,400,.04,500,.05,0,.06"
+        self.assertEqual(pr.calc_gorr_percent(600, 10, gorr), (.02, 'dprod = mprod / 30.5 days; 19.67 is > 0.0 and <= 250.0 for a RoyRate of 2.00%'))
+        self.assertEqual(pr.calc_gorr_percent(8235, 3, gorr), (.03, 'dprod = mprod / 30.5 days; 270.00 is > 250.0 and <= 300.0 for a RoyRate of 3.00%'))
+        self.assertEqual(pr.calc_gorr_percent(10065, 4, gorr), (.04, 'dprod = mprod / 30.5 days; 330.00 is > 300.0 and <= 400.0 for a RoyRate of 4.00%'))
+        self.assertEqual(pr.calc_gorr_percent(13725, 5, gorr), (.05, 'dprod = mprod / 30.5 days; 450.00 is > 400.0 and <= 500.0 for a RoyRate of 5.00%'))
 
         self.assertRaises(TypeError, pr.calc_gorr_percent, None, 10, gorr)
 
-        gorr = "mprod,250,2,300,3,400,4,500,5,0,6"
-        self.assertEqual(pr.calc_gorr_percent(200, 10, gorr), (2.0, 'mprod = 200 is > 0.0 and <= 250.0 for a RoyRate of 2.0%'))
-        self.assertEqual(pr.calc_gorr_percent(300, 4, gorr), (3.0, 'mprod = 300 is > 250.0 and <= 300.0 for a RoyRate of 3.0%'))
-        self.assertEqual(pr.calc_gorr_percent(350.6, 1, gorr), (4.0, 'mprod = 350.6 is > 300.0 and <= 400.0 for a RoyRate of 4.0%'))
-        self.assertEqual(pr.calc_gorr_percent(410, 2, gorr), (5.0, 'mprod = 410 is > 400.0 and <= 500.0 for a RoyRate of 5.0%'))
-        self.assertEqual(pr.calc_gorr_percent(10000, 17, gorr), (6.0, 'mprod = 10000 is > 500.0 for a RoyRate of 6.0%'))
+        gorr = "mprod,250,.02,300,.03,400,.04,500,.05,0,.06"
+        self.assertEqual(pr.calc_gorr_percent(200, 10, gorr), (.02, 'mprod = 200 is > 0.0 and <= 250.0 for a RoyRate of 2.00%'))
+        self.assertEqual(pr.calc_gorr_percent(300, 4, gorr), (.03, 'mprod = 300 is > 250.0 and <= 300.0 for a RoyRate of 3.00%'))
+        self.assertEqual(pr.calc_gorr_percent(350.6, 1, gorr), (.04, 'mprod = 350.6 is > 300.0 and <= 400.0 for a RoyRate of 4.00%'))
+        self.assertEqual(pr.calc_gorr_percent(410, 2, gorr), (.05, 'mprod = 410 is > 400.0 and <= 500.0 for a RoyRate of 5.00%'))
+        self.assertEqual(pr.calc_gorr_percent(10000, 17, gorr), (.06, 'mprod = 10000 is > 500.0 for a RoyRate of 6.00%'))
 
-        gorr = "hprod,250,2,300,3,400,4,500,5,0,6"
-        self.assertEqual(pr.calc_gorr_percent(200, 10, gorr), (2.0, 'hprod = mprod / hours; 20.00 is > 0.0 and <= 250.0 for a RoyRate of 2.0%'))
+        gorr = "hprod,250,.02,300,.03,400,.04,500,.05,0,.06"
+        self.assertEqual(pr.calc_gorr_percent(200, 10, gorr), (.02, 'hprod = mprod / hours; 20.00 is > 0.0 and <= 250.0 for a RoyRate of 2.00%'))
 
-        gorr = "fixed,0,2"
-        self.assertEqual(pr.calc_gorr_percent(200, 10, gorr), (2.0, 'fixed for a RoyRate of 2.0%'))
-        self.assertEqual(pr.calc_gorr_percent(10000, 4, gorr), (2.0, 'fixed for a RoyRate of 2.0%'))
-        self.assertEqual(pr.calc_gorr_percent(None, 10, gorr), (2.0, 'fixed for a RoyRate of 2.0%'))
+        gorr = "fixed,0,.02"
+        self.assertEqual(pr.calc_gorr_percent(200, 10, gorr), (.02, 'fixed for a RoyRate of 2.00%'))
+        self.assertEqual(pr.calc_gorr_percent(10000, 4, gorr), (.02, 'fixed for a RoyRate of 2.00%'))
+        self.assertEqual(pr.calc_gorr_percent(None, 10, gorr), (.02, 'fixed for a RoyRate of 2.00%'))
 
     def test_calcSupplementaryRoyaltiesIOGR1995(self):
         reference_price = {'Pigeon Lake Indian': 24.04, 'Reserve no.138A': 25.37, 'Sawridge Indian': 25.13, 'Stony Plain Indian': 24.64}

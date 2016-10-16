@@ -514,14 +514,16 @@ class ProcessRoyalties(object):
             else:
                 gorr_percent = float(s)
                 if eval_vol == 0:
-                    gorr_explain += ' for a RoyRate of ' + str(gorr_percent) + '%'
+                    gorr_explain += ' for a RoyRate of ' + '{:.2%}'.format(gorr_percent)
+                    # gorr_explain += ' for a RoyRate of ' + str(gorr_percent) + '%'
+
                     return round(gorr_percent, 6), gorr_explain
                 elif gorr_max_vol == 0:
-                    gorr_explain += ' is > ' + str(last_gorr_max_vol) + ' for a RoyRate of ' + str(gorr_percent) + '%'
+                    gorr_explain += ' is > ' + str(last_gorr_max_vol) + ' for a RoyRate of ' + '{:.2%}'.format(gorr_percent)
                     return round(gorr_percent, 6), gorr_explain
                 elif eval_vol <= gorr_max_vol:
                     gorr_explain += ' is > ' + str(last_gorr_max_vol) + ' and <= ' + str(
-                        gorr_max_vol) + ' for a RoyRate of ' + str(gorr_percent) + '%'
+                        gorr_max_vol) + ' for a RoyRate of ' + '{:.2%}'.format(gorr_percent)
                     return round(gorr_percent, 6), gorr_explain
         raise AppError('GORR Logic Error. We should never ever get here: ')
 
