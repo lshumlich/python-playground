@@ -58,9 +58,9 @@ class Loader(object):
             cols = ""
             i = 0
             for cell in header_row:
-                print(cell.value)
+                # print(cell.value)
                 name = cell.value.replace('#', '')
-                print(cell.value)
+                # print(cell.value)
                 name = '"' + name + '"'
                 if type(data_row[i].value) is str:
                     cols = cols + name + ' text, '
