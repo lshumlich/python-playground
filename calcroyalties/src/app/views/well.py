@@ -16,7 +16,7 @@ def results():
     if not request.is_xhr: abort(404)
     # try:
     db = config.get_database()
-    results = db.select('Well')
+    results = db.select('WellRoyaltyMaster')
     return render_template('well/results.html', results = results)
     # except:
     #     return "<h2>No results found</h2>"
@@ -26,7 +26,7 @@ def details():
     if not request.is_xhr: abort(404)
     try:
         db = config.get_database()
-        result = db.select1('Well', ID=request.args.get('ID'))
+        result = db.select1('WellRoyaltyMaster', ID=request.args.get('ID'))
         return render_template('well/details.html', result = result)
     except:
         abort(404)

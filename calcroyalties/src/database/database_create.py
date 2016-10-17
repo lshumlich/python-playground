@@ -18,6 +18,9 @@ Database Change Log: Must be maintained so we can keep the database in sink:
 - Rename RoyaltyMaster.MinRoyalty to MinRoyaltyDollar
 - move MinRoyaltyDollar to the min section of RoyaltyMaster
 - remove well PEFNInterest, Lease, LeaseType
+2016-10-16
+- Rename Well to WellRoyaltyMaster
+- Rename RoyaltyMaster to LeaseRoyaltyMaster
 
 """
 import datetime
@@ -36,10 +39,10 @@ class DatabaseCreate(object):
         tables = self.dbi.get_table_names()
         if 'Config' not in tables:
             self.config()
-        if 'Well' not in tables:
-            self.well()
-        if 'RoyaltyMaster' not in tables:
-            self.royalty_master()
+        if 'WellRoyaltyMaster' not in tables:
+            self.well_royalty_master()
+        if 'LeaseRoyaltyMaster' not in tables:
+            self.lease_royalty_master()
         if 'Lease' not in tables:
             self.lease()
         if 'WellLeaseLink' not in tables:
@@ -68,9 +71,9 @@ class DatabaseCreate(object):
                            + ",'" + str(datetime.datetime.now()) + "');"
         self.dbi.execute(insert_statement)
 
-    def well(self):
+    def well_royalty_master(self):
         statement = """
-            CREATE TABLE Well ('ID' integer primary key autoincrement, 
+            CREATE TABLE WellRoyaltyMaster ('ID' integer primary key autoincrement,
              "StartDate" timestamp,
              "EndDate" timestamp,
              'WellEvent' text,
@@ -82,13 +85,14 @@ class DatabaseCreate(object):
              'CommencementDate' timestamp,
              'ReferencePrice' int,
              "FinishDrillDate" timestamp,
-             "HorizontalDrilllnd" text);
+             "HorizontalDrilllnd" text,
+             "Notes" text);
         """
         self.dbi.execute_statement(statement)
         
-    def royalty_master(self):
+    def lease_royalty_master(self):
         statement = """
-            CREATE TABLE RoyaltyMaster ('ID' integer primary key autoincrement,
+            CREATE TABLE LeaseRoyaltyMaster ('ID' integer primary key autoincrement,
              "StartDate" timestamp,
              "EndDate" timestamp,
              "RightsGranted" text,

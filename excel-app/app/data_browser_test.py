@@ -109,7 +109,7 @@ class FlaskTest(unittest.TestCase):
 
         dbu.delete_all_tables()
         db_create.linktab()
-        dbu.create_some_test_wells()
+        dbu.create_some_test_well_royalty_masters()
         dbu.create_some_test_leases()
         
         linktab = db.get_data_structure('LinkTab')

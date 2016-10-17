@@ -5,6 +5,7 @@ from openpyxl import load_workbook
 
 import config
 from src.util.apperror import AppError
+from src.database.database_create import DatabaseCreate
 
 
 class Loader(object):
@@ -125,7 +126,6 @@ class Loader(object):
     def close(self):
         self.dbi.close()
 
-from src.database.database_create import DatabaseCreate
 
 def load_all_from_scratch(file_name):
     db_create = DatabaseCreate()
@@ -144,9 +144,8 @@ def load_all_from_scratch(file_name):
 
 
 def load_sheet(file_name):
-    worksheet = config.get_temp_dir() + file_name
     loader = Loader()
-    loader.open_excel(worksheet)
+    loader.open_excel(file_name)
     loader.load_all_sheets()
 
 
@@ -154,5 +153,5 @@ if __name__ == '__main__':
     #
     # Note: Set the new database in config.json
     #
-    #load_sheet()
-    load_all_from_scratch('sample_data.xlsx')
+    # load_sheet()
+    load_all_from_scratch(config.get_temp_dir() + 'sample_data.xlsx')

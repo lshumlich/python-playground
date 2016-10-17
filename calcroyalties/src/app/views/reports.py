@@ -10,9 +10,8 @@ reports = Blueprint('reports', __name__)
 @PermissionHandler('well_view')
 def royalties():
     db = config.get_database()
-    # proddate=get_proddate_int()
-    proddate = 201601
-    statement = """SELECT * from calc, wellleaselink where calc.wellevent = wellleaselink.wellevent
+    proddate=get_proddate_int()
+    statement = """SELECT * from calc, wellleaselink where calc.wellid = wellleaselink.wellid
                 and calc.prodmonth = {proddate}""".format(proddate=proddate)
     result = db.select_sql(statement)
     if result:

@@ -19,7 +19,8 @@ class DataObj(object):
 class TestSaskRoyaltyCalc(unittest.TestCase):
 
     def setUp(self):
-        self.assertEqual(config.get_environment(), 'unittest') # Destructive Tests must run in unittest environment
+        # Destructive Tests must run in unittest environment
+        self.assertEqual('unittest', config.get_environment())
 
 
 #     def xtest_determineRoyaltyPrice (self):
@@ -62,7 +63,7 @@ class TestSaskRoyaltyCalc(unittest.TestCase):
         self.assertEqual(pr.determine_commencement_period(201501, date(2010, 1, 1)), 5)
         self.assertEqual(pr.determine_commencement_period(201501, date(2010, 1, 31)), 4.92)
         self.assertEqual(pr.determine_commencement_period(201501, date(2010, 1, 1)), 5.0)
-        self.assertEqual(pr.determine_commencement_period(None, None),5)
+        self.assertEqual(pr.determine_commencement_period(None, None), 5)
         self.assertEqual(pr.determine_commencement_period(201501, datetime(2003, 1, 1)), 12.01)
         return
     
@@ -383,8 +384,8 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, PEFNInterest, MinRoyalty, RoyaltyPric
     def test_process_monthly(self):
         self.dbu = DatabaseUtilities()
         self.dbu.delete_all_tables()
-        self.dbu.create_some_test_wells()
-        self.dbu.create_some_test_royalties()
+        self.dbu.create_some_test_well_royalty_masters()
+        self.dbu.create_some_test_lease_royalty_masters()
         self.dbu.create_some_test_leases()
         self.dbu.create_some_test_well_lease_link()
         self.dbu.create_some_test_monthly()

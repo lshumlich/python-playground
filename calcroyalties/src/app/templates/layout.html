@@ -138,10 +138,10 @@ if (!proddateCookie){
                 <div class="dropdown_container dropdown_fullwidth"> 
                     <div class="col_6">
                         <ul>
-                            {% if 'well_view' in session['permissions'] %}<li><a href="/well/search">Wells</a></li>{% endif %}
+                            {% if 'lease_view' in session['permissions'] %}<li><a href="/lease/search">Leases Royalty Master</a></li>{% endif %}
+                            {% if 'well_view' in session['permissions'] %}<li><a href="/well/search">Well Royalty Master</a></li>{% endif %}
                             {% if 'wellevent_view' in session['permissions'] %}<li><a href="/wellevent/search">Well Events</a></li>{% endif %}
                             {% if 'facility_view' in session['permissions'] %}<li><a href="/facility/search">Facilities</a></li>{% endif %}
-                            {% if 'lease_view' in session['permissions'] %}<li><a href="/lease/search">Leases</a></li>{% endif %}
                         </ul>
                     </div>   
                 </div>  

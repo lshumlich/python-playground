@@ -5,6 +5,9 @@ from unittest import TestSuite
 # from unittest import TestLoader, TextTestRunner
 import subprocess
 import os
+import sys
+import logging
+import datetime
 
 # from database.database import DataBase
 # from database.royaltyworksheet import RoyaltyWorksheet
@@ -33,10 +36,12 @@ def run_royalties_and_worksheet():
 
 #    pr.process(config.get_file_dir() + 'database.xlsx')
 #     pr.process('d:/$temp/sample.xlsx')
+
+def browse_file():
     print('os name is:', os.name)
     if os.name != "posix":
         subprocess.call(['notepad.exe', config.get_temp_dir() + 'log.txt'])
-        subprocess.call(['notepad.exe', config.get_temp_dir() + 'Royalty Worksheet.txt'])
+        # subprocess.call(['notepad.exe', config.get_temp_dir() + 'Royalty Worksheet.txt'])
 
 
 def run_test_module():
@@ -66,21 +71,38 @@ def create_tables():
 def load_sample_data():
     dbu = DatabaseUtilities()
     drop_create_tables()
-    dbu.create_some_test_wells()
+    dbu.create_some_test_well_royalty_masters()
     dbu.create_some_test_leases()
 
-print('-- Runing Batch for --> ' + __name__)
-if __name__ == "__main__":
-    drop_create_tables()
-    load_sheet("sample_data.xlsx")
-    # load_sample_data()
+def start_logging():
+    logging.basicConfig(filename=config.get_temp_dir() + 'calc.log', level=logging.INFO)
+    root = logging.getLogger()
+    root.setLevel(logging.INFO)
 
-    # browser_app()
-    # create_tables()
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter('%(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    root.addHandler(ch)
+
+
+if __name__ == "__main__":
+    start_logging()
+    t1 = datetime.datetime.now()
+    logging.info('Batch started: ' + str(t1))
+
+    # drop_create_tables()
+    # load_sheet(config.get_temp_dir() + "sample_data.xlsx")
     run_royalties_and_worksheet()
-    # unittest.main()
-    # runTestModule()
-    print("Goodbye world!")
+    # print("Goodbye world!")
+
+    t2 = datetime.datetime.now()
+    logging.info('Ended: ' + str(t2))
+
+    t3 = t2 - t1
+    logging.info('Took: ' + str(t3))
+
 
 # if __name__ == "__main__":
 #     """This runs all the tests in the module"""

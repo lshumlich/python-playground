@@ -289,8 +289,8 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, IndianInterest, MinRoyalty, RoyaltyPr
     def test_process_monthly(self):
         self.dbu = DatabaseUtilities()
         self.dbu.delete_all_tables()
-        self.dbu.create_some_test_wells()
-        self.dbu.create_some_test_royalties()
+        self.dbu.create_some_test_well_royalty_masters()
+        self.dbu.create_some_test_lease_royalty_masters()
         self.dbu.create_some_test_leases()
         self.dbu.create_some_test_monthly()
         self.dbu.create_some_test_econdata()

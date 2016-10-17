@@ -18,12 +18,12 @@ def calc_worksheet():
             well_id = int(request.args["WellId"])
             prod_month = get_proddate_int()
             product = "Oil"
-            well = db.select1('Well', ID=well_id)
+            well = db.select1('WellRoyaltyMaster', ID=well_id)
             well_lease_link_array = db.select('WellLeaseLink', WellID=well_id)
             if len(well_lease_link_array) == 0:
                 raise AppError("There were no well_lease_link records for " + str(well_id) + str(prod_month))
             well_lease_link = well_lease_link_array[0]
-            royalty = db.select1('RoyaltyMaster', ID=well_lease_link.LeaseID)
+            royalty = db.select1('LeaseRoyaltyMaster', ID=well_lease_link.LeaseID)
             lease = db.select1('Lease', ID=well_lease_link.LeaseID)
             monthly = db.select1('Monthly', WellID=well_id, prodMonth=prod_month, product=product)
             calc = db.select1('Calc', WellID=well_id, prodMonth=prod_month)

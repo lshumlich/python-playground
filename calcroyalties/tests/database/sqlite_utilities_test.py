@@ -50,25 +50,25 @@ class DatabaseUtilities(object):
     def delete_table(self,table):
         self.db_instance.execute('DROP TABLE %s' % table)
 
-    def create_some_test_wells(self):
-        if not 'Well' in self.db_instance.get_table_names():
-            self.db_create.well()
+    def create_some_test_well_royalty_masters(self):
+        if not 'WellRoyaltyMaster' in self.db_instance.get_table_names():
+            self.db_create.well_royalty_master()
             
         statement = """
-            INSERT INTO Well VALUES(1, '2010-01-01 00:00:00', '9999-12-31 23:59:59.000005', 'SKWI111062705025W300','SK','Oil','New Oil',        'Heavy',    0,'2014-12-01 00:00:00',1.0,'9999-12-31 23:59:59.000005', 'HORIZONTAL');
-            INSERT INTO Well VALUES(2, '2011-11-01 00:00:00', '9999-12-31 23:59:59.000005', 'SKWI112062705025W300','SK','Oil','Third Tier Oil', 'Southwest',0,'2014-12-01 00:00:00',1.0,'9999-12-31 23:59:59.000005', 'HORIZONTAL');
-            INSERT INTO Well VALUES(3, '2004-10-01 00:00:00', '9999-12-31 23:59:59.000005', 'SKWI113062705025W300','SK','Oil','Fourth Tier Oil','Other',    0,'2014-12-01 00:00:00',1.0,'9999-12-31 23:59:59.000005', 'VERTICAL');
-            INSERT INTO Well VALUES(4, '2013-01-01 00:00:00', '9999-12-31 23:59:59.000005', 'SKWI114062705025W300','SK','Oil','Old Oil',        'Other',    0,'2014-12-01 00:00:00',1.0,'9999-12-31 23:59:59.000005', 'VERTICAL');
+            INSERT INTO WellRoyaltyMaster VALUES(1, '2010-01-01 00:00:00', '9999-12-31 23:59:59.000005', 'SKWI111062705025W300','SK','Oil','New Oil',        'Heavy',    0,'2014-12-01 00:00:00',1.0,'9999-12-31 23:59:59.000005', 'HORIZONTAL','Some Note');
+            INSERT INTO WellRoyaltyMaster VALUES(2, '2011-11-01 00:00:00', '9999-12-31 23:59:59.000005', 'SKWI112062705025W300','SK','Oil','Third Tier Oil', 'Southwest',0,'2014-12-01 00:00:00',1.0,'9999-12-31 23:59:59.000005', 'HORIZONTAL','Some Note');
+            INSERT INTO WellRoyaltyMaster VALUES(3, '2004-10-01 00:00:00', '9999-12-31 23:59:59.000005', 'SKWI113062705025W300','SK','Oil','Fourth Tier Oil','Other',    0,'2014-12-01 00:00:00',1.0,'9999-12-31 23:59:59.000005', 'VERTICAL','Some Note');
+            INSERT INTO WellRoyaltyMaster VALUES(4, '2013-01-01 00:00:00', '9999-12-31 23:59:59.000005', 'SKWI114062705025W300','SK','Oil','Old Oil',        'Other',    0,'2014-12-01 00:00:00',1.0,'9999-12-31 23:59:59.000005', 'VERTICAL','Some Note');
         """
         
         self.db_instance.execute_statement(statement)
 
-    def create_some_test_royalties(self):
-        if not 'RoyaltyMaster' in self.db_instance.get_table_names():
-            self.db_create.royalty_master()
+    def create_some_test_lease_royalty_masters(self):
+        if not 'LeaseRoyaltyMaster' in self.db_instance.get_table_names():
+            self.db_create.lease_royalty_master()
 
         statement = """
-            INSERT INTO RoyaltyMaster VALUES(1, '2001-01-08 00:00:00', '2016-01-07 00:00:00', 'All', 'SKProvCrownVar,
+            INSERT INTO LeaseRoyaltyMaster VALUES(1, '2001-01-08 00:00:00', '2016-01-07 00:00:00', 'All', 'SKProvCrownVar,
             GORR', 1.2, 'SaskWellHead', 'Y', 'Y', 'Y', 'mprod,250,2,300,3,400,4,500,5,0,6', NULL, 0, 50, 50, NULL)
         """
 

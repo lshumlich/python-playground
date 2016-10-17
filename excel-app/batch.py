@@ -66,7 +66,7 @@ def drop_create_tables():
 def load_sample_data():
     dbu = DatabaseUtilities()
     drop_create_tables()
-    dbu.create_some_test_wells()
+    dbu.create_some_test_well_royalty_masters()
     dbu.create_some_test_leases()
 
 print('-- Runing Batch')

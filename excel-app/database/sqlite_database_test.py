@@ -34,7 +34,7 @@ class SqliteDatabaseTest(unittest.TestCase):
         self.assertEqual('WhatEver',ds._table_name)
 
     def test_select(self):
-        self.dbu.create_some_test_wells()
+        self.dbu.create_some_test_well_royalty_masters()
         self.dbu.create_some_test_leases()
         
         self.assertIsNotNone(self.db.select('Well', RoyaltyClassification='New Oil'))
@@ -48,7 +48,7 @@ class SqliteDatabaseTest(unittest.TestCase):
         self.assertEqual(len(self.db.select('Well', ID=1000)),0)
         
     def test_update(self):
-        self.dbu.create_some_test_wells()
+        self.dbu.create_some_test_well_royalty_masters()
 
         # change all types of attributes, read another record and then read the record again to make sure the changes were made.
         well = self.db.select('Well', ID=2)
@@ -135,7 +135,7 @@ class SqliteDatabaseTest(unittest.TestCase):
         
         
     def test_delete(self):
-        self.dbu.create_some_test_wells()
+        self.dbu.create_some_test_well_royalty_masters()
 
         self.assertEqual(4,len(self.db.select('Well')))
                          
@@ -144,7 +144,7 @@ class SqliteDatabaseTest(unittest.TestCase):
         self.assertEqual(0, len(self.db.select('Well', ID=2)))
         
     def test_date_format(self):
-        self.dbu.create_some_test_wells()
+        self.dbu.create_some_test_well_royalty_masters()
         
         well = self.db.select('Well', ID=1)
         self.assertTrue(isinstance(well[0].CommencementDate,datetime))

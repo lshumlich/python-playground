@@ -2,12 +2,7 @@
 
 from datetime import date
 from datetime import datetime
-import subprocess
-# import traceback
-# import sys
-# import unittest
-import os
-
+import logging
 from src.util.apperror import AppError
 import config
 
@@ -59,30 +54,26 @@ class ProcessRoyalties(object):
 
     def process_all(self):
         # errorCount = 0
-        log = open(config.get_temp_dir() + 'log.txt', 'w')
-        log.write("Hello World.\n")
         for monthlyData in self.db.select('Monthly'):
             try:
                 self.process_one(monthlyData.WellID, monthlyData.ProdMonth, monthlyData.Product)
 
             except AppError as e:
-                print(e)
+                logging.error(str(e))
 
     """
     Process a single royalty
     """
 
     def process_one(self, well_id, prod_month, product):
-        print('**** Processing ***', well_id, prod_month, product)
+        logging.info('**** Processing *** {0:6d} {1:6d} {2:}'.format(well_id, prod_month, product))
         # errorCount = 0
-        log = open(config.get_temp_dir() + 'log.txt', 'w')
-        log.write("Hello World.\n")
-        well = self.db.select1('Well', ID=well_id)
+        well = self.db.select1('WellRoyaltyMaster', ID=well_id)
         well_lease_link_array = self.db.select('WellLeaseLink', WellID=well_id)
         if len(well_lease_link_array) == 0:
-            raise AppError("There were no well_lease_link records for " + str(well_id) + str(prod_month))
+            raise AppError("There were no well_lease_link records for: " + str(well_id) + str(prod_month))
         well_lease_link = well_lease_link_array[0]
-        royalty = self.db.select1('Royaltymaster', ID=well_lease_link.LeaseID)
+        royalty = self.db.select1('LeaseRoyaltymaster', ID=well_lease_link.LeaseID)
         monthly = self.db.select1('Monthly', WellID=well_id, ProdMonth=prod_month, Product=product)
         calc_array = self.db.select('Calc', WellID=well_id, ProdMonth=prod_month)
         if len(calc_array) == 0:
@@ -115,8 +106,8 @@ class ProcessRoyalties(object):
             calc.RoyaltyValue = calc.RoyaltyValuePreDeductions
 
         else:
-            raise AppError("No calculation for" + str(well.WellEvent) + str(monthly.ProdMonth) + str(monthly.Product) +
-                           str(royalty.RoyaltyScheme))
+            raise AppError("No calculation for " + str(well.ID) + ' ' + str(monthly.ProdMonth) + ' ' +
+                           str(monthly.Product) + ' ' + str(royalty.RoyaltyScheme))
 
         if monthly.Product == 'Oil' and 'GORR' in royalty.RoyaltyScheme:
             calc.GorrRoyaltyRate, calc.GorrMessage = self.calc_gorr_percent(monthly.ProdVol, monthly.ProdHours,
@@ -205,8 +196,8 @@ class ProcessRoyalties(object):
 
             else:
                 raise AppError(
-                    'Well Type: ' + well_type + ' not known for ' + well_royalty_classification +
-                    ' Royalty not calculated.')
+                    'Well Type: "' + well_type + '" not known for "' + well_royalty_classification +
+                    '" Royalty not calculated.')
 
         elif well_royalty_classification == 'Third Tier Gas':
             if mgp < 115.4:
@@ -244,8 +235,8 @@ class ProcessRoyalties(object):
 
         else:
             raise AppError(
-                'Royalty Classification: ' + well_royalty_classification + ' not known for ' + well_type +
-                ' Royalty not calculated.')
+                'Royalty Classification: "' + well_royalty_classification + '" not known for "' + well_type +
+                '" Royalty not calculated.')
 
         calc.ProvCrownRoyaltyRate = round(calc.ProvCrownRoyaltyRate, 6)
         return calc.ProvCrownRoyaltyRate
@@ -272,7 +263,7 @@ class ProcessRoyalties(object):
                     calc.D = econ_oil_data.O4T_D
                 else:
                     raise AppError(
-                        'Royalty Classification: ' + well_royalty_classification + ' not known for ' +
+                        'Royalty Classification: "' + well_royalty_classification + ' not known for ' +
                         well_classification + ' Royalty not calculated.')
                 calc.ProvCrownRoyaltyRate = ((calc.C * mop) - calc.D) / 100
 
@@ -312,7 +303,7 @@ class ProcessRoyalties(object):
                     calc.X = econ_oil_data.SWNEW_X
                 else:
                     raise AppError(
-                        'Royalty Classification: ' + well_royalty_classification + ' not known for ' +
+                        'Royalty Classification: "' + well_royalty_classification + '" not known for ' +
                         well_classification + ' Royalty not calculated.')
             elif well_classification == 'Other':
                 if well_royalty_classification == 'Third Tier Oil':
@@ -326,10 +317,10 @@ class ProcessRoyalties(object):
                     calc.X = econ_oil_data.OOLD_X
                 else:
                     raise AppError(
-                        'Royalty Classification: ' + well_royalty_classification + ' not known for ' +
+                        'Royalty Classification: "' + well_royalty_classification + '" not known for ' +
                         well_classification + ' Royalty not calculated.')
             else:
-                raise AppError('Product Classification: ' + well_classification + ' not known. Royalty not calculated.')
+                raise AppError('Product Classification: "' + well_classification + '" not known. Royalty not calculated.')
 
             if mop == 0:
                 calc.ProvCrownRoyaltyRate = 0
@@ -358,7 +349,7 @@ class ProcessRoyalties(object):
                                              royalty.CrownMultiplier *
                                              m.ProdVol * fn_interest), 2)
 
-        calc.ProvCrownRoyaltyValue = round(calc.ProvCrownRoyaltyVolume * calc.RoyaltyPrice,2)
+        calc.ProvCrownRoyaltyValue = round(calc.ProvCrownRoyaltyVolume * calc.RoyaltyPrice, 2)
 
         if royalty.MinRoyaltyDollar:
             if royalty.MinRoyaltyDollar > calc.ProvCrownRoyaltyValue:
@@ -519,7 +510,8 @@ class ProcessRoyalties(object):
 
                     return round(gorr_percent, 6), gorr_explain
                 elif gorr_max_vol == 0:
-                    gorr_explain += ' is > ' + str(last_gorr_max_vol) + ' for a RoyRate of ' + '{:.2%}'.format(gorr_percent)
+                    gorr_explain += ' is > ' + str(last_gorr_max_vol) + ' for a RoyRate of ' + \
+                                    '{:.2%}'.format(gorr_percent)
                     return round(gorr_percent, 6), gorr_explain
                 elif eval_vol <= gorr_max_vol:
                     gorr_explain += ' is > ' + str(last_gorr_max_vol) + ' and <= ' + str(

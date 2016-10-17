@@ -109,7 +109,7 @@ def details(wellevent_num):
     statement_volumetric = """SELECT * From VolumetricInfo WHERE FromTo = '{wellevent}' AND DATE(ProdMonth) = DATE('{proddate}')""".format(wellevent=wellevent_num, proddate=get_proddate())
     volumetric = db.select_sql(statement_volumetric)
 
-    well = db.select1('Well', WellEvent=wellevent_num)
+    well = db.select1('WellRoyaltyMaster', WellEvent=wellevent_num)
 
     statement_leases = """SELECT Lease.*, WellLeaseLink.PEFNInterest FROM Lease, WellLeaseLink WHERE WellLeaseLink.WellEvent="%s" AND Lease.ID=WellLeaseLink.LeaseID"""
     leases = db.select_sql(statement_leases % wellevent_num)
