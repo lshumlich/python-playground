@@ -35,9 +35,10 @@ def details():
 def calculate():
     from src.calc.calcroyalties import ProcessRoyalties
     pr = ProcessRoyalties()
-    well_id = request.args.get('WellId')
+    well_id = int(request.args.get('WellId'))
     try:
         pr.process_one(well_id, get_proddate_int(), 'Oil')
         return 'Calculation successful for %s, %i, %s' % (well_id, get_proddate_int(), 'Oil')
     except Exception as e:
-        return 'Something went wrong during calculation for %s, %i, %s:<br />%s' % (well_id, get_proddate_int(), 'Oil', e)
+        print(e)
+        return 'Something went wrong during calculation for %s, %i, %s:<br />%s' % (well_id, get_proddate_int(), 'Oil', str(e))
