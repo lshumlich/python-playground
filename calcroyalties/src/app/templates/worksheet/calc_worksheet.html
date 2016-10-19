@@ -301,7 +301,7 @@ table, th, td {
 <tr><td align="left" style="text-align:left">RVol =</td><td style="text-align:center"> {{ '{:.6%}'.format(calc.ProvCrownUsedRoyaltyRate) }}</td>
     <td style="text-align:center">*</td> <td style="text-align:center">{{ rm.CrownMultiplier }}</td> <td style="text-align:center">*</td>
     <td style="text-align:center">{{ '{:.2f}'.format(m.ProdVol) }}</td> <td>*</td> <td>{{ '{:.6%}'.format(well_lease_link.PEFNInterest) }}</td></tr>
-<tr align="left" style="text-align:left"><td>RVol =</td> <td style="text-align:center">{{ '{:.2f}'.format(calc.ProvCrownRoyaltyVolume) }}</td></tr>
+<tr align="left" style="text-align:left"><td>RVol =</td> <td style="text-align:center">{{ '{:.6f}'.format(calc.ProvCrownRoyaltyVolume) }}</td></tr>
 {% endif %}
 
 {% if m.Product == 'Oil' and 'IOGR1995' in rm.RoyaltyScheme %}

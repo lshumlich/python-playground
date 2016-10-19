@@ -347,7 +347,7 @@ class ProcessRoyalties(object):
 
         calc.ProvCrownRoyaltyVolume = round((calc.ProvCrownUsedRoyaltyRate *
                                              royalty.CrownMultiplier *
-                                             m.ProdVol * fn_interest), 2)
+                                             m.ProdVol * fn_interest), 6)
 
         calc.ProvCrownRoyaltyValue = round(calc.ProvCrownRoyaltyVolume * calc.RoyaltyPrice, 2)
 
