@@ -9,85 +9,6 @@
 <script src={{ url_for('static', filename='js/mgmenu_plugins.js') }}></script>
 <script src={{ url_for('static', filename='js/mgmenu.js') }}></script>
 <script src={{ url_for('static', filename='js/formtools.js') }}></script>
-
-<script>
-var proddateCookie = getCookie("proddate");
-
-function setCookie(cname,cvalue,exdays) {
-    var d = new Date();
-    d.setTime(d.getTime() + (exdays*24*60*60*1000));
-    var expires = "expires=" + d.toGMTString();
-    document.cookie = cname+"="+cvalue+"; "+expires+"; path=/";
-}
-
-function getCookie(cname) {
-    var name = cname + "=";
-    var ca = document.cookie.split(';');
-    for(var i=0; i<ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0)==' ') {
-            c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
-        }
-    }
-    return "";
-}
-
-function updateCookie() {
-    setCookie("proddate", $("#proddate-input").val());
-    updateProddateText();
-}
-
-function updateProddateText() {
-    proddateCookie = getCookie("proddate");
-    $("#proddate-header").text(proddateCookie);
-    $("#proddate-input").attr("value", proddateCookie);
-}
-
-$(document).ready(function($){
-    $('#mgmenu1').universalMegaMenu({
-        menu_speed_show: 300,
-        menu_speed_hide: 200,
-        menu_speed_delay: 200,
-        menu_effect: 'hover_fade',
-        menu_click_outside: true,
-        menubar_trigger : false,
-        menubar_hide : false,
-        menu_responsive: false
-    });
-
-proddateModal = $("#proddate-modal").dialog({
-    autoOpen: false,
-    height:300,
-    width:350,
-    modal:true,
-    beforeClose: function() {
-      if (!checkRegexp($( "#proddate-input" ), /(\d{4})(\d{2})/ )) {$("#proddate-error").text('Please enter a valid date in the YYYYMM format'); return false} else {updateCookie();}
-    },
-    buttons: {
-        "Save": function() {proddateModal.dialog("close");}
-    },
-    close: function() {form[ 0 ].reset(); $("#proddate-error").text("");},
-    });
-
-form = proddateModal.find( "form" ).on( "submit", function( event ) {
-  event.preventDefault();
-  proddateModal.dialog("close");
-  });
-
-updateProddateText();
-
-// stupid workaround: we can't access the 'session' cookie from JS, so we have to check if it's set on the server
-{% if session['login'] %}
-if (!proddateCookie){
-    proddateModal.dialog("open");
-}
-{% endif %}
-
-});
-</script>
 </head>
 <body>
 
@@ -449,7 +370,7 @@ if (!proddateCookie){
     </div><!-- End Mega Menu Container -->
     <!-- THE MENU ENDS HERE -->
 
-<div id="proddate-modal" style="display:none" title="Set production date">
+<div id="proddate-modal" title="Set production date">
     <p>Please set the production date:</p>
     <form>
         <input id="proddate-input" type="text" />
@@ -464,4 +385,84 @@ if (!proddateCookie){
 </div>
 <hr>
 <div style="text-align:center; font-size:10px">The Solution Stack, 2016</div>
+
+<script>
+var proddateCookie = getCookie("proddate");
+
+function setCookie(cname,cvalue,exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires=" + d.toGMTString();
+    document.cookie = cname+"="+cvalue+"; "+expires+"; path=/";
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+function updateCookie() {
+    setCookie("proddate", $("#proddate-input").val());
+    updateProddateText();
+}
+
+function updateProddateText() {
+    proddateCookie = getCookie("proddate");
+    $("#proddate-header").text(proddateCookie);
+    $("#proddate-input").attr("value", proddateCookie);
+}
+
+$(document).ready(function($){
+    $('#mgmenu1').universalMegaMenu({
+        menu_speed_show: 300,
+        menu_speed_hide: 200,
+        menu_speed_delay: 200,
+        menu_effect: 'hover_fade',
+        menu_click_outside: true,
+        menubar_trigger : false,
+        menubar_hide : false,
+        menu_responsive: false
+    });
+
+proddateModal = $("#proddate-modal").dialog({
+    autoOpen: false,
+    height:300,
+    width:350,
+    modal:true,
+    beforeClose: function() {
+      if (!checkRegexp($( "#proddate-input" ), /(\d{4})(\d{2})/ )) {$("#proddate-error").text('Please enter a valid date in the YYYYMM format'); return false} else {updateCookie();}
+    },
+    buttons: {
+        "Save": function() {proddateModal.dialog("close");}
+    },
+    close: function() {form[ 0 ].reset(); $("#proddate-error").text("");},
+    });
+
+form = proddateModal.find( "form" ).on( "submit", function( event ) {
+  event.preventDefault();
+  proddateModal.dialog("close");
+  });
+
+updateProddateText();
+
+// stupid workaround: we can't access the 'session' cookie from JS, so we have to check if it's set on the server
+{% if session['login'] %}
+if (!proddateCookie){
+    proddateModal.dialog("open");
+}
+{% endif %}
+
+});
+</script>
+
 </body>

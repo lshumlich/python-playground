@@ -3,9 +3,10 @@
 <script>
   $(function() {
   	$('#tabs').tabs();
-    $('#accordion').accordion({
+    $('#search-accordion').accordion({
       collapsible:true,
       heightStyle:'content',
+      animate:false
     });
     $('#search-basic, #search-advanced').button({
       icons: {primary: 'ui-icon-search'}
@@ -15,7 +16,7 @@
 
 <h2>Lease Search</h2>
 
-<div id="accordion">
+<div id="search-accordion">
   <h3>Search Criteria</h3>
   <div>
   	<div id="tabs">
@@ -25,15 +26,15 @@
   	  </ul>
 
   	  <div id="tabs-basic">
-      <form name="search-basic">
+      <form name="search-basic" action="/leases" method="get">
   	    Lease ID
         <br>
-        <input id='ID' name="ID"></input>
+        <input id='ID' name="ID" value="{% if search_terms %}{{ search_terms['ID'] }}{% endif %}" />
         <br>
         <br>
         Province
         <br>
-        <input id='Prov' name="Prov"></input>
+        <input id='Prov' name="Prov" value="{% if search_terms %}{{ search_terms['Prov'] }}{% endif %}" />
         <br>
         <br>
         <button type="submit" id='search-basic'>Search</button>
@@ -41,15 +42,15 @@
   	  </div>
 
   	  <div id="tabs-advanced">
-      <form name="search-advanced">
+      <form name="search-advanced" action="/leases" method="get">
   	    Province
         <br>
-        <input id='well-search-prov' name="Province"></input>
+        <input id='well-search-prov' name="Province" value="{% if search_terms %}{{ search_terms['Prov'] }}{% endif %}"/>
         <br>
         <br>
         Well Type
         <br>
-        <input id='well-search-type' name="WellType"></input>
+        <input id='well-search-type' name="FNReserve" value="{% if search_terms %}{{ search_terms['FNReserve'] }}{% endif %}" />
         <br>
         <br>
         <button type="submit" id='search-advanced'>Search</button>
@@ -60,9 +61,39 @@
   </div>
 </div>
 
+{% if results %}
 <div id='results-table'>
+<table style="width:100%" class="results_table table-striped">
+  <tr>
+    <td colspan=13><b>{{results|length}}</b> results found</td>
+  </tr>
+  <tr>
+    <th>ID</th>
+    <th>Lease Type</th>
+    <th>Province</th>
+    <th>FN Reserve</th>
+    <th>FN Band ID</th>
+  </tr>
+  {% for row in results %}
+  <tr>
+    <td><a href="{{ url_for('leases.details', lease_num = row.ID) }}">{{ row.ID or "" }}</a></td>
+    <td>{{ row.LeaseType or "" }}</td>
+    <td>{{ row.Prov or "" }}</td>
+    <td>{{ row.FNReserve or "" }}</td>
+    <td>{{ row.FNBandID or "" }}</td>
+  </tr>
+  {% endfor %}
+</table>
 </div>
+<script>
+// collapses the accordion if there are search results
+$(function(){
+  $("#search-accordion").accordion("option", "active", false);
+})
+</script>
+{% endif %}
 
+<!--
 <script>
 $('form[name="search-basic"]').submit(function() {
   event.preventDefault();
@@ -99,6 +130,7 @@ $('form[name="search-basic"]').submit(function() {
   }
 
 </script>
+-->
 
 </html>
 

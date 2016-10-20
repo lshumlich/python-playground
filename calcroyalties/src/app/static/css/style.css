@@ -9,6 +9,15 @@ a {
     color: #222222;
 }
 
+a.button {
+    -webkit-appearance: button;
+    -moz-appearance: button;
+    appearance: button;
+
+    text-decoration: none;
+    color: initial;
+}
+
 input[type="text"]:disabled {
     background: #eaeaea;
     outline: #7d7d7d solid 1px;
@@ -70,3 +79,4 @@ width: 100%
     font-size: 14px;
     font-weight: bold;
 }
+

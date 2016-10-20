@@ -16,7 +16,7 @@
   {% for row in results %}
   <tr>
     <td>{{ row.LeaseType }}</td>
-    <td><a href="{{ url_for('lease.details', lease_num = row.ID) }}">{{ row.ID or "" }}</a></td>
+    <td><a href="{{ url_for('leases.details', lease_num = row.ID) }}">{{ row.ID or "" }}</a></td>
     <td>{{ row.Prov or "" }}</td>
     <td>{{ row.FNReserve or "" }}</td>
     <td>{{ row.FNBandID or "" }}</td>

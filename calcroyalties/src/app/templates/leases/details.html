@@ -1,0 +1,134 @@
+{% extends 'layout.html' %}
+{% block body %}
+
+<form id="leaseForm">
+    <fieldset>
+        <legend><h3>Lease {{ lease.Lease }}</h3></legend>
+        <table cellpadding="5">
+            <tr>
+                <td><label for="LeaseType">Lease Type</label></td>
+                <td><input type="text" id="LeaseType" value="{{ lease.LeaseType }}" /></td>
+                <td><label for="ID">ID</label></td>
+                <td><input type="text" id="ID" value="{{ lease.ID }}" /></td>
+            </tr>
+            <tr>
+                <td><label for="Province">Province</label></td>
+                <td><input type="text" id="Province" value="{{ lease.Prov }}" /></td>
+                <td><label for="FNReserve">FNReserve</label></td>
+                <td><input type="text" id="FNReserve" value="{{ lease.FNReserve }}" /></td>
+            </tr>
+            <tr>
+                <td><label for="FNBandID">FNBandID</label></td>
+                <td><input type="text" id="FNBandID" value="{{ lease.FNBandID }}" /></td>
+                <td><label for="Lessor">Lessor</label></td>
+                <td><input type="text" id="Lessor" value="{{ lease.Lessor }}" /></td>
+            </tr>
+            <tr>
+                <td><label for="Notes">Notes</label></td>
+                <td colspan="3"><input style="width:100%" type="text" id="Notes" value="{{ lease.Notes }}" /></td>
+            </tr>
+            <tr>
+                <td><label for="RightsGranted">Rights Granted</label></td>
+                <td><input type="text" id="RightsGranted" value="{{ royaltymaster.RightsGranted }}" /></td>
+                <td><label for="RoyaltyScheme">Royalty Scheme</label></td>
+                <td><input type="text" id="RoyaltyScheme" value="{{ royaltymaster.RoyaltyScheme }}" /></td>
+            </tr>
+            <tr>
+                <td><label for="CrownMultiplier">Crown Multiplier</label></td>
+                <td><input type="text" id="CrownMultiplier" value="{{ royaltymaster.CrownMultiplier }}" /></td>
+                <td><label for="ValuationMethod">Valuation Method</label></td>
+                <td><input type="text" id="ValuationMethod" value="{{ royaltymaster.ValuationMethod }}" /></td>
+            </tr>
+            <tr>
+                <td colspan="2">&nbsp;</td>
+                <td>
+                    <a class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" href="{{ url_for('leases.search') }}">
+                        <span class="ui-button-text">Cancel</span>
+                    </a>
+                </td>
+                <td>
+                    <button type="submit" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" style="float:right;">
+                        <span class="ui-button-text">Save</span>
+                    </button>
+                </td>
+            </tr>
+        </table>
+    </fieldset>
+</form>
+
+{% if wellevents %}
+<br />
+<fieldset>
+<legend><h3><b>{{wellevents|length}}</b> well events attached:</h3></legend>
+    <ul>
+    {% for wellevent in wellevents %}
+    <li><a href="/wellevent/{{ wellevent.WellEvent }}">{{ wellevent.WellEvent }}</a></li>
+    {% endfor %}
+    </ul>
+</fieldset>
+{% endif %}
+
+<script>
+$(function(){
+  // handles form submission with traditional methods, i.e. pressing enter
+  $( "#leaseForm" ).on( "submit", function( event ) {
+    event.preventDefault();
+    //formSave();
+    console.log('saving form');
+  });
+
+
+  // verifies form before submission; relies on formtools.js included in layout.html
+  function formVerify(){
+    var valid = true;
+
+    valid = valid && checkLength($( "#Login" ),  3, 16);
+    valid = valid && checkEntered($( "#Name" ));
+    valid = valid && checkRegexp($( "#Email" ), emailRegexp);
+    if (valid) {
+      return true;
+    }
+  }
+
+  function formSave(){
+    if ($("#ID").attr("value") != "") {
+      var ajax_method = "POST";
+    } else {
+      var ajax_method = "PUT";
+    }
+
+    if (formVerify()){
+      $.ajax({
+        url: "/api/lease",
+        method: ajax_method,
+        contentType: "application/json",
+        data: JSON.stringify(formToDict(document.forms["form_user"])),
+      })
+      .done(function(data){
+      });
+      updateUsers();
+      dialog.dialog("close");
+      dialog.remove();
+    }
+  };
+
+  function formToDict(oForm) {
+    var dict = {};
+    for (i = 0; i < oForm.length; i++) {
+      if (oForm.elements[i].name != '') {
+        if (oForm.elements[i].type == 'text' || oForm.elements[i].type == 'hidden') {
+          dict[oForm.elements[i].name] = oForm.elements[i].value;
+        } else if (oForm.elements[i].type == 'checkbox') {
+          dict[oForm.elements[i].name] = oForm.elements[i].checked;
+        } else {
+          console.log('*** did not handle: ' + oForm.elements[i].name + "," + oForm.elements[i].value + "," + oForm.elements[i].type)
+        };
+      }
+    }
+    return dict
+  }
+
+});
+</script>
+
+{% endblock %}
