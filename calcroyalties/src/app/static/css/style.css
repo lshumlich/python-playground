@@ -80,3 +80,7 @@ width: 100%
     font-weight: bold;
 }
 
+
+.flashes p.error {
+    color: red;
+}

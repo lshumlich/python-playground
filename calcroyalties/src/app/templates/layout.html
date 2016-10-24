@@ -12,11 +12,11 @@
 </head>
 <body>
 
-{% with messages = get_flashed_messages() %}
+{% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     <div class="flashes">
-    {% for message in messages %}
-      <p>{{ message }}</p>
+    {% for category, message in messages %}
+      <p class="{{category}}">{{ message }}</p>
     {% endfor %}
     </div>
   {% endif %}
@@ -60,7 +60,7 @@
                     <div class="col_6">
                         <ul>
                             {% if 'lease_view' in session['permissions'] %}<li><a href="/leases">Lease Royalty Master</a></li>{% endif %}
-                            {% if 'well_view' in session['permissions'] %}<li><a href="/well/search">Well Royalty Master</a></li>{% endif %}
+                            {% if 'well_view' in session['permissions'] %}<li><a href="/wells">Well Royalty Master</a></li>{% endif %}
                             {% if 'wellevent_view' in session['permissions'] %}<li><a href="/wellevent/search">Well Events</a></li>{% endif %}
                             {% if 'facility_view' in session['permissions'] %}<li><a href="/facility/search">Facilities</a></li>{% endif %}
                         </ul>

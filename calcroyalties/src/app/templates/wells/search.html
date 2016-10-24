@@ -14,7 +14,7 @@
   });
 </script>
 
-<h2>Lease Search</h2>
+<h2>Well Search</h2>
 
 <div id="search-accordion">
   <h3>Search Criteria</h3>
@@ -26,34 +26,34 @@
   	  </ul>
 
   	  <div id="tabs-basic">
-      <form name="search-basic" action="/leases" method="get">
-  	    Lease ID
+      <form name="search-basic" action="/wells" method="get">
+  	    ID
         <br>
-        <input id='ID' name="ID" value="{% if search_terms %}{{ search_terms['ID'] }}{% endif %}" />
+        <input name="ID" value="{% if search_terms %}{{ search_terms['ID'] }}{% endif %}"/>
         <br>
         <br>
-        Province
+        Classification
         <br>
-        <input id='Prov' name="Prov" value="{% if search_terms %}{{ search_terms['Prov'] }}{% endif %}" />
+        <input name="Classification" value="{% if search_terms %}{{ search_terms['Classification'] }}{% endif %}"/>
         <br>
         <br>
         <button type="submit" id='search-basic'>Search</button>
-       </form>
+        </form>
   	  </div>
 
   	  <div id="tabs-advanced">
-      <form name="search-advanced" action="/leases" method="get">
+      <form name="search-advanced" action="/wells" method="get">
   	    Province
         <br>
-        <input id='well-search-prov' name="Province" value="{% if search_terms %}{{ search_terms['Prov'] }}{% endif %}"/>
+        <input name="Prov" value="{% if search_terms %}{{ search_terms['Prov'] }}{% endif %}"/>
         <br>
         <br>
         Well Type
         <br>
-        <input id='well-search-type' name="FNReserve" value="{% if search_terms %}{{ search_terms['FNReserve'] }}{% endif %}" />
+        <input name="WellType" value="{% if search_terms %}{{ search_terms['WellType'] }}{% endif %}"/>
         <br>
         <br>
-        <button type="submit" id='search-advanced'>Search</button>
+        <button id='search-advanced'>Search</button>
       </form>
   	  </div>
 
@@ -61,30 +61,30 @@
   </div>
 </div>
 
+</html>
+
 {% if results %}
-<div id='results-table'>
 <table style="width:100%" class="results_table table-striped">
   <tr>
     <td colspan=13><b>{{results|length}}</b> results found</td>
   </tr>
   <tr>
     <th>ID</th>
-    <th>Lease Type</th>
     <th>Province</th>
-    <th>FN Reserve</th>
-    <th>FN Band ID</th>
+    <th>Well Type</th>
+    <th>Royalty Classification</th>
+    <th>Classification</th>
   </tr>
   {% for row in results %}
   <tr>
-    <td><a href="{{ url_for('leases.details', lease_num = row.ID) }}">{{ row.ID or "" }}</a></td>
-    <td>{{ row.LeaseType or "" }}</td>
+    <td><a href="{{ url_for('wells.details', well_num = row.ID) }}">{{ row.ID or "" }}</a></td>
     <td>{{ row.Prov or "" }}</td>
-    <td>{{ row.FNReserve or "" }}</td>
-    <td>{{ row.FNBandID or "" }}</td>
+    <td>{{ row.WellType or "" }}</td>
+    <td>{{ row.RoyaltyClassification or "" }}</td>
+    <td>{{ row.Classification or "" }}</td>
   </tr>
   {% endfor %}
 </table>
-</div>
 <script>
 // collapses the accordion if there are search results
 $(function(){
@@ -92,7 +92,5 @@ $(function(){
 })
 </script>
 {% endif %}
-
-</html>
 
 {% endblock %}

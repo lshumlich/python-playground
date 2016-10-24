@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}
+{% block body %}
+
+<form>
+    <fieldset>
+        <legend><h3>Well {{ well.ID }}</h3></legend>
+        <table cellpadding="5">
+            <tr>
+                <td><label for="Prov">Province</label></td>
+                <td><input type="text" id="Prov" value="{{ well.Prov }}" /></td>
+                <td><label for="WellType">Well Type</label></td>
+                <td><input type="text" id="WellType" value="{{ well.WellType }}" /></td>
+            </tr>
+            <tr>
+                <td><label for="RoyaltyClassification">Royalty Classification</label></td>
+                <td><input type="text" id="RoyaltyClassification" value="{{ well.RoyaltyClassification }}" /></td>
+                <td><label for="Classification">Classification</label></td>
+                <td><input type="text" id="Classification" value="{{ well.Classification }}" /></td>
+            </tr>
+        </table>
+    </fieldset>
+</form>
+
+{% endblock %}
