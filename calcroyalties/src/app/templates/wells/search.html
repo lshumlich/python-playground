@@ -74,6 +74,7 @@
     <th>Well Type</th>
     <th>Royalty Classification</th>
     <th>Classification</th>
+    <th>Actions</th>
   </tr>
   {% for row in results %}
   <tr>
@@ -82,6 +83,10 @@
     <td>{{ row.WellType or "" }}</td>
     <td>{{ row.RoyaltyClassification or "" }}</td>
     <td>{{ row.Classification or "" }}</td>
+    <td><a href="/worksheet?WellId={{ row.ID }}" title="Worksheet" class="icon icon-text-document"></a>
+    &nbsp;
+    <a href="{{ url_for('wells.calculate') }}?WellId={{ row.ID }}" title="Recalculate" class="icon icon-reload"></a>
+    </td>
   </tr>
   {% endfor %}
 </table>

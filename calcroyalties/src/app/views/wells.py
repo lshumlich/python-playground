@@ -44,7 +44,6 @@ def details(well_num):
         abort(404)
 
 
-"""
 @wells.route('/well/calculate')
 def calculate():
     from src.calc.calcroyalties import ProcessRoyalties
@@ -56,4 +55,3 @@ def calculate():
     except Exception as e:
         print(e)
         return 'Something went wrong during calculation for %s, %i, %s:<br />%s' % (well_id, get_proddate_int(), 'Oil', str(e))
-"""
