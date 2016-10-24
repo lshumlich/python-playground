@@ -5,13 +5,13 @@ from .permission_handler import PermissionHandler
 from src.util.apperror import AppError
 from .main import get_proddate
 
-lookup = Blueprint('lookup', __name__)
+lookups = Blueprint('lookups', __name__)
 
-@lookup.route('/lookup/ba')
+@lookups.route('/lookup/ba')
 def ba():
     return render_template('lookups/ba.html')
 
-@lookup.route('/lookup/ba_results')
+@lookups.route('/lookup/ba_results')
 def ba_results():
     db = config.get_database()
     statement = """SELECT * FROM BAInfo WHERE (DATE('{proddate}') BETWEEN BAInfo.StartDate AND BAInfo.EndDate OR BAInfo.StartDate IS NULL)""".format(proddate=get_proddate())
