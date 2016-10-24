@@ -3,7 +3,7 @@
 <script>
 function showLicenseeLookupDialog() {
   var licenseeLookupDialog = $('#licensee-lookup-dialog')
-  .load('/lookup/ba')
+  .load('/lookups/ba')
   .dialog({
       autoOpen: true,
       modal: false,
@@ -20,7 +20,7 @@ function showLicenseeLookupDialog() {
 
 function showOperatorLookupDialog() {
   var operatorlookupDialog = $('#operator-lookup-dialog')
-  .load('/lookup/ba')
+  .load('/lookups/ba')
   .dialog({
       autoOpen: true,
       modal: false,
@@ -75,7 +75,7 @@ $(function() {
   	  </ul>
 
   	  <div id="tabs-basic">
-      <form name="search-basic" action="/wellevent/search" method="get">
+      <form name="search-basic" action="/wellevents" method="get">
   	    <b>Well Event:</b>
         <br>
         <input id='WellEvent' name="WellEvent" value="{% if search_terms %}{{ search_terms['WellEvent'] }}{% endif %}" />
@@ -164,7 +164,7 @@ $(function() {
   </tr>
   {% for row in results %}
   <tr>
-    <td><a href="{{ url_for('wellevent.details', wellevent_num = row.WellEvent) }}">{{ row.WellEvent or "" }}</a></td>
+    <td><a href="{{ url_for('wellevents.details', wellevent_num = row.WellEvent) }}">{{ row.WellEvent or "" }}</a></td>
     <td>{{ row.Status or "" }}</td>
     <td>{{ row.Licensee or "" }}</td>
     <td>{{ row.RTPOperator or "" }}</td>

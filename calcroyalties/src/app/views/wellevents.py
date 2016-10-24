@@ -6,11 +6,11 @@ from .permission_handler import PermissionHandler
 from src.util.apperror import AppError
 from .main import get_proddate
 
-wellevent = Blueprint('wellevent', __name__)
+wellevents = Blueprint('wellevents', __name__)
 
-@wellevent.route('/wellevent/search', methods=['GET'])
+@wellevents.route('/wellevents', methods=['GET'])
 def search():
-    if not request.args: return render_template('wellevent/search.html')
+    if not request.args: return render_template('wellevents/search.html')
     statement = """SELECT WellEventInfo.WellEvent, RTAHeader.RTPOperator, WellEventStatus.Status, WellLicence.Licensee, BAInfo.CorpShortName, WellFacilitylink.Facility, FacilityInfo.Name, WellEventLoc.Lat, WellEventLoc.Long
     FROM WellEventInfo
     LEFT OUTER JOIN RTAHeader ON WellEventInfo.WellEvent = RTAHeader.WellEvent
@@ -81,18 +81,14 @@ def search():
             return Response(output.getvalue(), mimetype="text/csv", headers={"Content-disposition": "attachment; filename=WellEvent_export.csv"})
 
         else:
-            return render_template('wellevent/search.html', results=results, search_terms=request.args.to_dict())
+            return render_template('wellevents/search.html', results=results, search_terms=request.args.to_dict())
     else:
-        flash('No results found.')
-        return render_template('wellevent/search.html', search_terms=request.args.to_dict())
+        flash('No well events found.', 'error')
+        return render_template('wellevents/search.html', search_terms=request.args.to_dict())
 
-@wellevent.route('/wellevent/')
-def handle_redirect():
-    return redirect(url_for('wellevent.search'))
-
-@wellevent.route('/wellevent/<wellevent_num>')
+@wellevents.route('/wellevents/<wellevent_num>')
 def details(wellevent_num):
-    if not wellevent_num: redirect(url_for('wellevent.search'))
+    if not wellevent_num: redirect(url_for('wellevents.search'))
     try:
         db = config.get_database()
         statement="""SELECT WellEventInfo.*, RTAMineralOwnership.Product
@@ -109,13 +105,18 @@ def details(wellevent_num):
     statement_volumetric = """SELECT * From VolumetricInfo WHERE FromTo = '{wellevent}' AND DATE(ProdMonth) = DATE('{proddate}')""".format(wellevent=wellevent_num, proddate=get_proddate())
     volumetric = db.select_sql(statement_volumetric)
 
-    well = db.select1('WellRoyaltyMaster', WellEvent=wellevent_num)
+    try:
+        well = db.select1('WellRoyaltyMaster', WellEvent=wellevent_num)
 
-    statement_leases = """SELECT Lease.*, WellLeaseLink.PEFNInterest FROM Lease, WellLeaseLink WHERE WellLeaseLink.WellEvent="%s" AND Lease.ID=WellLeaseLink.LeaseID"""
-    leases = db.select_sql(statement_leases % wellevent_num)
+        statement_leases = """SELECT Lease.*, WellLeaseLink.PEFNInterest FROM Lease, WellLeaseLink WHERE WellLeaseLink.WellID="%s" AND Lease.ID=WellLeaseLink.LeaseID"""
+        leases = db.select_sql(statement_leases % well.ID)
 
-    statement_facilities = """SELECT FacilityInfo.* FROM FacilityInfo, WellFacilitylink WHERE FacilityInfo.Facility=WellFacilitylink.Facility AND WellFacilitylink.WellEvent="%s" """
-    facilities = db.select_sql(statement_facilities % wellevent_num)
+        statement_facilities = """SELECT FacilityInfo.* FROM FacilityInfo, WellFacilitylink WHERE FacilityInfo.Facility=WellFacilitylink.Facility AND WellFacilitylink.WellEvent="%s" """
+        facilities = db.select_sql(statement_facilities % wellevent_num)
+    except Exception as e:
+        print(e)
+        pass
+
     return render_template('wellevent/details.html', wellevent=wellevent, leases=leases, facilities=facilities, volumetric=volumetric, well=well)
 
 def center_point(points):
