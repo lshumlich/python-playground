@@ -439,18 +439,24 @@ proddateModal = $("#proddate-modal").dialog({
     height:300,
     width:350,
     modal:true,
-    beforeClose: function() {
-      if (!checkRegexp($( "#proddate-input" ), /(\d{4})(\d{2})/ )) {$("#proddate-error").text('Please enter a valid date in the YYYYMM format'); return false} else {updateCookie();}
-    },
-    buttons: {
-        "Save": function() {proddateModal.dialog("close");}
-    },
+    buttons: [{
+        text: 'Save',
+        id: 'proddate-save',
+        click: function() {
+            if (!checkRegexp($( "#proddate-input" ), /^(\d{4})(\d{2})$/ )) {
+                $("#proddate-error").text('Please enter a valid date in the YYYYMM format'); return false
+            } else {
+                updateCookie();
+            }
+            proddateModal.dialog("close");
+        }
+    }],
     close: function() {form[ 0 ].reset(); $("#proddate-error").text("");},
     });
 
 form = proddateModal.find( "form" ).on( "submit", function( event ) {
   event.preventDefault();
-  proddateModal.dialog("close");
+  $('#proddate-save').click();
   });
 
 updateProddateText();
