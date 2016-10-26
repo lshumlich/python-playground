@@ -92,8 +92,8 @@ if __name__ == "__main__":
     t1 = datetime.datetime.now()
     logging.info('Batch started: ' + str(t1))
 
-    # drop_create_tables()
-    # load_sheet(config.get_temp_dir() + "sample_data.xlsx")
+    drop_create_tables()
+    load_sheet(config.get_temp_dir() + "sample_data.xlsx")
     run_royalties_and_worksheet()
     # print("Goodbye world!")
 

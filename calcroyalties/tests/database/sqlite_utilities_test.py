@@ -93,7 +93,8 @@ class DatabaseUtilities(object):
             self.db_create.monthly()
 
         statement = """
-            INSERT INTO Monthly Values(4, '2015-09-29 00:00:00', 201501, 4, 'Oil', 2, 740, 100, 2.2, 221.123456, 2.123455, 0.123455, 0.0)
+            INSERT INTO Monthly Values(4, '2015-09-29 00:00:00', 201501, 1, 'Oil', 2, 740, 100, 221.123456, 2.123455, 0.123455, 0.0);
+            INSERT INTO Monthly Values(5, '2015-09-29 00:00:00', 201501, 4, 'Oil', 2, 740, 100, 221.123456, 2.123455, 0.123455, 0.0);
         """
         self.db_instance.execute_statement(statement)
 

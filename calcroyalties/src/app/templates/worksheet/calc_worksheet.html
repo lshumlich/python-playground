@@ -182,7 +182,7 @@ table, th, td {
 	   <TD>Amend No.</TD>
 	   <TD>Prod.</TD>
 	   <TD>Monthly Prod. Vol.</TD>
-	   <TD>Well Head Price</TD>
+	   <TD>Sales Price</TD>
 	   <TD>Trucking Price</TD>
 	   <TD>Processing Price</TD>
    </TR>
@@ -193,7 +193,7 @@ table, th, td {
 	   <TD>{{ m.AmendNo }}</TD>
 	   <TD>{{ m.Product }}</TD>
 	   <TD>{{ '{:.2f}'.format(m.ProdVol) }}</TD>
-	   <TD>{{ '{:>10,.6f}\n'.format(m.WellHeadPrice) }}</TD>
+	   <TD>{{ '{:>10,.6f}\n'.format(m.SalesPrice) }}</TD>
 	   <TD>{{ '{:>10,.6f}\n'.format(m.TransRate) }}</TD>
 	   <TD>{{ '{:>10,.6f}\n'.format(m.ProcessingRate) }}</TD>
     </TR>

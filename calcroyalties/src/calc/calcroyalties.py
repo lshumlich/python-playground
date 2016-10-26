@@ -124,7 +124,7 @@ class ProcessRoyalties(object):
                               calc.GorrRoyaltyVolume)
 
         if royalty.TruckingDeducted == 'Y':
-            calc.RoyaltyTransportation = calc.RoyaltyVolume * monthly.TransRate
+            calc.RoyaltyTransportation = round(calc.RoyaltyVolume * monthly.TransRate,2)
             calc.RoyaltyDeductions += calc.RoyaltyTransportation
             calc.RoyaltyValue -= calc.RoyaltyTransportation
 
@@ -132,13 +132,13 @@ class ProcessRoyalties(object):
         #     calc.RoyaltyTransportation = royalty.TruckingOverride
 
         if royalty.ProcessingDeducted == 'Y':
-            calc.RoyaltyProcessing = calc.RoyaltyVolume * monthly.ProcessingRate
+            calc.RoyaltyProcessing = round(calc.RoyaltyVolume * monthly.ProcessingRate,2)
             calc.RoyaltyDeductions += calc.RoyaltyProcessing
             calc.RoyaltyValue -= calc.RoyaltyProcessing
 
         if monthly.Product == 'Gas':
             if royalty.GCADeducted == 'Y':
-                calc.RoyaltyGCA = calc.RoyaltyVolume * monthly.GCARate
+                calc.RoyaltyGCA = round(calc.RoyaltyVolume * monthly.GCARate,2)
                 calc.RoyaltyDeductions += calc.RoyaltyGCA
                 calc.RoyaltyValue -= calc.RoyaltyGCA
 
@@ -320,7 +320,8 @@ class ProcessRoyalties(object):
                         'Royalty Classification: "' + well_royalty_classification + '" not known for ' +
                         well_classification + ' Royalty not calculated.')
             else:
-                raise AppError('Product Classification: "' + well_classification + '" not known. Royalty not calculated.')
+                raise AppError('Product Classification: "' + well_classification +
+                               '" not known. Royalty not calculated.')
 
             if mop == 0:
                 calc.ProvCrownRoyaltyRate = 0
@@ -377,7 +378,7 @@ class ProcessRoyalties(object):
                                           calc.RoyaltyPrice, 2)
 
         calc.SupplementaryRoyalties = round(
-            self.calc_supplementary_royalties_iogr1995(calc.CommencementPeriod, m.WellHeadPrice, m.ProdVol,
+            self.calc_supplementary_royalties_iogr1995(calc.CommencementPeriod, m.SalesPrice, m.ProdVol,
                                                        calc.RoyaltyRegulation, self.reference_price['Onion Lake']), 2)
         return
 
@@ -434,14 +435,19 @@ class ProcessRoyalties(object):
 
     @staticmethod
     def determine_royalty_price(method, monthly):
+        """
+        As we understand more about pricing we will develop this further. We know we need a method we just don't
+        quite no what to do with it.
+        """
 
         # royalty_price = 0.0
-        if method == 'ActSales':
-            royalty_price = monthly.WellHeadPrice + monthly.TransRate + monthly.ProcessingRate
-        else:
-            royalty_price = monthly.WellHeadPrice
+        # if method == 'ActSales':
+        #     royalty_price = monthly.WellHeadPrice + monthly.TransRate + monthly.ProcessingRate
+        # else:
+        #     royalty_price = monthly.WellHeadPrice
 
-        return royalty_price
+        # return royalty_price
+        return monthly.SalesPrice
 
     @staticmethod
     def ensure_date(d):

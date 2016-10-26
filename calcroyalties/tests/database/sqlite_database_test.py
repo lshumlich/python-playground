@@ -144,7 +144,12 @@ class SqliteDatabaseTest(unittest.TestCase):
         self.db.delete('WellRoyaltyMaster', 2)
         self.assertEqual(3,len(self.db.select('WellRoyaltyMaster')))
         self.assertEqual(0, len(self.db.select('WellRoyaltyMaster', ID=2)))
-        
+
+    def test_count(self):
+        self.dbu.create_some_test_well_royalty_masters()
+        self.assertEqual(1, self.db.count('WellRoyaltyMaster', ID=1))
+        self.assertEqual(4, self.db.count('WellRoyaltyMaster'))
+
     def test_date_format(self):
         self.dbu.create_some_test_well_royalty_masters()
         

@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<style>
+tr.border_bottom td {
+  border-bottom:1pt solid black;
+}
+</style>
+
+<table class="table-striped" style="width:100%">
+    <tr>
+        <th>Well</th>
+        <th>Royalty Volume</th>
+        <th>Royalty Value</th>
+    </tr>
+    {% for r in result %}
+    <tr>
+        <td>{{ r.ID }}</td>
+        <td> <a href="/worksheet?WellId={{ r.ID }}" title="Worksheet" class="icon icon-text-document"></a> </td>
+
+        <td>{{ r.WellEvent }}</td>
+        <td>{{ r.ProdMonth }}</td>
+        <td>{{ r.RoyaltyVolume }}</td>
+        <td>{{ r.WellEvent }}</td>
+        <td>{{ r.RoyaltyValue }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

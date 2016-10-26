@@ -21,6 +21,9 @@ Database Change Log: Must be maintained so we can keep the database in sink:
 2016-10-16
 - Rename Well to WellRoyaltyMaster
 - Rename RoyaltyMaster to LeaseRoyaltyMaster
+2016-10-25
+- Rename Monthly.WellHeadPrice to SalesPrice
+- Remove Monthly.TransPrice
 
 """
 import datetime
@@ -146,8 +149,7 @@ class DatabaseCreate(object):
             "AmendNo" int,
             "ProdHours" int,
             "ProdVol" int,
-            "WellHeadPrice" float,
-            "TransPrice" float,
+            "SalesPrice" float,
             "TransRate" float,
             "ProcessingRate" float,
             "GCARate" float);

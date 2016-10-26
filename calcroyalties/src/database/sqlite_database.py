@@ -69,6 +69,22 @@ class Database(object):
             raise AppError("sqlite_database.select1 should have only found 1, but we found " + str(len(result)) + " in table: " + table +
                 ". We are only looking for " + str(kwargs))
 
+    def count(self, table, **kwargs):
+        statement = "SELECT count(*) FROM %s " % table
+        if kwargs:
+            # kwargs = dict((k, v) for k, v in kwargs.items() if v)  # this is to get rid of empty values coming from forms
+            statement += "WHERE"
+            i = len(kwargs)
+            for arg in kwargs:
+                statement += " %s = '%s' " % (arg, str(kwargs[arg]))
+                i -= 1
+                if i > 0:
+                    statement += 'AND'
+        self.dbi.execute(statement)
+        #         print('The Value of x:',x)
+        result = self.dbi.cursor.fetchall()
+        return result[0][0]
+
     def to_db_value(self, value):
 
         if type(value) is str:
