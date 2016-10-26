@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<style>
+tr.border_bottom td {
+  border-bottom:1pt solid black;
+}
+</style>
+
+{% if result %}
+
+<h2>Well Events in WellRoyaltyMaster that are not in WellEventInfo</h2>
+
+<table class="table-striped" style="width:100%">
+    <caption><b>{{result|length}}</b> results found</caption>
+    <tr>
+        <th>Well Event</th>
+        <th>Province</th>
+        <th>Well Type</th>
+    </tr>
+    {% for r in result %}
+    <tr>
+        <td>{{ r.WellEvent }}</td>
+        <td>{{ r.Prov }}</td>
+        <td>{{ r.WellType }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% else %}
+
+<h2>Nothing found, your data is in order.</h2>
+
+{% endif %}
+
+{% endblock %}

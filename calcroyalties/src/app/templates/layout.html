@@ -84,8 +84,10 @@
                 <div class="dropdown_container dropdown_fullwidth">
                     <div class="col_6">
                         <ul>
-                            <li><a href="/reports/royalties">Royalties by Lease</a></li>
-                            <li><a href="/reports/calclist">Royalties in Calc Table</a></li>
+                            <li><a href="{{ url_for('reports.royalties') }}">Royalties by Lease</a></li>
+                            <li><a href="{{ url_for('reports.calc_list') }}">Royalties in Calc Table</a></li>
+                            <li><a href="{{ url_for('reports.wellroyaltymastermissing') }}">WellRoyaltyMaster missing</a></li>
+                            <li><a href="{{ url_for('reports.welleventinfomissing') }}">WellEventInfo missing</a></li>
                         </ul>
                     </div>
                 </div>

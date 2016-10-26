@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, abort
 
 import config
 from .permission_handler import PermissionHandler
@@ -8,7 +8,7 @@ reports = Blueprint('reports', __name__)
 
 
 @reports.route('/reports/royalties')
-@PermissionHandler('well_view')
+#@PermissionHandler('well_view')
 def royalties():
     db = config.get_database()
     proddate = get_proddate_int()
@@ -22,7 +22,7 @@ def royalties():
 
 
 @reports.route('/reports/calclist')
-@PermissionHandler('well_view')
+#@PermissionHandler('well_view')
 def calc_list():
     db = config.get_database()
     statement = """SELECT * from calc, wellroyaltymaster where calc.wellid = wellroyaltymaster.id"""
@@ -32,3 +32,28 @@ def calc_list():
         return render_template('reports/calclist.html', result=result)
     else:
         return "Nothing found"
+
+
+@reports.route('/reports/wellroyaltymastermissing')
+def wellroyaltymastermissing():
+    try:
+        db = config.get_database()
+        statement = """SELECT * FROM WellRoyaltyMaster
+                       WHERE WellEvent NOT IN (SELECT WellEvent FROM WellEventInfo)"""
+        results = db.select_sql(statement)
+        return render_template('/reports/wellroyaltymastermissing.html', result=results)
+    except Exception as e:
+        print(e)
+        abort(404)
+
+@reports.route('/reports/welleventinfomissing')
+def welleventinfomissing():
+    try:
+        db = config.get_database()
+        statement = """SELECT * FROM WellEventInfo
+                       WHERE WellEvent NOT IN (SELECT WellEvent FROM WellRoyaltyMaster)"""
+        results = db.select_sql(statement)
+        return render_template('/reports/welleventinfomissing.html', result=results)
+    except Exception as e:
+        print(e)
+        abort(404)
