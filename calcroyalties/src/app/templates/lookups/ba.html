@@ -13,7 +13,7 @@ $(function() {
     event.preventDefault();
     $.ajax({
       type: "GET",
-      url: "/lookup/ba_results",
+      url: "/lookups/ba_results",
       dataType: "html",
       data: $('#ba-lookup-form').serialize()
     })
@@ -44,8 +44,8 @@ $(function() {
           <br>
           <!--<input name="BAType" />-->
           <select name="BAType">
-            <option value="COMPANY">Company</option>
-            <option value="INDIVIDUAL">Individual</option>
+            <option value="RTP">RTP</option>
+            <option value="LESSOR">Lessor</option>
           </select>
         </td>
       </tr>

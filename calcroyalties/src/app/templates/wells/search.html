@@ -23,6 +23,8 @@
   	  <ul>
   	    <li><a href="#tabs-basic">Basic search</a></li>
   	    <li><a href="#tabs-advanced">Advanced search</a></li>
+  	    <li><a href="#tabs-band">Search by band</a></li>
+
   	  </ul>
 
   	  <div id="tabs-basic">
@@ -54,6 +56,17 @@
         <br>
         <br>
         <button id='search-advanced'>Search</button>
+      </form>
+  	  </div>
+
+  	  <div id="tabs-band">
+      <form name="search-band" action="/wells" method="get">
+  	    Band ID
+        <br>
+        <input name="Band" value="{% if search_terms %}{{ search_terms['Band'] }}{% endif %}"/>
+        <br>
+        <br>
+        <button id='search-band'>Search</button>
       </form>
   	  </div>
 

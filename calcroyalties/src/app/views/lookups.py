@@ -7,11 +7,11 @@ from .main import get_proddate
 
 lookups = Blueprint('lookups', __name__)
 
-@lookups.route('/lookup/ba')
+@lookups.route('/lookups/ba')
 def ba():
     return render_template('lookups/ba.html')
 
-@lookups.route('/lookup/ba_results')
+@lookups.route('/lookups/ba_results')
 def ba_results():
     db = config.get_database()
     statement = """SELECT * FROM BAInfo WHERE (DATE('{proddate}') BETWEEN BAInfo.StartDate AND BAInfo.EndDate OR BAInfo.StartDate IS NULL)""".format(proddate=get_proddate())
