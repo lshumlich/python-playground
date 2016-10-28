@@ -320,8 +320,8 @@ table, th, td {
 {% if rm.ValuationMethod == 'ActSales' %}
     <br>
     <tr align="center"> <td colspan="7">Valuation Method is ActSales:</tr></tr>
-    <tr align="center"><td>RVal =</td> <td>WellHeadPrice</td> <td>+</td> <td>TransRate</td> <td>+</td> <td>ProcessingRate</td></tr>
-    <tr align="center"><td>RVal =</td> <td>{{ '{:>10,.6f}\n'.format(m.WellHeadPrice) }}</td> <td>+</td> <td>{{ '{:>10,.6f}\n'.format(m.TransRate) }}</td> <td>+</td> <td>{{ '{:>10,.6f}\n'.format(m.ProcessingRate) }}</td></tr>
+    <tr align="center"><td>RVal =</td> <td>??? WellHeadPrice</td> <td>+</td> <td>TransRate</td> <td>+</td> <td>ProcessingRate</td></tr>
+    <tr align="center"><td>RVal =</td> <td>{{ '{:>10,.6f}\n'.format(m.SalesPrice) }}</td> <td>+</td> <td>{{ '{:>10,.6f}\n'.format(m.TransRate) }}</td> <td>+</td> <td>{{ '{:>10,.6f}\n'.format(m.ProcessingRate) }}</td></tr>
     <tr align="center"><td>RVal =</td> <td>{{ '{:>10,.6f}\n'.format(calc.RoyaltyPrice) }}</td></tr>
 {% endif %}
 
@@ -367,7 +367,7 @@ table, th, td {
 <br>
 <tr align="center"><td>S$</td> <td>=</td> <td>(T</td> <td>-</td> <td>B)</td> <td>*</td> <td>0.50</td> <td>*</td> <td>(P</td> <td>-</td> <td>R)</td></tr>
 <tr align="center"><td>S$</td> <td>=</td> <td>({{ '{:.2f}'.format(m.ProdVol) }}</td> <td>-</td> <td>{{ '{:.2f}'.format(calc.RoyaltyRegulation) }})</td> <td>*</td>
-<td>0.50</td> <td>*</td> <td>({{ '{:>10,.6f}\n'.format(m.WellHeadPrice) }}</td> <td>-</td> <td> 25.00)</td></tr>
+<td>0.50</td> <td>*</td> <td> ??? ({{ '{:>10,.6f}\n'.format(m.SalesPrice) }}</td> <td>-</td> <td> 25.00)</td></tr>
 <tr align="center"><td>S$</td> <td>=</td> <td>{{ '{:>10,.2f}\n'.format(calc.SupplementaryRoyalties) }}</td></tr>
 </table>
 {% endif %}

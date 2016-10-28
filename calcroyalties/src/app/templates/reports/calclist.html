@@ -16,13 +16,17 @@ tr.border_bottom td {
     {% for r in result %}
     <tr>
         <td>{{ r.ID }}</td>
-        <td> <a href="/worksheet?WellId={{ r.ID }}" title="Worksheet" class="icon icon-text-document"></a> </td>
-
+        <td>
+            <a href="{{ url_for('worksheet.calc_worksheet') }}?WellId={{ r.ID }}" title="Worksheet" class="icon icon-text-document"></a>
+            &nbsp;
+            <a href="{{ url_for('wells.calculate') }}?WellId={{ r.ID }}" title="Recalculate" class="icon icon-reload"></a>
+        </td>
         <td>{{ r.WellEvent }}</td>
         <td>{{ r.ProdMonth }}</td>
         <td>{{ r.RoyaltyVolume }}</td>
         <td>{{ r.WellEvent }}</td>
         <td>{{ r.RoyaltyValue }}</td>
+        <td align="right">{{ '{:.6%}'.format(r.ProvCrownUsedRoyaltyRate) }}</td>
     </tr>
     {% endfor %}
 </table>

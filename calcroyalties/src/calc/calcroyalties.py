@@ -113,9 +113,9 @@ class ProcessRoyalties(object):
             calc.GorrRoyaltyRate, calc.GorrMessage = self.calc_gorr_percent(monthly.ProdVol, monthly.ProdHours,
                                                                             royalty.Gorr)
             calc.GorrRoyaltyValue = round(monthly.ProdVol * well_lease_link.PEFNInterest / 100 *
-                                          calc.GorrRoyaltyRate / 100.0 * calc.RoyaltyPrice, 6)
+                                          calc.GorrRoyaltyRate / 100.0 * calc.RoyaltyPrice, 2)
             calc.GorrRoyaltyVolume = round(monthly.ProdVol * well_lease_link.PEFNInterest / 100 *
-                                           calc.GorrRoyaltyRate / 100.0, 2)
+                                           calc.GorrRoyaltyRate / 100.0, 6)
             calc.RoyaltyValuePreDeductions += calc.GorrRoyaltyValue
             calc.RoyaltyValue = calc.RoyaltyValuePreDeductions
 
