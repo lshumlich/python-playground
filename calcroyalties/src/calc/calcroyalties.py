@@ -124,7 +124,7 @@ class ProcessRoyalties(object):
                               calc.GorrRoyaltyVolume)
 
         if royalty.TruckingDeducted == 'Y':
-            calc.RoyaltyTransportation = round(calc.RoyaltyVolume * monthly.TransRate,2)
+            calc.RoyaltyTransportation = round(calc.RoyaltyVolume * monthly.TransRate, 2)
             calc.RoyaltyDeductions += calc.RoyaltyTransportation
             calc.RoyaltyValue -= calc.RoyaltyTransportation
 
@@ -132,13 +132,13 @@ class ProcessRoyalties(object):
         #     calc.RoyaltyTransportation = royalty.TruckingOverride
 
         if royalty.ProcessingDeducted == 'Y':
-            calc.RoyaltyProcessing = round(calc.RoyaltyVolume * monthly.ProcessingRate,2)
+            calc.RoyaltyProcessing = round(calc.RoyaltyVolume * monthly.ProcessingRate, 2)
             calc.RoyaltyDeductions += calc.RoyaltyProcessing
             calc.RoyaltyValue -= calc.RoyaltyProcessing
 
         if monthly.Product == 'Gas':
             if royalty.GCADeducted == 'Y':
-                calc.RoyaltyGCA = round(calc.RoyaltyVolume * monthly.GCARate,2)
+                calc.RoyaltyGCA = round(calc.RoyaltyVolume * monthly.GCARate, 2)
                 calc.RoyaltyDeductions += calc.RoyaltyGCA
                 calc.RoyaltyValue -= calc.RoyaltyGCA
 
