@@ -94,6 +94,7 @@ if __name__ == "__main__":
 
     drop_create_tables()
     load_sheet(config.get_temp_dir() + "sample_data.xlsx")
+    # load_sheet("K:\\lms\\Analysis and Design\\Sample Data Saved\\sample_data 2016-10-17.xlsx")
     run_royalties_and_worksheet()
     # print("Goodbye world!")
 

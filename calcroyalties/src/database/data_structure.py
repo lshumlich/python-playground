@@ -30,12 +30,12 @@ class DataStructure(object):
             lid = self.ID
         return '{}-{:04d}'.format(self.LeaseType, lid)
 
-"""
-Formatter: formats the attributes for various reports.
-"""
 
 class Formatter(object):
-    
+    """
+    Formatter: formats the attributes for various reports.
+    """
+
     def __init__(self, data_obj):
         self.data_obj = data_obj
     
