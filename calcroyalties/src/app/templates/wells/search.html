@@ -1,20 +1,100 @@
 {% extends "layout.html" %}
 {% block body %}
 <script>
-  $(function() {
-  	$('#tabs').tabs();
-    $('#search-accordion').accordion({
-      collapsible:true,
-      heightStyle:'content',
-      animate:false
-    });
-    $('#search-basic, #search-advanced').button({
-      icons: {primary: 'ui-icon-search'}
-    });
+$(function() {
+  $('#tabs').tabs();
+
+  $('#search-accordion').accordion({
+    collapsible:true,
+    heightStyle:'content',
+    animate:false
   });
+
+  $('#search-basic, #search-advanced').button({
+    icons: {primary: 'ui-icon-search'}
+  });
+
+  $('#band-lookup-button')
+  .click(function() {
+    showBandLookupDialog();
+  })
+
+  $('#band-lookup-accordion').accordion({
+    collapsible:true,
+    heightStyle:'content',
+  });
+
+  $('#band-lookup-search')
+    .button({
+      icons: {primary: 'ui-icon-search'}
+    })
+    .click(function() {
+      event.preventDefault();
+      $.ajax({
+        type: "GET",
+        url: "/lookups/band",
+        dataType: "html",
+        data: $('#band-lookup-form').serialize()
+      })
+      .done(function (msg){
+          if (msg) {
+            $('#band-lookup-results').html(msg);
+            $("#band-lookup-accordion").accordion("option", "active", false)
+          } else {
+            $('#band-lookup-results').html('<span style="color:red">No results found</span>');
+          }
+      });
+  });
+
+});
+
+function showBandLookupDialog() {
+  var BandLookupDialog = $('#band-lookup-dialog')
+  .dialog({
+      autoOpen: true,
+      modal: false,
+      title: 'Band lookup',
+      width: 600,
+      height: 400,
+      buttons:{
+        Cancel: function() {$(BandLookupDialog.dialog('close')); $('#band-lookup-form')[0].reset()},
+        "Save": function() {$('#FNBandID').val($('#band-lookup-results-select').val()); BandLookupDialog.dialog('close')}
+      },
+  });
+
+}
 </script>
 
 <h2>Well Search</h2>
+
+<div id="band-lookup-dialog" class="lookup-dialog" style="display:none;">
+  <div id="band-lookup-modal">
+    <div id="band-lookup-accordion">
+    <h3>Search parameters</h3>
+      <form id="band-lookup-form" method="GET">
+        <table>
+          <tr>
+            <td>
+              <b>Band Name:</b>
+              <br>
+              <input name="FNBandName"/>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <button type="submit" id="band-lookup-search">Search</button>
+            </td>
+          </tr>
+        </table>
+       </form>
+    </div>
+
+    <br>
+
+    <div id="band-lookup-results">
+    </div>
+  </div>
+</div>
 
 <div id="search-accordion">
   <h3>Search Criteria</h3>
@@ -23,8 +103,6 @@
   	  <ul>
   	    <li><a href="#tabs-basic">Basic search</a></li>
   	    <li><a href="#tabs-advanced">Advanced search</a></li>
-  	    <li><a href="#tabs-band">Search by band</a></li>
-
   	  </ul>
 
   	  <div id="tabs-basic">
@@ -37,6 +115,11 @@
         Classification
         <br>
         <input name="Classification" value="{% if search_terms %}{{ search_terms['Classification'] }}{% endif %}"/>
+        <br>
+        <br>
+  	    Band ID
+        <br>
+        <input id="FNBandID" name="FNBandID" value="{% if search_terms %}{{ search_terms['FNBandID'] }}{% endif %}"/><input type="button" id="band-lookup-button" value="..."/>
         <br>
         <br>
         <button type="submit" id='search-basic'>Search</button>
@@ -58,18 +141,6 @@
         <button id='search-advanced'>Search</button>
       </form>
   	  </div>
-
-  	  <div id="tabs-band">
-      <form name="search-band" action="/wells" method="get">
-  	    Band ID
-        <br>
-        <input name="Band" value="{% if search_terms %}{{ search_terms['Band'] }}{% endif %}"/>
-        <br>
-        <br>
-        <button id='search-band'>Search</button>
-      </form>
-  	  </div>
-
   	</div>
   </div>
 </div>
@@ -85,6 +156,8 @@
     <th>Well Type</th>
     <th>Royalty Classification</th>
     <th>Classification</th>
+    <th>FN Band ID</th>
+    <th>FN Band</th>
     <th>Actions</th>
   </tr>
   {% for row in results %}
@@ -94,6 +167,8 @@
     <td>{{ row.WellType or "" }}</td>
     <td>{{ row.RoyaltyClassification or "" }}</td>
     <td>{{ row.Classification or "" }}</td>
+    <td>{{ row.FNBandID or "" }}</td>
+    <td>{{ row.FNBandName or "" }}</td>
     <td><a href="/worksheet?WellId={{ row.ID }}" title="Worksheet" class="icon icon-text-document"></a>
     &nbsp;
     <a href="{{ url_for('wells.calculate') }}?WellId={{ row.ID }}" title="Recalculate" class="icon icon-reload"></a>
@@ -106,6 +181,8 @@
 $(function(){
   $("#search-accordion").accordion("option", "active", false);
 })
+
+
 </script>
 {% endif %}
 

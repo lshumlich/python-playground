@@ -1,0 +1,12 @@
+{% if results %}
+<select id="band-lookup-results-select" size="10" style="width:100%">
+  {% for row in results %}
+  <option value="{{ row.ID }}">{{ row.ID }} - {{ row.FNBandName }}</option>
+  {% endfor %}
+</select>
+<script>
+  $('#band-lookup-results-select').dblclick(function() {
+    $('#band-lookup-dialog').dialog('option', 'buttons')['Save']();
+  });
+</script>
+{% endif %}

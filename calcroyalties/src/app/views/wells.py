@@ -11,17 +11,21 @@ wells = Blueprint('wells', __name__)
 def search():
     if not request.args: return render_template('wells/search.html')
     try:
-        db = config.get_database()
-        argument_tables = {'Prov': 'WellRoyaltyMaster', 'WellType': 'WellRoyaltyMaster', 'ID': 'WellRoyaltyMaster', 'Classification': 'WellRoyaltyMaster'}  # allowed Property:Table pairs
+        argument_tables = {'Prov': 'WellRoyaltyMaster', 'WellType': 'WellRoyaltyMaster', 'ID': 'WellRoyaltyMaster', 'Classification': 'WellRoyaltyMaster', 'FNBandID': 'Lease'}  # allowed Property:Table pairs
         kwargs = dict((k, v) for k, v in request.args.items() if v and k in argument_tables)  # this is to get rid
         # of empty values coming from forms and convert multidict to dict and to check if argument is allowed
+        print(kwargs)
         search_arguments = ""
         for arg in kwargs:
             compound = argument_tables[arg] + '.' + arg + '=' + '"' + kwargs[arg] + '"'
             search_arguments += " AND " + compound
-        statement = """SELECT * FROM WellRoyaltyMaster
-                       WHERE DATE("{proddate}") BETWEEN WellRoyaltyMaster.StartDate and WellRoyaltyMaster.EndDate
+        statement = """SELECT WellRoyaltyMaster.*, FNBand.FNBandName, Lease.FNBandID FROM WellRoyaltyMaster, FNBand, WellLeaseLink, Lease
+                       WHERE WellRoyaltyMaster.ID = WellLeaseLink.WellID
+                       AND WellLeaseLink.LeaseID = Lease.ID
+                       AND Lease.FNBandID = FNBand.ID
+                       AND DATE("{proddate}") BETWEEN WellRoyaltyMaster.StartDate and WellRoyaltyMaster.EndDate
                     """.format(proddate=get_proddate()) + search_arguments
+        db = config.get_database()
         result = db.select_sql(statement)
         if result:
             print(result)

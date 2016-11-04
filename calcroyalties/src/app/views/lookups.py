@@ -1,4 +1,4 @@
-from flask import Blueprint, request, config, render_template
+from flask import Blueprint, request, config, render_template, json
 
 import config
 from .permission_handler import PermissionHandler
@@ -10,6 +10,19 @@ lookups = Blueprint('lookups', __name__)
 @lookups.route('/lookups/ba')
 def ba():
     return render_template('lookups/ba.html')
+
+@lookups.route('/lookups/band')
+def band():
+    try:
+        db = config.get_database()
+        statement = """SELECT * FROM FNBand
+                       WHERE FNBandName LIKE "%{bandname}%"
+                    """.format(bandname = request.args['FNBandName'])
+        results = db.select_sql(statement)
+        return render_template('lookups/band_results.html', results = results)
+    except Exception as e:
+        print(e)
+        return 'Something went wrong fetching bands'
 
 @lookups.route('/lookups/ba_results')
 def ba_results():
