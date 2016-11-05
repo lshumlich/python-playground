@@ -110,14 +110,7 @@ class ProcessRoyalties(object):
                            str(monthly.Product) + ' ' + str(royalty.RoyaltyScheme))
 
         if monthly.Product == 'Oil' and 'GORR' in royalty.RoyaltyScheme:
-            calc.GorrRoyaltyRate, calc.GorrMessage = self.calc_gorr_percent(monthly.ProdVol, monthly.ProdHours,
-                                                                            royalty.Gorr)
-            calc.GorrRoyaltyValue = round(monthly.ProdVol * well_lease_link.PEFNInterest / 100 *
-                                          calc.GorrRoyaltyRate / 100.0 * calc.RoyaltyPrice, 2)
-            calc.GorrRoyaltyVolume = round(monthly.ProdVol * well_lease_link.PEFNInterest / 100 *
-                                           calc.GorrRoyaltyRate / 100.0, 6)
-            calc.RoyaltyValuePreDeductions += calc.GorrRoyaltyValue
-            calc.RoyaltyValue = calc.RoyaltyValuePreDeductions
+            self.calc_gorr(royalty, calc, monthly, well_lease_link)
 
         calc.RoyaltyVolume = (calc.ProvCrownRoyaltyVolume +
                               calc.IOGR1995RoyaltyVolume +
@@ -142,30 +135,17 @@ class ProcessRoyalties(object):
                 calc.RoyaltyDeductions += calc.RoyaltyGCA
                 calc.RoyaltyValue -= calc.RoyaltyGCA
 
-            # #            self.ws.printSaskOilRoyaltyRate(monthly, well, royalty, lease, calc)
-            # log.write('--- Royalty Calculated: {} {} {} prod: {} Crown Rate: {}\n'.format(monthly.Row, calc.ProdMonth,
-            # #                                                     calc.WellId, monthly.ProdVol, calc.RoyaltyRate))
-            # #             self.db.updateRoyaltycalc(calc)
-            #
-            #         # except AppError as e:
-            #         #     errorCount +=1
-            #         #     log.write ('Record #: ' + str(monthly.RecordNumber) + ' ' + str(e) + '\n')
-            #         # except Exception as e:
-            #         #     exc_type, exc_value, exc_traceback = sys.exc_info()
-            #         #     errorCount +=1
-            #         #     print('-'*10)
-            #         #     print ('Record #: ' + str(monthly.RecordNumber) + ' ' + str(e))
-            #         #     print(repr(traceback.extract_tb(exc_traceback)))
-            #         #     traceback.print_exc()
-            #         #     print('-'*10)
-            #         #     log.write ('Record #: ' + str(monthly.RecordNumber) + ' ' + str(e) + '\n')
-            #
-            #
-            #         self.db.commit()
-            # #         log.write ("*** That's it folks " + str(errorCount) + ' errors \n')
-            # #         log.close()
-            # #
-            # #         del self.ws
+    @staticmethod
+    def calc_gorr(leaserm, calc, monthly, well_lease_link):
+        calc.GorrRoyaltyRate, calc.GorrMessage = \
+            ProcessRoyalties.calc_gorr_percent(monthly.ProdVol, monthly.ProdHours, leaserm.Gorr)
+
+        calc.GorrRoyaltyValue = round(monthly.ProdVol * well_lease_link.PEFNInterest *
+                                      calc.GorrRoyaltyRate * calc.RoyaltyPrice, 2)
+        calc.GorrRoyaltyVolume = round(monthly.ProdVol * well_lease_link.PEFNInterest *
+                                       calc.GorrRoyaltyRate, 6)
+        calc.RoyaltyValuePreDeductions += calc.GorrRoyaltyValue
+        calc.RoyaltyValue = calc.RoyaltyValuePreDeductions
 
     @staticmethod
     def calc_sask_gas_prov_crown_royalty_rate(calc, econ_gas_data,
@@ -320,7 +300,7 @@ class ProcessRoyalties(object):
                         'Royalty Classification: "' + well_royalty_classification + '" not known for ' +
                         well_classification + ' Royalty not calculated.')
             else:
-                raise AppError('Product Classification: "' + well_classification +
+                raise AppError('Product Classification: "' + str(well_classification) +
                                '" not known. Royalty not calculated.')
 
             if mop == 0:
@@ -332,29 +312,32 @@ class ProcessRoyalties(object):
 
         return calc.ProvCrownRoyaltyRate
 
-    def calc_sask_oil_prov_crown_royalty_volume_value(self, m, fn_interest, royalty, calc):
+    def calc_sask_oil_prov_crown_royalty_volume_value(self, m, fn_interest, lease_rm, calc):
         # Note: If there is no sales. Use last months sales value... Not included in this code
 
-        calc.RoyaltyPrice = self.determine_royalty_price(royalty.ValuationMethod, m)
+        calc.RoyaltyPrice = self.determine_royalty_price(lease_rm.ValuationMethod, m)
 
         calc.ProvCrownUsedRoyaltyRate = calc.ProvCrownRoyaltyRate
 
         if calc.ProvCrownUsedRoyaltyRate < 0:
             calc.ProvCrownUsedRoyaltyRate = 0
 
-        if royalty.MinRoyaltyRate is not None:
-            if royalty.MinRoyaltyRate > calc.ProvCrownUsedRoyaltyRate:
-                calc.ProvCrownUsedRoyaltyRate = royalty.MinRoyaltyRate
+        if lease_rm.CrownModifier:
+            calc.ProvCrownUsedRoyaltyRate += lease_rm.CrownModifier
+
+        if lease_rm.MinRoyaltyRate:
+            if lease_rm.MinRoyaltyRate > calc.ProvCrownUsedRoyaltyRate:
+                calc.ProvCrownUsedRoyaltyRate = lease_rm.MinRoyaltyRate
 
         calc.ProvCrownRoyaltyVolume = round((calc.ProvCrownUsedRoyaltyRate *
-                                             royalty.CrownMultiplier *
+                                             lease_rm.CrownMultiplier *
                                              m.ProdVol * fn_interest), 6)
 
         calc.ProvCrownRoyaltyValue = round(calc.ProvCrownRoyaltyVolume * calc.RoyaltyPrice, 2)
 
-        if royalty.MinRoyaltyDollar:
-            if royalty.MinRoyaltyDollar > calc.ProvCrownRoyaltyValue:
-                calc.ProvCrownRoyaltyValue = royalty.MinRoyaltyDollar
+        if lease_rm.MinRoyaltyDollar:
+            if lease_rm.MinRoyaltyDollar > calc.ProvCrownRoyaltyValue:
+                calc.ProvCrownRoyaltyValue = lease_rm.MinRoyaltyDollar
 
     def calc_sask_oil_iogr1995(self, commencement_date, valuation_method, crown_multiplier, fn_interest, m, calc):
         """
@@ -447,6 +430,7 @@ class ProcessRoyalties(object):
         #     royalty_price = monthly.WellHeadPrice
 
         # return royalty_price
+
         return monthly.SalesPrice
 
     @staticmethod
@@ -538,10 +522,10 @@ class ProcessRoyalties(object):
         calc.CommencementPeriod = self.determine_commencement_period(monthly.ProdMonth, well.CommencementDate)
         econ_oil_data = self.db.select1("ECONData", ProdMonth=monthly.ProdMonth)
         if royalty.OverrideRoyaltyClassification is not None:
-            royalty_classification = royalty.OverrideRoyaltyClassification
+            calc.RoyaltyClassification = royalty.OverrideRoyaltyClassification
         else:
-            royalty_classification = well.RoyaltyClassification
-        self.calc_sask_oil_prov_crown_royalty_rate(calc, econ_oil_data, royalty_classification,
+            calc.RoyaltyClassification = well.RoyaltyClassification
+        self.calc_sask_oil_prov_crown_royalty_rate(calc, econ_oil_data, calc.RoyaltyClassification,
                                                    well.Classification, monthly.ProdVol, well.SRC)
         self.calc_sask_oil_prov_crown_royalty_volume_value(monthly, well_lease_link.PEFNInterest, royalty, calc)
 

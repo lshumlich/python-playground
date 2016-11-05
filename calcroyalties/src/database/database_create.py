@@ -24,6 +24,11 @@ Database Change Log: Must be maintained so we can keep the database in sink:
 2016-10-25
 - Rename Monthly.WellHeadPrice to SalesPrice
 - Remove Monthly.TransPrice
+2016-11-03
+- Add LeaseRoyaltyMaster.CrownModifier
+- Remove Lease.LessorID
+2016-11-04
+- Add
 
 """
 import datetime
@@ -101,6 +106,7 @@ class DatabaseCreate(object):
              "RightsGranted" text,
              "RoyaltyScheme" text,
              "CrownMultiplier" float,
+             "CrownModifier" float,
              "ValuationMethod" text,
              "TruckingDeducted" text,
              "ProcessingDeducted" text,
@@ -123,7 +129,6 @@ class DatabaseCreate(object):
              "Prov" text,
              "FNReserveID" int,
              "FNBandID" int,
-             "LessorID" int,
              "Notes" text);
         """
         self.dbi.execute_statement(statement)
@@ -170,6 +175,7 @@ class DatabaseCreate(object):
             "RoyaltyVolume" int,
             "ProvCrownRoyaltyRate" int,
             "ProvCrownUsedRoyaltyRate" int,
+            "RoyaltyClassification" text,
             "IOGR1995RoyaltyRate" int,
             "GorrRoyaltyRate" int,
             "ProvCrownRoyaltyVolume" int,
@@ -245,5 +251,6 @@ class DatabaseCreate(object):
         self.dbi.execute_statement(statement)
 
         insert_statement = "insert into Users values(1,'admin','Admin Admin','info@thesolutionstack.com',201604, \
-                           ' ,well_view,well_edit,wellevent_view,wellevent_edit,facility_view,lease_view,lease_edit,welllease_view,welllease_edit,data_view,data_edit,users_view,users_edit');"
+                           ' ,well_view,well_edit,wellevent_view,wellevent_edit,facility_view,lease_view,lease_edit," \
+                           "welllease_view,welllease_edit,data_view,data_edit,users_view,users_edit');"
         self.dbi.execute(insert_statement)

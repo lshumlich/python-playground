@@ -21,7 +21,6 @@ class DataStructure(object):
         d = vars(self)
         return list(d.values())
 
-    # NOTE: Delete this method once we move to the new sql world
     @property
     def Lease(self):
         if hasattr(self, 'LeaseID'):
