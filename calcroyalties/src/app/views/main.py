@@ -53,24 +53,29 @@ def map():
         json_obj['type'] = 'Feature'
         json_obj['properties'] = {}
         json_obj['properties']['name'] = wellevent.WellEvent
-        json_obj['properties']['popupContent'] = '<b>%s</b> <br> Pool Name: %s<br><a href="/wellevent/%s">Details</a>' % (wellevent.WellEvent, wellevent.PoolName, wellevent.WellEvent)
+        json_obj['properties']['popupContent'] = '<b>%s</b> <br> Pool Name: %s<br><a href="/wellevent/%s">Details</a>'\
+                                                 % (wellevent.WellEvent, wellevent.PoolName, wellevent.WellEvent)
         json_obj['geometry'] = {}
         json_obj['geometry']['type'] = 'Point'
         json_obj['geometry']['coordinates'] = [random.randint(-50, 50), random.randint(-100, 100)]
         results.append(json_obj)
     return render_template('map.html', results=json.dumps(results))
 
+
 @app.errorhandler(404)
 def not_found(error):
     return render_template('404.html')
 
+
 def get_proddate():
     cookie = request.cookies['proddate']
-    if not cookie: raise AppError('Proddate cookie not set for some reason')
+    if not cookie:
+        raise AppError('Proddate cookie not set for some reason')
     proddate = cookie[0:4] + "-" + cookie[4:6] + "-01"
     return proddate
 
-def get_proddate_int() -> object:
+
+def get_proddate_int() -> int:
     try:
         return int(request.cookies['proddate'])
     except:
@@ -79,7 +84,8 @@ def get_proddate_int() -> object:
 """
 1. Well event view - search field verification
 2. Make flash messages work from JS (i.e. on AJAX request status)
-3. Idea: change all db.select functions to take into account the production date (to avoid setting it manually on every query)
+3. Idea: change all db.select functions to take into account the production date
+    (to avoid setting it manually on every query)
 
 PRWI101010610825W300; 199001
 """
