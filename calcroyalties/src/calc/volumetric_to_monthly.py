@@ -1,4 +1,5 @@
-'''
+"""
+
 variables in monthly:
 ID (add 1 to previous)
 ExtractMonth	(where is this from?)
@@ -12,11 +13,11 @@ TransPrice: (need)
 WellHeadPrice: (need)
 TransRate: (need)
 ProcessingRate: (need)
-'''
+"""
 
 import config
 from src.util.apperror import AppError
-from src.database.data_structure import DataStructure
+
 
 def volumetric_to_monthly():
 
@@ -55,12 +56,13 @@ def volumetric_to_monthly():
             ds.Product = a.Product
             ds.AmendNo = a.Amendment
             ds.ProdVol = a.Volume
-            print(e)
+            print(ds)
             print('Inserting ', ds.WellID)
             db.insert(ds)
             inserted_counter += 1
 
         else:
-            raise AppError(len(existing), " records found in table Monthly for ", a)
+            raise AppError(str(len(existing)) + " records found in table Monthly for " + a)
 
-    return('Complete. %i records traversed, %i records inserted, %i records updated' % (total_counter, inserted_counter, updated_counter))
+    return('Complete. %i records traversed, %i records inserted, %i records updated' %
+           total_counter, inserted_counter, updated_counter)

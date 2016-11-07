@@ -13,7 +13,7 @@ from tests.database.sqlite_utilities_test import DatabaseUtilities
 class SqliteDatabaseTest(unittest.TestCase):
 
     def setUp(self):
-        self.assertEqual(config.get_environment(),'unittest') # Distructive Tests must run in unittest enviornment
+        self.assertEqual('unittest', config.get_environment())  # Destructive Tests must run in unittest environment
         self.dbi = config.get_database_instance()
         self.db = config.get_database()
         self.dbu = DatabaseUtilities()
@@ -31,7 +31,7 @@ class SqliteDatabaseTest(unittest.TestCase):
         
     def test_get_data_structure(self):
         ds = self.db.get_data_structure('WhatEver')
-        self.assertEqual('WhatEver',ds._table_name)
+        self.assertEqual('WhatEver', ds._table_name)
 
     def test_select(self):
         self.dbu.create_some_test_well_royalty_masters()
@@ -41,19 +41,19 @@ class SqliteDatabaseTest(unittest.TestCase):
         self.assertEqual(len(self.db.select('WellRoyaltyMaster', Prov='SK', Classification='Other')), 2)
         self.assertEqual(len(self.db.select('WellRoyaltyMaster')), 4)
         self.assertRaises(AppError, self.db.select, 'WrongTable')
-        self.assertRaises(AppError, self.db.select, 'WrongTable',WrongAttr='WhoCares')
+        self.assertRaises(AppError, self.db.select, 'WrongTable', WrongAttr='WhoCares')
         self.assertRaises(AppError, self.db.select, 'Well', Foo='bar')
         self.assertEqual(len(self.db.select('Lease')), 4)
         self.assertEqual(len(self.db.select('Lease', Prov='SK')), 4)
-        self.assertEqual(len(self.db.select('WellRoyaltyMaster', ID=1000)),0)
+        self.assertEqual(len(self.db.select('WellRoyaltyMaster', ID=1000)), 0)
 
-
-        #WRITE TEST FOR SELECT1
+        # WRITE TEST FOR SELECT1
         
     def test_update(self):
         self.dbu.create_some_test_well_royalty_masters()
 
-        # change all types of attributes, read another record and then read the record again to make sure the changes were made.
+        # change all types of attributes, read another record and then read the record again to make sure
+        # the changes were made.
         well = self.db.select('WellRoyaltyMaster', ID=2)
         well[0].WellEvent = 'Changed'
         well[0].LeaseID = 100
@@ -66,7 +66,7 @@ class SqliteDatabaseTest(unittest.TestCase):
         well = self.db.select('WellRoyaltyMaster', ID=2)
         self.assertEqual(well[0].ID, 2)
         self.assertEqual(well[0].WellEvent, 'Changed')
-        self.assertEqual(well[0].CommencementDate, datetime(2016,2,1,0,0))
+        self.assertEqual(well[0].CommencementDate, datetime(2016, 2, 1, 0, 0))
         self.assertEqual(well[0].WellType, None)
 
         ds = DataStructure()
@@ -116,11 +116,10 @@ class SqliteDatabaseTest(unittest.TestCase):
         well.WellEvent = 'Just One More'
         self.db.insert(well)
         self.assertEqual(well.ID, 11)
-        
 
         well = self.db.get_data_structure('WellRoyaltyMaster')
         well.BadAttr = 'Just another value'
-        self.assertRaises(AppError, self.db.insert,well)
+        self.assertRaises(AppError, self.db.insert, well)
         
         # if the ID is None,Blank,or zero we shold still be able to insert a record
         well = self.db.get_data_structure('WellRoyaltyMaster')
@@ -134,15 +133,14 @@ class SqliteDatabaseTest(unittest.TestCase):
         well.ID = ''
         self.db.insert(well)
         self.assertEqual(well.ID, 14)
-        
-        
+
     def test_delete(self):
         self.dbu.create_some_test_well_royalty_masters()
 
-        self.assertEqual(4,len(self.db.select('WellRoyaltyMaster')))
+        self.assertEqual(4, len(self.db.select('WellRoyaltyMaster')))
                          
         self.db.delete('WellRoyaltyMaster', 2)
-        self.assertEqual(3,len(self.db.select('WellRoyaltyMaster')))
+        self.assertEqual(3, len(self.db.select('WellRoyaltyMaster')))
         self.assertEqual(0, len(self.db.select('WellRoyaltyMaster', ID=2)))
 
     def test_count(self):
@@ -154,5 +152,5 @@ class SqliteDatabaseTest(unittest.TestCase):
         self.dbu.create_some_test_well_royalty_masters()
         
         well = self.db.select('WellRoyaltyMaster', ID=1)
-        self.assertTrue(isinstance(well[0].CommencementDate,datetime))
+        self.assertTrue(isinstance(well[0].CommencementDate, datetime))
 #         print('CommencementDate:' , well[0].CommencementDate, type(well[0].CommencementDate))

@@ -154,6 +154,8 @@ class DatabaseCreate(object):
             "AmendNo" int,
             "ProdHours" int,
             "ProdVol" int,
+            "Oper" text,
+            "OperVol" float,
             "SalesPrice" float,
             "TransRate" float,
             "ProcessingRate" float,

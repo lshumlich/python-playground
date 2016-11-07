@@ -180,7 +180,7 @@ table, th, td {
 </head>
 <body>
 
-
+??????
     <TABLE style="width:700" border="1">
 
 	<caption><b>Monthly Data</b></caption>
@@ -220,7 +220,7 @@ table, th, td {
     </TR>
 
 </TABLE>
-
+??????
     <br>
 
         {*** Note: Replace Well Head Price with Petrinex detail when available ***}<br>
@@ -452,9 +452,50 @@ table, th, td {
     </div>
 
     <div align="center">
-{#
+
     <h1>test area</h1>
-#}
+??????
+    <TABLE style="width:700" border="1">
+
+	<caption><b>Monthly Data</b></caption>
+	<col width="10">
+	<col width="10">
+	<col width="12.5%">
+	<col width="12.5%">
+	<col width="12.5%">
+	<col width="12.5%">
+	<col width="12.5%">
+	<col width="12.5%">
+
+    {#
+        --- Monthly Data
+    #}
+
+   <TR>
+      <TD>Extract Date</TD>
+      <TD>Prod. Month</TD>
+	   <TD>Amend No.</TD>
+	   <TD>Prod.</TD>
+	   <TD>Monthly Prod. Vol.</TD>
+	   <TD>Sales Price</TD>
+	   <TD>Trans Price</TD>
+	   <TD>Processing Price</TD>
+   </TR>
+
+	<TR>
+      <TD>{{ m._format.yyyy_mm_dd(m.ExtractMonth) }}</TD>
+      <TD>{{ m._format.ProdMonth }}</TD>
+	   <TD>{{ m.AmendNo }}</TD>
+	   <TD>{{ m.Product }}</TD>
+	   <TD>{{ '{:.2f}'.format(m.ProdVol) }}</TD>
+	   <TD>{{ '{:>10,.6f}\n'.format(m.SalesPrice) }}</TD>
+	   <TD>{{ '{:>10,.6f}\n'.format(m.TransRate) }}</TD>
+	   <TD>{{ '{:>10,.6f}\n'.format(m.ProcessingRate) }}</TD>
+    </TR>
+
+</TABLE>
+??????
+
     </div>
 
     </body>
