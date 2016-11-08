@@ -26,12 +26,13 @@ def calc_worksheet():
             royalty = db.select1('LeaseRoyaltyMaster', ID=well_lease_link.LeaseID)
             lease = db.select1('Lease', ID=well_lease_link.LeaseID)
             monthly = db.select1('Monthly', WellID=well_id, prodMonth=prod_month, product=product)
+            ba = db.select1('BAInfo',BAid=monthly.Oper)
             calc = db.select1('Calc', WellID=well_id, prodMonth=prod_month)
             # calc = calc_array[0]
-            print(monthly)
+            # print(monthly)
             return render_template('worksheet/calc_worksheet.html',
                                    well=well, rm=royalty, m=monthly, lease=lease,
-                                   calc=calc, well_lease_link=well_lease_link)
+                                   calc=calc, well_lease_link=well_lease_link, ba=ba)
         else:
             return "No monthly data for this well"
 

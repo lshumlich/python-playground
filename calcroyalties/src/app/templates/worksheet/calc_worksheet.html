@@ -48,18 +48,11 @@ fmath {
 
 </style>
 </head>
+<body>
 
-{# how about his is it a comment #}
 
-{#
-
-Several Lines of comments
-
-#}
-
-<h1 align="center">Well: {{ well.ID }}<br>
-	Well Event: {{ well.WellEvent }}</h1>
-<hr> </hr>
+<h1 align="center">Well: {{ well.ID }} Operator: {{ m.Oper }} <br>
+	  {{ well.WellEvent }} - {{ ba.CorpShortName }}</h1>
 
 <!--<p1>-->
 <div align="center">
@@ -170,62 +163,54 @@ Several Lines of comments
 
 </TABLE>
 
-<head>
+<!--<head>-->
 <style>
 table, th, td {
     border-collapse: collapse;
 }
 
 </style>
-</head>
-<body>
+<!--</head>-->
 
-??????
     <TABLE style="width:700" border="1">
+        <colgroup>
+            <col span="8" width="100" align="right">
+        </colgroup>
 
 	<caption><b>Monthly Data</b></caption>
-	<col width="12.5%">
-	<col width="12.5%">
-	<col width="12.5%">
-	<col width="12.5%">
-	<col width="12.5%">
-	<col width="12.5%">
-	<col width="12.5%">
-	<col width="12.5%">
 
     {#
         --- Monthly Data
     #}
 
    <TR>
-      <TD>Extract Date</TD>
-      <TD>Prod. Month</TD>
-	   <TD>Amend No.</TD>
-	   <TD>Prod.</TD>
-	   <TD>Monthly Prod. Vol.</TD>
-	   <TD>Sales Price</TD>
-	   <TD>Trans Price</TD>
-	   <TD>Processing Price</TD>
+      <th>Extract Date</th>
+      <th>Prod. Month</th>
+	   <th>Amend No.</th>
+	   <th>Prod.</th>
+	   <th>Prod Vol</th>
+	   <th>Operated Vol</th>
+	   <th>Sales Price</th>
+	   <th>Trans Price</th>
+	   <th>Processing Price</th>
    </TR>
 
-	<TR>
-      <TD>{{ m._format.yyyy_mm_dd(m.ExtractMonth) }}</TD>
-      <TD>{{ m._format.ProdMonth }}</TD>
-	   <TD>{{ m.AmendNo }}</TD>
-	   <TD>{{ m.Product }}</TD>
-	   <TD>{{ '{:.2f}'.format(m.ProdVol) }}</TD>
-	   <TD>{{ '{:>10,.6f}\n'.format(m.SalesPrice) }}</TD>
-	   <TD>{{ '{:>10,.6f}\n'.format(m.TransRate) }}</TD>
-	   <TD>{{ '{:>10,.6f}\n'.format(m.ProcessingRate) }}</TD>
-    </TR>
+	<tr>
+        <td align="center">{{ m._format.yyyy_mm_dd(m.ExtractMonth) }}</td>
+        <td align="center">{{ m._format.ProdMonth }}</td>
+	    <td align="center">{{ m.AmendNo }}</td>
+	    <td align="center">{{ m.Product }}</td>
+	    <td align="center">{{ '{:.2f}'.format(m.ProdVol) }}</td>
+	    <td align="center">{{ '{:.2f}'.format(m.OperVol) }}</td>
+	    <td align="center">{{ '{:>10,.6f}\n'.format(m.SalesPrice) }}</td>
+	    <td align="center">{{ '{:>10,.6f}\n'.format(m.TransRate) }}</td>
+	    <td align="center">{{ '{:>10,.6f}\n'.format(m.ProcessingRate) }}</td>
+    </tr>
 
-</TABLE>
-??????
+    </TABLE>
     <br>
 
-        {*** Note: Replace Well Head Price with Petrinex detail when available ***}<br>
-        {*** Note: Replace Trucking Price with Petrinex detail when available ***}<br>
-        {*** Note: Replace Processing Price with Petrinex detail when available ***}<br>
+        {*** Note: Replace Monthly data with Petrinex detail when available ***}<br>
 
     {#
         --- SKProvCrownVar display methods
@@ -283,37 +268,76 @@ table, th, td {
             {% if m.ProdVol < 80 %}
                 <tr><td align ="right">MOP < 80: RVol</td> <td align="center">=</td> <td align="left">10% * MOP</td></tr>
                 <tr><td align="right"> RVol</td><td align="center">=</td><td align="left">10% * {{ '{:.2f}'.format(m.ProdVol) }}</td></tr>
-                <tr><td align ="right">RVol</td> <td align="center">=</td> <td align="left">{{ calc.IOGR1995RoyaltyVolume }}</td></tr>
+                <tr><td align ="right">RVol</td> <td align="center">=</td> <td align="left">{{ calc.IOGR1995WellRoyaltyVolume }}</td></tr>
             {% elif m.ProdVol < 160 %}
                <tr><td align="right"> MOP 80 to 160: RVol</td> <td align="center">=</td> <td align="left">8 + [20% * (MOP - 80)]</td></TR>
                <tr><td align="right"> RVol</td><td align="center">=</td><td align="left">8 + [20% * ({{ '{:.2f}'.format(m.ProdVol) }} - 80)]</td></tr>
-               <tr><td align="right"> RVol</td><td align="center">=</td><td align="left">{{ '{:.2f}'.format(calc.IOGR1995RoyaltyVolume) }}</td></tr>
+               <tr><td align="right"> RVol</td><td align="center">=</td><td align="left">{{ '{:.2f}'.format(calc.IOGR1995WellRoyaltyVolume) }}</td></tr>
             {% elif calc.CommencementPeriod < 5 %}
                 <tr><td align="right"> MOP > 160: RVol</td> <td align="center">=</td> <td align="left">24 + [26% * (MOP - 160)]</td></tr>
                 <tr><td align="right"> RVol</td><td align="center">=</td><td align="left">24 + [26% * ({{ '{:.2f}'.format(m.ProdVol) }} - 160)]</td></tr>
-                <tr><td align="right"> RVol</td><td align="center">=</td></td><td align="left">{{ '{:.2f}'.format(calc.IOGR1995RoyaltyVolume) }}</td></tr>
+                <tr><td align="right"> RVol</td><td align="center">=</td></td><td align="left">{{ '{:.2f}'.format(calc.IOGR1995WellRoyaltyVolume) }}</td></tr>
             {% elif m.ProdVol < 795 %}
                 <tr><td align="right">MOP 160 to 795: RVol</td> <td align="center">=</td> <td align="left">24 + [26% * (MOP - 160)]</td></tr>
                 <tr><td align="right">RVol</td><td align="center">=</td> <td align="left">24 + [26% * ({{ '{:.2f}'.format(m.ProdVol) }} - 160)]</td></tr>
-                <tr><td align="right">RVol</td><td align="center">=</td> <td align="left">{{ '{:.2f}'.format(calc.IOGR1995RoyaltyVolume) }}</td></tr>
+                <tr><td align="right">RVol</td><td align="center">=</td> <td align="left">{{ '{:.2f}'.format(calc.IOGR1995WellRoyaltyVolume) }}</td></tr>
             {% else %}
                 <tr><td align="right">MOP > 795: RVol </td> <td align="center">=</td> <td align="left">189 + [40% * (MOP - 795)]</td></tr>
                 <tr><td align="right">RVol</td><td align="center">=</td> <td align="left">189 + [40% * ({{ '{:.2f}'.format(m.ProdVol) }} - 795)]</td></tr>
-                <tr><td align="right">RVol</td><td align="center">=</td> <td align="left">{{ '{:.2f}'.format(calc.IOGR1995RoyaltyVolume) }}</td></tr>
+                <tr><td align="right">RVol</td><td align="center">=</td> <td align="left">{{ '{:.2f}'.format(calc.IOGR1995WellRoyaltyVolume) }}</td></tr>
             {% endif %}
+
+            {% if calc.IOGR1995WellRoyaltyVolume != calc.IOGR1995RoyaltyVolume %}
+                <tr> <td> &nbsp </td></tr>
+                <tr>
+                    <td align="right"> Oper RVol</td>
+                    <td align="center"> = </td>
+                    <td> RVol * OperVol / MOP </td>
+                </tr>
+                <tr>
+                    <td align="right"> Oper RVol</td>
+                    <td align="center"> = </td>
+                    <td>
+                        {{ '{:.6f}'.format(calc.IOGR1995WellRoyaltyVolume) }} *
+                        {{ '{:.2f}'.format(m.OperVol) }} /
+                        {{ '{:.2f}'.format(m.ProdVol) }}
+                </tr>
+                <tr>
+                    <td align="right"> Oper RVol</td>
+                    <td align="center"> = </td>
+                    <td>
+                        {{ '{:.6f}'.format(calc.IOGR1995RoyaltyVolume) }}
+                </tr>
+            {% endif %}
+
 
         </TABLE>
     {% endif %}
     {% if m.Product == 'Oil' and 'SKProvCrownVar' in rm.RoyaltyScheme %}
         <table>
 
-            <tr><td align="left" style="text-align:left">RVol =</td><td style="text-align:center"> CR%</td> <td style="text-align:center">*</td>
-                <td style="text-align:center">CMult</td> <td style="text-align:center">*</td> <td style="text-align:center">ProdVol</td>
-                <td style="text-align:center">*</td> <td style="text-align:center">PE FN %</td></tr>
-            <tr><td align="left" style="text-align:left">RVol =</td><td style="text-align:center"> {{ '{:.6%}'.format(calc.ProvCrownUsedRoyaltyRate) }}</td>
-                <td style="text-align:center">*</td> <td style="text-align:center">{{ rm.CrownMultiplier }}</td> <td style="text-align:center">*</td>
-                <td style="text-align:center">{{ '{:.2f}'.format(m.ProdVol) }}</td> <td>*</td> <td>{{ '{:.6%}'.format(well_lease_link.PEFNInterest) }}</td></tr>
-            <tr align="left" style="text-align:left"><td>RVol =</td> <td style="text-align:center">{{ '{:.6f}'.format(calc.ProvCrownRoyaltyVolume) }}</td></tr>
+            <tr>
+                <td align="left" style="text-align:left">RVol =</td>
+                <td style="text-align:center"> CR%</td>
+                <td style="text-align:center">*</td>
+                <td style="text-align:center">CMult</td>
+                <td style="text-align:center">*</td>
+                <td style="text-align:center">OperVol</td>
+                <td style="text-align:center">*</td>
+                <td style="text-align:center">PE FN %</td>
+            </tr>
+            <tr>
+                <td align="left" style="text-align:left">RVol =</td>
+                <td style="text-align:center"> {{ '{:.6%}'.format(calc.ProvCrownUsedRoyaltyRate) }}</td>
+                <td style="text-align:center">*</td> <td style="text-align:center">{{ rm.CrownMultiplier }}</td>
+                <td style="text-align:center">*</td>
+                <td style="text-align:center">{{ '{:.2f}'.format(m.OperVol) }}</td>
+                <td>*</td>
+                <td>{{ '{:.6%}'.format(well_lease_link.PEFNInterest) }}</td>
+            </tr>
+            <tr align="left" style="text-align:left"><td>RVol =</td>
+                <td style="text-align:center">{{ '{:.6f}'.format(calc.ProvCrownRoyaltyVolume) }}</td>
+            </tr>
 
         </table>
     {% endif %}
@@ -340,48 +364,75 @@ table, th, td {
 
     {% if 'IOGR1995' in rm.RoyaltyScheme %}
         {% if calc.CommencementPeriod <= 5 %}
-            <table align="center" width="200">
-                    <col width="4%">
-                    <col width="4%">
-                    <col width="4%">
-                    <col width="4%">
-                    <col width="4%">
-                    <col width="4%">
-                    <col width="4%">
-                    <col width="4%">
-                    <col width="4%">
-                    <col width="4%">
-                    <col width="4%">
-                    <col width="4%">
-                    <col width="4%">
-                <br>
-                <tr align="center"><td>S$</td> <td>=</td> <td>(T</td> <td>-</td> <td>B)</td> <td>*</td> <td>0.50</td> <td>*</td> <td>(P</td> <td>-</td> <td>R)</td></tr>
-                <tr align="center"><td>S$</td> <td>=</td> <td>({{ '{:.2f}'.format(m.ProdVol) }}</td> <td>-</td> <td>{{ '{:.2f}'.format(calc.RoyaltyRegulation) }})</td> <td>*</td>
-                <td>0.50</td> <td>*</td> <td> ??? ({{ '{:>10,.6f}\n'.format(m.SalesPrice) }}</td> <td>-</td> <td> 25.00)</td></tr>
-                <tr align="center"><td>S$</td> <td>=</td> <td> $ {{ '{:>10,.2f}\n'.format(calc.SupplementaryRoyalties) }}</td></tr>
+            <br>
+            IOGR 1995 Supplementary Royalties<br>
+            <table>
+                <tr align="center">
+                    <td>S$</td>
+                    <td>=</td>
+                    <td>(T</td>
+                    <td>-</td>
+                    <td>B)</td>
+                    <td>*</td>
+                    <td>0.50</td>
+                    <td>*</td>
+                    <td>(P</td>
+                    <td>-</td>
+                    <td>R)</td>
+                </tr>
+                <tr align="center">
+                    <td>S$</td>
+                    <td>=</td>
+                    <td>({{ '{:.2f}'.format(m.ProdVol) }}</td>
+                    <td>-</td>
+                    <td>{{ '{:.2f}'.format(calc.IOGR1995RoyaltyVolume) }})</td>
+                    <td>*</td>
+                    <td>0.50</td>
+                    <td>*</td>
+                    <td> ??? ({{ '{:>10,.6f}\n'.format(m.SalesPrice) }}</td>
+                    <td>-</td>
+                    <td> 25.00)</td>
+                </tr>
+                <tr align="center">
+                    <td>S$</td>
+                    <td>=</td>
+                    <td> $ {{ '{:>10,.2f}\n'.format(calc.SupplementaryRoyalties) }}</td>
+                </tr>
             </table>
         {% endif %}
     {% endif %}
 
-
     {% if 'GORR' in rm.RoyaltyScheme %}
-        <table align="center" width="550">
-            <col width="8%">
-            <col width="4%">
-            <col width="4%">
-            <col width="4%">
-            <col width="4%">
-            <col width="4%">
-            <col width="4%">
-            <col width="4%">
-            <col width="10%">
-            <col width="4%">
-            <col width="4%">
-            <col width="8%">
-            <caption><center> GORR: {{ calc.GorrMessage }} </center></caption>
-            <tr align="center"><td></td><td></td><td>GORR$</td> <td>=</td> <td>ProdVol</td> <td>*</td> <td>PE FN %</td> <td>*</td> <td>GORRRoyRate</td> <td>*</td> <td>RVal</td><td></td></tr>
-            <tr align="center"><td></td><td></td><td>GORR$</td><td>=</td><td>{{ '{:.2f}'.format(m.ProdVol) }}</td> <td>*</td> <td>{{ '{:.6%}'.format(well_lease_link.PEFNInterest) }}</td><td>*</td> <td>{{ '{:.6%}'.format(calc.GorrRoyaltyRate) }}</td><td>*</td> <td> {{ '{:>10,.6f}'.format(calc.RoyaltyPrice) }} </td><td></td></tr>
-            <tr align="center"><td></td><td></td><td>GORR$</td><td>=</td><td> $ {{ '{:>10,.2f}'.format(calc.GorrRoyaltyValue) }}</td></tr>
+        <br>
+        GORR: {{ calc.GorrMessage }} <br>
+        <table>
+            <tr align="center">
+                <td>GORR$</td>
+                <td> = </td>
+                <td>OperVol</td>
+                <td> * </td>
+                <td>PE FN %</td>
+                <td> * </td>
+                <td>GORRRoyRate</td>
+                <td> * </td>
+                <td>RVal</td>
+            </tr>
+            <tr align="center">
+                <td>GORR$</td>
+                <td>=</td>
+                <td>{{ '{:.2f}'.format(m.OperVol) }}</td>
+                <td>*</td>
+                <td>{{ '{:.6%}'.format(well_lease_link.PEFNInterest) }}</td>
+                <td> * </td>
+                <td>{{ '{:.6%}'.format(calc.GorrRoyaltyRate) }}</td>
+                <td> * </td>
+                <td> {{ '{:>10,.6f}'.format(calc.RoyaltyPrice) }}</td>
+            </tr>
+            <tr align="center">
+                <td>GORR$</td>
+                <td>=</td>
+                <td> $ {{ '{:>10,.2f}'.format(calc.GorrRoyaltyValue) }}</td>
+            </tr>
         </table>
         <br>
     {% endif %}
@@ -454,47 +505,6 @@ table, th, td {
     <div align="center">
 
     <h1>test area</h1>
-??????
-    <TABLE style="width:700" border="1">
-
-	<caption><b>Monthly Data</b></caption>
-	<col width="10">
-	<col width="10">
-	<col width="12.5%">
-	<col width="12.5%">
-	<col width="12.5%">
-	<col width="12.5%">
-	<col width="12.5%">
-	<col width="12.5%">
-
-    {#
-        --- Monthly Data
-    #}
-
-   <TR>
-      <TD>Extract Date</TD>
-      <TD>Prod. Month</TD>
-	   <TD>Amend No.</TD>
-	   <TD>Prod.</TD>
-	   <TD>Monthly Prod. Vol.</TD>
-	   <TD>Sales Price</TD>
-	   <TD>Trans Price</TD>
-	   <TD>Processing Price</TD>
-   </TR>
-
-	<TR>
-      <TD>{{ m._format.yyyy_mm_dd(m.ExtractMonth) }}</TD>
-      <TD>{{ m._format.ProdMonth }}</TD>
-	   <TD>{{ m.AmendNo }}</TD>
-	   <TD>{{ m.Product }}</TD>
-	   <TD>{{ '{:.2f}'.format(m.ProdVol) }}</TD>
-	   <TD>{{ '{:>10,.6f}\n'.format(m.SalesPrice) }}</TD>
-	   <TD>{{ '{:>10,.6f}\n'.format(m.TransRate) }}</TD>
-	   <TD>{{ '{:>10,.6f}\n'.format(m.ProcessingRate) }}</TD>
-    </TR>
-
-</TABLE>
-??????
 
     </div>
 

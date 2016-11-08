@@ -28,7 +28,11 @@ Database Change Log: Must be maintained so we can keep the database in sink:
 - Add LeaseRoyaltyMaster.CrownModifier
 - Remove Lease.LessorID
 2016-11-04
-- Add
+- Add Monthly.Oper
+- Add Monthly.OperVol
+2016-11-08
+- Remove Calc.RoyaltyRegulation
+- Add Calc.IOGR1995WellRoyaltyVolume
 
 """
 import datetime
@@ -182,8 +186,9 @@ class DatabaseCreate(object):
             "GorrRoyaltyRate" int,
             "ProvCrownRoyaltyVolume" int,
             "GorrRoyaltyVolume" int,
-            "IOGR1995RoyaltyVolume" int,
-            "ProvCrownRoyaltyValue" int,
+            "IOGR1995WellRoyaltyVolume" float,
+            "IOGR1995RoyaltyVolume" float,
+            "ProvCrownRoyaltyValue" float,
             "IOGR1995RoyaltyValue" float,
             "GorrRoyaltyValue" float,
             "RoyaltyValuePreDeductions" float,
@@ -191,7 +196,6 @@ class DatabaseCreate(object):
             "RoyaltyProcessing" int,
             "RoyaltyGCA" int,
             "SupplementaryRoyalties" int,
-            "RoyaltyRegulation" int,
             "RoyaltyDeductions" int,
             "RoyaltyValue" float,
             "CommencementPeriod" float,

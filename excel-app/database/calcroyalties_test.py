@@ -39,19 +39,19 @@ class TestSaskRoyaltyCalc(unittest.TestCase):
     def test_calcSaskOilRegulationSubsection2(self):
         """ subsection (2) """
         pr = ProcessRoyalties()
-        self.assertEqual(pr.calc_sask_oil_regulation_subsection2(70), 7)
-        self.assertEqual(pr.calc_sask_oil_regulation_subsection2(90), 10)
-        self.assertEqual(pr.calc_sask_oil_regulation_subsection2(200), (24 + .26 * (200 - 160)))
-        self.assertEqual(pr.calc_sask_oil_regulation_subsection2(2000), (24 + .26 * (2000 - 160)))
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection2(70), 7)
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection2(90), 10)
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection2(200), (24 + .26 * (200 - 160)))
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection2(2000), (24 + .26 * (2000 - 160)))
         return
     
     def test_calcSaskOilRegulationSubsection3(self):
         """ subsection (3) """
         pr = ProcessRoyalties()
-        self.assertEqual(pr.calc_sask_oil_regulation_subsection3(70), 7)
-        self.assertEqual(pr.calc_sask_oil_regulation_subsection3(90), 10)
-        self.assertEqual(pr.calc_sask_oil_regulation_subsection3(200), (24 + .26 * (200 - 160)))
-        self.assertEqual(pr.calc_sask_oil_regulation_subsection3(2000), (189 + .4 * (2000 - 795)))
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection3(70), 7)
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection3(90), 10)
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection3(200), (24 + .26 * (200 - 160)))
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection3(2000), (189 + .4 * (2000 - 795)))
         return
     
     
@@ -210,18 +210,18 @@ ProvCrownUsedRoyaltyRate, CrownMultiplier, IndianInterest, MinRoyalty, RoyaltyPr
 
     def test_calcSaskOilRegulationSubsection2(self):
         pr = ProcessRoyalties()
-        self.assertEqual(pr.calc_sask_oil_regulation_subsection2(70), 7)
-        self.assertEqual(pr.calc_sask_oil_regulation_subsection2(100), 12)
-        self.assertEqual(pr.calc_sask_oil_regulation_subsection2(170), 26.6)
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection2(70), 7)
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection2(100), 12)
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection2(170), 26.6)
 
 
 
     def test_calcSaskOilRegulationSubsection3(self):
         pr = ProcessRoyalties()
-        self.assertAlmostEqual(pr.calc_sask_oil_regulation_subsection3(79.9), 7.99)
-        self.assertEqual(pr.calc_sask_oil_regulation_subsection3(150), 22)
-        self.assertEqual(pr.calc_sask_oil_regulation_subsection3(500), 112.4)
-        self.assertEqual(pr.calc_sask_oil_regulation_subsection3(800), 191)
+        self.assertAlmostEqual(pr.calc_sask_oil_iogr_subsection3(79.9), 7.99)
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection3(150), 22)
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection3(500), 112.4)
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection3(800), 191)
 
     def test_determineRoyaltyPrice(self):
         m = DataStructure()

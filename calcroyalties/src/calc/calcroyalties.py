@@ -44,10 +44,11 @@ by code coverage.
 
 class ProcessRoyalties(object):
     def __init__(self):
+        """ """
         self.reference_price = {'Pigeon Lake Indian': 24.04, 'Reserve no.138A': 25.37, 'Sawridge Indian': 25.13,
                                 'Stony Plain Indian': 24.64, 'Onion Lake': 25}
         self.db = config.get_database()
-
+        """ """
     """
     Process all the royalties that have monthly data
     """
@@ -140,9 +141,9 @@ class ProcessRoyalties(object):
         calc.GorrRoyaltyRate, calc.GorrMessage = \
             ProcessRoyalties.calc_gorr_percent(monthly.ProdVol, monthly.ProdHours, leaserm.Gorr)
 
-        calc.GorrRoyaltyValue = round(monthly.ProdVol * well_lease_link.PEFNInterest *
+        calc.GorrRoyaltyValue = round(monthly.OperVol * well_lease_link.PEFNInterest *
                                       calc.GorrRoyaltyRate * calc.RoyaltyPrice, 2)
-        calc.GorrRoyaltyVolume = round(monthly.ProdVol * well_lease_link.PEFNInterest *
+        calc.GorrRoyaltyVolume = round(monthly.OperVol * well_lease_link.PEFNInterest *
                                        calc.GorrRoyaltyRate, 6)
         calc.RoyaltyValuePreDeductions += calc.GorrRoyaltyValue
         calc.RoyaltyValue = calc.RoyaltyValuePreDeductions
@@ -331,7 +332,7 @@ class ProcessRoyalties(object):
 
         calc.ProvCrownRoyaltyVolume = round((calc.ProvCrownUsedRoyaltyRate *
                                              lease_rm.CrownMultiplier *
-                                             m.ProdVol * fn_interest), 6)
+                                             m.OperVol * fn_interest), 6)
 
         calc.ProvCrownRoyaltyValue = round(calc.ProvCrownRoyaltyVolume * calc.RoyaltyPrice, 2)
 
@@ -347,11 +348,11 @@ class ProcessRoyalties(object):
         # Calculate the Comensment Date
         calc.CommencementPeriod = self.determine_commencement_period(m.ProdMonth, commencement_date)
         if calc.CommencementPeriod < 5:
-            calc.RoyaltyRegulation = self.calc_sask_oil_regulation_subsection2(m.ProdVol)
-            calc.IOGR1995RoyaltyVolume = round(calc.RoyaltyRegulation, 2)
+            calc.IOGR1995WellRoyaltyVolume, calc.IOGR1995RoyaltyVolume = \
+                self.calc_sask_oil_iogr_subsection2(m.ProdVol, m.OperVol)
         else:
-            calc.RoyaltyRegulation = self.calc_sask_oil_regulation_subsection3(m.ProdVol)
-            calc.IOGR1995RoyaltyVolume = round(calc.RoyaltyRegulation, 2)
+            calc.IOGR1995WellRoyaltyVolume, calc.IOGR1995RoyaltyVolume = \
+                self.calc_sask_oil_iogr_subsection3(m.ProdVol, m.OperVol)
 
         calc.RoyaltyPrice = round(self.determine_royalty_price(valuation_method, m), 6)
 
@@ -362,11 +363,12 @@ class ProcessRoyalties(object):
 
         calc.SupplementaryRoyalties = round(
             self.calc_supplementary_royalties_iogr1995(calc.CommencementPeriod, m.SalesPrice, m.ProdVol,
-                                                       calc.RoyaltyRegulation, self.reference_price['Onion Lake']), 2)
+                                                       calc.IOGR1995RoyaltyVolume,
+                                                       self.reference_price['Onion Lake']), 2)
         return
 
     @staticmethod
-    def calc_sask_oil_regulation_subsection2(mop):
+    def calc_sask_oil_iogr_subsection2(mop, oper_vol):
         """
 (2) During the five year period beginning on the date determined by the Executive Director
     to be the date of commencement of production of oil from a contract area, the basic royalty
@@ -381,16 +383,19 @@ class ProcessRoyalties(object):
         3.      More than 160       24 m3 plus 26% of the number of cubic metres in excess of 160
         """
         if mop < 80.0:
-            roy_vol = mop * .1
+            well_roy_vol = mop * .1
         elif mop <= 160.0:
-            roy_vol = 8 + (mop - 80) * .2
+            well_roy_vol = 8 + (mop - 80) * .2
         else:
-            roy_vol = 24 + (mop - 160) * .26
+            well_roy_vol = 24 + (mop - 160) * .26
 
-        return roy_vol
+        well_roy_vol = round(well_roy_vol, 6)
+        oper_roy_vol = round(oper_vol / mop * well_roy_vol, 6)
+
+        return well_roy_vol, oper_roy_vol
 
     @staticmethod
-    def calc_sask_oil_regulation_subsection3(mop):
+    def calc_sask_oil_iogr_subsection3(mop, oper_vol):
         """
 (3) Commencing immediately after the period referred to in subsection (2), the basic royalty is the
     part of the oil that is obtained from, or attributable to, each well in a contract area during
@@ -414,7 +419,10 @@ class ProcessRoyalties(object):
         else:
             roy_vol = 189 + (mop - 795) * .4
 
-        return roy_vol
+        roy_vol = round(roy_vol, 6)
+        oper_royalty = round(oper_vol / mop * roy_vol, 6)
+
+        return roy_vol, oper_royalty
 
     @staticmethod
     def determine_royalty_price(method, monthly):
@@ -569,6 +577,7 @@ class ProcessRoyalties(object):
 
         setattr(rc, 'ProvCrownRoyaltyVolume', 0.0)
         setattr(rc, 'GorrRoyaltyVolume', 0.0)
+        setattr(rc, 'IOGR1995WellRoyaltyVolume', 0.0)
         setattr(rc, 'IOGR1995RoyaltyVolume', 0.0)
 
         setattr(rc, 'ProvCrownRoyaltyValue', 0.0)
@@ -582,7 +591,6 @@ class ProcessRoyalties(object):
         setattr(rc, 'RoyaltyDeductions', 0.0)
         setattr(rc, 'RoyaltyValue', 0.0)
         setattr(rc, 'SupplementaryRoyalties', 0.0)
-        setattr(rc, 'RoyaltyRegulation', 0.0)
 
         setattr(rc, 'CommencementPeriod', None)
         setattr(rc, 'Message', None)
