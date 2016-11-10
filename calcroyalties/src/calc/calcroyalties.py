@@ -75,18 +75,32 @@ class ProcessRoyalties(object):
             raise AppError("There were no well_lease_link records for: " + str(well_id) + str(prod_month))
         well_lease_link = well_lease_link_array[0]
         royalty = self.db.select1('LeaseRoyaltymaster', ID=well_lease_link.LeaseID)
-        monthly = self.db.select1('Monthly', WellID=well_id, ProdMonth=prod_month, Product=product)
+        lease = self.db.select1('Lease', ID=well_lease_link.LeaseID)
+
+        monthly_list = self.db.select('Monthly', WellID=well_id, ProdMonth=prod_month, Product=product)
+        if len(monthly_list) == 0:
+            raise AppError("No monthly data found for WellID: " + str(well_id) + " ProdMonth:" + str(prod_month) + " Product:" + product)
+
         calc_array = self.db.select('Calc', WellID=well_id, ProdMonth=prod_month)
-        if len(calc_array) == 0:
+        for calc in calc_array:
+            self.db.delete('Calc', calc.ID)
+
+        for monthly in monthly_list:
+            # calc_array = self.db.select('Calc', WellID=well_id, ProdMonth=prod_month)
+            # if len(calc_array) == 0:
+            #     calc = None
+            # else:
+            #     calc = calc_array[0]
             calc = None
-        else:
-            calc = calc_array[0]
-        calc = self.zero_royalty_calc(prod_month, well_id, product, calc)
-        self.calc_royalties(well, royalty, calc, monthly, well_lease_link)
-        if len(calc_array) == 0:
+            calc = self.zero_royalty_calc(prod_month, well_id, product, calc)
+            self.calc_royalties(well, royalty, calc, monthly, well_lease_link)
+            calc.Oper = monthly.Oper
+            calc.FNReserveID = lease.FNReserveID
+            calc.FNBandID = lease.FNBandID
+            # if len(calc_array) == 0:
             self.db.insert(calc)
-        else:
-            self.db.update(calc)
+            # else:
+            #     self.db.update(calc)
 
     def calc_royalties(self, well, royalty, calc, monthly, well_lease_link):
 

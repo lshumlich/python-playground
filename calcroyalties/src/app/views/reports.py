@@ -25,7 +25,12 @@ def royalties():
 #@PermissionHandler('well_view')
 def calc_list():
     db = config.get_database()
-    statement = """SELECT * from calc, wellroyaltymaster where calc.wellid = wellroyaltymaster.id"""
+    statement = """SELECT * from calc, wellroyaltymaster,monthly
+        where calc.wellid = wellroyaltymaster.id and
+        calc.wellid = monthly.wellid  and
+        calc.ProdMonth = monthly.ProdMonth
+        order by calc.prodMonth,calc.wellid
+    """
     result = db.select_sql(statement)
     print('we have found: ', len(result))
     if result:

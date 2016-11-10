@@ -33,6 +33,13 @@ Database Change Log: Must be maintained so we can keep the database in sink:
 2016-11-08
 - Remove Calc.RoyaltyRegulation
 - Add Calc.IOGR1995WellRoyaltyVolume
+2016-11-09
+- Add Calc.Oper
+- Add Calc.FNBandID
+- Add Calc.FNReserveID (Note: Add logic to pick the correct one
+- Add WellRoyaltyMaster.PrimaryReserve
+
+
 
 """
 import datetime
@@ -91,6 +98,7 @@ class DatabaseCreate(object):
              'WellEvent' text,
              'Prov' text,
              'WellType' text,
+             "PrimaryReserve" text,
              'RoyaltyClassification' text,
              'Classification' text,
              'SRC' int,
@@ -173,6 +181,9 @@ class DatabaseCreate(object):
             "ProdMonth" int,
             "WellID" id,
             "Product" text,
+            "Oper" text,
+            "FNBandID" text,
+            "FNReserveID" text,
             "K" int,
             "X" int,
             "C" int,

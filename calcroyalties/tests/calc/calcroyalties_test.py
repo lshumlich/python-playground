@@ -471,7 +471,8 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.dbu.create_calc()
         pr = ProcessRoyalties()
         pr.process_one(4, 201501, 'Oil')
-        self.assertEqual(1, db.count('calc'))
+        # Check to see if the oper record exists
+        self.assertEqual(2, db.count('calc'))
 
         pr.process_all()
-        self.assertEqual(2, db.count('calc'))
+        self.assertEqual(3, db.count('calc'))

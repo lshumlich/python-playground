@@ -58,16 +58,16 @@ class DatabaseUtilities(object):
             
         statement = """
             INSERT INTO WellRoyaltyMaster VALUES(1, '2010-01-01 00:00:00', '9999-12-31 23:59:59.000005',
-                'SKWI111062705025W300','SK','Oil','New Oil', 'Heavy', 0, '2014-12-01 00:00:00',1.0,
+                'SKWI111062705025W300','SK','Oil','res1','New Oil', 'Heavy', 0, '2014-12-01 00:00:00',1.0,
                 '9999-12-31 23:59:59.000005', 'HORIZONTAL','Some Note');
             INSERT INTO WellRoyaltyMaster VALUES(2, '2011-11-01 00:00:00', '9999-12-31 23:59:59.000005',
-                'SKWI112062705025W300','SK','Oil','Third Tier Oil', 'Southwest',0,'2014-12-01 00:00:00',1.0,
+                'SKWI112062705025W300','SK','Oil','res1','Third Tier Oil', 'Southwest',0,'2014-12-01 00:00:00',1.0,
                 '9999-12-31 23:59:59.000005', 'HORIZONTAL','Some Note');
             INSERT INTO WellRoyaltyMaster VALUES(3, '2004-10-01 00:00:00', '9999-12-31 23:59:59.000005',
-                'SKWI113062705025W300','SK','Oil','Fourth Tier Oil','Other', 0,'2014-12-01 00:00:00',1.0,
+                'SKWI113062705025W300','SK','Oil','res1','Fourth Tier Oil','Other', 0,'2014-12-01 00:00:00',1.0,
                 '9999-12-31 23:59:59.000005', 'VERTICAL','Some Note');
             INSERT INTO WellRoyaltyMaster VALUES(4, '2013-01-01 00:00:00', '9999-12-31 23:59:59.000005',
-                'SKWI114062705025W300','SK','Oil','Old Oil', 'Other', 0,'2014-12-01 00:00:00',1.0,
+                'SKWI114062705025W300','SK','Oil','res1','Old Oil', 'Other', 0,'2014-12-01 00:00:00',1.0,
                 '9999-12-31 23:59:59.000005', 'VERTICAL','Some Note');
         """
         
@@ -107,7 +107,9 @@ class DatabaseUtilities(object):
             INSERT INTO Monthly Values(4, '2015-09-29 00:00:00', 201501, 1,
                 'Oil', 2, 740, 100, "oper", 100.0, 221.123456, 2.123455, 0.123455, 0.0);
             INSERT INTO Monthly Values(5, '2015-09-29 00:00:00', 201501, 4,
-                'Oil', 2, 740, 100, "oper", 100.0, 221.123456, 2.123455, 0.123455, 0.0);
+                'Oil', 2, 740, 100, "oper1", 50.0, 221.123456, 2.123455, 0.123455, 0.0);
+            INSERT INTO Monthly Values(6, '2015-09-29 00:00:00', 201501, 4,
+                'Oil', 2, 740, 100, "oper2", 50.0, 221.123456, 2.123455, 0.123455, 0.0);
         """
         self.db_instance.execute_statement(statement)
 
