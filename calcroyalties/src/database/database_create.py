@@ -33,6 +33,7 @@ Database Change Log: Must be maintained so we can keep the database in sink:
 2016-11-08
 - Remove Calc.RoyaltyRegulation
 - Add Calc.IOGR1995WellRoyaltyVolume
+- Add Calc.RoyaltyClassification
 2016-11-09
 - Add Calc.Oper
 - Add Calc.FNBandID
