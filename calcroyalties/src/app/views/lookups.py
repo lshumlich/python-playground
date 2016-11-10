@@ -7,6 +7,12 @@ from .main import get_proddate
 
 lookups = Blueprint('lookups', __name__)
 
+@lookups.route('/lookups/help')
+def help():
+    help_item = request.args['item']
+    print(help_item)
+    return "Lookup successful! You are looking for help for %s" % help_item
+
 @lookups.route('/lookups/ba')
 def ba():
     return render_template('lookups/ba.html')

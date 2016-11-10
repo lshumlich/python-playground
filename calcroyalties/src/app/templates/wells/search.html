@@ -2,6 +2,16 @@
 {% block body %}
 <script>
 $(function() {
+  $('.help').on('click', function(){showHelp()});
+
+  $("#help-modal").dialog({
+  modal: true,
+  autoOpen: false,
+  buttons: {
+    OK: function() {$(this).dialog("close")}
+  }
+  });
+
   $('#tabs').tabs();
 
   $('#search-accordion').accordion({
@@ -63,7 +73,29 @@ function showBandLookupDialog() {
   });
 
 }
+
+function showHelp() {
+  var helpItem = $(event.target).data('help');
+  $.get('/lookups/help', {item: helpItem})
+    .done(function(data) {
+      $('#help-modal-text').html(data);
+    })
+    .fail(function(data) {
+      $('#help-modal-text').html('Failed to get help for ', helpItem);
+    })
+    .always(function(data) {
+      $('#help-modal').dialog({title: 'Help for ' + helpItem});
+      $('#help-modal').dialog('open');
+    });
+
+}
 </script>
+
+<div id="help-modal">
+  <div id="help-modal-text">
+
+  </div>
+</div>
 
 <h2>Well Search</h2>
 
@@ -107,17 +139,17 @@ function showBandLookupDialog() {
 
   	  <div id="tabs-basic">
       <form name="search-basic" action="/wells" method="get">
-  	    ID
+  	    ID<sup><i data-help="Well.ID" class="fa fa-question-circle help"></i></sup>
         <br>
         <input name="ID" value="{% if search_terms %}{{ search_terms['ID'] }}{% endif %}"/>
         <br>
         <br>
-        Classification
+        Classification<sup><i data-help="Well.Classification" class="fa fa-question-circle help"></i></sup>
         <br>
         <input name="Classification" value="{% if search_terms %}{{ search_terms['Classification'] }}{% endif %}"/>
         <br>
         <br>
-  	    Band ID
+  	    Band ID<sup><i data-help="FNBand.ID" class="fa fa-question-circle help"></i></sup>
         <br>
         <input id="FNBandID" name="FNBandID" value="{% if search_terms %}{{ search_terms['FNBandID'] }}{% endif %}"/><input type="button" id="band-lookup-button" value="..."/>
         <br>
