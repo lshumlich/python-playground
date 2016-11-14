@@ -21,10 +21,10 @@ def calc_worksheet():
             else:
                 prod_month = get_proddate_int()
 
-            if "Oper" in request.args:
-                oper = request.args["Oper"]
+            if "RPBA" in request.args:
+                rpba = request.args["RPBA"]
             else:
-                oper = None
+                rpba = None
 
             product = "Oil"
             well = db.select1('WellRoyaltyMaster', ID=well_id)
@@ -35,16 +35,16 @@ def calc_worksheet():
             royalty = db.select1('LeaseRoyaltyMaster', ID=well_lease_link.LeaseID)
             lease = db.select1('Lease', ID=well_lease_link.LeaseID)
 
-            if oper:
-                monthly_array = db.select('Monthly', WellID=well_id, prodMonth=prod_month, product=product, oper=oper)
+            if rpba:
+                monthly_array = db.select('Monthly', WellID=well_id, prodMonth=prod_month, product=product, RPBA=rpba)
             else:
                 monthly_array = db.select('Monthly', WellID=well_id, prodMonth=prod_month, product=product)
             if len(monthly_array) == 0:
                 raise AppError("There were no monthly records for " + str(well_id) + str(prod_month) + product)
             monthly = monthly_array[0]
 
-            ba = db.select1('BAInfo',BAid=monthly.Oper)
-            calc = db.select1('Calc', WellID=well_id, prodMonth=prod_month,oper=monthly.Oper)
+            ba = db.select1('BAInfo',BAid=monthly.RPBA)
+            calc = db.select1('Calc', WellID=well_id, ProdMonth=prod_month,RPBA=monthly.RPBA)
             # calc = calc_array[0]
             # print(monthly)
             return render_template('worksheet/calc_worksheet.html',

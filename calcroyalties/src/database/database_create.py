@@ -39,7 +39,11 @@ Database Change Log: Must be maintained so we can keep the database in sink:
 - Add Calc.FNBandID
 - Add Calc.FNReserveID (Note: Add logic to pick the correct one
 - Add WellRoyaltyMaster.PrimaryReserve
-
+2016-11-14
+- Rename Calc.Oper to RPBA
+- Rename Monthly.Oper to RPBA
+- Rename Monthly.OperVol to RPVol
+- Rename DataDictionary.Table to TableName
 
 
 """
@@ -167,8 +171,8 @@ class DatabaseCreate(object):
             "AmendNo" int,
             "ProdHours" int,
             "ProdVol" int,
-            "Oper" text,
-            "OperVol" float,
+            "RPBA" text,
+            "RPVol" float,
             "SalesPrice" float,
             "TransRate" float,
             "ProcessingRate" float,
@@ -182,7 +186,7 @@ class DatabaseCreate(object):
             "ProdMonth" int,
             "WellID" id,
             "Product" text,
-            "Oper" text,
+            "RPBA" text,
             "FNBandID" text,
             "FNReserveID" text,
             "K" int,

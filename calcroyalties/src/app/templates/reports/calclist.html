@@ -12,11 +12,11 @@ tr.border_bottom td {
         <th>Date</th>
         <th>Band</th>
         <th>Reserve</th>
-        <th>Operator</th>
+        <th>Royalty Payor</th>
         <th>Well ID</th>
         <th>Well Event</th>
         <th>Prod</th>
-        <th>Oper Vol</th>
+        <th>RP Vol</th>
         <th>Royalty Value</th>
         <th> </th>
     </tr>
@@ -25,14 +25,14 @@ tr.border_bottom td {
         <td>{{ r.ProdMonth }}</td>
         <td>{{ r.FNBandID }}</td>
         <td>{{ r.FNReserveID }}</td>
-        <td>{{ r.Oper }} </td>
+        <td>{{ r.RPBA }} </td>
         <td>{{ r.WellID }} </td>
         <td>{{ r.WellEvent }}</td>
         <td align="right">{{ '{:>10,.1f}\n'.format(r.ProdVol) }} </td>
-        <td align="right">{{ '{:>10,.1f}\n'.format(r.OperVol) }} </td>
+        <td align="right">{{ '{:>10,.1f}\n'.format(r.RPVol) }} </td>
         <td align="right">{{ '{:>10,.2f}\n'.format(r.RoyaltyValue) }} </td>
         <td>
-            <a href="{{ url_for('worksheet.calc_worksheet') }}?WellId={{ r.WellID }}&ProdDate={{ r.ProdMonth }}&Oper={{ r.Oper }}" title="Worksheet" class="icon icon-text-document"></a>
+            <a href="{{ url_for('worksheet.calc_worksheet') }}?WellId={{ r.WellID }}&ProdDate={{ r.ProdMonth }}&RPBA={{ r.RPBA }}" title="Worksheet" class="icon icon-text-document"></a>
             &nbsp;
             <a href="{{ url_for('wells.calculate') }}?WellId={{ r.WellID }}" title="Recalculate" class="icon icon-reload"></a>
         </td>

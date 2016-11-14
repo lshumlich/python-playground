@@ -51,7 +51,7 @@ fmath {
 <body>
 
 
-<h1 align="center">Well: {{ well.ID }} Operator: {{ m.Oper }} <br>
+<h1 align="center">Well: {{ well.ID }} Royalty Payor: {{ m.RPBA }} <br>
 	  {{ well.WellEvent }} - {{ ba.CorpShortName }}</h1>
 
 <!--<p1>-->
@@ -189,7 +189,7 @@ table, th, td {
 	   <th>Amend No.</th>
 	   <th>Prod.</th>
 	   <th>Prod Vol</th>
-	   <th>Operated Vol</th>
+	   <th>RP Vol</th>
 	   <th>Sales Price</th>
 	   <th>Trans Price</th>
 	   <th>Processing Price</th>
@@ -201,7 +201,7 @@ table, th, td {
 	    <td align="center">{{ m.AmendNo }}</td>
 	    <td align="center">{{ m.Product }}</td>
 	    <td align="center">{{ '{:.2f}'.format(m.ProdVol) }}</td>
-	    <td align="center">{{ '{:.2f}'.format(m.OperVol) }}</td>
+	    <td align="center">{{ '{:.2f}'.format(m.RPVol) }}</td>
 	    <td align="center">{{ '{:>10,.6f}\n'.format(m.SalesPrice) }}</td>
 	    <td align="center">{{ '{:>10,.6f}\n'.format(m.TransRate) }}</td>
 	    <td align="center">{{ '{:>10,.6f}\n'.format(m.ProcessingRate) }}</td>
@@ -290,20 +290,20 @@ table, th, td {
             {% if calc.IOGR1995WellRoyaltyVolume != calc.IOGR1995RoyaltyVolume %}
                 <tr> <td> &nbsp </td></tr>
                 <tr>
-                    <td align="right"> Oper RVol</td>
+                    <td align="right"> RP RVol</td>
                     <td align="center"> = </td>
-                    <td> RVol * OperVol / MOP </td>
+                    <td> RVol * RPVol / MOP </td>
                 </tr>
                 <tr>
-                    <td align="right"> Oper RVol</td>
+                    <td align="right"> RP RVol</td>
                     <td align="center"> = </td>
                     <td>
                         {{ '{:.6f}'.format(calc.IOGR1995WellRoyaltyVolume) }} *
-                        {{ '{:.2f}'.format(m.OperVol) }} /
+                        {{ '{:.2f}'.format(m.RPVol) }} /
                         {{ '{:.2f}'.format(m.ProdVol) }}
                 </tr>
                 <tr>
-                    <td align="right"> Oper RVol</td>
+                    <td align="right"> RP RVol</td>
                     <td align="center"> = </td>
                     <td>
                         {{ '{:.6f}'.format(calc.IOGR1995RoyaltyVolume) }}
@@ -322,7 +322,7 @@ table, th, td {
                 <td style="text-align:center">*</td>
                 <td style="text-align:center">CMult</td>
                 <td style="text-align:center">*</td>
-                <td style="text-align:center">OperVol</td>
+                <td style="text-align:center">RPVol</td>
                 <td style="text-align:center">*</td>
                 <td style="text-align:center">PE FN %</td>
             </tr>
@@ -331,7 +331,7 @@ table, th, td {
                 <td style="text-align:center"> {{ '{:.6%}'.format(calc.ProvCrownUsedRoyaltyRate) }}</td>
                 <td style="text-align:center">*</td> <td style="text-align:center">{{ rm.CrownMultiplier }}</td>
                 <td style="text-align:center">*</td>
-                <td style="text-align:center">{{ '{:.2f}'.format(m.OperVol) }}</td>
+                <td style="text-align:center">{{ '{:.2f}'.format(m.RPVol) }}</td>
                 <td>*</td>
                 <td>{{ '{:.6%}'.format(well_lease_link.PEFNInterest) }}</td>
             </tr>
@@ -348,7 +348,7 @@ table, th, td {
 
             {% if 'SKProvCrownVar' in rm.RoyaltyScheme %}
                 <tr align="center"><td>R$ =  </td><td>RVol</td><td> * </td><td>RVal</td></tr>
-                <tr align="center"><td>R$ =  </td><td>{{ '{:.2f}'.format(calc.ProvCrownRoyaltyVolume) }}</td><td> * </td><td>{{ '{:>10,.6f}\n'.format(calc.RoyaltyPrice) }}</td></tr>
+                <tr align="center"><td>R$ =  </td><td>{{ '{:.6f}'.format(calc.ProvCrownRoyaltyVolume) }}</td><td> * </td><td>{{ '{:>10,.6f}\n'.format(calc.RoyaltyPrice) }}</td></tr>
                 <tr align="center"><td>R$ =  </td><td> $ {{ '{:>10,.2f}\n'.format(calc.ProvCrownRoyaltyValue)}}</td></tr>
             {% endif %}
 
@@ -409,7 +409,7 @@ table, th, td {
             <tr align="center">
                 <td>GORR$</td>
                 <td> = </td>
-                <td>OperVol</td>
+                <td>RPVol</td>
                 <td> * </td>
                 <td>PE FN %</td>
                 <td> * </td>
@@ -420,7 +420,7 @@ table, th, td {
             <tr align="center">
                 <td>GORR$</td>
                 <td>=</td>
-                <td>{{ '{:.2f}'.format(m.OperVol) }}</td>
+                <td>{{ '{:.2f}'.format(m.RPVol) }}</td>
                 <td>*</td>
                 <td>{{ '{:.6%}'.format(well_lease_link.PEFNInterest) }}</td>
                 <td> * </td>
@@ -444,7 +444,7 @@ table, th, td {
 
         {% if calc.RoyaltyValuePreDeductions != calc.RoyaltyValue %}
             <tr>
-                <td colspan="2"><b>Royalty Pre Deductions: </b> </td>
+                <td colspan="2"><b>Gross Royalty: </b> </td>
                 <td colspan="5"> </td>
                 <td align="right"> <b>${{ '{:>10,.2f}\n'.format(calc.RoyaltyValuePreDeductions) }} </b> </td>
             </tr>
@@ -489,7 +489,7 @@ table, th, td {
         {% endif %}
 
         <tr>
-            <td colspan="2"> <b>Royalty Amount: </b> </td>
+            <td colspan="2"> <b>Net Royalty: </b> </td>
             <td colspan="6" align="right"> <b> ${{ '{:>10,.2f}\n'.format(calc.RoyaltyValue) }} </b> </td>
         </tr>
 

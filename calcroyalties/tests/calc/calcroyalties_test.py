@@ -188,7 +188,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         m = DataStructure()
         lease_rm = DataStructure()
         m.ProdVol = 100
-        m.OperVol = 100
+        m.RPVol = 100
         lease_rm.MinRoyaltyRate = 0.0
         lease_rm.MinRoyaltyDollar = 0.0
         lease_rm.CrownMultiplier = 1
@@ -243,7 +243,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual(calc.ProvCrownRoyaltyValue, 5584.26)
 
         m.ProdVol = 100
-        m.OperVol = 50.0
+        m.RPVol = 50.0
         pr.calc_sask_oil_prov_crown_royalty_volume_value(m, 1, lease_rm, calc)
         self.assertEqual(calc.ProvCrownRoyaltyVolume, 12.5)
         self.assertEqual(calc.ProvCrownRoyaltyValue, 2792.13)
@@ -255,7 +255,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         m.TransRate = 2.123455
         m.ProcessingRate = 0.123455
         m.ProdVol = 70
-        m.OperVol = 70
+        m.RPVol = 70
         m.ProdMonth = 201501
 
         calc = DataStructure()
@@ -273,37 +273,37 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual(calc.RoyaltyPrice, 221.123456)
 
         m.ProdVol = 100
-        m.OperVol = 100
+        m.RPVol = 100
         pr.calc_sask_oil_iogr1995(datetime(2015, 4, 2), "SaskWellHead", 0.25, 3, m, calc)
         self.assertEqual(calc.IOGR1995RoyaltyValue, 1990.11)
 
         m.ProdVol = 170
-        m.OperVol = 170
+        m.RPVol = 170
         pr.calc_sask_oil_iogr1995(datetime(2015, 5, 1), "SaskWellHead", 1, 1, m, calc)
         self.assertEqual(calc.IOGR1995RoyaltyValue, 5881.88)
 
         m.ProdVol = 79.9
-        m.OperVol = 79.9
+        m.RPVol = 79.9
         pr.calc_sask_oil_iogr1995(datetime(2010, 1, 1), "SaskWellHead", 3, 2, m, calc)
         self.assertEqual(calc.IOGR1995RoyaltyValue, 10600.66)
 
         m.ProdVol = 150
-        m.OperVol = 150
+        m.RPVol = 150
         pr.calc_sask_oil_iogr1995(datetime(2009, 7, 3), "SaskWellHead", 2, 4, m, calc)
         self.assertEqual(calc.IOGR1995RoyaltyValue, 38917.73)
 
         m.ProdVol = 500
-        m.OperVol = 500
+        m.RPVol = 500
         pr.calc_sask_oil_iogr1995(datetime(2007, 8, 2), "SaskWellHead", 1, 5, m, calc)
         self.assertEqual(calc.IOGR1995RoyaltyValue, 124271.38)
 
         m.ProdVol = 800
-        m.OperVol = 800
+        m.RPVol = 800
         pr.calc_sask_oil_iogr1995(datetime(2008, 9, 9), "SaskWellHead", 5, 0.1, m, calc)
         self.assertEqual(calc.IOGR1995RoyaltyValue, 21117.29)
 
         m.ProdVol = 800
-        m.OperVol = 400
+        m.RPVol = 400
         pr.calc_sask_oil_iogr1995(datetime(2008, 9, 9), "SaskWellHead", 5, 0.1, m, calc)
         self.assertEqual(calc.IOGR1995RoyaltyValue, 10558.65)
 
@@ -413,7 +413,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         well_lease_link = DataStructure()
 
         monthly.ProdVol = 100.0
-        monthly.OperVol = 100.0
+        monthly.RPVol = 100.0
         monthly.ProdHours = 10.0
         leaserm.Gorr = "fixed,0,.02"
 
@@ -429,7 +429,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual(2.0, calc.GorrRoyaltyVolume)
 
         monthly.ProdVol = 100.0
-        monthly.OperVol = 50.0
+        monthly.RPVol = 50.0
         pr.calc_gorr(leaserm, calc, monthly, well_lease_link)
         self.assertEqual(200.0, calc.GorrRoyaltyValue)
         self.assertEqual(1.0, calc.GorrRoyaltyVolume)

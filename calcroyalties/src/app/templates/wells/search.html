@@ -139,12 +139,12 @@ function showHelp() {
 
   	  <div id="tabs-basic">
       <form name="search-basic" action="/wells" method="get">
-  	    ID<sup><i data-help="Well.ID" class="fa fa-question-circle help"></i></sup>
+  	    ID<sup><i data-help="WellRoyaltyMaster.ID" class="fa fa-question-circle help"></i></sup>
         <br>
         <input name="ID" value="{% if search_terms %}{{ search_terms['ID'] }}{% endif %}"/>
         <br>
         <br>
-        Classification<sup><i data-help="Well.Classification" class="fa fa-question-circle help"></i></sup>
+        Classification<sup><i data-help="WellRoyaltyMaster.Classification" class="fa fa-question-circle help"></i></sup>
         <br>
         <input name="Classification" value="{% if search_terms %}{{ search_terms['Classification'] }}{% endif %}"/>
         <br>
@@ -160,7 +160,7 @@ function showHelp() {
 
   	  <div id="tabs-advanced">
       <form name="search-advanced" action="/wells" method="get">
-  	    Province
+  	    Province<sup><i data-help="WellRoyaltyMaster.Prov" class="fa fa-question-circle help"></i></sup>
         <br>
         <input name="Prov" value="{% if search_terms %}{{ search_terms['Prov'] }}{% endif %}"/>
         <br>
