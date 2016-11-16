@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<p>This will generate worksheets for a range of wells:</p>
+<form method="GET" action="/worksheet">
+    <label>Start well ID:</label>
+    <input type="number" name="WellStart" />
+    <br>
+    <label>End well ID:</label>
+    <input type="number" name="WellEnd" />
+    <br>
+    <button type="submit">Submit</button>
+</form>
+
+{% endblock %}
