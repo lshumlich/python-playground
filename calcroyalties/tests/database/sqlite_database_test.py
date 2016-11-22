@@ -47,6 +47,15 @@ class SqliteDatabaseTest(unittest.TestCase):
         self.assertEqual(len(self.db.select('Lease', Prov='SK')), 4)
         self.assertEqual(len(self.db.select('WellRoyaltyMaster', ID=1000)), 0)
 
+    def test_select_date_effective(self):
+
+        self.dbu.create_some_test_well_royalty_masters()
+        self.assertEqual(4, len(self.db.select('WellRoyaltyMaster')))
+        self.assertEqual(1, len(self.db.select('WellRoyaltyMaster', Date=datetime(2009, 1, 1, 12, 0, 0))))
+        self.assertEqual(2, len(self.db.select('WellRoyaltyMaster', Date=datetime(2010, 9, 1, 12, 0, 0))))
+        self.assertEqual(3, len(self.db.select('WellRoyaltyMaster', Date=datetime(2012, 1, 1, 12, 0, 0))))
+        self.assertEqual(3, len(self.db.select('WellRoyaltyMaster', Date=datetime(2017, 1, 1, 12, 0, 0))))
+
         # WRITE TEST FOR SELECT1
         
     def test_update(self):

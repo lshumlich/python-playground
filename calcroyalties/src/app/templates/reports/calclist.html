@@ -16,7 +16,6 @@ tr.border_bottom td {
         <th>Well ID</th>
         <th>Well Event</th>
         <th>Prod</th>
-        <th>RP Vol</th>
         <th>Royalty Value</th>
         <th> </th>
     </tr>
@@ -29,8 +28,7 @@ tr.border_bottom td {
         <td>{{ r.WellID }} </td>
         <td>{{ r.WellEvent }}</td>
         <td align="right">{{ '{:>10,.1f}\n'.format(r.ProdVol) }} </td>
-        <td align="right">{{ '{:>10,.1f}\n'.format(r.RPVol) }} </td>
-        <td align="right">{{ '{:>10,.2f}\n'.format(r.RoyaltyValue) }} </td>
+        <td align="right">{{ '{:>10,.2f}\n'.format(r.NetRoyaltyValue) }} </td>
         <td>
             <a href="{{ url_for('worksheet.calc_worksheet') }}?WellId={{ r.WellID }}&ProdDate={{ r.ProdMonth }}&RPBA={{ r.RPBA }}" title="Worksheet" class="icon icon-text-document"></a>
             &nbsp;

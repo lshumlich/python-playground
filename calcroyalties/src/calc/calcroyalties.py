@@ -5,16 +5,10 @@ from datetime import datetime
 import logging
 from src.util.apperror import AppError
 import config
+from src.util.appdate import prod_month_to_date
+
 
 """
-ToDo:
-
-1) Calculate GORR and put in Worksheet (Done)
-2) Save the calculated results in the spreadhseet
-    Delete the old results from the calculated results
-3) Calucate suplimental royalties
-4) Split the worksheet into it's own file
-5) Document and write good unit tests
 
 Big Note: *************
           Putting all this code in one module is very bad programming technique.
@@ -27,8 +21,7 @@ BUT..... Now the justification.....
 
 
 This is the royalty calculation class that actually calculates the royalties.
-It is a work in progress. Today it uses an Excel Worksheet that must
-be formated just so... to simulate a database. This is being done simply 
+It is a work in progress. Today it uses an SQLite database. This is being done simply
 for agility purposes.
 
 Now all you real good programmers out there...This is written so we can
@@ -77,9 +70,19 @@ class ProcessRoyalties(object):
         royalty = self.db.select1('LeaseRoyaltymaster', ID=well_lease_link.LeaseID)
         lease = self.db.select1('Lease', ID=well_lease_link.LeaseID)
 
+        # todo Create a test to ensure there is a RTPInfo for the well. raise an apperror if note
+        # todo call the prod_month_to_date in the select and not everytime we use the select.
+        rtp_info_array = self.db.select('RTPInfo', WellEvent=well.WellEvent, Product='OIL',
+                                        Date=prod_month_to_date(prod_month))
+        if len(rtp_info_array) == 0:
+            print('--- Well not found in RTPInfo', well.ID, well.WellEvent)
+        else:
+            print('--- Well found in RTPInfo Payer:', rtp_info_array[0].Payer)
+
         monthly_list = self.db.select('Monthly', WellID=well_id, ProdMonth=prod_month, Product=product)
         if len(monthly_list) == 0:
-            raise AppError("No monthly data found for WellID: " + str(well_id) + " ProdMonth:" + str(prod_month) + " Product:" + product)
+            raise AppError("No monthly data found for WellID: " + str(well_id) + " ProdMonth:" + str(prod_month) +
+                           " Product:" + product)
 
         calc_array = self.db.select('Calc', WellID=well_id, ProdMonth=prod_month)
         for calc in calc_array:
@@ -91,9 +94,12 @@ class ProcessRoyalties(object):
             #     calc = None
             # else:
             #     calc = calc_array[0]
-            calc = None
-            calc = self.zero_royalty_calc(prod_month, well_id, product, calc)
-            self.calc_royalties(well, royalty, calc, monthly, well_lease_link)
+            rtp_info = self.db.select1('RTPInfo', WellEvent=well.WellEvent, Product=product, Payer=monthly.RPBA,
+                                       Date=prod_month_to_date(prod_month))
+
+            # calc = None
+            calc = self.zero_royalty_calc(prod_month, well_id, product, None)
+            self.calc_royalties(well, royalty, calc, monthly, well_lease_link, rtp_info)
             calc.RPBA = monthly.RPBA
             calc.FNReserveID = lease.FNReserveID
             calc.FNBandID = lease.FNBandID
@@ -102,53 +108,53 @@ class ProcessRoyalties(object):
             # else:
             #     self.db.update(calc)
 
-    def calc_royalties(self, well, royalty, calc, monthly, well_lease_link):
+    def calc_royalties(self, well, royalty, calc, monthly, well_lease_link, rtp_info):
 
-        if monthly.Product == 'Oil' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
-            self.calc_sask_oil_prov_crown(monthly, well, royalty, calc, well_lease_link)
-            calc.RoyaltyValuePreDeductions = calc.ProvCrownRoyaltyValue
-            calc.RoyaltyValue = calc.RoyaltyValuePreDeductions
+        if monthly.Product == 'OIL' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
+            self.calc_sask_oil_prov_crown(monthly, well, royalty, calc, well_lease_link, rtp_info)
+            calc.GrossRoyaltyValue = calc.BaseRoyaltyValue
+            calc.NetRoyaltyValue = calc.BaseRoyaltyValue
 
-        elif monthly.Product == 'Oil' and 'IOGR1995' in royalty.RoyaltyScheme:
+        elif monthly.Product == 'OIL' and 'IOGR1995' in royalty.RoyaltyScheme:
             self.calc_sask_oil_iogr1995(well.CommencementDate, royalty.ValuationMethod, royalty.CrownMultiplier,
                                         well_lease_link.PEFNInterest, monthly, calc)
-            calc.RoyaltyValuePreDeductions = calc.IOGR1995RoyaltyValue + calc.SupplementaryRoyalties
-            calc.RoyaltyValue = calc.RoyaltyValuePreDeductions
+            calc.GrossRoyaltyValue = calc.IOGR1995RoyaltyValue + calc.SupplementaryRoyalties
+            calc.NetRoyaltyValue = calc.GrossRoyaltyValue
 
         elif monthly.Product == 'Gas' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
             self.calc_sask_gas_prov_crown(monthly, well, royalty, calc)
-            calc.RoyaltyValuePreDeductions = calc.ProvCrownRoyaltyValue
-            calc.RoyaltyValue = calc.RoyaltyValuePreDeductions
+            calc.GrossRoyaltyValue = calc.BaseRoyaltyValue
+            calc.NetRoyaltyValue = calc.GrossRoyaltyValue
 
         else:
             raise AppError("No calculation for " + str(well.ID) + ' ' + str(monthly.ProdMonth) + ' ' +
                            str(monthly.Product) + ' ' + str(royalty.RoyaltyScheme))
 
-        if monthly.Product == 'Oil' and 'GORR' in royalty.RoyaltyScheme:
+        if monthly.Product == 'OIL' and 'GORR' in royalty.RoyaltyScheme:
             self.calc_gorr(royalty, calc, monthly, well_lease_link)
 
-        calc.RoyaltyVolume = (calc.ProvCrownRoyaltyVolume +
+        calc.RoyaltyVolume = (calc.BaseRoyaltyVolume +
                               calc.IOGR1995RoyaltyVolume +
                               calc.GorrRoyaltyVolume)
 
-        if royalty.TruckingDeducted == 'Y':
-            calc.RoyaltyTransportation = round(calc.RoyaltyVolume * monthly.TransRate, 2)
-            calc.RoyaltyDeductions += calc.RoyaltyTransportation
-            calc.RoyaltyValue -= calc.RoyaltyTransportation
+        # if royalty.TruckingDeducted == 'Y':
+        #     calc.RoyaltyTransportation = round(calc.RoyaltyVolume * monthly.TransRate, 2)
+        #     calc.RoyaltyDeductions += calc.RoyaltyTransportation
+        #     calc.NetRoyaltyValue -= calc.RoyaltyTransportation
 
         # if (royalty.TruckingOverride != None):
         #     calc.RoyaltyTransportation = royalty.TruckingOverride
 
-        if royalty.ProcessingDeducted == 'Y':
-            calc.RoyaltyProcessing = round(calc.RoyaltyVolume * monthly.ProcessingRate, 2)
-            calc.RoyaltyDeductions += calc.RoyaltyProcessing
-            calc.RoyaltyValue -= calc.RoyaltyProcessing
+        # if royalty.ProcessingDeducted == 'Y':
+        #     calc.RoyaltyProcessing = round(calc.RoyaltyVolume * monthly.ProcessingRate, 2)
+        #     calc.RoyaltyDeductions += calc.RoyaltyProcessing
+        #     calc.NetRoyaltyValue -= calc.RoyaltyProcessing
 
         if monthly.Product == 'Gas':
             if royalty.GCADeducted == 'Y':
                 calc.RoyaltyGCA = round(calc.RoyaltyVolume * monthly.GCARate, 2)
                 calc.RoyaltyDeductions += calc.RoyaltyGCA
-                calc.RoyaltyValue -= calc.RoyaltyGCA
+                calc.NetRoyaltyValue -= calc.RoyaltyGCA
 
     @staticmethod
     def calc_gorr(leaserm, calc, monthly, well_lease_link):
@@ -159,8 +165,8 @@ class ProcessRoyalties(object):
                                       calc.GorrRoyaltyRate * calc.RoyaltyPrice, 2)
         calc.GorrRoyaltyVolume = round(monthly.RPVol * well_lease_link.PEFNInterest *
                                        calc.GorrRoyaltyRate, 6)
-        calc.RoyaltyValuePreDeductions += calc.GorrRoyaltyValue
-        calc.RoyaltyValue = calc.RoyaltyValuePreDeductions
+        calc.GrossRoyaltyValue += calc.GorrRoyaltyValue
+        calc.NetRoyaltyValue = calc.GrossRoyaltyValue
 
     @staticmethod
     def calc_sask_gas_prov_crown_royalty_rate(calc, econ_gas_data,
@@ -169,25 +175,25 @@ class ProcessRoyalties(object):
         if well_royalty_classification == 'Fourth Tier Gas':
             if well_type == 'GasWells':
                 if mgp <= 25:
-                    calc.ProvCrownRoyaltyRate = 0
+                    calc.BaseRoyaltyCalcRate = 0
                     calc.Message = 'MOP <= 25 - RR = 0.'
                 elif mgp <= 115.4:
                     calc.C = econ_gas_data.G4T_C
                     calc.D = econ_gas_data.G4T_D
-                    calc.ProvCrownRoyaltyRate = (calc.C * mgp) - calc.D
+                    calc.BaseRoyaltyCalcRate = (calc.C * mgp) - calc.D
                 else:
                     calc.K = econ_gas_data.G4T_K
                     calc.X = econ_gas_data.G4T_X
-                    calc.ProvCrownRoyaltyRate = calc.K - (calc.X / mgp)
+                    calc.BaseRoyaltyCalcRate = calc.K - (calc.X / mgp)
 
             elif well_type == 'OilWells':
                 if mgp <= 64.7:
-                    calc.ProvCrownRoyaltyRate = 0
+                    calc.BaseRoyaltyCalcRate = 0
                     calc.Message = 'MOP <= 64.7 - RR = 0.'
                 else:
                     calc.K = econ_gas_data.G4T_K
                     calc.X = econ_gas_data.G4T_X
-                    calc.ProvCrownRoyaltyRate = calc.K - (calc.X / mgp)
+                    calc.BaseRoyaltyCalcRate = calc.K - (calc.X / mgp)
 
             else:
                 raise AppError(
@@ -198,43 +204,43 @@ class ProcessRoyalties(object):
             if mgp < 115.4:
                 calc.C = econ_gas_data.G3T_C
                 # SRC ?? - ProdDate
-                calc.ProvCrownRoyaltyRate = (calc.C * mgp) - src
+                calc.BaseRoyaltyCalcRate = (calc.C * mgp) - src
 
             else:
                 calc.K = econ_gas_data.G3T_K
                 calc.X = econ_gas_data.G3T_X
                 # SRC ?? - ProdDate
-                calc.ProvCrownRoyaltyRate = calc.K - (calc.X / mgp) - src
+                calc.BaseRoyaltyCalcRate = calc.K - (calc.X / mgp) - src
 
         elif well_royalty_classification == 'New Gas':
             if mgp < 115.4:
                 calc.C = econ_gas_data.GNEW_C
-                calc.ProvCrownRoyaltyRate = (calc.C * mgp) - src
+                calc.BaseRoyaltyCalcRate = (calc.C * mgp) - src
                 # SRC ?? - ProdDate
             else:
                 calc.K = econ_gas_data.GNEW_K
                 calc.X = econ_gas_data.GNEW_X
                 # SRC ?? - ProdDate
-                calc.ProvCrownRoyaltyRate = calc.K - (calc.X / mgp) - src
+                calc.BaseRoyaltyCalcRate = calc.K - (calc.X / mgp) - src
 
         elif well_royalty_classification == 'Old Gas':
             if mgp < 115.4:
                 calc.C = econ_gas_data.GOLD_C
-                calc.ProvCrownRoyaltyRate = (calc.C * mgp) - src
+                calc.BaseRoyaltyCalcRate = (calc.C * mgp) - src
                 # SRC ?? - ProdDate
             else:
                 calc.K = econ_gas_data.GOLD_K
                 calc.X = econ_gas_data.GOLD_X
                 # SRC ?? - ProdDate
-                calc.ProvCrownRoyaltyRate = calc.K - (calc.X / mgp) - src
+                calc.BaseRoyaltyCalcRate = calc.K - (calc.X / mgp) - src
 
         else:
             raise AppError(
                 'Royalty Classification: "' + well_royalty_classification + '" not known for "' + well_type +
                 '" Royalty not calculated.')
 
-        calc.ProvCrownRoyaltyRate = round(calc.ProvCrownRoyaltyRate, 6)
-        return calc.ProvCrownRoyaltyRate
+        calc.BaseRoyaltyCalcRate = round(calc.BaseRoyaltyCalcRate, 6)
+        return calc.BaseRoyaltyCalcRate
 
     @staticmethod
     def calc_sask_oil_prov_crown_royalty_rate(calc, econ_oil_data,
@@ -243,7 +249,7 @@ class ProcessRoyalties(object):
         if well_royalty_classification == 'Fourth Tier Oil':
 
             if mop < 25:
-                calc.ProvCrownRoyaltyRate = 0
+                calc.BaseRoyaltyCalcRate = 0
                 calc.Message = 'MOP < 25 - RR = 0.'
 
             elif mop <= 136.2:
@@ -260,7 +266,7 @@ class ProcessRoyalties(object):
                     raise AppError(
                         'Royalty Classification: "' + well_royalty_classification + ' not known for ' +
                         well_classification + ' Royalty not calculated.')
-                calc.ProvCrownRoyaltyRate = ((calc.C * mop) - calc.D) / 100
+                calc.BaseRoyaltyCalcRate = ((calc.C * mop) - calc.D) / 100
 
             else:
                 if well_classification == 'Heavy':
@@ -276,7 +282,7 @@ class ProcessRoyalties(object):
                     raise AppError(
                         'Royalty Classification: ' + well_royalty_classification + ' not known for ' +
                         well_classification + ' Royalty not calculated.')
-                calc.ProvCrownRoyaltyRate = (calc.K - (calc.X / mop)) / 100
+                calc.BaseRoyaltyCalcRate = (calc.K - (calc.X / mop)) / 100
         else:
             if well_classification == 'Heavy':
                 if well_royalty_classification == 'Third Tier Oil':
@@ -319,40 +325,60 @@ class ProcessRoyalties(object):
                                '" not known. Royalty not calculated.')
 
             if mop == 0:
-                calc.ProvCrownRoyaltyRate = 0
+                calc.BaseRoyaltyCalcRate = 0
             else:
-                calc.ProvCrownRoyaltyRate = ((calc.K - (calc.X / mop))/100) - src
+                calc.BaseRoyaltyCalcRate = ((calc.K - (calc.X / mop))/100) - src
 
-        calc.ProvCrownRoyaltyRate = round(calc.ProvCrownRoyaltyRate, 8)
+        calc.BaseRoyaltyCalcRate = round(calc.BaseRoyaltyCalcRate, 8)
 
-        return calc.ProvCrownRoyaltyRate
+        return calc.BaseRoyaltyCalcRate
 
-    def calc_sask_oil_prov_crown_royalty_volume_value(self, m, fn_interest, lease_rm, calc):
-        # Note: If there is no sales. Use last months sales value... Not included in this code
+    def calc_sask_oil_prov_crown_royalty_volume_value(self, m, fn_interest, rp_interest, lease_rm, calc):
+        # todo: If there is no sales. Use last months sales value... Not included in this code
 
         calc.RoyaltyPrice = self.determine_royalty_price(lease_rm.ValuationMethod, m)
 
-        calc.ProvCrownUsedRoyaltyRate = calc.ProvCrownRoyaltyRate
+        calc.BaseRoyaltyRate = calc.BaseRoyaltyCalcRate
 
-        if calc.ProvCrownUsedRoyaltyRate < 0:
-            calc.ProvCrownUsedRoyaltyRate = 0
+        if calc.BaseRoyaltyRate < 0:
+            calc.BaseRoyaltyRate = 0
 
         if lease_rm.CrownModifier:
-            calc.ProvCrownUsedRoyaltyRate += lease_rm.CrownModifier
+            calc.BaseRoyaltyRate += lease_rm.CrownModifier
 
         if lease_rm.MinRoyaltyRate:
-            if lease_rm.MinRoyaltyRate > calc.ProvCrownUsedRoyaltyRate:
-                calc.ProvCrownUsedRoyaltyRate = lease_rm.MinRoyaltyRate
+            if lease_rm.MinRoyaltyRate > calc.BaseRoyaltyRate:
+                calc.BaseRoyaltyRate = lease_rm.MinRoyaltyRate
 
-        calc.ProvCrownRoyaltyVolume = round((calc.ProvCrownUsedRoyaltyRate *
-                                             lease_rm.CrownMultiplier *
-                                             m.RPVol * fn_interest), 6)
+        # Should not need this volume for anything.....
+        # calc.BaseRoyaltyVolume = round((calc.BaseRoyaltyRate *
+        #                                      lease_rm.CrownMultiplier *
+        #                                      m.RPVol * fn_interest), 6)
 
-        calc.ProvCrownRoyaltyValue = round(calc.ProvCrownRoyaltyVolume * calc.RoyaltyPrice, 2)
+        calc.BaseRoyaltyValue = round(calc.BaseRoyaltyRate *
+                                      lease_rm.CrownMultiplier *
+                                      m.ProdVol *
+                                      fn_interest *
+                                      (rp_interest / 100) *
+                                      calc.RoyaltyPrice, 2)
 
         if lease_rm.MinRoyaltyDollar:
-            if lease_rm.MinRoyaltyDollar > calc.ProvCrownRoyaltyValue:
-                calc.ProvCrownRoyaltyValue = lease_rm.MinRoyaltyDollar
+            if lease_rm.MinRoyaltyDollar > calc.BaseRoyaltyValue:
+                calc.BaseRoyaltyValue = lease_rm.MinRoyaltyDollar
+
+    def calc_sask_oil_prov_crown_deductions(self, m, fn_interest, rp_interest, lease_rm, calc):
+        """ We have calculated a royalty rate. Therefore calculate based on that"""
+
+        if lease_rm.TransDeducted == "All" or lease_rm.TransDeducted == 'Base':
+            return round(calc.BaseRoyaltyRate *
+                         lease_rm.CrownMultiplier *
+                         m.ProdVol *
+                         fn_interest *
+                         (rp_interest / 100) *
+                         m.TransRate,
+                         2)
+        else:
+            return 0.0
 
     def calc_sask_oil_iogr1995(self, commencement_date, valuation_method, crown_multiplier, fn_interest, m, calc):
         """
@@ -452,6 +478,9 @@ class ProcessRoyalties(object):
         #     royalty_price = monthly.WellHeadPrice
 
         # return royalty_price
+        # This needs some development
+        if method == '0':
+            return 0.0
 
         return monthly.SalesPrice
 
@@ -540,16 +569,27 @@ class ProcessRoyalties(object):
       OilFactors.pdf
     '''
 
-    def calc_sask_oil_prov_crown(self, monthly, well, royalty, calc, well_lease_link):
+    def calc_sask_oil_prov_crown(self, monthly, well, royalty, calc, well_lease_link, rtp_info):
         calc.CommencementPeriod = self.determine_commencement_period(monthly.ProdMonth, well.CommencementDate)
         econ_oil_data = self.db.select1("ECONData", ProdMonth=monthly.ProdMonth)
+
         if royalty.OverrideRoyaltyClassification is not None:
             calc.RoyaltyClassification = royalty.OverrideRoyaltyClassification
         else:
             calc.RoyaltyClassification = well.RoyaltyClassification
+
         self.calc_sask_oil_prov_crown_royalty_rate(calc, econ_oil_data, calc.RoyaltyClassification,
                                                    well.Classification, monthly.ProdVol, well.SRC)
-        self.calc_sask_oil_prov_crown_royalty_volume_value(monthly, well_lease_link.PEFNInterest, royalty, calc)
+
+        self.calc_sask_oil_prov_crown_royalty_volume_value(monthly, well_lease_link.PEFNInterest,
+                                                           rtp_info.Percent,
+                                                           royalty,
+                                                           calc)
+
+        calc.TransBaseValue = self.calc_sask_oil_prov_crown_deductions(monthly,
+                                                                       well_lease_link.PEFNInterest,
+                                                                       rtp_info.Percent,
+                                                                       royalty, calc)
 
     def calc_sask_gas_prov_crown(self, monthly, well, royalty, calc):
         calc.CommencementPeriod = self.determine_commencement_period(monthly.ProdMonth, well.CommencementDate)
@@ -584,26 +624,28 @@ class ProcessRoyalties(object):
         setattr(rc, 'RoyaltyPrice', 0.0)
         setattr(rc, 'RoyaltyVolume', 0.0)
 
-        setattr(rc, 'ProvCrownRoyaltyRate', 0.0)
-        setattr(rc, 'ProvCrownUsedRoyaltyRate', 0.0)
+        setattr(rc, 'BaseRoyaltyCalcRate', 0.0)
+        setattr(rc, 'BaseRoyaltyRate', 0.0)
         setattr(rc, 'IOGR1995RoyaltyRate', 0.0)
         setattr(rc, 'GorrRoyaltyRate', 0.0)
 
-        setattr(rc, 'ProvCrownRoyaltyVolume', 0.0)
+        setattr(rc, 'BaseRoyaltyVolume', 0.0)
         setattr(rc, 'GorrRoyaltyVolume', 0.0)
         setattr(rc, 'IOGR1995WellRoyaltyVolume', 0.0)
         setattr(rc, 'IOGR1995RoyaltyVolume', 0.0)
 
-        setattr(rc, 'ProvCrownRoyaltyValue', 0.0)
+        setattr(rc, 'BaseRoyaltyValue', 0.0)
         setattr(rc, 'IOGR1995RoyaltyValue', 0.0)
         setattr(rc, 'GorrRoyaltyValue', 0.0)
 
-        setattr(rc, 'RoyaltyValuePreDeductions', 0.0)
-        setattr(rc, 'RoyaltyTransportation', 0.0)
-        setattr(rc, 'RoyaltyProcessing', 0.0)
+        setattr(rc, 'GrossRoyaltyValue', 0.0)
+        setattr(rc, 'TransBaseValue', 0.0)
+        setattr(rc, 'TransGorrValue', 0.0)
+        setattr(rc, 'ProcessingBaseValue', 0.0)
+        setattr(rc, 'ProcessingGorrValue', 0.0)
         setattr(rc, 'RoyaltyGCA', 0.0)
         setattr(rc, 'RoyaltyDeductions', 0.0)
-        setattr(rc, 'RoyaltyValue', 0.0)
+        setattr(rc, 'NetRoyaltyValue', 0.0)
         setattr(rc, 'SupplementaryRoyalties', 0.0)
 
         setattr(rc, 'CommencementPeriod', None)

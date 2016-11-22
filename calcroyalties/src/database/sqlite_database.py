@@ -51,7 +51,10 @@ class Database(object):
             statement += "WHERE"
             i = len(kwargs)
             for arg in kwargs:
-                statement += " %s = '%s' " % (arg, str(kwargs[arg]))
+                if arg == 'Date':
+                    statement += " StartDate < '%s' and EndDate > '%s' " % (str(kwargs[arg]), str(kwargs[arg]))
+                else:
+                    statement += " %s = '%s' " % (arg, str(kwargs[arg]))
                 i -= 1
                 if i > 0:
                     statement += 'AND'

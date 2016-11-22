@@ -44,6 +44,23 @@ Database Change Log: Must be maintained so we can keep the database in sink:
 - Rename Monthly.Oper to RPBA
 - Rename Monthly.OperVol to RPVol
 - Rename DataDictionary.Table to TableName
+2016-11-21
+- Rename LeaseRoyaltyMaster.TruckingDeducted to TransDeducted
+- Remove Calc.RoyaltyTransportation
+- Add Calc.TransBaseValue
+- Add Calc.TransGorrValue
+- Remove Calc.RoyaltyProcessing
+- Add Calc.ProcessingBaseValue
+- Add Calc.ProcessingGorrValue
+- Rename Calc.RoyaltyValuePreDeductions to GrossRoyaltyValue
+- Rename Calc.RoyaltyValue to NetRoyaltyValue
+- Add Table RTPInfo
+- Add RTPInfo.ID
+- Rename calc.ProvCrownUsedRoyaltyRate to BaseRoyaltyRate
+- Rename calc.ProvCrownRoyaltyRate to BaseRoyaltyCalcRate
+- Rename calc.ProvCrownRoyaltyValue to BaseRoyaltyValue
+- Rename calc.ProvCrownRoyaltyVolume to BaseRoyaltyVolume
+
 
 
 """
@@ -81,6 +98,8 @@ class DatabaseCreate(object):
             self.linktab()
         if 'Users' not in tables:
             self.users()
+        if 'RPTInfo' not in tables:
+            self.rpt_info()
 
         self.dbi.commit()
 
@@ -125,7 +144,7 @@ class DatabaseCreate(object):
              "CrownMultiplier" float,
              "CrownModifier" float,
              "ValuationMethod" text,
-             "TruckingDeducted" text,
+             "TransDeducted" text,
              "ProcessingDeducted" text,
              "GCADeducted" text,
              "Gorr" text,
@@ -195,25 +214,27 @@ class DatabaseCreate(object):
             "D" int,
             "RoyaltyPrice" float,
             "RoyaltyVolume" int,
-            "ProvCrownRoyaltyRate" int,
-            "ProvCrownUsedRoyaltyRate" int,
+            "BaseRoyaltyCalcRate" int,
+            "BaseRoyaltyRate" int,
             "RoyaltyClassification" text,
             "IOGR1995RoyaltyRate" int,
             "GorrRoyaltyRate" int,
-            "ProvCrownRoyaltyVolume" int,
+            "BaseRoyaltyVolume" int,
             "GorrRoyaltyVolume" int,
             "IOGR1995WellRoyaltyVolume" float,
             "IOGR1995RoyaltyVolume" float,
-            "ProvCrownRoyaltyValue" float,
+            "BaseRoyaltyValue" float,
             "IOGR1995RoyaltyValue" float,
             "GorrRoyaltyValue" float,
-            "RoyaltyValuePreDeductions" float,
-            "RoyaltyTransportation" int,
-            "RoyaltyProcessing" int,
-            "RoyaltyGCA" int,
+            "GrossRoyaltyValue" float,
+            "TransBaseValue" float,
+            "TransGorrValue" float,
+            "ProcessingBaseValue" float,
+            "ProcessingGorrValue" float,
+            "RoyaltyGCA" float,
             "SupplementaryRoyalties" int,
             "RoyaltyDeductions" int,
-            "RoyaltyValue" float,
+            "NetRoyaltyValue" float,
             "CommencementPeriod" float,
             "Message" text,
             "GorrMessage" text);
@@ -276,3 +297,17 @@ class DatabaseCreate(object):
                            ' ,well_view,well_edit,wellevent_view,wellevent_edit,facility_view,lease_view,lease_edit," \
                            "welllease_view,welllease_edit,data_view,data_edit,users_view,users_edit');"
         self.dbi.execute(insert_statement)
+
+    def rpt_info(self):
+        statement = """
+            CREATE TABLE RTPInfo (
+                "ID"	    INTEGER PRIMARY KEY AUTOINCREMENT,
+                "WellEvent"	TEXT,
+                "Product"	TEXT,
+                "StartDate" timestamp,
+                "EndDate"   timestamp,
+                "Payer"	    TEXT,
+                "MineralOwnershipType"	TEXT,
+                "Percent"	Float)
+        """
+        self.dbi.execute_statement(statement)

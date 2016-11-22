@@ -66,7 +66,7 @@ class DatabaseUtilities(object):
             INSERT INTO WellRoyaltyMaster VALUES(3, '2004-10-01 00:00:00', '9999-12-31 23:59:59.000005',
                 'SKWI113062705025W300','SK','Oil','res1','Fourth Tier Oil','Other', 0,'2014-12-01 00:00:00',1.0,
                 '9999-12-31 23:59:59.000005', 'VERTICAL','Some Note');
-            INSERT INTO WellRoyaltyMaster VALUES(4, '2013-01-01 00:00:00', '9999-12-31 23:59:59.000005',
+            INSERT INTO WellRoyaltyMaster VALUES(4, '2013-01-01 00:00:00', '2016-12-31 23:59:59.000005',
                 'SKWI114062705025W300','SK','Oil','res1','Old Oil', 'Other', 0,'2014-12-01 00:00:00',1.0,
                 '9999-12-31 23:59:59.000005', 'VERTICAL','Some Note');
         """
@@ -105,11 +105,11 @@ class DatabaseUtilities(object):
 
         statement = """
             INSERT INTO Monthly Values(4, '2015-09-29 00:00:00', 201501, 1,
-                'Oil', 2, 740, 100, "oper", 100.0, 221.123456, 2.123455, 0.123455, 0.0);
+                'OIL', 2, 740, 100, "Payor1", 100.0, 221.123456, 2.123455, 0.123455, 0.0);
             INSERT INTO Monthly Values(5, '2015-09-29 00:00:00', 201501, 4,
-                'Oil', 2, 740, 100, "oper1", 50.0, 221.123456, 2.123455, 0.123455, 0.0);
+                'OIL', 2, 740, 100, "Payor1", 50.0, 221.123456, 2.123455, 0.123455, 0.0);
             INSERT INTO Monthly Values(6, '2015-09-29 00:00:00', 201501, 4,
-                'Oil', 2, 740, 100, "oper2", 50.0, 221.123456, 2.123455, 0.123455, 0.0);
+                'OIL', 2, 740, 100, "Payor1", 50.0, 221.123456, 2.123455, 0.123455, 0.0);
         """
         self.db_instance.execute_statement(statement)
 
@@ -135,5 +135,16 @@ class DatabaseUtilities(object):
             INSERT INTO ECONData VALUES(39,'Jan.',201501,181,223,262,
                 0.0934,2.34,23.12,1734,21.73,502,27.11,626,0.1085,2.71,
                 26.84,2013,32.38,747,38.94,899,0.1181,2.95,29.22,2192,35.58,821,40.54,936,52.3,1207);
+        """
+        self.db_instance.execute_statement(statement)
+
+    def create_some_test_rtp_info(self):
+        if 'RPTInfo' not in self.db_instance.get_table_names():
+            self.db_create.rpt_info()
+        statement = """
+            insert into RTPInfo values (1, 'SKWI111062705025W300', 'OIL', '2001-01-08 00:00:00', '2016-01-07 00:00:00',
+                'Payor1', 'MinOwership',100);
+            insert into RTPInfo values (2, 'SKWI114062705025W300', 'OIL', '2001-01-08 00:00:00', '2016-01-07 00:00:00',
+                'Payor1', 'MinOwership',100);
         """
         self.db_instance.execute_statement(statement)

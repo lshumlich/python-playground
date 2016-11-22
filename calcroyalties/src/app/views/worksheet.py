@@ -3,9 +3,10 @@ import traceback
 from flask import Blueprint, request, config, render_template
 
 import config
-# from .permission_handler import PermissionHandler
 from .main import get_proddate_int
 from src.util.apperror import AppError
+from src.util.appdate import prod_month_to_date
+from src.util.app_formatter import format_gorr
 
 worksheet = Blueprint('worksheet', __name__)
 
@@ -34,18 +35,19 @@ def calc_worksheet():
             result += "<hr>"
         return result
     else:
-        return "Something wasn't right"
+        return "worksheet.calc_worksheet Something wasn't right"
 
 def generate_worksheet(well_id, prod_month, rpba):
     try:
         db = config.get_database()
-        product = "Oil"
+        product = "OIL"
         well = db.select1('WellRoyaltyMaster', ID=well_id)
         well_lease_link_array = db.select('WellLeaseLink', WellID=well_id)
         if len(well_lease_link_array) == 0:
             raise AppError("There were no well_lease_link records for " + str(well_id) + str(prod_month))
         well_lease_link = well_lease_link_array[0]
         royalty = db.select1('LeaseRoyaltyMaster', ID=well_lease_link.LeaseID)
+        royalty.format_gorr = format_gorr(royalty.Gorr)
         lease = db.select1('Lease', ID=well_lease_link.LeaseID)
 
         if rpba:
@@ -54,15 +56,17 @@ def generate_worksheet(well_id, prod_month, rpba):
             monthly_array = db.select('Monthly', WellID=well_id, prodMonth=prod_month, product=product)
         if len(monthly_array) == 0:
             raise AppError("There were no monthly records for " + str(well_id) + str(prod_month) + product)
-        monthly = monthly_array[0]
+        monthly = monthly_array[0] # if there are multiple pick the first one
 
         ba = db.select1('BAInfo',BAid=monthly.RPBA)
         calc = db.select1('Calc', WellID=well_id, ProdMonth=prod_month,RPBA=monthly.RPBA)
+        rtp_info = db.select1('RTPInfo', WellEvent=well.WellEvent, Product=product, Payer=monthly.RPBA,
+                                   Date=prod_month_to_date(prod_month))
         # calc = calc_array[0]
         # print(monthly)
         return render_template('worksheet/calc_worksheet.html',
                                well=well, rm=royalty, m=monthly, lease=lease,
-                               calc=calc, well_lease_link=well_lease_link, ba=ba)
+                               calc=calc, well_lease_link=well_lease_link, ba=ba, rtp_info=rtp_info)
     except Exception as e:
         print('views.worksheet: ***Error:', e)
         traceback.print_exc(file=sys.stdout)
