@@ -60,9 +60,16 @@ Database Change Log: Must be maintained so we can keep the database in sink:
 - Rename calc.ProvCrownRoyaltyRate to BaseRoyaltyCalcRate
 - Rename calc.ProvCrownRoyaltyValue to BaseRoyaltyValue
 - Rename calc.ProvCrownRoyaltyVolume to BaseRoyaltyVolume
-
-
-
+2016-11-22
+- Remove Calc tab from sample.xlsx (The create database creates a blank one and the process creates updated ones.
+- Rename calc.IOGR1995RoyaltyVolume to BaseRoyaltyVolume
+- Rename calc.IOGR1995RoyaltyValue to BaseRoyaltyValue
+- Rename calc.SupplementaryRoyalties to SuppRoyaltyValue
+- Delete calc.IOGR1995RoyaltyRate
+- Delete calc.IOGR1995WellRoyaltyVolume
+- Delete calc.IOGR1995RoyaltyVolume
+- Delete calc.IOGR1995RoyaltyValue
+- Delete calc.GorrRoyaltyVolume
 """
 import datetime
 
@@ -212,29 +219,24 @@ class DatabaseCreate(object):
             "X" int,
             "C" int,
             "D" int,
+            "RoyaltyClassification" text,
             "RoyaltyPrice" float,
             "RoyaltyVolume" int,
             "BaseRoyaltyCalcRate" int,
             "BaseRoyaltyRate" int,
-            "RoyaltyClassification" text,
-            "IOGR1995RoyaltyRate" int,
             "GorrRoyaltyRate" int,
             "BaseRoyaltyVolume" int,
-            "GorrRoyaltyVolume" int,
-            "IOGR1995WellRoyaltyVolume" float,
-            "IOGR1995RoyaltyVolume" float,
             "BaseRoyaltyValue" float,
-            "IOGR1995RoyaltyValue" float,
+            "SuppRoyaltyValue" int,
             "GorrRoyaltyValue" float,
-            "GrossRoyaltyValue" float,
             "TransBaseValue" float,
             "TransGorrValue" float,
             "ProcessingBaseValue" float,
             "ProcessingGorrValue" float,
-            "RoyaltyGCA" float,
-            "SupplementaryRoyalties" int,
-            "RoyaltyDeductions" int,
+            "GrossRoyaltyValue" float,
             "NetRoyaltyValue" float,
+            "RoyaltyGCA" float,
+            "RoyaltyDeductions" int,
             "CommencementPeriod" float,
             "Message" text,
             "GorrMessage" text);

@@ -297,57 +297,74 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         m.TransRate = 2.123455
         m.ProcessingRate = 0.123455
         m.ProdVol = 70
-        m.RPVol = 70
         m.ProdMonth = 201501
 
         calc = DataStructure()
-        calc.IOGR1995RoyaltyValue = 0.0
+        calc.BaseRoyaltyValue = 0.0
         calc.CommencementPeriod = 0
-        calc.IOGR1995RoyaltyVolume = 0.0
+        calc.BaseRoyaltyVolume = 0.0
         calc.RoyaltyPrice = 0.0
+
+        crown_multiplier = 1.2
+        fn_interest = .25
+        rp_interest = 100
 
         pr = ProcessRoyalties()
         # all tests for SaskWellHead
-        pr.calc_sask_oil_iogr1995(datetime(2015, 1, 1), "SaskWellHead", 1.2, 0.25, m, calc)
-        self.assertEqual(464.36, calc.IOGR1995RoyaltyValue)
+        pr.calc_sask_oil_iogr1995(datetime(2015, 1, 1), "SaskWellHead", crown_multiplier, fn_interest, rp_interest, m, calc)
+        self.assertEqual(464.36, calc.BaseRoyaltyValue)
         self.assertEqual(calc.CommencementPeriod, 0)
-        self.assertEqual(calc.IOGR1995RoyaltyVolume, 7)
+        self.assertEqual(calc.BaseRoyaltyVolume, 7)
         self.assertEqual(calc.RoyaltyPrice, 221.123456)
 
         m.ProdVol = 100
-        m.RPVol = 100
-        pr.calc_sask_oil_iogr1995(datetime(2015, 4, 2), "SaskWellHead", 0.25, 3, m, calc)
-        self.assertEqual(calc.IOGR1995RoyaltyValue, 1990.11)
+        crown_multiplier = 0.25
+        fn_interest = 3
+        rp_interest = 100
+        pr.calc_sask_oil_iogr1995(datetime(2015, 4, 2), "SaskWellHead", crown_multiplier, fn_interest, rp_interest, m, calc)
+        self.assertEqual(calc.BaseRoyaltyValue, 1990.11)
 
         m.ProdVol = 170
-        m.RPVol = 170
-        pr.calc_sask_oil_iogr1995(datetime(2015, 5, 1), "SaskWellHead", 1, 1, m, calc)
-        self.assertEqual(calc.IOGR1995RoyaltyValue, 5881.88)
+        crown_multiplier = 1.0
+        fn_interest = 1
+        rp_interest = 100
+        pr.calc_sask_oil_iogr1995(datetime(2015, 5, 1), "SaskWellHead", crown_multiplier, fn_interest, rp_interest, m, calc)
+        self.assertEqual(calc.BaseRoyaltyValue, 5881.88)
 
         m.ProdVol = 79.9
-        m.RPVol = 79.9
-        pr.calc_sask_oil_iogr1995(datetime(2010, 1, 1), "SaskWellHead", 3, 2, m, calc)
-        self.assertEqual(calc.IOGR1995RoyaltyValue, 10600.66)
+        crown_multiplier = 3
+        fn_interest = 2
+        rp_interest = 100
+        pr.calc_sask_oil_iogr1995(datetime(2010, 1, 1), "SaskWellHead", crown_multiplier, fn_interest, rp_interest, m, calc)
+        self.assertEqual(calc.BaseRoyaltyValue, 10600.66)
 
         m.ProdVol = 150
-        m.RPVol = 150
-        pr.calc_sask_oil_iogr1995(datetime(2009, 7, 3), "SaskWellHead", 2, 4, m, calc)
-        self.assertEqual(calc.IOGR1995RoyaltyValue, 38917.73)
+        crown_multiplier = 2
+        fn_interest = 4
+        rp_interest = 100
+        pr.calc_sask_oil_iogr1995(datetime(2009, 7, 3), "SaskWellHead", crown_multiplier, fn_interest, rp_interest, m, calc)
+        self.assertEqual(calc.BaseRoyaltyValue, 38917.73)
 
         m.ProdVol = 500
-        m.RPVol = 500
-        pr.calc_sask_oil_iogr1995(datetime(2007, 8, 2), "SaskWellHead", 1, 5, m, calc)
-        self.assertEqual(calc.IOGR1995RoyaltyValue, 124271.38)
+        crown_multiplier = 1
+        fn_interest = 5
+        rp_interest = 100
+        pr.calc_sask_oil_iogr1995(datetime(2007, 8, 2), "SaskWellHead", crown_multiplier, fn_interest, rp_interest, m, calc)
+        self.assertEqual(calc.BaseRoyaltyValue, 124271.38)
 
         m.ProdVol = 800
-        m.RPVol = 800
-        pr.calc_sask_oil_iogr1995(datetime(2008, 9, 9), "SaskWellHead", 5, 0.1, m, calc)
-        self.assertEqual(calc.IOGR1995RoyaltyValue, 21117.29)
+        crown_multiplier = 5
+        fn_interest = 0.1
+        rp_interest = 100
+        pr.calc_sask_oil_iogr1995(datetime(2008, 9, 9), "SaskWellHead", crown_multiplier, fn_interest, rp_interest, m, calc)
+        self.assertEqual(calc.BaseRoyaltyValue, 21117.29)
 
         m.ProdVol = 800
-        m.RPVol = 400
-        pr.calc_sask_oil_iogr1995(datetime(2008, 9, 9), "SaskWellHead", 5, 0.1, m, calc)
-        self.assertEqual(calc.IOGR1995RoyaltyValue, 10558.65)
+        crown_multiplier = 5
+        fn_interest = 0.1
+        rp_interest = 50
+        pr.calc_sask_oil_iogr1995(datetime(2008, 9, 9), "SaskWellHead", crown_multiplier, fn_interest, rp_interest, m, calc)
+        self.assertEqual(calc.BaseRoyaltyValue, 10558.65)
 
     def test_determineCommencementPeriod(self):
         pr = ProcessRoyalties()
@@ -362,30 +379,21 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
 
     def test_calc_sask_oil_iogr_subsection2(self):
         pr = ProcessRoyalties()
-        self.assertEqual(pr.calc_sask_oil_iogr_subsection2(70, 70), (7, 7))
-        self.assertEqual(pr.calc_sask_oil_iogr_subsection2(100, 100), (12, 12))
-        self.assertEqual(pr.calc_sask_oil_iogr_subsection2(170, 170), (26.6, 26.6))
-        self.assertEqual(pr.calc_sask_oil_iogr_subsection2(200, 200), ((24 + .26 * (200 - 160)), 34.4))
-        self.assertEqual(pr.calc_sask_oil_iogr_subsection2(2000, 2000), (round((24 + .26 * (2000 - 160)), 6), 502.4))
-
-        self.assertEqual(pr.calc_sask_oil_iogr_subsection2(70, 10), (7, 1))
-        self.assertEqual(pr.calc_sask_oil_iogr_subsection2(100, 10), (12, 1.2))
-        self.assertEqual(pr.calc_sask_oil_iogr_subsection2(170, 17), (26.6, 2.66))
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection2(70), 7)
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection2(100), 12)
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection2(170), 26.6)
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection2(200), (24 + .26 * (200 - 160)))
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection2(2000), (round(24 + .26 * (2000 - 160), 6)))
 
     def test_calc_sask_oil_iogr_subsection3(self):
 
         pr = ProcessRoyalties()
-        self.assertEqual(pr.calc_sask_oil_iogr_subsection3(79.9, 79.9), (7.99, 7.99))
-        self.assertEqual(pr.calc_sask_oil_iogr_subsection3(150, 150), (22, 22))
-        self.assertEqual(pr.calc_sask_oil_iogr_subsection3(500, 500), (112.4, 112.4))
-        self.assertEqual(pr.calc_sask_oil_iogr_subsection3(800, 800), (191, 191))
-        self.assertEqual(pr.calc_sask_oil_iogr_subsection3(200, 200), (24 + .26 * (200 - 160), 34.4))
-        self.assertEqual(pr.calc_sask_oil_iogr_subsection3(2000, 2000), (189 + .4 * (2000 - 795), 671.0))
-
-        self.assertEqual(pr.calc_sask_oil_iogr_subsection3(79.9, 10), (7.99, 1))
-        self.assertEqual(pr.calc_sask_oil_iogr_subsection3(150, 15), (22, 2.2))
-        self.assertEqual(pr.calc_sask_oil_iogr_subsection3(500, 50), (112.4, 11.24))
-        self.assertEqual(pr.calc_sask_oil_iogr_subsection3(800, 80), (191, 19.1))
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection3(79.9), 7.99)
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection3(150), 22)
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection3(500), 112.4)
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection3(800), 191)
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection3(200), 24 + .26 * (200 - 160))
+        self.assertEqual(pr.calc_sask_oil_iogr_subsection3(2000), 189 + .4 * (2000 - 795))
 
     def test_determineRoyaltyPrice(self):
 
@@ -453,28 +461,31 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         calc = DataStructure()
         monthly = DataStructure()
         well_lease_link = DataStructure()
+        rtp_info = DataStructure()
 
         monthly.ProdVol = 100.0
-        monthly.RPVol = 100.0
         monthly.ProdHours = 10.0
+        monthly.TransRate = .1234
+        leaserm.TransDeducted = 'All'
         leaserm.Gorr = "fixed,0,.02"
 
         well_lease_link.PEFNInterest = 1.0
 
-        calc.RoyaltyPrice = 200.0
-        calc.GrossRoyaltyValue = 0.0
-        calc.GorrRoyaltyValue = 0.0
-        calc.GorrRoyaltyVolume = 0.0
+        rtp_info.Percent = 100.0
 
-        pr.calc_gorr(leaserm, calc, monthly, well_lease_link)
+        calc.RoyaltyPrice = 200.0
+        calc.TransGorralue = 0.0
+        calc.GorrRoyaltyValue = 0.0
+
+        pr.calc_gorr(leaserm, calc, monthly, well_lease_link, rtp_info)
         self.assertEqual(400.0, calc.GorrRoyaltyValue)
-        self.assertEqual(2.0, calc.GorrRoyaltyVolume)
+        self.assertEqual(.25, calc.TransGorrValue)
 
         monthly.ProdVol = 100.0
-        monthly.RPVol = 50.0
-        pr.calc_gorr(leaserm, calc, monthly, well_lease_link)
+        rtp_info.Percent = 50.0
+        pr.calc_gorr(leaserm, calc, monthly, well_lease_link, rtp_info)
         self.assertEqual(200.0, calc.GorrRoyaltyValue)
-        self.assertEqual(1.0, calc.GorrRoyaltyVolume)
+        self.assertEqual(.12, calc.TransGorrValue)
 
     def test_calcSupplementaryRoyaltiesIOGR1995(self):
         reference_price = {'Pigeon Lake Indian': 24.04, 'Reserve no.138A': 25.37,
@@ -500,18 +511,63 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual(pr.calc_supplementary_royalties_iogr1995(15, 180, 80, 35,
                                                                   reference_price['Stony Plain Indian']), 5101.88)
 
+    def test_calc_royalties(self):
+        dbu = DatabaseUtilities()
+        dbu.delete_all_tables()
+        dbu.create_some_test_econdata()
+
+        pr = ProcessRoyalties()
+        well = DataStructure()
+        royalty = DataStructure()
+        calc = DataStructure()
+        monthly = DataStructure()
+        well_lease_link = DataStructure()
+        rtp_info = DataStructure()
+
+        monthly.Product = 'OIL'
+        monthly.ProdMonth = 201501
+        monthly.ProdVol = 100
+        monthly.ProdHours = 744
+        monthly.SalesPrice = 210.0
+        royalty.RoyaltyScheme = 'SKProvCrownVar'
+        royalty.OverrideRoyaltyClassification = None
+        royalty.ValuationMethod = 'ActSales'
+        royalty.CrownModifier = None
+        royalty.MinRoyaltyRate = None
+        royalty.CrownMultiplier = 1.0
+        royalty.MinRoyaltyDollar = None
+        royalty.TransDeducted = None
+        well.CommencementDate = date(2015, 1, 22)
+        well.RoyaltyClassification = 'Old Oil'
+        well.Classification = 'Other'
+        well.SRC = 0.0
+        well_lease_link.PEFNInterest = 1.0
+        rtp_info.Percent = 100.0
+        calc.SuppRoyaltyValue = 0.0
+        calc.GorrRoyaltyValue = 0.0
+        calc.TransGorrValue = 0.0
+
+        pr.calc_royalties(well, royalty, calc, monthly, well_lease_link, rtp_info)
+
+        royalty.RoyaltyScheme = 'IOGR1995'
+        pr.calc_royalties(well, royalty, calc, monthly, well_lease_link, rtp_info)
+
+        royalty.RoyaltyScheme = 'IOGR1995,GORR'
+        royalty.Gorr = "fixed,0,.02"
+        pr.calc_royalties(well, royalty, calc, monthly, well_lease_link, rtp_info)
+
     def test_process_monthly(self):
         db = config.get_database()
-        self.dbu = DatabaseUtilities()
-        self.dbu.delete_all_tables()
-        self.dbu.create_some_test_well_royalty_masters()
-        self.dbu.create_some_test_lease_royalty_masters()
-        self.dbu.create_some_test_leases()
-        self.dbu.create_some_test_well_lease_link()
-        self.dbu.create_some_test_monthly()
-        self.dbu.create_some_test_econdata()
-        self.dbu.create_some_test_rtp_info()
-        self.dbu.create_calc()
+        dbu = DatabaseUtilities()
+        dbu.delete_all_tables()
+        dbu.create_some_test_well_royalty_masters()
+        dbu.create_some_test_lease_royalty_masters()
+        dbu.create_some_test_leases()
+        dbu.create_some_test_well_lease_link()
+        dbu.create_some_test_monthly()
+        dbu.create_some_test_econdata()
+        dbu.create_some_test_rtp_info()
+        dbu.create_calc()
         pr = ProcessRoyalties()
         pr.process_one(4, 201501, 'OIL')
         # Check to see if the oper record exists
