@@ -98,7 +98,7 @@ class ProcessRoyalties(object):
                                        Date=prod_month_to_date(prod_month))
 
             # calc = None
-            calc = self.zero_royalty_calc(prod_month, well_id, product, None)
+            calc = self.zero_royalty_calc(prod_month, well_id, product)
             self.calc_royalties(well, royalty, calc, monthly, well_lease_link, rtp_info)
             calc.RPBA = monthly.RPBA
             calc.FNReserveID = lease.FNReserveID
@@ -172,10 +172,10 @@ class ProcessRoyalties(object):
 
         if leaserm.TransDeducted == 'All' or leaserm.TransDeducted == 'GORR':
             calc.TransGorrValue = round(calc.GorrRoyaltyRate *
-                                          monthly.ProdVol *
-                                          well_lease_link.PEFNInterest *
-                                          (rtp_info.Percent / 100) *
-                                          monthly.TransRate, 2)
+                                        monthly.ProdVol *
+                                        well_lease_link.PEFNInterest *
+                                        (rtp_info.Percent / 100) *
+                                        monthly.TransRate, 2)
         else:
             calc.TransGorrValue = 0.0
 
@@ -377,7 +377,8 @@ class ProcessRoyalties(object):
             if lease_rm.MinRoyaltyDollar > calc.BaseRoyaltyValue:
                 calc.BaseRoyaltyValue = lease_rm.MinRoyaltyDollar
 
-    def calc_sask_oil_prov_crown_deductions(self, m, fn_interest, rp_interest, lease_rm, calc):
+    @staticmethod
+    def calc_sask_oil_prov_crown_deductions(m, fn_interest, rp_interest, lease_rm, calc):
         """ We have calculated a royalty rate. Therefore calculate based on that"""
 
         if lease_rm.TransDeducted == "All" or lease_rm.TransDeducted == 'Base':
@@ -620,7 +621,7 @@ class ProcessRoyalties(object):
     Royalty Calculation
     '''
 
-    def zero_royalty_calc(self, month, well_id, product, rc):
+    def zero_royalty_calc(self, month, well_id, product, rc=None):
         if rc is None:
             rc = self.db.get_data_structure('Calc')
             #         rc.ID = 0

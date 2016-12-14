@@ -68,8 +68,6 @@ fmath {
     <tr>
         <td align="right" colspan="2">
             <table align="center">
-            	<col width="25%">
-	            <col width="25%">
                 <tr>
                     <th align="right">Lease:</th> <td>{{ lease.Lease }}</td>
                 </tr>
@@ -116,56 +114,48 @@ fmath {
     {#
         --- Top Right of Page
     #}
-        <TD align=right><b>
-      {% if well.SRC != None %}
-        SRC:<br>
-      {% endif %}
-      {% if well.Classification != None %}
-        Area Classification:<br>
-      {% endif %}
-      {% if well.RoyaltyClassification != None %}
-        Royalty/Tax Classification:<br>
-      {% endif %}
-      Valuation Method:<br>
-      {% if well.CommencementDate != None %}
-        Commencement Date:<br>
-      {% endif %}
-      {% if calc.CommencementPeriod != None %}
-        Commencement Period:<br>
-      {% endif %}
-      {% if rm.TransDeducted %}
-        Trans Deduction:<br>
-      {% endif %}
-      {% if rm.ProcessingDeducted %}
-        Processing Deduction:</b></TD>
-      {% endif %}
-
-
-      <TD align="left">
-      {% if well.SRC != None %}
-        {{ well.SRC }}<br>
-      {% endif %}
-      {% if well.Classification != None %}
-        {{ well.Classification }}<br>
-      {% endif %}
-      {% if well.RoyaltyClassification != None %}
-        {{ well.RoyaltyClassification }}<br>
-      {% endif %}
-      {{ rm.ValuationMethod }}<br>
-      {% if well.CommencementDate != None %}
-        {{ well._format.yyyy_mm_dd(well.CommencementDate) }}<br>
-      {% endif %}
-      {% if well.CommencementPeriod != None %}
-        {{ calc.CommencementPeriod }}<br>
-      {% endif %}
-      {% if rm.TransDeducted %}
-        {{ rm.TransDeducted }}<br>
-      {% endif %}
-      {% if rm.ProcessingDeducted %}
-        {{ rm.ProcessingDeducted }}
-      {% endif %}
-      </TD>
-
+        <td align="left" colspan="2">
+            <table align="center">
+                {% if well.SRC != None %}
+                    <tr>
+                        <th align="right">SRC:</th> <td> {{ well.SRC }} </td>
+                    </tr>
+                {% endif %}
+                {% if well.Classification != None %}
+                    <tr>
+                        <th align="right">Area Classification:</th> <td> {{ well.Classification }} </td>
+                    </tr>
+                {% endif %}
+                {% if well.RoyaltyClassification != None %}
+                    <tr>
+                        <th align="right">Royalty/Tax Classification:</th> <td> {{ well.RoyaltyClassification }} </td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <th align="right">Valuation Method:</th> <td> {{ rm.ValuationMethod }} </td>
+                </tr>
+                {% if well.CommencementDate != None %}
+                    <tr>
+                        <th align="right">Commencement Date:</th> <td> {{ well.CommencementDate }} </td>
+                    </tr>
+                {% endif %}
+                {% if calc.CommencementPeriod != None %}
+                    <tr>
+                        <th align="right">Commencement Period:</th> <td> {{ calc.CommencementPeriod }} </td>
+                    </tr>
+                {% endif %}
+                {% if rm.TransDeducted != None %}
+                    <tr>
+                        <th align="right">Trans Deduction:</th> <td> {{ rm.TransDeducted }} </td>
+                    </tr>
+                {% endif %}
+                {% if rm.ProcessingDeducted != None %}
+                    <tr>
+                        <th align="right">Processing Deduction:</th> <td> {{ rm.ProcessingDeducted }} </td>
+                    </tr>
+                {% endif %}
+                </table>
+            </td>
    </TR>
 
 </TABLE>
@@ -184,7 +174,8 @@ table, th, td {
             <col span="8" width="100" align="right">
         </colgroup>
 
-	<caption><b>Monthly Data</b></caption>
+
+	<caption><br><b>Monthly Data</b><br><br></caption>
 
     {#
         --- Monthly Data
@@ -218,7 +209,7 @@ table, th, td {
         {*** Note: Replace Monthly data with Petrinex detail when available ***}<br>
 
     {#
-        --- SKProvCrownVar display methods
+        --- SKProvCrownVar Crown Royalty %
     #}
 
     {% if 'SKProvCrownVar' in rm.RoyaltyScheme %}
@@ -252,7 +243,7 @@ table, th, td {
     {% endif %}
 
     {#
-        --- IOGR 1995
+        --- IOGR 1995 --- Royalty Volume
     #}
 
     {% if 'IOGR1995' in rm.RoyaltyScheme %}
@@ -292,28 +283,6 @@ table, th, td {
                 <tr><td align="right">RVol</td><td align="center">=</td> <td align="left">{{ '{:.2f}'.format(calc.BaseRoyaltyVolume) }}</td></tr>
             {% endif %}
 
-            {% if calc.IOGR1995WellRoyaltyVolume != calc.IOGR1995RoyaltyVolume %}
-                <tr> <td> &nbsp </td></tr>
-                <tr>
-                    <td align="right"> RP RVol</td>
-                    <td align="center"> = </td>
-                    <td> RVol * RPVol / MOP </td>
-                </tr>
-                <tr>
-                    <td align="right"> RP RVol</td>
-                    <td align="center"> = </td>
-                    <td>
-                        {{ '{:.6f}'.format(calc.IOGR1995WellRoyaltyVolume) }} *
-                        {{ '{:.2f}'.format(m.RPVol) }} /
-                        {{ '{:.2f}'.format(m.ProdVol) }}
-                </tr>
-                <tr>
-                    <td align="right"> RP RVol</td>
-                    <td align="center"> = </td>
-                    <td>
-                        {{ '{:.6f}'.format(calc.IOGR1995RoyaltyVolume) }}
-                </tr>
-            {% endif %}
         </TABLE>
     {% endif %}
 
@@ -398,15 +367,50 @@ table, th, td {
         {% endif %}
     {% endif %}
 
+    {#
+        --- IOGR1995 --- Royalty $
+    #}
+
     {% if m.Product == 'OIL' and 'IOGR1995' in rm.RoyaltyScheme%}
         <br>
         <table>
-             <tr align="center"><td>R$</td><td>=</td><td>CrownMult</td> <td>*</td> <td>RVol</td> <td>*</td> <td>PE FN %</td> <td>*</td> <td>RVal</td></tr>
-                <tr align="center"><td>R$</td><td>=</td><td>{{ rm.CrownMultiplier }}</td> <td>*</td> <td>{{ '{:.2f}'.format(calc.BaseRoyaltyVolume) }}</td>
-                    <td>*</td> <td>{{ '{:.6f}'.format(well_lease_link.PEFNInterest) }}%</td> <td>*</td><td>{{ '{:>10,.6f}\n'.format(calc.RoyaltyPrice) }}</td></tr>
-                <tr align="center"><td>R$</td><td>=</td><td> $ {{ '{:>10,.2f}\n'.format(calc.BaseRoyaltyValue) }}</td></tr>
+             <tr align="center">
+                 <td>R$</td>
+                 <td>=</td>
+                 <td>CrownMult</td>
+                 <td>*</td>
+                 <td>RVol</td>
+                 <td>*</td>
+                 <td>PE FN %</td>
+                 <td>*</td>
+                 <td>RP %</td>
+                 <td>*</td>
+                 <td>RVal</td>
+             </tr>
+            <tr align="center">
+                <td>R$</td>
+                <td>=</td>
+                <td>{{ rm.CrownMultiplier }}</td>
+                <td>*</td>
+                <td>{{ '{:.2f}'.format(calc.BaseRoyaltyVolume) }}</td>
+                <td>*</td>
+                <td>{{ '{:.6%}'.format(well_lease_link.PEFNInterest) }}</td>
+                <td>*</td>
+                <td>{{ '{:.6f}%'.format(rtp_info.Percent)}}</td>
+                <td>*</td>
+                <td>{{ '{:>10,.6f}\n'.format(calc.RoyaltyPrice) }}</td>
+            </tr>
+            <tr align="center">
+                <td>R$</td>
+                <td>=</td>
+                <td> $ {{ '{:>10,.2f}\n'.format(calc.BaseRoyaltyValue) }}</td>
+            </tr>
         </table>
     {% endif %}
+
+    {#
+        --- IOGR1995 --- Supplementary Royalty
+    #}
 
     {% if 'IOGR1995' in rm.RoyaltyScheme %}
         {% if calc.CommencementPeriod <= 5 %}
