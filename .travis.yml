@@ -12,7 +12,6 @@ notifications:
     recipients:
       - konstantin.lazutin@thesolutionstack.com
       - larry.shumlich@thesolutionstack.com
-      - adrienne.shumlich@gmail.com
 
 before_install:
   - pip install codecov
