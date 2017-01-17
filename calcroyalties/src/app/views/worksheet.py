@@ -40,7 +40,7 @@ def calc_worksheet():
 def generate_worksheet(well_id, prod_month, rpba):
     try:
         db = config.get_database()
-        product = "OIL"
+        product = "GAS"
         well = db.select1('WellRoyaltyMaster', ID=well_id)
         well_lease_link_array = db.select('WellLeaseLink', WellID=well_id)
         if len(well_lease_link_array) == 0:
@@ -59,7 +59,7 @@ def generate_worksheet(well_id, prod_month, rpba):
         monthly = monthly_array[0] # if there are multiple pick the first one
 
         ba = db.select1('BAInfo',BAid=monthly.RPBA)
-        calc = db.select1('Calc', WellID=well_id, ProdMonth=prod_month,RPBA=monthly.RPBA)
+        calc = db.select1('Calc', WellID=well_id, ProdMonth=prod_month,RPBA=monthly.RPBA,Product=product)
         rtp_info = db.select1('RTPInfo', WellEvent=well.WellEvent, Product=product, Payer=monthly.RPBA,
                                    Date=prod_month_to_date(prod_month))
         # calc = calc_array[0]

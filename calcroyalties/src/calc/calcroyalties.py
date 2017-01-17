@@ -84,7 +84,7 @@ class ProcessRoyalties(object):
             raise AppError("No monthly data found for WellID: " + str(well_id) + " ProdMonth:" + str(prod_month) +
                            " Product:" + product)
 
-        calc_array = self.db.select('Calc', WellID=well_id, ProdMonth=prod_month)
+        calc_array = self.db.select('Calc', WellID=well_id, ProdMonth=prod_month, Product=product)
         for calc in calc_array:
             self.db.delete('Calc', calc.ID)
 
@@ -109,13 +109,15 @@ class ProcessRoyalties(object):
             #     self.db.update(calc)
 
     def calc_royalties(self, well, royalty, calc, monthly, well_lease_link, rtp_info):
-
         if monthly.Product == 'OIL' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
             self.calc_sask_oil_prov_crown(monthly, well, royalty, calc, well_lease_link, rtp_info)
 
         elif monthly.Product == 'OIL' and 'IOGR1995' in royalty.RoyaltyScheme:
             self.calc_sask_oil_iogr1995(well.CommencementDate, royalty.ValuationMethod, royalty.CrownMultiplier,
                                         well_lease_link.PEFNInterest, rtp_info.Percent, monthly, calc)
+
+        elif monthly.Product == 'GAS' and 'IOGR1995' in royalty.RoyaltyScheme:
+            self.calc_sask_gas_iogr1995(monthly, well, royalty, calc)
 
         elif monthly.Product == 'Gas' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
             self.calc_sask_gas_prov_crown(monthly, well, royalty, calc)
@@ -146,7 +148,7 @@ class ProcessRoyalties(object):
         #     calc.RoyaltyDeductions += calc.RoyaltyProcessing
         #     calc.NetRoyaltyValue -= calc.RoyaltyProcessing
 
-        if monthly.Product == 'Gas':
+        if monthly.Product == 'GAS':
             if royalty.GCADeducted == 'Y':
                 calc.RoyaltyGCA = round(calc.RoyaltyVolume * monthly.GCARate, 2)
                 calc.RoyaltyDeductions += calc.RoyaltyGCA
@@ -391,6 +393,22 @@ class ProcessRoyalties(object):
                          2)
         else:
             return 0.0
+
+    def calc_sask_gas_iogr1995(self, monthly, well, royalty, calc):
+        # selling_price = monthly.SalesPrice / monthly.ProdVol
+        selling_price = monthly.SalesPrice
+        basic_gross_royalty = 0.25 * monthly.ProdVol * selling_price
+        if selling_price < 10.65:
+            supplementary_royalty = 0
+        elif selling_price > 10.65 and selling_price < 24.85:
+            supplementary_royalty = 0.3 * (selling_price - 10.65)
+        elif selling_price > 24.85:
+            supplementary_royalty = 4.26 + 0.55 * (selling_price - 27.68)
+        gross_royalty = basic_gross_royalty + supplementary_royalty
+        calc.SuppRoyaltyValue = round(supplementary_royalty, 2)
+        calc.BaseRoyaltyValue = round(basic_gross_royalty, 2)
+        print('gas done')
+        return
 
     def calc_sask_oil_iogr1995(self, commencement_date, valuation_method, crown_multiplier,
                                fn_interest, rp_interest, m, calc):
