@@ -23,9 +23,14 @@ def calc_worksheet():
     else:
         rpba = None
 
+    if "Product" in request.args:
+        product = request.args["Product"]
+    else:
+        product = None
+
     if "WellId" in request.args:
         well_id = int(request.args["WellId"])
-        return generate_worksheet(well_id, prod_month, rpba)
+        return generate_worksheet(well_id, prod_month, rpba, product)
     elif "WellStart" in request.args and "WellEnd" in request.args and "WellId" not in request.args:
         well_start = int(request.args["WellStart"])
         well_end = int(request.args["WellEnd"])
@@ -37,10 +42,10 @@ def calc_worksheet():
     else:
         return "worksheet.calc_worksheet Something wasn't right"
 
-def generate_worksheet(well_id, prod_month, rpba):
+def generate_worksheet(well_id, prod_month, rpba, product):
     try:
         db = config.get_database()
-        product = "SUL"
+        # product = "SUL"
         well = db.select1('WellRoyaltyMaster', ID=well_id)
         well_lease_link_array = db.select('WellLeaseLink', WellID=well_id)
         if len(well_lease_link_array) == 0:
