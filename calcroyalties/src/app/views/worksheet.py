@@ -40,7 +40,7 @@ def calc_worksheet():
 def generate_worksheet(well_id, prod_month, rpba):
     try:
         db = config.get_database()
-        product = "GAS"
+        product = "SUL"
         well = db.select1('WellRoyaltyMaster', ID=well_id)
         well_lease_link_array = db.select('WellLeaseLink', WellID=well_id)
         if len(well_lease_link_array) == 0:

@@ -286,17 +286,9 @@ table, th, td {
         </TABLE>
     {% endif %}
 
-    {% if 'IOGR1995' in rm.RoyaltyScheme and m.Product == 'GAS' %}
+    {% if 'IOGR1995' in rm.RoyaltyScheme and (m.Product == 'GAS' or m.Product == 'PEN' or m.Product == 'SUL') %}
         <br>
         <b>IOGR1995 Basic Gross Royalty</b>
-        {% if calc.CommencementPeriod %}
-            <br>
-            {% if calc.CommencementPeriod < 5 %}
-                Royalty Calc Type: IOGR 1995 with Commencement Period < 5 Years:
-            {% else %}
-                Royalty Calc Type: IOGR 1995  with Commencement Period >=  5 Years:
-            {% endif %}
-        {% endif %}
         <br>
         <TABLE align="center" style="width:100">
             <col width="20%">
@@ -477,7 +469,7 @@ table, th, td {
 
     {% if 'IOGR1995' in rm.RoyaltyScheme and m.Product == 'GAS'%}
         <br>
-        <b>IOGR1995 Supplementary Gross Royalty</b><br>
+        <b>IOGR1995 Supplementary Gross Royalty (Marketable gas)</b><br>
         <table>
 
             {% if m.SalesPrice < 10.65 %}
@@ -490,6 +482,40 @@ table, th, td {
             {% elif m.SalesPrice > 24.85 %}
                 <tr><td align ="right">SalesPrice > 24.85: Supplementary Royalty</td> <td align="center">=</td> <td align="left">75% * (\$4.26 + 55% * (SalesPrice - \$27.68))</td></tr>
                 <tr><td align ="right">Supplementary Royalty</td><td align="center">=</td><td align="left">75% * (\$4.26 + 55% * (\${{ '{:.2f}'.format(m.SalesPrice) }} - \$27.68))</td></tr>
+                <tr><td align ="right">Supplementary Royalty</td> <td align="center">=</td> <td align="left">\$ {{ calc.SuppRoyaltyValue }}</td></tr>
+            {% endif %}
+
+        </table>
+    {% endif %}
+
+    {% if 'IOGR1995' in rm.RoyaltyScheme and m.Product == 'PEN'%}
+        <br>
+        <b>IOGR1995 Supplementary Gross Royalty (Pentanes)</b><br>
+        <table>
+
+            {% if m.SalesPrice < 27.68 %}
+                <tr><td align ="right">Sales Price < $27.68: Supplementary Royalty</td> <td align="center">=</td> <td align="left">0</td></tr>
+                <tr><td align ="right">Supplementary Royalty</td> <td align="center">=</td> <td align="left">{{ calc.SuppRoyaltyValue }}</td></tr>
+            {% elif m.SalesPrice > 27.68 %}
+                <tr><td align ="right">SalesPrice > $27.68: Supplementary Royalty</td> <td align="center">=</td> <td align="left">75% *  50% * (SalesPrice - \$27.68))</td></tr>
+                <tr><td align ="right">Supplementary Royalty</td><td align="center">=</td><td align="left">75% * 50% * (\${{ '{:.2f}'.format(m.SalesPrice) }} - \$27.68))</td></tr>
+                <tr><td align ="right">Supplementary Royalty</td> <td align="center">=</td> <td align="left">\$ {{ calc.SuppRoyaltyValue }}</td></tr>
+            {% endif %}
+
+        </table>
+    {% endif %}
+
+    {% if 'IOGR1995' in rm.RoyaltyScheme and m.Product == 'SUL'%}
+        <br>
+        <b>IOGR1995 Supplementary Gross Royalty (Sulphur)</b><br>
+        <table>
+
+            {% if m.SalesPrice < 39.37 %}
+                <tr><td align ="right">Sales Price < $39.37: Supplementary Royalty</td> <td align="center">=</td> <td align="left">0</td></tr>
+                <tr><td align ="right">Supplementary Royalty</td> <td align="center">=</td> <td align="left">{{ calc.SuppRoyaltyValue }}</td></tr>
+            {% elif m.SalesPrice > 39.37 %}
+                <tr><td align ="right">SalesPrice > $39.37: Supplementary Royalty</td> <td align="center">=</td> <td align="left">75% *  50% * (SalesPrice - \$39.37))</td></tr>
+                <tr><td align ="right">Supplementary Royalty</td><td align="center">=</td><td align="left">75% * 50% * (\${{ '{:.2f}'.format(m.SalesPrice) }} - \$39.37))</td></tr>
                 <tr><td align ="right">Supplementary Royalty</td> <td align="center">=</td> <td align="left">\$ {{ calc.SuppRoyaltyValue }}</td></tr>
             {% endif %}
 

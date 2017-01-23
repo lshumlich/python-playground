@@ -119,6 +119,12 @@ class ProcessRoyalties(object):
         elif monthly.Product == 'GAS' and 'IOGR1995' in royalty.RoyaltyScheme:
             self.calc_sask_gas_iogr1995(monthly, well, royalty, calc)
 
+        elif monthly.Product == 'PEN' and 'IOGR1995' in royalty.RoyaltyScheme:
+            self.calc_sask_pen_iogr1995(monthly, well, royalty, calc)
+
+        elif monthly.Product == 'SUL' and 'IOGR1995' in royalty.RoyaltyScheme:
+            self.calc_sask_sul_iogr1995(monthly, well, royalty, calc)
+
         elif monthly.Product == 'Gas' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
             self.calc_sask_gas_prov_crown(monthly, well, royalty, calc)
 
@@ -409,7 +415,6 @@ class ProcessRoyalties(object):
             e. Other from non-gas source
         """
 
-        # selling_price = monthly.SalesPrice / monthly.ProdVol
         selling_price = monthly.SalesPrice
         basic_gross_royalty = 0.25 * monthly.ProdVol * selling_price
         if selling_price < 10.65:
@@ -420,7 +425,58 @@ class ProcessRoyalties(object):
             supplementary_royalty = 0.75 * (4.26 + 0.55 * (selling_price - 27.68))
         calc.SuppRoyaltyValue = round(supplementary_royalty, 2)
         calc.BaseRoyaltyValue = round(basic_gross_royalty, 2)
-        print('gas done')
+        return
+
+    def calc_sask_pen_iogr1995(self, monthly, well, royalty, calc):
+        print('processing !!PEN!!')
+        """
+        1. Royalty Payable = Gross Royalty - (Gross Royalty / Total Value)
+        2. Gross Royalty = Basic Gross Royalty + Supplementary Gross Royalty
+        3. Basic Gross Royalty = 25% * Gas Volume * Selling Price
+        4. Supplementary Gross Royalty = 75% *
+            a. Gas: if Selling Price < $10.65: 0
+                    if $10.65 > Selling Price < $24.85: 30% * (Selling Price - $10.65)
+                    if Selling Price > $24.85: $4.26 + 55% * (Selling Price - $24.85)
+            b. Pentanes
+            c. Sulphur
+            d. Other from gas source
+            e. Other from non-gas source
+        """
+
+        selling_price = monthly.SalesPrice
+        basic_gross_royalty = 0.25 * monthly.ProdVol * selling_price
+        if selling_price < 27.68:
+            supplementary_royalty = 0
+        elif selling_price > 27.68:
+            supplementary_royalty = 0.75 * 0.5 * (selling_price - 27.68)
+        calc.SuppRoyaltyValue = round(supplementary_royalty, 2)
+        calc.BaseRoyaltyValue = round(basic_gross_royalty, 2)
+        return
+
+    def calc_sask_sul_iogr1995(self, monthly, well, royalty, calc):
+        print('processing !!SUL!!')
+        """
+        1. Royalty Payable = Gross Royalty - (Gross Royalty / Total Value)
+        2. Gross Royalty = Basic Gross Royalty + Supplementary Gross Royalty
+        3. Basic Gross Royalty = 25% * Gas Volume * Selling Price
+        4. Supplementary Gross Royalty = 75% *
+            a. Gas: if Selling Price < $10.65: 0
+                    if $10.65 > Selling Price < $24.85: 30% * (Selling Price - $10.65)
+                    if Selling Price > $24.85: $4.26 + 55% * (Selling Price - $24.85)
+            b. Pentanes
+            c. Sulphur
+            d. Other from gas source
+            e. Other from non-gas source
+        """
+
+        selling_price = monthly.SalesPrice
+        basic_gross_royalty = 0.25 * monthly.ProdVol * selling_price
+        if selling_price < 39.37:
+            supplementary_royalty = 0
+        elif selling_price > 39.37:
+            supplementary_royalty = 0.75 * 0.5 * (selling_price - 39.37)
+        calc.SuppRoyaltyValue = round(supplementary_royalty, 2)
+        calc.BaseRoyaltyValue = round(basic_gross_royalty, 2)
         return
 
     def calc_sask_oil_iogr1995(self, commencement_date, valuation_method, crown_multiplier,
