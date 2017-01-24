@@ -62,11 +62,11 @@ if __name__ == "__main__":
     t1 = datetime.datetime.now()
     logging.info('Batch started: ' + str(t1))
 
-    drop_create_tables()
+    # drop_create_tables()
     # drop_table("DataDictionary")
     # load_sheet(config.get_temp_dir() + "DataDictionary.xlsx")
     # load_sheet("K:\\lms\\Analysis and Design\\Sample Data Saved\\DataDictionary.xlsx")
-    load_sheet(config.get_temp_dir() + "sample_data.xlsx")
+    # load_sheet(config.get_temp_dir() + "sample_data.xlsx")
     # load_sheet("K:\\lms\\Analysis and Design\\Sample Data Saved\\sample_data 2016-10-17.xlsx")
     process_royalties()
 

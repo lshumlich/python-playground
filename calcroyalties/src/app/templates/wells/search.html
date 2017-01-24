@@ -201,7 +201,7 @@ function showHelp() {
     <td>{{ row.Classification or "" }}</td>
     <td>{{ row.FNBandID or "" }}</td>
     <td>{{ row.FNBandName or "" }}</td>
-    <td><a href="/worksheet?WellId={{ row.ID }}" title="Worksheet" class="icon icon-text-document"></a>
+    <td><a href="/worksheet?WellId={{ row.ID }}&Product={{ row.Product }}" title="Worksheet" class="icon icon-text-document"></a>
     &nbsp;
     <a href="{{ url_for('wells.calculate') }}?WellId={{ row.ID }}" title="Recalculate" class="icon icon-reload"></a>
     </td>
