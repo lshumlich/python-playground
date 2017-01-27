@@ -1,5 +1,5 @@
 from flask import Blueprint, request, render_template
-
+from openpyxl import load_workbook
 from batch import drop_create_tables, process_royalties
 from src.calc import volumetric_to_monthly
 from src.tool import sqlite_load_excel
@@ -21,9 +21,17 @@ def load_xls():
         return render_template('/process/load_xls.html', results=results)
 
 def process_xls(file):
-    drop_create_tables()
-    sqlite_load_excel.load_sheet(file)
-    process_royalties()
-    results = 'File <b>%s</b> processed successfully.' % file.filename
-    print(results)
+    try:
+        results = 'Testing the Excel file...'
+        wb_temp = load_workbook(file, read_only=True)
+        del wb_temp
+        results += '<br>Seems OK. Dropping tables...'
+        drop_create_tables()
+        results += '<br>Loading data from the Excel sheet...'
+        sqlite_load_excel.load_sheet(file)
+        results += '<br>Processing royalties...'
+        process_royalties()
+        results += '<br><span style="color:green;">Done. File <b>%s</b> processed successfully.</span>' % file.filename
+    except Exception as e:
+        results += '<span style="color:red;"><br>Error: %s</span>' % str(e)
     return results
