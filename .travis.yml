@@ -5,7 +5,7 @@ python:
 install: "pip install -r calcroyalties/requirements.txt"
 # command to run tests
 # script: py.test --cov=excel-app/ --cov-report=xml
-script: py.test calcroyalties/ --cov=calcroyalties/ --cov-report=xml
+script: py.test calcroyalties/ --ignore=calcroyalties/src/tool/performance_test.py --cov=calcroyalties/ --cov-report=xml
 
 notifications:
   email:
@@ -16,9 +16,9 @@ notifications:
 before_install:
   - pip install codecov
 
-  - wget https://github.com/mozilla/geckodriver/releases/download/v0.11.1/geckodriver-v0.11.1-linux64.tar.gz
-  - mkdir geckodriver
-  - tar -xzf geckodriver-v0.11.1-linux64.tar.gz -C geckodriver
-  - export PATH=$PATH:$PWD/geckodriver
+    #  - wget https://github.com/mozilla/geckodriver/releases/download/v0.11.1/geckodriver-v0.11.1-linux64.tar.gz
+    #  - mkdir geckodriver
+    #  - tar -xzf geckodriver-v0.11.1-linux64.tar.gz -C geckodriver
+    #  - export PATH=$PATH:$PWD/geckodriver
 after_success:
   - codecov
