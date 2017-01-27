@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<form method="POST" enctype="multipart/form-data">
+    <span style="color:red;">The following will replace all data in the database:</span>
+    <br><br>
+    Select XLSX file to upload:
+    <input type="file" name="fileToUpload" id="fileToUpload" />
+    <br>
+    <br>
+    <button type="submit" name="submit" id="submit">Submit</button>
+</form>
+
+<br>
+
+{% if results %}
+<div id="results">
+    {{ results|safe }}
+</div>
+{% endif %}
+
+{% endblock %}
