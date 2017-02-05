@@ -70,7 +70,7 @@ class ProcessRoyalties(object):
         royalty = self.db.select1('LeaseRoyaltymaster', ID=well_lease_link.LeaseID)
         lease = self.db.select1('Lease', ID=well_lease_link.LeaseID)
 
-        # todo Create a test to ensure there is a RTPInfo for the well. raise an apperror if note
+        # todo Create a test to ensure there is a RTPInfo for the well. raise an apperror if not
         # todo call the prod_month_to_date in the select and not everytime we use the select.
         rtp_info_array = self.db.select('RTPInfo', WellEvent=well.WellEvent, Product='OIL',
                                         Date=prod_month_to_date(prod_month))

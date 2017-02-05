@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<style>
+tr.border_bottom td {
+  border-bottom:1pt solid black;
+
+table {
+    display: table;
+    border-collapse: separate;
+    border-spacing: 0px;
+    border-color: gray;
+}
+}
+</style>
+
+    {% for r in result %}
+        <a href="#" class="batt">{{ r.Facility }}</a>
+    {% endfor %}
+
+<div id="show-data"> in show-data div...</div>
+
+<script>
+$(document).ready(function () {
+    $('.batt').click(newbatteryclicked);
+ })
+
+function newbatteryclicked() {
+    console.log(this.innerHTML)
+
+    var data = "batt=" + this.innerHTML
+    var jqxhr = $.ajax({url:"/reports/lfs", type: 'GET', data:data, dataType: 'json', success: function(data) {newbatterydiagram(data)}})
+        .fail(function() {
+            alert( "newbattery did not work. Not sure why." );
+        })
+}
+
+function newbatterydiagram(data) {
+    var s = ''
+    s = '<h1>' + data.facilities[0].Facility + '</h1>'
+    s = s + '<table>'
+    for (i = 0; i < data.facilities.length; i++) {
+        s = s + '<tr>'
+		s = s + '<td>' + data.facilities[i].Activity + '</td>' +
+		        '<td>' + data.facilities[i].InorOut + '</td>' +
+		        '<td>' + data.facilities[i].Product + '</td>' +
+		        '<td>' + data.facilities[i].FromTo + '</td>'
+		if (data.facilities[i].InorOut == 'in') {
+		    s = s + '<td>' + data.facilities[i].Volume + '</td>' + '<td> </td>'
+		} else {
+		    s = s + '<td> </td>' +'<td>' + data.facilities[i].Volume + '</td>'
+		}
+        s = s + '</tr>'
+	}
+    s = s + '</table>'
+	console.log(s)
+    $('#show-data').html(s);
+}
+
+
+</script>
+
+{% endblock %}

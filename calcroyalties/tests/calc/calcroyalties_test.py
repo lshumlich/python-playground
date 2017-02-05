@@ -566,7 +566,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         royalty.Gorr = "fixed,0,.02"
         pr.calc_royalties(well, royalty, calc, monthly, well_lease_link, rtp_info)
 
-    def test_process_monthly(self):
+    def test_process_all(self):
         db = config.get_database()
         dbu = DatabaseUtilities()
         dbu.delete_all_tables()
@@ -578,10 +578,18 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         dbu.create_some_test_econdata()
         dbu.create_some_test_rtp_info()
         dbu.create_calc()
+
         pr = ProcessRoyalties()
         pr.process_one(4, 201501, 'OIL')
-        # Check to see if the oper record exists
+
+        # Check to see if calc records exist for both royalty payors
         self.assertEqual(2, db.count('calc'))
 
         pr.process_all()
         self.assertEqual(3, db.count('calc'))
+
+        # Now lets create an exception
+
+
+
+

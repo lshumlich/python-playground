@@ -113,6 +113,13 @@ class DatabaseUtilities(object):
         """
         self.db_instance.execute_statement(statement)
 
+    def create_orphin_monthly(self):
+        statement = """
+            INSERT INTO Monthly Values(37, '2015-09-29 00:00:00', 201501, 1,
+                'Stuff', 2, 740, 100, "Payor1", 100.0, 221.123456, 2.123455, 0.123455, 0.0);
+        """
+        self.db_instance.execute_statement(statement)
+
     def create_calc(self):
         if 'Calc' not in self.db_instance.get_table_names():
             self.db_create.calc()
