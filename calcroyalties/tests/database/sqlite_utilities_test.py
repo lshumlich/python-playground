@@ -1,6 +1,6 @@
 
 import unittest
-
+import logging
 import config
 from src.database.database_create import DatabaseCreate
 
@@ -46,6 +46,8 @@ class DatabaseUtilities(object):
     def delete_all_tables(self):
         """ Used only for unit tests. It was put here so the database itself did not have distructive code in it """
         for table in self.db_instance.get_table_names():
+            print('!!! DELETING !!!')
+            logging.info('Deleting table %s' % table)
             self.delete_table(table)
         self.db_instance.commit()
         

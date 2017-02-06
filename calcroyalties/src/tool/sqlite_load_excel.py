@@ -2,7 +2,7 @@
 
 import datetime
 from openpyxl import load_workbook
-
+import logging
 import config
 from src.util.apperror import AppError
 from src.database.database_create import DatabaseCreate
@@ -27,6 +27,7 @@ class Loader(object):
         sheets = self.wb.get_sheet_names()
         for sheet in sheets:
             if sheet not in self.EXCLUDE_SHEETS:
+                logging.info('Loading sheet %s' % sheet)
                 self.load_worksheet(sheet)
 
     def load_worksheet(self, tab_name):

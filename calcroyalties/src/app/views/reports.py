@@ -65,7 +65,7 @@ def welleventinfomissing():
         print(e)
         abort(404)
 
-@reports.route('/reports/wellrane')
+@reports.route('/reports/wellrange')
 def wellrange():
     return render_template('/reports/wellrange.html')
 
