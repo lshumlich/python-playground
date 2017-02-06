@@ -1,24 +1,122 @@
 {% extends "layout.html" %}
 {% block body %}
 
-<style>
-tr.border_bottom td {
-  border-bottom:1pt solid black;
+<script src={{ url_for('static', filename='js/d3.js') }}></script>
 
-table {
-    display: table;
-    border-collapse: separate;
-    border-spacing: 0px;
-    border-color: gray;
+
+<style>
+
+    table.comp, ht.comp, td.comp, tr.comp {
+        border: 1px solid blue;
+        border-collapse: collapse;
+        height: 0px;
+    }
+    td.vol {
+        text-align: right;
+    }
+
+    table.xcomp, th.xcomp, tr.xcomp, td.xcomp {
+        table-layout: fixed;
+        border: 1px solid black;
+        border-collapse: collapse;
+        text-align: right;
+        margin: 1px 1px 1px 1px;
+        padding: 1px 1px 1px 1px;
+        height: 0px;
+    }
+
+    table.xcomp, th.xcomp, td.xcomp {
+        table-layout: fixed;
+        border: 0px solid black;
+        border-collapse: collapse;
+        text-align: right;
+        margin: 0px 0px 0px 0px;
+        padding: 0px;
+    }
+
+    tr:hover {background-color: #f5f5f5}
+
+
+svg{
+    border: 1px solid silver;
 }
+
+.well, .batt, .disp {
+    cursor: pointer;
 }
+
+.node circle{
+    stroke: steelblue;
+    stroke-width: 1.5px;
+}
+
+.link{
+    fill: none;
+    stroke: lightgray;
+    stroke-width: 1.5px;
+}
+
+.dialog {
+    position: absolute;
+    top: 200px;
+    left: 200px;
+    opacity: 0;
+    z-index: -1;
+    background: rgba(100,100,100,0.9);
+    padding: 5px 25px 5px 25px;
+    border-radius: 10px;
+    border: 3px solid #73AD21;
+}
+
+#show-all {
+    position:relative;
+    height:1000px;
+}
+
+#show-html {
+    position: absolute;
+    top:0;
+    left:0;
+    width: 400px;
+    border-radius: 10px;
+    border: 3px solid;
+//    border: 3px solid #73AD21;
+}
+
+
+#show-diagram {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width:600px;
+    border-radius: 10px;
+    border: 3px solid;
+}
+.battdiagram {
+}
+
 </style>
 
     {% for r in result %}
-        <a href="#" class="batt">{{ r.Facility }}</a>
+        {% if r.totalVol > 0 %}
+            <a href="#" class="batt">{{ r.Facility }}</a> {{ '{:>10,.1f}\n'.format(r.totalVol) }}
+        {% endif %}
     {% endfor %}
+<br>
+<div id="show-all">
+<div id="show-html"  > </div>
+<div id="show-diagram" > </div>
+</div>
 
-<div id="show-data"> in show-data div...</div>
+<div>
+-- More Stuff just trying to keep it all together. We'll see how that works.
+</div>
+
+<div id="dialogId" class="dialog">
+    <h3>Dialog Attributes</h3>
+    <div id="dialogData"></div>
+</div>
+
 
 <script>
 $(document).ready(function () {
@@ -26,37 +124,175 @@ $(document).ready(function () {
  })
 
 function newbatteryclicked() {
-    console.log(this.innerHTML)
+    <!--console.log(this.innerHTML)-->
 
     var data = "batt=" + this.innerHTML
     var jqxhr = $.ajax({url:"/reports/lfs", type: 'GET', data:data, dataType: 'json', success: function(data) {newbatterydiagram(data)}})
         .fail(function() {
-            alert( "newbattery did not work. Not sure why." );
+            alert( "newbatteryclicked() did not work. Not sure why." );
         })
 }
 
 function newbatterydiagram(data) {
-    var s = ''
-    s = '<h1>' + data.facilities[0].Facility + '</h1>'
-    s = s + '<table>'
-    for (i = 0; i < data.facilities.length; i++) {
-        s = s + '<tr>'
-		s = s + '<td>' + data.facilities[i].Activity + '</td>' +
-		        '<td>' + data.facilities[i].InorOut + '</td>' +
-		        '<td>' + data.facilities[i].Product + '</td>' +
-		        '<td>' + data.facilities[i].FromTo + '</td>'
-		if (data.facilities[i].InorOut == 'in') {
-		    s = s + '<td>' + data.facilities[i].Volume + '</td>' + '<td> </td>'
-		} else {
-		    s = s + '<td> </td>' +'<td>' + data.facilities[i].Volume + '</td>'
-		}
-        s = s + '</tr>'
-	}
-    s = s + '</table>'
-	console.log(s)
-    $('#show-data').html(s);
+	<!--console.log(s)-->
+    <!--$('#show-data').html(s);-->
+    $('#show-html').html(data.html);
+    $('.batt').off("click");
+    $('.batt').click(newbatteryclicked);
+    diagram(data);
 }
 
+/*
+
+------------------ Diagram Sections Starts here --------------------------
+
+*/
+
+
+var sample_data =
+{
+	"batt" : [
+    	{"name": "SKBTG103796"}
+    ],
+    "wells": [
+       {"name":"SKWI101010605627W301"},
+       {"name":"SKWI101010605627W302"},
+       {"name":"SKWI101010605627W303"},
+       {"name":"SKWI101010605627W304"},
+       {"name":"SKWI101010605627W305"},
+       {"name":"SKWI101010605627W306"},
+       {"name":"SKWI101010605627W307"},
+       {"name":"SKWI101010605627W308"},
+       {"name":"SKWI101010605627W309"}
+	],
+    "disps": [
+          {"name":"disp101010605627W301"},
+          {"name":"disp101010605627W302"}
+	]
+};
+
+
+function click(d, i) {
+	el = document.getElementById('dialogId')
+
+    el.style.opacity = 0;
+    el.style.top = d3.event.clientY + 'px';
+    el.style.left = d3.event.clientX + 'px';
+    el.style.zIndex = "1";
+    el.style.opacity = 1;
+
+    el = document.getElementById('dialogData')
+    el.innerHTML = el.innerHTML + d.name +'<br>'
+}
+
+function hide() {
+	el = document.getElementById('dialogId')
+    el.style.opacity = 0;
+    el.style.zIndex = "-1";
+}
+
+function addNodes(svg, nodeName, nodes, radius) {
+	var node = svg.selectAll("g." + nodeName)
+		.data(nodes);
+
+	var nodeEnter = node.enter()
+		.append("g")
+		.on("click", click)
+		.attr("transform", function(d) {
+			return "translate(" + d.x + "," + d.y + ")";
+		})
+		.attr("class", nodeName);
+
+	nodeEnter.append("circle")
+		.attr("r",radius)
+		.style("fill", function(d){
+	    	return "lightsteelblue";
+	});
+
+	nodeEnter.append("text")
+		.attr("x", function(d){
+		    return -radius;
+		})
+		.attr("dy", "-10")
+		.attr("text-anchor", function(d){ return "middle"; })
+		.text(function(d){ return d.name; });
+}
+
+function positionNodes(data, x, height) {
+	var vspacing = height / (data.length + 1)
+
+	for (i = 0; i < data.length; i++) {
+		data[i].x = x;
+		data[i].y = (i + 1) * vspacing;
+	}
+}
+
+function addPath(svg, a, b, radius) {
+
+	xm = a.x + ((b.x - a.x) / 2);
+
+	var s = "M " + (a.x + radius) + "," + a.y +
+		" C " + xm + "," + a.y + " " +
+		xm + "," + b.y + " " + (b.x - radius) + "," + b.y;
+
+	p = svg.append("path")
+	.attr("d", s)
+	.attr("stroke","lightsteelblue")
+	.attr("fill","none");
+	return p;
+}
+
+function diagram(data) {
+
+    <!--console.log(Math.max(data.wells.length, data.disps.length))-->
+
+    var margin = {top: 10, right: 10, bottom: 0, left: 10};
+    var width = 600 - margin.left - margin.right;
+    var height = (Math.max(data.wells.length, data.disps.length) * 35) - margin.top - margin.bottom;
+
+// ???
+
+//    var svg = d3.select("body").append("svg")
+    d3.select("svg").remove();
+
+//    d3.select("#show-diagram.svg").remove();
+    var svg = d3.select("#show-diagram").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var radius = 8
+
+    positionNodes(data.wells, 90, height);
+    positionNodes(data.batt, 290, height);
+    positionNodes(data.disps, 490, height);
+
+    addNodes(svg, "well" , data.wells, radius);
+    addNodes(svg, "batt" , data.batt, radius);
+    addNodes(svg, "disp" , data.disps, radius);
+
+    for (i = 0; i < data.wells.length; i++) {
+        addPath(svg, data.wells[i],data.batt[0], radius);
+    };
+
+    for (i = 0; i < data.disps.length; i++) {
+        addPath(svg, data.batt[0],data.disps[i], radius);
+    };
+}
+
+
+
+// diagram(sample_data)
+document.getElementById('dialogId').addEventListener('click', hide, false)
+
+/*
+
+Seems to have some positioning steps
+
+http://www.barelyfitz.com/screencast/html-training/css/positioning/
+
+*/
 
 </script>
 

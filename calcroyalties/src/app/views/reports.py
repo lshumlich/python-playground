@@ -1,3 +1,4 @@
+import traceback
 from flask import Blueprint, render_template, abort, request, json
 
 import config
@@ -63,6 +64,7 @@ def welleventinfomissing():
         return render_template('/reports/welleventinfomissing.html', result=results)
     except Exception as e:
         print(e)
+        traceback.print_exc(file=sys.stdout)
         abort(404)
 
 @reports.route('/reports/wellrane')
@@ -72,48 +74,30 @@ def wellrange():
 
 @reports.route('/reports/battdiagram')
 def battdiagram():
-    try:
-        db = config.get_database()
-        statement = """SELECT distinct facility from VolumetricInfo"""
-        results = db.select_sql(statement)
-        return render_template('/reports/battdiagram.html', result=results)
-    except Exception as e:
-        print(e)
-        abort(404)
+    # try:
+    db = config.get_database()
+    # statement = """SELECT distinct facility from VolumetricInfo"""
+    statement = """SELECT facility, sum(volume) as totalVol from VolumetricInfo group by facility"""
+    results = db.select_sql(statement)
+    return render_template('/reports/battdiagram.html', result=results)
+    # except Exception as e:
+    #     print(e)
+    #     abort(404)
 
 
 @reports.route('/reports/lfs')
 def lfs():
-    print('in lfs() -->', request.args)
-    print('in lfs() -->', request.args["batt"])
-    data = """
-{
-  "items": [
-    {
-      "key": "First",
-      "value": 100
-    },{
-      "key": "Second",
-      "value": false
-    },{
-      "key": "Last",
-      "value": "Mixed"
-    }
-  ],
-  "obj": {
-    "number": 1.2345e-6,
-    "enabled": true
-  },
-  "message": "Strings have to be in double-quotes."
-}
-"""
+
+    print('--lfs()', request.args["batt"])
     db = config.get_database()
     proddate = get_proddate_int()
     results = db.select("VolumetricInfo", Facility = request.args["batt"])
 
     data = {}
     facilities = []
-    print(results)
+    wells = []
+    disps = []
+    # print(results)
     for r in results:
         facl = {}
         facl['Facility'] = r.Facility
@@ -121,13 +105,31 @@ def lfs():
         facl['Product'] = r.Product
         facl['FromTo'] = r.FromTo
         facl['Volume'] = r.Volume
+        setattr(r, 'InorOut', inorout.get(r.Activity, '?'))
         facl['InorOut'] = inorout.get(r.Activity, '?')
         facl['Key'] = faclsort(facl)
+        setattr(r, 'Key', faclsort(facl))
         facilities.append(facl)
+        if r.FromTo:
+            if r.FromTo[2] == 'W':
+                wells.append({"name":r.FromTo})
+            else:
+                disps.append({"name":r.FromTo})
 
     facilities.sort(key=faclsort)
+    results.sort(key=lambda r: r.Key)
+
+    html = render_template('/reports/battdiagramvolinout.html', result=results, facility=request.args["batt"])
+    data['html'] = html
+
 
     data['facilities'] = facilities
+    data['wells'] = wells
+    data['disps'] = disps
+    data['batt'] = [{"name":request.args["batt"]}]
+    data['count'] = len(results)
+    print('---lfs()--', wells)
+    # print('---lfs()--->', len(results))
     # print(json.dumps(data))
     return json.dumps(data)
 
@@ -135,12 +137,18 @@ def lfs():
 def faclsort(facl):
     f = facl['FromTo']
     if not f : f = ''
-    return facl['Product'] + facl['InorOut'] + f
+    if facl['InorOut'] == '+':
+        order = 1
+    elif facl['InorOut'] == '?':
+        order = 2
+    else:
+        order = 3
+    return facl['Product'] + str(order) + f
 
 
 inorout = {
-    "PROD": "in",
-    "REC": "in",
-    "DISP": "out",
-    "FUEL": "out"
+    "PROD": "+",
+    "REC": "+",
+    "DISP": "-",
+    "FUEL": "-"
 }

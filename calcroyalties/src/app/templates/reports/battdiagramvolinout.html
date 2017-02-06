@@ -1,0 +1,21 @@
+<h1> {{ facility }} </h1>
+<table class="comp">
+{% for r in result %}
+    {% if r.Volume != 'NULL' and r.Volume > 0 %}
+        <tr class="comp">
+            <td class="comp">{{ r.Product }}</td>
+            <td class="comp">{{ r.InorOut }}</td>
+            <td class="comp"> <a href="#" class="batt">{{ r.FromTo }}</a> </td>
+            <td class="comp">{{ r.Activity }}</td>
+            {% if r.InorOut == '+' %}
+                <td class="comp vol">{{ '{:>10,.1f}\n'.format(r.Volume) }}</td>
+                <td></td>
+            {% else %}
+                <td></td>
+                <td class="comp vol">{{ '{:>10,.1f}\n'.format(r.Volume) }}</td>
+            {% endif %}
+        </tr>
+    {% endif %}
+{% endfor %}
+</table>
+<br>

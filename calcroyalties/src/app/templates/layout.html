@@ -25,10 +25,10 @@
 
 <div class="header" style="width:100%; height:60px; float:left; margin-top:8px">
   <div class="header_left" style="width:23%; float:left; padding-left:1%; padding-right:1%; padding-top:5px">
-    <a href="/"><img src="{{url_for("static", filename="img/logo.png")}}" style="height:40px"></a>
+    <!--<a href="/"><img src="{{url_for("static", filename="img/logo.png")}}" style="height:40px"></a>-->
   </div>
   <div class="header_center" style="width:50%; text-align:center; float:left">
-    <div style="font-size:2em; font-weight:bold">The Solution Stack</div>
+    <div style="font-size:2em; font-weight:bold">Lean Minds</div>
     <div style="font-size:1.5em">Information Management System</div>
   </div>
   <div class="header_right" style="width:23%; float:right; text-align:right; padding-left:1%; padding-right:1%">
@@ -90,6 +90,7 @@
                             <li><a href="{{ url_for('reports.wellroyaltymastermissing') }}">WellRoyaltyMaster missing</a></li>
                             <li><a href="{{ url_for('reports.welleventinfomissing') }}">WellEventInfo missing</a></li>
                             <li><a href="{{ url_for('reports.wellrange') }}">Worksheet for well range</a></li>
+                            <li><a href="{{ url_for('reports.battdiagram') }}">Battery Volume Overview</a></li>
                         </ul>
                     </div>
                 </div>
@@ -390,7 +391,7 @@
 {% endblock %}
 </div>
 <hr>
-<div style="text-align:center; font-size:10px">The Solution Stack, 2016</div>
+<div style="text-align:center; font-size:10px">Lean Minds, 2016</div>
 
 <script>
 var proddateCookie = getCookie("proddate");
