@@ -21,10 +21,10 @@ def load_xls():
     elif request.method == 'POST':
         file = request.files['fileToUpload']
         results, log = process_xls(file)
-        log = "<xmp>" + log + "</xmp>"
         return render_template('/process/load_xls.html', results=results, log=log)
 
 def process_xls(file):
+    results = ""
     try:
         start_logging()
         logging.info('Batch started: ' + str(datetime.datetime.now()))
@@ -44,6 +44,7 @@ def process_xls(file):
     try:
         with open(config.get_temp_dir() + 'calc.log') as f:
             log = f.read()
+            log = "<xmp>" + log + "</xmp>"
     except:
-        log = None
+        log = "No log was created."
     return results, log

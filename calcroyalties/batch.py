@@ -45,9 +45,7 @@ def load_sample_data():
 
 
 def start_logging():
-    logfile = config.get_temp_dir() + 'calc.log'
-    os.remove(logfile)
-    logging.basicConfig(filename=logfile, level=logging.INFO)
+    logging.basicConfig(filename=config.get_temp_dir() + 'calc.log', filemode='w', level=logging.INFO)
     root = logging.getLogger()
     root.setLevel(logging.INFO)
 
