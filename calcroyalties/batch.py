@@ -45,9 +45,12 @@ def load_sample_data():
 
 
 def start_logging():
-    logging.basicConfig(filename=config.get_temp_dir() + 'calc.log', level=logging.INFO)
+    logging.basicConfig(filename=config.get_temp_dir() + 'calc.log', filemode='w', level=logging.INFO)
     root = logging.getLogger()
     root.setLevel(logging.INFO)
+
+    log = logging.getLogger('werkzeug')
+    log.setLevel(logging.CRITICAL)
 
     ch = logging.StreamHandler(sys.stdout)
     ch.setLevel(logging.DEBUG)

@@ -1,8 +1,11 @@
 from flask import Blueprint, request, render_template
 from openpyxl import load_workbook
-from batch import drop_create_tables, process_royalties
+from batch import drop_create_tables, process_royalties, start_logging
 from src.calc import volumetric_to_monthly
 from src.tool import sqlite_load_excel
+import config
+import logging
+import datetime
 
 process = Blueprint('process', __name__)
 
@@ -17,11 +20,14 @@ def load_xls():
         return render_template('/process/load_xls.html')
     elif request.method == 'POST':
         file = request.files['fileToUpload']
-        results = process_xls(file)
-        return render_template('/process/load_xls.html', results=results)
+        results, log = process_xls(file)
+        return render_template('/process/load_xls.html', results=results, log=log)
 
 def process_xls(file):
+    results = ""
     try:
+        start_logging()
+        logging.info('Batch started: ' + str(datetime.datetime.now()))
         results = 'Testing the Excel file...'
         wb_temp = load_workbook(file, read_only=True)
         del wb_temp
@@ -32,6 +38,13 @@ def process_xls(file):
         results += '<br>Processing royalties...'
         process_royalties()
         results += '<br><span style="color:green;">Done. File <b>%s</b> processed successfully.</span>' % file.filename
+        logging.info('Batch finished: ' + str(datetime.datetime.now()))
     except Exception as e:
         results += '<span style="color:red;"><br>Error: %s</span>' % str(e)
-    return results
+    try:
+        with open(config.get_temp_dir() + 'calc.log') as f:
+            log = f.read()
+            log = "<xmp>" + log + "</xmp>"
+    except:
+        log = "No log was created."
+    return results, log
