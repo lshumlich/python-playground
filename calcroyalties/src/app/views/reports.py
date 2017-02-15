@@ -97,6 +97,8 @@ def lfs():
     facilities = []
     wells = []
     disps = []
+    unique = {}
+
     # print(results)
     for r in results:
         facl = {}
@@ -110,8 +112,9 @@ def lfs():
         facl['Key'] = faclsort(facl)
         setattr(r, 'Key', faclsort(facl))
         facilities.append(facl)
-        if r.FromTo:
-            if r.FromTo[2] == 'W':
+        if r.FromTo and r.FromTo not in unique:
+            unique[r.FromTo] = 0
+            if len(r.FromTo) > 12:
                 wells.append({"name":r.FromTo})
             else:
                 disps.append({"name":r.FromTo})
