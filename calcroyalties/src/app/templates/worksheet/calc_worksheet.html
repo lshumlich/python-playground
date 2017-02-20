@@ -467,6 +467,10 @@ table, th, td {
         {% endif %}
     {% endif %}
 
+    {#
+        IOGR1995 GAS and other products
+    #}
+
     {% if 'IOGR1995' in rm.RoyaltyScheme and m.Product == 'GAS'%}
         <br>
         <b>IOGR1995 Supplementary Gross Royalty (Marketable gas)</b><br>
@@ -520,6 +524,96 @@ table, th, td {
             {% endif %}
 
         </table>
+    {% endif %}
+
+    {#
+        SaskProvCrownVar Gas
+    #}
+
+        <br>
+        <TABLE>
+            {% set well_type = 'Oil' %}
+            {% if calc.RoyaltyClassification == 'Fourth Tier Gas' and well_type == 'Gas' %}
+                {% if m.ProdVol <= 25.0 %}
+                    <tr><td>{{ calc.Message }}<td><tr>
+                {% endif %}
+                {% if m.ProdVol >= 25.1 and m.ProdVol <= 115.4 %}
+                    <tr><td align="right">CR% =</td> <td align="center">(C * MGP) - D</td></tr>
+                    <tr><td align="right">CR% =</td> <td align="center">&nbsp;&nbsp;({{ '{:.4f}'.format(calc.C) }} * {{ '{:.2f}'.format(m.ProdVol) }}) - {{'{:.2f}'.format(calc.D)}}</td></tr>
+                    <tr><td align="right">CR% =</td> <td align="center"> {{'{:.6%}'.format(calc.BaseRoyaltyCalcRate) }}</td></tr>
+                {% endif %}
+                {% if m.ProdVol >= 115.4 %}
+                    <tr><td align="left"> CR% = </td> <td>$$ (K - X / {MGP} ) $$ </td></tr>
+                    <tr><td align="left"> CR% = </td> <td>$$ ( {{'{:.2f}'.format(calc.K)}} -
+                        {{ calc.X }} / {{ '{:.2f}'.format(m.ProdVol) }} ) $$ </td></tr>
+                    <tr><td align="left"> CR% = </td><td align="center"> {{ '{:.6%}'.format(calc.BaseRoyaltyCalcRate) }} </td></tr>
+                {% endif %}
+            {% endif %}
+            {% if calc.RoyaltyClassification == 'Fourth Tier Gas' and well_type == 'Oil' %}
+                {% if m.ProdVol <= 64.7 %}
+                    <tr><td> {{ calc.Message }}<td><tr>
+                {% endif %}
+                {% if m.ProdVol > 64.7 %}
+                    <tr><td align="left"> CR% = </td> <td>$$ (K - X / {MGP} ) $$ </td></tr>
+                    <tr><td align="left"> CR% = </td> <td>$$ ( {{'{:.2f}'.format(calc.K)}} -
+                        {{ calc.X }} / {{ '{:.2f}'.format(m.ProdVol) }} ) $$ </td></tr>
+                    <tr><td align="left"> CR% = </td><td align="center"> {{ '{:.6%}'.format(calc.BaseRoyaltyCalcRate) }} </td></tr>
+                {% endif %}
+            {% endif %}
+            {% if calc.RoyaltyClassification == 'Third Tier Gas' or calc.RoyaltyClassification == 'New Gas' or calc.RoyaltyClassification == 'Old Gas' %}
+                {% if m.ProdVol <= 115.4 %}
+                    <tr><td align="right">CR% =</td> <td align="center">(C * MGP) - SRC</td></tr>
+                    <tr><td align="right">CR% =</td> <td align="center">&nbsp;&nbsp;({{ '{:.4f}'.format(calc.C) }} * {{ '{:.2f}'.format(m.ProdVol) }}) - {{'{:.2f}'.format(calc.SRC)}}</td></tr>
+                    <tr><td align="right">CR% =</td> <td align="center"> {{'{:.6%}'.format(calc.BaseRoyaltyCalcRate) }}</td></tr>
+                {% endif %}
+                {% if m.ProdVol > 115.4 %}
+                    <tr><td align="left"> CR% = </td> <td>$$ ((K - X / {MGP} ) - SRС) $$ </td></tr>
+                    <tr><td align="left"> CR% = </td> <td>$$ ( ({{'{:.2f}'.format(calc.K)}} -
+                        {{ calc.X }} / {{ '{:.2f}'.format(m.ProdVol) }}) - SRC ) $$ </td></tr>
+                    <tr><td align="left"> CR% = </td><td align="center"> {{ '{:.6%}'.format(calc.BaseRoyaltyCalcRate) }} </td></tr>
+                {% endif %}
+            {% endif %}
+
+        </TABLE>
+        <br>
+        <table>
+            <tr>
+                <td>Base Royalty =</td>
+                <td style="text-align:center"> CR%</td>
+                <td style="text-align:center">*</td>
+                <td style="text-align:center">CMult</td>
+                <td style="text-align:center">*</td>
+                <td style="text-align:center">Prod Vol</td>
+                <td style="text-align:center">*</td>
+                <td style="text-align:center">PE FN %</td>
+                <td style="text-align:center">*</td>
+                <td style="text-align:center">RP %</td>
+                <td style="text-align:center">*</td>
+                <td style="text-align:center">RVal</td>
+            </tr>
+            <tr>
+                <td> </td>
+                <td style="text-align:center"> {{ '{:.6%}'.format(calc.BaseRoyaltyRate) }}</td>
+                <td style="text-align:center">*</td>
+                <td style="text-align:center">{{ rm.CrownMultiplier }}</td>
+                <td style="text-align:center">*</td>
+                <td style="text-align:center">{{ '{:.2f}'.format(m.ProdVol) }}</td>
+                <td>*</td>
+                <td>{{ '{:.6%}'.format(well_lease_link.PEFNInterest) }}</td>
+                <td>*</td>
+                <td>{{ '{:.6f}%'.format(rtp_info.Percent)}}</td>
+                <td>*</td>
+                <td>{{ '{:>10,.6f}\n'.format(calc.RoyaltyPrice) }}</td>
+            </tr>
+            <tr>
+                <td> </td>
+                <td style="text-align:center">$ {{ '{:>10,.2f}\n'.format(calc.BaseRoyaltyValue)}}</td>
+            </tr>
+        </table>
+
+
+    {% if 'SaskProvCrownVar' in rm.RoyaltyScheme and m.Product == 'GAS' %}
+        <h3>gas found!</h3>
     {% endif %}
 
     {#
