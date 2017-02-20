@@ -91,7 +91,8 @@ class Database(object):
     def to_db_value(self, value):
 
         if type(value) is str:
-            return '"' + value + '"'
+            # return '"' + value + '"'
+            return "'" + value + "'"
         elif type(value) is int or type(value) is float:
             return str(value)
         elif type(value) is bool:

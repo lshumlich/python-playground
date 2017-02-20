@@ -36,11 +36,12 @@ def calc_worksheet():
         well_end = int(request.args["WellEnd"])
         result = ""
         for w in range(well_start, well_end + 1):
-            result += generate_worksheet(w, prod_month, rpba)
+            result += generate_worksheet(w, prod_month, rpba, product)
             result += "<hr>"
         return result
     else:
         return "worksheet.calc_worksheet Something wasn't right"
+
 
 def generate_worksheet(well_id, prod_month, rpba, product):
     try:
@@ -61,12 +62,12 @@ def generate_worksheet(well_id, prod_month, rpba, product):
             monthly_array = db.select('Monthly', WellID=well_id, prodMonth=prod_month, product=product)
         if len(monthly_array) == 0:
             raise AppError("There were no monthly records for " + str(well_id) + str(prod_month) + product)
-        monthly = monthly_array[0] # if there are multiple pick the first one
+        monthly = monthly_array[0]  # if there are multiple pick the first one
 
-        ba = db.select1('BAInfo',BAid=monthly.RPBA)
-        calc = db.select1('Calc', WellID=well_id, ProdMonth=prod_month,RPBA=monthly.RPBA,Product=product)
+        ba = db.select1('BAInfo', BAid=monthly.RPBA)
+        calc = db.select1('Calc', WellID=well_id, ProdMonth=prod_month, RPBA=monthly.RPBA, Product=product)
         rtp_info = db.select1('RTPInfo', WellEvent=well.WellEvent, Product=product, Payer=monthly.RPBA,
-                                   Date=prod_month_to_date(prod_month))
+                              Date=prod_month_to_date(prod_month))
         # calc = calc_array[0]
         # print(monthly)
         return render_template('worksheet/calc_worksheet.html',

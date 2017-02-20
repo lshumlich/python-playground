@@ -1,5 +1,7 @@
 #!/bin/env python3
 
+import json
+
 """
 DataStructure is the base object for all the data objects in the system.
 """
@@ -7,8 +9,10 @@ DataStructure is the base object for all the data objects in the system.
 
 class DataStructure(object):
     
-    def __init__(self):
+    def __init__(self, json_string=None):
         self._format = Formatter(self)
+        if json_string:
+            json.loads(json_string, object_hook=self.json_decode)
         
     def __str__(self):
         return str(vars(self))
@@ -20,6 +24,15 @@ class DataStructure(object):
     def data(self):
         d = vars(self)
         return list(d.values())
+
+    def json_decode(self, dictionary_data):
+        for k in dictionary_data:
+            setattr(self, k, dictionary_data[k])
+
+    def json_dumps(self):
+        d = dict(self.__dict__)
+        del d['_format']
+        return json.dumps(d, sort_keys=True)
 
     @property
     def Lease(self):

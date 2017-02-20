@@ -39,8 +39,9 @@ class Test(unittest.TestCase):
         monthly.ID = 123
         monthly.ExtractMonth = datetime(2016, 2, 22)
         self.assertEqual(monthly._format.yyyy_mm_dd(monthly.ExtractMonth), '2016-02-22')
+        self.assertEqual(monthly._format.yyyy_mm_dd(None), '')
 
-    def test_formatter_lease(self):        
+    def test_formatter_lease(self):
         well = DataStructure()
         well.ID = 123
         well.LeaseType = 'OL'
@@ -58,3 +59,16 @@ class Test(unittest.TestCase):
         
         # If there is no attribute in the object called 'LeaseID' use the ID attribute to format the lease string
         self.assertEqual(well._format.ProdMonth, '2016-02')
+
+    def test_json(self):
+        well = DataStructure(json_string='{"ID": 123, "LeaseType": "OL"}')
+        self.assertEqual(123,well.ID)
+        self.assertEqual('OL',well.LeaseType)
+        self.assertEqual('{"ID": 123, "LeaseType": "OL"}', well.json_dumps())
+
+    def test_list_str(self):
+        # this silly method is just to get 100% coverage. Don't test this because the order sometimes changes.
+        well = DataStructure(json_string='{"ID": 123, "LeaseType": "OL"}')
+        s = str(well)
+        s = well.headers()
+        s = well.data()

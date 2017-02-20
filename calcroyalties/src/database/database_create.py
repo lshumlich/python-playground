@@ -70,6 +70,9 @@ Database Change Log: Must be maintained so we can keep the database in sink:
 - Delete calc.IOGR1995RoyaltyVolume
 - Delete calc.IOGR1995RoyaltyValue
 - Delete calc.GorrRoyaltyVolume
+2017-02-19
+- Add calc.RoyaltySpecific
+- Add monthly.SalesVol
 """
 import datetime
 
@@ -100,13 +103,13 @@ class DatabaseCreate(object):
         if 'Calc' not in tables:
             self.calc()
         if 'ECONData' not in tables:
-            self.econ_data()
+            self.econ_oil()
         if 'LinkTab' not in tables:
             self.linktab()
         if 'Users' not in tables:
             self.users()
-        if 'RPTInfo' not in tables:
-            self.rpt_info()
+        if 'RTPInfo' not in tables:
+            self.rtp_info()
 
         self.dbi.commit()
 
@@ -197,6 +200,7 @@ class DatabaseCreate(object):
             "AmendNo" int,
             "ProdHours" int,
             "ProdVol" int,
+            "SalesVol" int,
             "RPBA" text,
             "RPVol" float,
             "SalesPrice" float,
@@ -239,13 +243,14 @@ class DatabaseCreate(object):
             "RoyaltyDeductions" int,
             "CommencementPeriod" float,
             "Message" text,
-            "GorrMessage" text);
+            "GorrMessage" text,
+            "RoyaltySpecific" text);
         """
         self.dbi.execute_statement(statement)
         
-    def econ_data(self):
+    def econ_oil(self):
         statement = """
-            CREATE TABLE ECONData ('ID' integer primary key autoincrement,
+            CREATE TABLE ECONOil ('ID' integer primary key autoincrement,
             "CharMonth" text,
             "ProdMonth" int,
             "HOP" int,
@@ -264,9 +269,9 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
 
-    def econ_gas_data(self):
+    def econ_gas(self):
         statement = """
-            CREATE TABLE ECONGasData ('ID' integer primary key autoincrement,
+            CREATE TABLE ECONGas ('ID' integer primary key autoincrement,
             "CharMonth" text, "ProdMonth" int,
             "G4T_C" int, "G4T_D" int, "G4T_K" int,
             "G4T_X" float, "G3T_C" float, "G3T_K" float, "G3T_X" int,
@@ -300,7 +305,7 @@ class DatabaseCreate(object):
                            "welllease_view,welllease_edit,data_view,data_edit,users_view,users_edit');"
         self.dbi.execute(insert_statement)
 
-    def rpt_info(self):
+    def rtp_info(self):
         statement = """
             CREATE TABLE RTPInfo (
                 "ID"	    INTEGER PRIMARY KEY AUTOINCREMENT,

@@ -3,10 +3,11 @@
 from datetime import date
 from datetime import datetime
 import logging
-from src.util.apperror import AppError
-import config
-from src.util.appdate import prod_month_to_date
 
+import config
+from src.util.apperror import AppError
+from src.util.appdate import prod_month_to_date
+from src.database.data_structure import DataStructure
 
 """
 
@@ -75,9 +76,11 @@ class ProcessRoyalties(object):
         rtp_info_array = self.db.select('RTPInfo', WellEvent=well.WellEvent, Product='OIL',
                                         Date=prod_month_to_date(prod_month))
         if len(rtp_info_array) == 0:
-            print('--- Well not found in RTPInfo', well.ID, well.WellEvent)
-        else:
-            print('--- Well found in RTPInfo Payer:', rtp_info_array[0].Payer)
+            raise AppError("Well not found in RTPInfo. Well ID: " + str(well_id) + " " + well.WellEvent +
+                           " Product:" + product)
+        #     print('--- Well not found in RTPInfo', well.ID, well.WellEvent)
+        # else:
+        #     print('--- Well found in RTPInfo Payer:', rtp_info_array[0].Payer)
 
         monthly_list = self.db.select('Monthly', WellID=well_id, ProdMonth=prod_month, Product=product)
         if len(monthly_list) == 0:
@@ -125,7 +128,7 @@ class ProcessRoyalties(object):
         elif monthly.Product == 'SUL' and 'IOGR1995' in royalty.RoyaltyScheme:
             self.calc_sask_sul_iogr1995(monthly, well, royalty, calc)
 
-        elif monthly.Product == 'Gas' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
+        elif monthly.Product == 'GAS' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
             self.calc_sask_gas_prov_crown(monthly, well, royalty, calc)
 
         else:
@@ -425,6 +428,12 @@ class ProcessRoyalties(object):
             supplementary_royalty = 0.75 * (4.26 + 0.55 * (selling_price - 27.68))
         calc.SuppRoyaltyValue = round(supplementary_royalty, 2)
         calc.BaseRoyaltyValue = round(basic_gross_royalty, 2)
+
+        # ??? Just Playing Right Now
+        calc_specific = DataStructure()
+        calc_specific.BaseRoyaltyValue = calc.BaseRoyaltyValue
+        calc.RoyaltySpecific = calc_specific.json_dumps()
+
         return
 
     def calc_sask_pen_iogr1995(self, monthly, well, royalty, calc):
@@ -671,7 +680,7 @@ class ProcessRoyalties(object):
 
     def calc_sask_oil_prov_crown(self, monthly, well, royalty, calc, well_lease_link, rtp_info):
         calc.CommencementPeriod = self.determine_commencement_period(monthly.ProdMonth, well.CommencementDate)
-        econ_oil_data = self.db.select1("ECONData", ProdMonth=monthly.ProdMonth)
+        econ_oil_data = self.db.select1("ECONOil", ProdMonth=monthly.ProdMonth)
 
         if royalty.OverrideRoyaltyClassification is not None:
             calc.RoyaltyClassification = royalty.OverrideRoyaltyClassification
@@ -693,7 +702,7 @@ class ProcessRoyalties(object):
 
     def calc_sask_gas_prov_crown(self, monthly, well, royalty, calc):
         calc.CommencementPeriod = self.determine_commencement_period(monthly.ProdMonth, well.CommencementDate)
-        econ_gas_data = self.db.select1("ECONGasData", ProdMonth=monthly.ProdMonth)
+        econ_gas_data = self.db.select1("ECONGas", ProdMonth=monthly.ProdMonth)
         if royalty.OverrideRoyaltyClassification is not None:
             royalty_classification = royalty.OverrideRoyaltyClassification
         else:

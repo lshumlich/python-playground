@@ -23,7 +23,7 @@ class SqliteDatabaseTest(unittest.TestCase):
         
     def test_to_db_value(self):
         self.assertEqual('123', self.db.to_db_value(123))
-        self.assertEqual('"asdf"', self.db.to_db_value("asdf"))
+        self.assertEqual("'asdf'", self.db.to_db_value("asdf"))
         self.assertEqual('123.45', self.db.to_db_value(123.45))
         self.assertEqual('1', self.db.to_db_value(True))
         self.assertEqual('0', self.db.to_db_value(False))

@@ -38,6 +38,9 @@ To Checkin Code:
         
 To review code coverage:
 
+    batch.py run_code_coverage
+
+    (could not make this work)
     1) run the unit tests
         pytest_run.py
     2) look at the coverage

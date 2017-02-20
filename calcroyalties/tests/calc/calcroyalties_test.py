@@ -5,11 +5,11 @@ from datetime import date
 from datetime import datetime
 
 import config
-from src.database.data_structure import DataStructure
 from src.calc.calcroyalties import ProcessRoyalties
-from src.util.apperror import AppError
+from src.database.data_structure import DataStructure
 from tests.database.testhelper import TestHelper
 from tests.database.sqlite_utilities_test import DatabaseUtilities
+from src.util.apperror import AppError
 
 
 # class DataObj(object):
@@ -588,7 +588,12 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         pr.process_all()
         self.assertEqual(3, db.count('calc'))
 
-        # Now lets create an exception
+        # Create an error to test the exception
+        # Remove the monthly data record should raise an exception
+        db.delete("RTPInfo", 1)  # This should cause an exception
+        pr.process_all()
+        # self.assertRaises(AppError, pr.process_all)
+        # todo get the log to ensure a message was logged
 
 
 

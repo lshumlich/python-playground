@@ -1,3 +1,4 @@
+import traceback, sys
 from flask import Blueprint, request, render_template
 from openpyxl import load_workbook
 from batch import drop_create_tables, process_royalties, start_logging
@@ -41,6 +42,8 @@ def process_xls(file):
         logging.info('Batch finished: ' + str(datetime.datetime.now()))
     except Exception as e:
         results += '<span style="color:red;"><br>Error: %s</span>' % str(e)
+        print ('Error -->', e)
+        traceback.print_exc(file=sys.stdout)
     try:
         with open(config.get_temp_dir() + 'calc.log') as f:
             log = f.read()
