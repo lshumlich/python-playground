@@ -62,36 +62,36 @@ Sept.,201509,0.1185,2.96,24.39,1578,0.1434,33.10,1910,0.1593,36.77,2121,0.2062,4
         royalty_calc = DataStructure()
 
         self.assertEqual(pr.calc_sask_gas_prov_crown_royalty_rate(royalty_calc, econ_gas_data,
-                                                                  'Fourth Tier Gas', 0, 0, 'GasWells'), 0)
+                                                                  'Fourth Tier Gas', 0, 0, 'Gas'), 0)
         self.assertEqual(pr.calc_sask_gas_prov_crown_royalty_rate(royalty_calc, econ_gas_data,
-                                                                  'Fourth Tier Gas', 30, 0, 'GasWells'), 0.595)
+                                                                  'Fourth Tier Gas', 30, 0, 'Gas'), 0.00595)
         self.assertEqual(pr.calc_sask_gas_prov_crown_royalty_rate(royalty_calc, econ_gas_data,
-                                                                  'Fourth Tier Gas', 200, 0, 'GasWells'), 16.5)
+                                                                  'Fourth Tier Gas', 200, 0, 'Gas'), 0.165)
 
         self.assertEqual(pr.calc_sask_gas_prov_crown_royalty_rate(royalty_calc, econ_gas_data,
-                                                                  'Fourth Tier Gas', 0, 0, 'OilWells'), 0)
+                                                                  'Fourth Tier Gas', 0, 0, 'Oil'), 0)
         self.assertEqual(pr.calc_sask_gas_prov_crown_royalty_rate(royalty_calc, econ_gas_data,
-                                                                  'Fourth Tier Gas', 220, 0, 'OilWells'), 17.217273)
+                                                                  'Fourth Tier Gas', 220, 0, 'Oil'), 0.172173)
 
         self.assertEqual(pr.calc_sask_gas_prov_crown_royalty_rate(royalty_calc, econ_gas_data,
-                                                                  'Third Tier Gas', 100, 0.75, None), 13.59)
+                                                                  'Third Tier Gas', 100, 0.75, None), 0.1359)
         self.assertEqual(pr.calc_sask_gas_prov_crown_royalty_rate(royalty_calc, econ_gas_data,
-                                                                  'Third Tier Gas', 200, 1, None), 22.55)
+                                                                  'Third Tier Gas', 200, 1, None), 0.2255)
 
         self.assertEqual(pr.calc_sask_gas_prov_crown_royalty_rate(royalty_calc, econ_gas_data,
-                                                                  'New Gas', 50, 2.25, None), 5.715)
+                                                                  'New Gas', 50, 2.25, None), 0.05715)
         self.assertEqual(pr.calc_sask_gas_prov_crown_royalty_rate(royalty_calc, econ_gas_data,
-                                                                  'New Gas', 130, 0.75, None), 19.704615)
+                                                                  'New Gas', 130, 0.75, None), 0.197046)
 
         self.assertEqual(pr.calc_sask_gas_prov_crown_royalty_rate(royalty_calc, econ_gas_data,
-                                                                  'Old Gas', 20, 1, None), 3.124)
+                                                                  'Old Gas', 20, 1, None), 0.03124)
         self.assertEqual(pr.calc_sask_gas_prov_crown_royalty_rate(royalty_calc, econ_gas_data,
-                                                                  'Old Gas', 150, 0.5, None), 28.79)
+                                                                  'Old Gas', 150, 0.5, None), 0.2879)
 
         self.assertRaises(AppError, pr.calc_sask_gas_prov_crown_royalty_rate, royalty_calc,
                           econ_gas_data, 'Fourth Tier Gas', 20, 1, 'Bad String')
         self.assertRaises(AppError, pr.calc_sask_gas_prov_crown_royalty_rate, royalty_calc,
-                          econ_gas_data, 'Bad String', 20, 1, 'GasWells')
+                          econ_gas_data, 'Bad String', 20, 1, 'Gas')
 
     def test_calcSaskOilBaseRoyaltyCalcRate(self):
         econ_string_data = \
