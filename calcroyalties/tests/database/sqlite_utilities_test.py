@@ -60,16 +60,16 @@ class DatabaseUtilities(object):
             
         statement = """
             INSERT INTO WellRoyaltyMaster VALUES(1, '2010-01-01 00:00:00', '9999-12-31 23:59:59.000005',
-                'SKWI111062705025W300','SK','Oil','res1','New Oil', 'Heavy', 0, '2014-12-01 00:00:00',1.0,
+                'SKWI111062705025W300','SK','Oil','res1','New', 'Heavy', 0, '2014-12-01 00:00:00',1.0,
                 '9999-12-31 23:59:59.000005', 'HORIZONTAL','Some Note');
             INSERT INTO WellRoyaltyMaster VALUES(2, '2011-11-01 00:00:00', '9999-12-31 23:59:59.000005',
-                'SKWI112062705025W300','SK','Oil','res1','Third Tier Oil', 'Southwest',0,'2014-12-01 00:00:00',1.0,
+                'SKWI112062705025W300','SK','Oil','res1','Third Tier', 'Southwest',0,'2014-12-01 00:00:00',1.0,
                 '9999-12-31 23:59:59.000005', 'HORIZONTAL','Some Note');
             INSERT INTO WellRoyaltyMaster VALUES(3, '2004-10-01 00:00:00', '9999-12-31 23:59:59.000005',
-                'SKWI113062705025W300','SK','Oil','res1','Fourth Tier Oil','Other', 0,'2014-12-01 00:00:00',1.0,
+                'SKWI113062705025W300','SK','Oil','res1','Fourth Tier','Other', 0,'2014-12-01 00:00:00',1.0,
                 '9999-12-31 23:59:59.000005', 'VERTICAL','Some Note');
             INSERT INTO WellRoyaltyMaster VALUES(4, '2013-01-01 00:00:00', '2016-12-31 23:59:59.000005',
-                'SKWI114062705025W300','SK','Oil','res1','Old Oil', 'Other', 0,'2014-12-01 00:00:00',1.0,
+                'SKWI114062705025W300','SK','Oil','res1','Old', 'Other', 0,'2014-12-01 00:00:00',1.0,
                 '9999-12-31 23:59:59.000005', 'VERTICAL','Some Note');
         """
         
@@ -106,11 +106,11 @@ class DatabaseUtilities(object):
             self.db_create.monthly()
 
         statement = """
-            INSERT INTO Monthly Values(4, '2015-09-29 00:00:00', 201501, 1,
+            INSERT INTO Monthly Values(1, '2015-09-29 00:00:00', 201501, 1,
                 'OIL', 2, 740, 100, 90.0, "Payor1", 100.0, 221.123456, 2.123455, 0.123455, 0.0);
-            INSERT INTO Monthly Values(5, '2015-09-29 00:00:00', 201501, 4,
+            INSERT INTO Monthly Values(2, '2015-09-29 00:00:00', 201501, 4,
                 'OIL', 2, 740, 100, 90.0, "Payor1", 50.0, 221.123456, 2.123455, 0.123455, 0.0);
-            INSERT INTO Monthly Values(6, '2015-09-29 00:00:00', 201501, 4,
+            INSERT INTO Monthly Values(4, '2015-09-29 00:00:00', 201501, 4,
                 'OIL', 2, 740, 100, 90.0, "Payor1", 50.0, 221.123456, 2.123455, 0.123455, 0.0);
         """
         self.db_instance.execute_statement(statement)
@@ -137,13 +137,22 @@ class DatabaseUtilities(object):
         """
         self.db_instance.execute_statement(statement)
 
-    def create_some_test_econdata(self):
+    def create_some_test_econoil(self):
         if 'ECONOil' not in self.db_instance.get_table_names():
             self.db_create.econ_oil()
         statement = """
             INSERT INTO ECONOil VALUES(39,'Jan.',201501,181,223,262,
                 0.0934,2.34,23.12,1734,21.73,502,27.11,626,0.1085,2.71,
                 26.84,2013,32.38,747,38.94,899,0.1181,2.95,29.22,2192,35.58,821,40.54,936,52.3,1207);
+        """
+        self.db_instance.execute_statement(statement)
+
+    def create_some_test_econgas(self):
+        if 'ECONGas' not in self.db_instance.get_table_names():
+            self.db_create.econ_gas()
+        statement = """
+            INSERT INTO ECONGas VALUES(13,'Jan.',201501,0.1199,3,24.67,1596,0.1443,33.31,1922,0.16,36.92,2130,
+                0.2071,47.78,2756);
         """
         self.db_instance.execute_statement(statement)
 

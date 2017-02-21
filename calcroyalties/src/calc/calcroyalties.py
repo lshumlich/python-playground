@@ -102,14 +102,14 @@ class ProcessRoyalties(object):
 
             # calc = None
             calc = self.zero_royalty_calc(prod_month, well_id, product)
+
             self.calc_royalties(well, royalty, calc, monthly, well_lease_link, rtp_info)
+
             calc.RPBA = monthly.RPBA
             calc.FNReserveID = lease.FNReserveID
             calc.FNBandID = lease.FNBandID
-            # if len(calc_array) == 0:
+
             self.db.insert(calc)
-            # else:
-            #     self.db.update(calc)
 
     def calc_royalties(self, well, royalty, calc, monthly, well_lease_link, rtp_info):
         if monthly.Product == 'OIL' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
@@ -194,7 +194,7 @@ class ProcessRoyalties(object):
     def calc_sask_gas_prov_crown_royalty_rate(calc, econ_gas_data,
                                               well_royalty_classification, mgp, src, well_type):
 
-        if well_royalty_classification == 'Fourth Tier Gas':
+        if well_royalty_classification == 'Fourth Tier':
             if well_type == 'Gas':
                 if mgp <= 25:
                     calc.BaseRoyaltyCalcRate = 0
@@ -222,7 +222,7 @@ class ProcessRoyalties(object):
                     'Well Type: "' + well_type + '" not known for "' + well_royalty_classification +
                     '" Royalty not calculated.')
 
-        elif well_royalty_classification == 'Third Tier Gas':
+        elif well_royalty_classification == 'Third Tier':
             if mgp < 115.4:
                 calc.C = econ_gas_data.G3T_C
                 # SRC ?? - ProdDate
@@ -234,7 +234,7 @@ class ProcessRoyalties(object):
                 # SRC ?? - ProdDate
                 calc.BaseRoyaltyCalcRate = calc.K - (calc.X / mgp) - src
 
-        elif well_royalty_classification == 'New Gas':
+        elif well_royalty_classification == 'New':
             if mgp < 115.4:
                 calc.C = econ_gas_data.GNEW_C
                 calc.BaseRoyaltyCalcRate = (calc.C * mgp) - src
@@ -245,7 +245,7 @@ class ProcessRoyalties(object):
                 # SRC ?? - ProdDate
                 calc.BaseRoyaltyCalcRate = calc.K - (calc.X / mgp) - src
 
-        elif well_royalty_classification == 'Old Gas':
+        elif well_royalty_classification == 'Old':
             if mgp < 115.4:
                 calc.C = econ_gas_data.GOLD_C
                 calc.BaseRoyaltyCalcRate = (calc.C * mgp) - src
@@ -303,7 +303,7 @@ class ProcessRoyalties(object):
     def calc_sask_oil_prov_crown_royalty_rate(calc, econ_oil_data,
                                               well_royalty_classification, well_classification, mop, src):
 
-        if well_royalty_classification == 'Fourth Tier Oil':
+        if well_royalty_classification == 'Fourth Tier':
 
             if mop < 25:
                 calc.BaseRoyaltyCalcRate = 0
@@ -342,10 +342,10 @@ class ProcessRoyalties(object):
                 calc.BaseRoyaltyCalcRate = (calc.K - (calc.X / mop)) / 100
         else:
             if well_classification == 'Heavy':
-                if well_royalty_classification == 'Third Tier Oil':
+                if well_royalty_classification == 'Third Tier':
                     calc.K = econ_oil_data.H3T_K
                     calc.X = econ_oil_data.H3T_X
-                elif well_royalty_classification == 'New Oil':
+                elif well_royalty_classification == 'New':
                     calc.K = econ_oil_data.HNEW_K
                     calc.X = econ_oil_data.HNEW_X
                 else:
@@ -353,10 +353,10 @@ class ProcessRoyalties(object):
                         'Royalty Classification: ' + well_royalty_classification + ' not known for ' +
                         well_classification + ' Royalty not calculated.')
             elif well_classification == 'Southwest':
-                if well_royalty_classification == 'Third Tier Oil':
+                if well_royalty_classification == 'Third Tier':
                     calc.K = econ_oil_data.SW3T_K
                     calc.X = econ_oil_data.SW3T_X
-                elif well_royalty_classification == 'New Oil':
+                elif well_royalty_classification == 'New':
                     calc.K = econ_oil_data.SWNEW_K
                     calc.X = econ_oil_data.SWNEW_X
                 else:
@@ -364,13 +364,13 @@ class ProcessRoyalties(object):
                         'Royalty Classification: "' + well_royalty_classification + '" not known for ' +
                         well_classification + ' Royalty not calculated.')
             elif well_classification == 'Other':
-                if well_royalty_classification == 'Third Tier Oil':
+                if well_royalty_classification == 'Third Tier':
                     calc.K = econ_oil_data.O3T_K
                     calc.X = econ_oil_data.O3T_X
-                elif well_royalty_classification == 'New Oil':
+                elif well_royalty_classification == 'New':
                     calc.K = econ_oil_data.ONEW_K
                     calc.X = econ_oil_data.ONEW_X
-                elif well_royalty_classification == 'Old Oil':
+                elif well_royalty_classification == 'Old':
                     calc.K = econ_oil_data.OOLD_K
                     calc.X = econ_oil_data.OOLD_X
                 else:
@@ -743,7 +743,7 @@ class ProcessRoyalties(object):
             calc.RoyaltyClassification = well.RoyaltyClassification
         calc.CommencementPeriod = self.determine_commencement_period(monthly.ProdMonth, well.CommencementDate)
         econ_gas_data = self.db.select1("ECONGas", ProdMonth=monthly.ProdMonth)
-        if royalty.OverrideRoyaltyClassification is not None:
+        if royalty.OverrideRoyaltyClassification:
             royalty_classification = royalty.OverrideRoyaltyClassification
         else:
             royalty_classification = well.RoyaltyClassification

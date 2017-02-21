@@ -38,13 +38,14 @@ To Checkin Code:
         
 To review code coverage:
 
-    batch.py run_code_coverage
-
-    (could not make this work)
-    1) run the unit tests
-        pytest_run.py
-    2) look at the coverage
+    1) Right Click on the tests directory and run tests
+    2) Edit the Target / Options: --cov --cov-report=html
+    3) look at the coverage
         htmlcov/index.html
+
+    if all else fails:
+        batch.py run_code_coverage
+
 
 Using the SQL database
 
