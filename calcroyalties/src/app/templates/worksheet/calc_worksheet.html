@@ -216,13 +216,13 @@ table, th, td {
         <br>
         <TABLE>
 
-            {% if calc.RoyaltyClassification == 'Fourth Tier Oil' and m.ProdVol <= 25.0 %}
+            {% if calc.RoyaltyClassification == 'Fourth Tier' and m.ProdVol <= 25.0 %}
                 <tr><td> {{ calc.Message }}<td><tr>
-            {% elif calc.RoyaltyClassification == 'Fourth Tier Oil' and m.ProdVol <= 136.2 %}
+            {% elif calc.RoyaltyClassification == 'Fourth Tier' and m.ProdVol <= 136.2 %}
                 <tr><td align="right">CR% =</td> <td align="center">(C * MOP) - D</td></tr>
                 <tr><td align="right">CR% =</td> <td align="center">&nbsp;&nbsp;({{ '{:.4f}'.format(calc.C) }} * {{ '{:.2f}'.format(m.ProdVol) }}) - {{'{:.2f}'.format(calc.D)}}</td></tr>
                 <tr><td align="right">CR% =</td> <td align="center"> {{'{:.6%}'.format(calc.BaseRoyaltyCalcRate) }}</td></tr>
-            {% elif calc.RoyaltyClassification == 'Fourth Tier Oil' %}
+            {% elif calc.RoyaltyClassification == 'Fourth Tier' %}
                 <tr><td align="left"> CR% = </td> <td>$$ (K - X / {MOP} ) $$ </td></tr>
                 <tr><td align="left"> CR% = </td> <td>$$ ( {{'{:.2f}'.format(calc.K)}} -
                     {{ calc.X }} / {{ '{:.2f}'.format(m.ProdVol) }} ) $$ </td></tr>
@@ -530,10 +530,11 @@ table, th, td {
         SaskProvCrownVar Gas
     #}
 
+    {% if 'SKProvCrownVar' in rm.RoyaltyScheme and m.Product == 'GAS' %}
         <br>
         <TABLE>
-            {% set well_type = 'Oil' %}
-            {% if calc.RoyaltyClassification == 'Fourth Tier Gas' and well_type == 'Gas' %}
+            <!--{% set well_type = 'Oil' %}-->
+            {% if calc.RoyaltyClassification == 'Fourth Tier' and well_type == 'Gas' %}
                 {% if m.ProdVol <= 25.0 %}
                     <tr><td>{{ calc.Message }}<td><tr>
                 {% endif %}
@@ -549,7 +550,7 @@ table, th, td {
                     <tr><td align="left"> CR% = </td><td align="center"> {{ '{:.6%}'.format(calc.BaseRoyaltyCalcRate) }} </td></tr>
                 {% endif %}
             {% endif %}
-            {% if calc.RoyaltyClassification == 'Fourth Tier Gas' and well_type == 'Oil' %}
+            {% if calc.RoyaltyClassification == 'Fourth Tier' and well_type == 'Oil' %}
                 {% if m.ProdVol <= 64.7 %}
                     <tr><td> {{ calc.Message }}<td><tr>
                 {% endif %}
@@ -560,7 +561,7 @@ table, th, td {
                     <tr><td align="left"> CR% = </td><td align="center"> {{ '{:.6%}'.format(calc.BaseRoyaltyCalcRate) }} </td></tr>
                 {% endif %}
             {% endif %}
-            {% if calc.RoyaltyClassification == 'Third Tier Gas' or calc.RoyaltyClassification == 'New Gas' or calc.RoyaltyClassification == 'Old Gas' %}
+            {% if calc.RoyaltyClassification == 'Third Tier' or calc.RoyaltyClassification == 'New' or calc.RoyaltyClassification == 'Old' %}
                 {% if m.ProdVol <= 115.4 %}
                     <tr><td align="right">CR% =</td> <td align="center">(C * MGP) - SRC</td></tr>
                     <tr><td align="right">CR% =</td> <td align="center">&nbsp;&nbsp;({{ '{:.4f}'.format(calc.C) }} * {{ '{:.2f}'.format(m.ProdVol) }}) - {{'{:.2f}'.format(calc.SRC)}}</td></tr>
@@ -611,16 +612,16 @@ table, th, td {
             </tr>
         </table>
 
-
-    {% if 'SaskProvCrownVar' in rm.RoyaltyScheme and m.Product == 'GAS' %}
-        <h3>gas found!</h3>
     {% endif %}
+
 
     {#
         --- OIL - GORR $
     #}
 
     {% if m.Product == 'OIL' and 'GORR' in rm.RoyaltyScheme %}
+    {% endif %}
+    {% if 'GORR' in rm.RoyaltyScheme %}
         <br>
         <table>
             <tr>
