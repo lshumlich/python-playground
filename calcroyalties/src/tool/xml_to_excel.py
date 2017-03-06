@@ -7,19 +7,19 @@ As of today this is just a hack file
 
 """
 
-import config
 from openpyxl import Workbook
-
 import xml.etree.ElementTree as et
+import os
+import config
 
-# tree = et.parse('\\$temp\\xml\\Sample-FACILITY.xml')
-tree = et.parse('\\$temp\\xml\\Sample-VOLUMETRIC.xml')
-# tree = et.parse(config.get_temp_dir() + 'Sample-FACILITY.xml')
+# Global Variables
+
 wb = Workbook()
-ws = wb.create_sheet("MySheet")
+ws = None
+order = 0
+row = 2
 
-
-root = tree.getroot()
+# ws = wb.create_sheet("MySheet")
 
 # print ('---Tag-->', root.tag)
 # print('----attr->', root.attrib)
@@ -46,9 +46,7 @@ def output_structure(e, level, name):
         order += 1
         update_cell(name, row, order, e.text)
 
-    this_level_order = order
-
-    print(' '*level*3, level, row, order, "me--> ", name, ' ', e.attrib, ' ', e.text, ' Length=',len(e), dup_children)
+    # print(' '*level*3, level, row, order, "me--> ", name, ' ', e.attrib, ' ', e.text, ' Length=',len(e), dup_children)
 
     if len(e) > 0:
         for i in range(0, len(e)):
@@ -83,17 +81,34 @@ def update_cell(attr, row, col, value):
     if not ws.cell(row=1, column=col).value:
         ws.cell(row=1, column=col, value=attr)
 
-e = root        # Envelope
-e = e[0]        # Body
-e = e[0]        # LIST_FACILITY_003
-e = e[1]        # DATAAREA
+def process_xml_file(name):
+    global order, row
+    print("process_xml_file --> ", name)
 
-print("--Setup a worksheet: ", e[0].tag)
-create_sheet(e[0].tag)
-# e = e[0]    # First Child (In this case facility)
-order = 0
-row = 2
-output_structure(e, 0, None)
+
+    tree = et.parse(name)
+    root = tree.getroot()
+    e = root        # Envelope
+    e = e[0]        # Body
+    e = e[0]        # LIST_FACILITY_003
+    e = e[1]        # DATAAREA
+
+    create_sheet(e[0].tag)
+    # e = e[0]    # First Child (In this case facility)
+    order = 0
+    row = 2
+    output_structure(e, 0, None)
+
+def process_xml_dir(name):
+    for f in os.listdir(name):
+        if f.endswith('.xml'):
+            # print(name+f)
+            process_xml_file(name+f)
+
+# process_xml_file('\\$temp\\xml\\Sample-VOLUMETRIC.xml')
+# tree = et.parse('\\$temp\\xml\\Sample-FACILITY.xml')
+# process_xml_file(config.get_temp_dir() + 'Sample-FACILITY.xml')
+process_xml_dir(config.get_temp_dir())
 
 
 # print('Length=',len(e),' Length=',len(e[0]))
