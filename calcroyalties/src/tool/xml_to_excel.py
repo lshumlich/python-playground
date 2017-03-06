@@ -8,14 +8,16 @@ As of today this is just a hack file
 """
 
 import config
-# import xml
 from openpyxl import Workbook
 
 import xml.etree.ElementTree as et
 
 # tree = et.parse('\\$temp\\xml\\Sample-FACILITY.xml')
-# tree = et.parse('\\$temp\\xml\\Sample-VOLUMETRIC.xml')
-tree = et.parse(config.get_temp_dir() + 'Sample-FACILITY.xml')
+tree = et.parse('\\$temp\\xml\\Sample-VOLUMETRIC.xml')
+# tree = et.parse(config.get_temp_dir() + 'Sample-FACILITY.xml')
+wb = Workbook()
+ws = wb.create_sheet("MySheet")
+
 
 root = tree.getroot()
 
@@ -26,50 +28,32 @@ root = tree.getroot()
 #     print(c.tag, " - ", c.attrib, c.text, ' - ' )
 
 
-class CommonData():
-    eDocument = {}
-    eRow = {}
-    column_count = 0
-    dot_notation = []
-    data = []
+def output_structure(e, level, name):
+    global order, row
+    this_level_order = order
 
+    if name:
+        name += '.' + e.tag
+    else:
+        name = e.tag
 
+    dup_children = False
+    if len(e) > 1:
+        if e[0].tag == e[1].tag:
+            dup_children = True
 
-def showStruc(element, level):
-    for child in element:
-        if '}' in child.tag:
-            tag = child.tag.split('}', 1)[1]  # strip all namespaces
-        else:
-            tag = child.tag
+    if len(e) == 0:
+        order += 1
+        update_cell(name, row, order, e.text)
 
-        if len(cd.dot_notation) <= level:
-            cd.dot_notation.append("")
-
-        cd.dot_notation[level] = tag
-        fulltag = ""
-        for i in range(level+1):
-            fulltag += '.' + cd.dot_notation[i]
-
-        print(level, ' - ', fulltag, " Tag-> ", tag, "Child-> ", child.attrib, child.text)
-
-        if fulltag not in cd.eDocument:
-            # print("   new element: ", fulltag, cd.column_count)
-            cd.eDocument[fulltag] = cd.column_count
-            cd.column_count += 1
-        if fulltag not in cd.eRow:
-            cd.eRow[fulltag] = cd.column_count
-            cd.data.append(child.text)
-        else:
-            print("---> output row: ", cd.data)
-
-
-        showStruc(child, level + 1)
-
-def show_children(e):
+    print(' '*level*3, level, row, order, "me--> ", name, ' ', e.attrib, ' ', e.text, ' Length=',len(e), dup_children)
+    # print(' '*l*3, "me--> ", e.tag, ' ', e.attrib, ' ', e.text, ' Length=',len(e),' Length=',len(e[0]))
     for child in e:
-        print("child-->", child.tag)
-
-
+        if dup_children:
+            order = this_level_order
+        output_structure(child, level+1, name)
+        if dup_children:
+            row += 1
 
 def write_excel():
     print("About to write some excel.")
@@ -80,7 +64,44 @@ def write_excel():
     wb.save(config.get_temp_dir() + 'lfsdata.xlsx')
 
 
-write_excel()
+def create_sheet(name):
+    global ws, wb
+    ws = wb.create_sheet(name)
+
+
+def update_cell(attr, row, col, value):
+    global ws
+    ws.cell(row=row, column=col, value=value)
+    if not ws.cell(row=1, column=col).value:
+        ws.cell(row=1, column=col, value=attr)
+
+e = root        # Envelope
+e = e[0]        # Body
+e = e[0]        # LIST_FACILITY_003
+e = e[1]        # DATAAREA
+
+print("--Setup a worksheet: ", e[0].tag)
+create_sheet(e[0].tag)
+# e = e[0]    # First Child (In this case facility)
+order = 0
+row = 2
+output_structure(e, 0, None)
+
+
+# print('Length=',len(e),' Length=',len(e[0]))
+
+# e = get_dataarea()
+
+# print(e)
+# show_children(e)
+#
+# e = e.firstChild
+# show_children(e)
+#
+
+wb.save(config.get_temp_dir() + 'lfsdata.xlsx')
+
+
 
 #
 #
@@ -96,12 +117,4 @@ write_excel()
 # print('data-->',e[0].tag, e[1].tag)
 # print('data-->',e[0][0].tag, e[1][0].tag)
 # show_children(e)
-
-# for child in root:
-#     print("Tag-> ", child.tag, "Child-> ", child.attrib)
-#     # r = child.getroot()
-#     # print ("r-->", r.tag)
-#     for c in child:
-#         print("T-> ", c.tag, "C- > ", c.attrib)
-
 
