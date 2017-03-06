@@ -30,7 +30,7 @@ root = tree.getroot()
 
 def output_structure(e, level, name):
     global order, row
-    this_level_order = order
+    tab_order = {}
 
     if name:
         name += '.' + e.tag
@@ -46,14 +46,22 @@ def output_structure(e, level, name):
         order += 1
         update_cell(name, row, order, e.text)
 
+    this_level_order = order
+
     print(' '*level*3, level, row, order, "me--> ", name, ' ', e.attrib, ' ', e.text, ' Length=',len(e), dup_children)
-    # print(' '*l*3, "me--> ", e.tag, ' ', e.attrib, ' ', e.text, ' Length=',len(e),' Length=',len(e[0]))
-    for child in e:
-        if dup_children:
-            order = this_level_order
-        output_structure(child, level+1, name)
-        if dup_children:
-            row += 1
+
+    if len(e) > 0:
+        for i in range(0, len(e)):
+            if e[i].tag in tab_order:
+                order = tab_order[e[i].tag]
+                row += 1
+            else:
+                if i < len(e) - 1:
+                    if e[i].tag == e[i+1].tag:
+                        tab_order[e[i].tag] = order
+
+            # print('-->', order)
+            output_structure(e[i], level+1, name)
 
 def write_excel():
     print("About to write some excel.")
