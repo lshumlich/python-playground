@@ -367,6 +367,74 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
                                   crown_multiplier, fn_interest, rp_interest, m, calc)
         self.assertEqual(calc.BaseRoyaltyValue, 10558.65)
 
+    def test_calcSaskGasIOGR1995(self):
+        pr = ProcessRoyalties()
+        m = DataStructure()
+
+        calc = DataStructure()
+        calc.BaseRoyaltyValue = 0.0
+        calc.CommencementPeriod = 0
+        calc.BaseRoyaltyVolume = 0.0
+        calc.RoyaltyPrice = 0.0
+
+        m.SalesPrice = 5
+        m.ProdVol = 70
+        pr.calc_sask_gas_iogr1995(m.SalesPrice, m.ProdVol, calc)
+        self.assertEqual(calc.SuppRoyaltyValue, 0)
+        self.assertEqual(calc.BaseRoyaltyValue, 87.5)
+
+        m.SalesPrice = 20
+        pr.calc_sask_gas_iogr1995(m.SalesPrice, m.ProdVol, calc)
+        self.assertEqual(calc.SuppRoyaltyValue, 2.1)
+        self.assertEqual(calc.BaseRoyaltyValue, 350)
+
+        m.SalesPrice = 50
+        pr.calc_sask_gas_iogr1995(m.SalesPrice, m.ProdVol, calc)
+        self.assertEqual(calc.SuppRoyaltyValue, 12.4)
+        self.assertEqual(calc.BaseRoyaltyValue, 875)
+
+    def test_calcSaskPenIOGR1995(self):
+        pr = ProcessRoyalties()
+        m = DataStructure()
+        calc = DataStructure()
+
+        calc.BaseRoyaltyValue = 0.0
+        calc.CommencementPeriod = 0
+        calc.BaseRoyaltyVolume = 0.0
+        calc.RoyaltyPrice = 0.0
+
+        m.SalesPrice = 5
+        m.ProdVol = 70
+        pr.calc_sask_pen_iogr1995(m.SalesPrice, m.ProdVol, calc)
+        self.assertEqual(calc.SuppRoyaltyValue, 0)
+        self.assertEqual(calc.BaseRoyaltyValue, 87.5)
+
+        m.SalesPrice = 50
+        pr.calc_sask_pen_iogr1995(m.SalesPrice, m.ProdVol, calc)
+        self.assertEqual(calc.SuppRoyaltyValue, 8.37)
+        self.assertEqual(calc.BaseRoyaltyValue, 875)
+
+    def test_calcSaskSulIOGR1995(self):
+        pr = ProcessRoyalties()
+        m = DataStructure()
+        calc = DataStructure()
+
+        calc.BaseRoyaltyValue = 0.0
+        calc.CommencementPeriod = 0
+        calc.BaseRoyaltyVolume = 0.0
+        calc.RoyaltyPrice = 0.0
+
+        m.SalesPrice = 5
+        m.ProdVol = 70
+        pr.calc_sask_sul_iogr1995(m.SalesPrice, m.ProdVol, calc)
+        self.assertEqual(calc.SuppRoyaltyValue, 0)
+        self.assertEqual(calc.BaseRoyaltyValue, 87.5)
+
+        m.SalesPrice = 50
+        pr.calc_sask_sul_iogr1995(m.SalesPrice, m.ProdVol, calc)
+        self.assertEqual(calc.SuppRoyaltyValue, 3.99)
+        self.assertEqual(calc.BaseRoyaltyValue, 875)
+
     def test_determineCommencementPeriod(self):
         pr = ProcessRoyalties()
         self.assertEqual(pr.determine_commencement_period(201501, datetime(2015, 1, 1)), 0)
