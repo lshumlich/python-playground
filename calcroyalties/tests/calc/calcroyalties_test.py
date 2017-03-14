@@ -95,6 +95,83 @@ Sept.,201509,0.1185,2.96,24.39,1578,0.1434,33.10,1910,0.1593,36.77,2121,0.2062,4
         self.assertRaises(AppError, pr.calc_sask_gas_prov_crown_royalty_rate, royalty_calc,
                           econ_gas_data, 'Bad String', 20, 1, 'Gas')
 
+    def test_calc_sask_gas_prov_crown_royalty_volume_value(self):
+        pr = ProcessRoyalties()
+        m = DataStructure()
+        m.ProdVol = 100
+
+        lease_rm = DataStructure()
+        lease_rm.MinRoyaltyRate = 0.0
+        lease_rm.MinRoyaltyDollar = 0.0
+        lease_rm.CrownMultiplier = 1
+        lease_rm.ValuationMethod = 'ActSales'
+        lease_rm.CrownModifier = None
+
+        calc = DataStructure()
+        calc.BaseRoyaltyRate = .25
+        calc.BaseRoyaltyCalcRate = .25
+        calc.RoyaltyPrice = 210
+        calc.BaseRoyaltyVolume = 0.0
+        calc.BaseRoyaltyValue = 0.0
+        m.SalesPrice = 223.370366
+        m.TransRate = 2.123455
+        m.ProcessingRate = 0.123455
+
+        fn_interest = 1.0
+        rp_interest = 100.0
+
+        pr.calc_sask_gas_prov_crown_royalty_volume_value(m, fn_interest, rp_interest, lease_rm, calc)
+        self.assertEqual(calc.BaseRoyaltyVolume, 0.0)
+        self.assertEqual(calc.BaseRoyaltyValue, 5584.26)
+
+        calc.BaseRoyaltyCalcRate = -.01
+        calc.BaseRoyaltyRate = -.01
+        lease_rm.MinRoyaltyRate = None
+        pr.calc_sask_gas_prov_crown_royalty_volume_value(m, fn_interest, rp_interest, lease_rm, calc)
+        self.assertEqual(calc.BaseRoyaltyRate, 0)
+
+        calc.BaseRoyaltyCalcRate = -.01
+        calc.BaseRoyaltyRate = -.01
+        lease_rm.MinRoyaltyRate = .02
+        pr.calc_sask_gas_prov_crown_royalty_volume_value(m, fn_interest, rp_interest, lease_rm, calc)
+        self.assertEqual(calc.BaseRoyaltyRate, .02)
+        self.assertEqual(calc.BaseRoyaltyValue, 446.74)
+
+        lease_rm.MinRoyaltyDollar = 500.0
+        pr.calc_sask_gas_prov_crown_royalty_volume_value(m, fn_interest, rp_interest, lease_rm, calc)
+        self.assertEqual(calc.BaseRoyaltyValue, 500.0)
+
+        lease_rm.MinRoyaltyDollar = None
+        lease_rm.MinRoyaltyRate = None
+        calc.BaseRoyaltyCalcRate = .35
+        lease_rm.CrownModifier = .02
+        calc.BaseRoyaltyRate = None
+        pr.calc_sask_gas_prov_crown_royalty_volume_value(m, fn_interest, rp_interest, lease_rm, calc)
+        self.assertEqual(calc.BaseRoyaltyRate, .37)
+
+        # Reset to normal again
+        lease_rm.CrownModifier = .0
+        calc.BaseRoyaltyCalcRate = .25
+        calc.RoyaltyPrice = 210
+        calc.BaseRoyaltyVolume = 0.0
+        calc.BaseRoyaltyValue = 0.0
+        pr.calc_sask_gas_prov_crown_royalty_volume_value(m, fn_interest, rp_interest, lease_rm, calc)
+        self.assertEqual(calc.BaseRoyaltyVolume, 0.0)
+        self.assertEqual(calc.BaseRoyaltyValue, 5584.26)
+
+        m.ProdVol = 100
+        rp_interest = 50.0
+        pr.calc_sask_gas_prov_crown_royalty_volume_value(m, fn_interest, rp_interest, lease_rm, calc)
+        self.assertEqual(calc.BaseRoyaltyVolume, 0.0)
+        self.assertEqual(calc.BaseRoyaltyValue, 2792.13)
+
+        m.ProdVol = 100
+        rp_interest = 50.0
+        fn_interest = 0.5
+        pr.calc_sask_gas_prov_crown_royalty_volume_value(m, fn_interest, rp_interest, lease_rm, calc)
+        self.assertEqual(calc.BaseRoyaltyVolume, 0.0)
+        self.assertEqual(calc.BaseRoyaltyValue, 1396.06)
+
     def test_calcSaskOilBaseRoyaltyCalcRate(self):
         econ_string_data = \
             """
@@ -366,6 +443,74 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         pr.calc_sask_oil_iogr1995(datetime(2008, 9, 9), "SaskWellHead",
                                   crown_multiplier, fn_interest, rp_interest, m, calc)
         self.assertEqual(calc.BaseRoyaltyValue, 10558.65)
+
+    def test_calcSaskGasIOGR1995(self):
+        pr = ProcessRoyalties()
+        m = DataStructure()
+
+        calc = DataStructure()
+        calc.BaseRoyaltyValue = 0.0
+        calc.CommencementPeriod = 0
+        calc.BaseRoyaltyVolume = 0.0
+        calc.RoyaltyPrice = 0.0
+
+        m.SalesPrice = 5
+        m.ProdVol = 70
+        pr.calc_sask_gas_iogr1995(m.SalesPrice, m.ProdVol, calc)
+        self.assertEqual(calc.SuppRoyaltyValue, 0)
+        self.assertEqual(calc.BaseRoyaltyValue, 87.5)
+
+        m.SalesPrice = 20
+        pr.calc_sask_gas_iogr1995(m.SalesPrice, m.ProdVol, calc)
+        self.assertEqual(calc.SuppRoyaltyValue, 2.1)
+        self.assertEqual(calc.BaseRoyaltyValue, 350)
+
+        m.SalesPrice = 50
+        pr.calc_sask_gas_iogr1995(m.SalesPrice, m.ProdVol, calc)
+        self.assertEqual(calc.SuppRoyaltyValue, 12.4)
+        self.assertEqual(calc.BaseRoyaltyValue, 875)
+
+    def test_calcSaskPenIOGR1995(self):
+        pr = ProcessRoyalties()
+        m = DataStructure()
+        calc = DataStructure()
+
+        calc.BaseRoyaltyValue = 0.0
+        calc.CommencementPeriod = 0
+        calc.BaseRoyaltyVolume = 0.0
+        calc.RoyaltyPrice = 0.0
+
+        m.SalesPrice = 5
+        m.ProdVol = 70
+        pr.calc_sask_pen_iogr1995(m.SalesPrice, m.ProdVol, calc)
+        self.assertEqual(calc.SuppRoyaltyValue, 0)
+        self.assertEqual(calc.BaseRoyaltyValue, 87.5)
+
+        m.SalesPrice = 50
+        pr.calc_sask_pen_iogr1995(m.SalesPrice, m.ProdVol, calc)
+        self.assertEqual(calc.SuppRoyaltyValue, 8.37)
+        self.assertEqual(calc.BaseRoyaltyValue, 875)
+
+    def test_calcSaskSulIOGR1995(self):
+        pr = ProcessRoyalties()
+        m = DataStructure()
+        calc = DataStructure()
+
+        calc.BaseRoyaltyValue = 0.0
+        calc.CommencementPeriod = 0
+        calc.BaseRoyaltyVolume = 0.0
+        calc.RoyaltyPrice = 0.0
+
+        m.SalesPrice = 5
+        m.ProdVol = 70
+        pr.calc_sask_sul_iogr1995(m.SalesPrice, m.ProdVol, calc)
+        self.assertEqual(calc.SuppRoyaltyValue, 0)
+        self.assertEqual(calc.BaseRoyaltyValue, 87.5)
+
+        m.SalesPrice = 50
+        pr.calc_sask_sul_iogr1995(m.SalesPrice, m.ProdVol, calc)
+        self.assertEqual(calc.SuppRoyaltyValue, 3.99)
+        self.assertEqual(calc.BaseRoyaltyValue, 875)
 
     def test_determineCommencementPeriod(self):
         pr = ProcessRoyalties()

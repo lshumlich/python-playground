@@ -121,13 +121,13 @@ class ProcessRoyalties(object):
                                         well_lease_link.PEFNInterest, rtp_info.Percent, monthly, calc)
 
         elif monthly.Product == 'GAS' and 'IOGR1995' in royalty.RoyaltyScheme:
-            self.calc_sask_gas_iogr1995(monthly, well, royalty, calc)
+            self.calc_sask_gas_iogr1995(monthly.SalesPrice, monthly.ProdVol, calc)
 
         elif monthly.Product == 'PEN' and 'IOGR1995' in royalty.RoyaltyScheme:
-            self.calc_sask_pen_iogr1995(monthly, well, royalty, calc)
+            self.calc_sask_pen_iogr1995(monthly.SalesPrice, monthly.ProdVol, calc)
 
         elif monthly.Product == 'SUL' and 'IOGR1995' in royalty.RoyaltyScheme:
-            self.calc_sask_sul_iogr1995(monthly, well, royalty, calc)
+            self.calc_sask_sul_iogr1995(monthly.SalesPrice, monthly.ProdVol, calc)
 
         elif monthly.Product == 'GAS' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
             self.calc_sask_gas_prov_crown(monthly, well, royalty, calc, well_lease_link, rtp_info)
@@ -400,7 +400,7 @@ class ProcessRoyalties(object):
 
         if calc.BaseRoyaltyRate < 0:
             calc.BaseRoyaltyRate = 0
-
+    
         if lease_rm.CrownModifier:
             calc.BaseRoyaltyRate += lease_rm.CrownModifier
 
@@ -439,7 +439,7 @@ class ProcessRoyalties(object):
         else:
             return 0.0
 
-    def calc_sask_gas_iogr1995(self, monthly, well, royalty, calc):
+    def calc_sask_gas_iogr1995(self, sales_price, prod_vol, calc):
         """
         1. Royalty Payable = Gross Royalty - (Gross Royalty / Total Value)
         2. Gross Royalty = Basic Gross Royalty + Supplementary Gross Royalty
@@ -454,8 +454,8 @@ class ProcessRoyalties(object):
             e. Other from non-gas source
         """
 
-        selling_price = monthly.SalesPrice
-        basic_gross_royalty = 0.25 * monthly.ProdVol * selling_price
+        selling_price = sales_price
+        basic_gross_royalty = 0.25 * prod_vol * selling_price
         if selling_price < 10.65:
             supplementary_royalty = 0
         elif selling_price > 10.65 and selling_price < 24.85:
@@ -472,7 +472,7 @@ class ProcessRoyalties(object):
 
         return
 
-    def calc_sask_pen_iogr1995(self, monthly, well, royalty, calc):
+    def calc_sask_pen_iogr1995(self, sales_price, prod_vol, calc):
         print('processing !!PEN!!')
         """
         1. Royalty Payable = Gross Royalty - (Gross Royalty / Total Value)
@@ -488,8 +488,8 @@ class ProcessRoyalties(object):
             e. Other from non-gas source
         """
 
-        selling_price = monthly.SalesPrice
-        basic_gross_royalty = 0.25 * monthly.ProdVol * selling_price
+        selling_price = sales_price
+        basic_gross_royalty = 0.25 * prod_vol * selling_price
         if selling_price < 27.68:
             supplementary_royalty = 0
         elif selling_price > 27.68:
@@ -498,7 +498,7 @@ class ProcessRoyalties(object):
         calc.BaseRoyaltyValue = round(basic_gross_royalty, 2)
         return
 
-    def calc_sask_sul_iogr1995(self, monthly, well, royalty, calc):
+    def calc_sask_sul_iogr1995(self, sales_price, prod_vol, calc):
         print('processing !!SUL!!')
         """
         1. Royalty Payable = Gross Royalty - (Gross Royalty / Total Value)
@@ -514,8 +514,8 @@ class ProcessRoyalties(object):
             e. Other from non-gas source
         """
 
-        selling_price = monthly.SalesPrice
-        basic_gross_royalty = 0.25 * monthly.ProdVol * selling_price
+        selling_price = sales_price
+        basic_gross_royalty = 0.25 * prod_vol * selling_price
         if selling_price < 39.37:
             supplementary_royalty = 0
         elif selling_price > 39.37:
