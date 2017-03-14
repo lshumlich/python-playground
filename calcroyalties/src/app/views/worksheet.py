@@ -76,6 +76,6 @@ def generate_worksheet(well_id, prod_month, rpba, product):
     except Exception as e:
         print('views.worksheet: ***Error:', e)
         traceback.print_exc(file=sys.stdout)
-        tb = traceback.format_exe()
+        tb = traceback.format_exc()
         return "<h2>Error displaying worksheet for well %s</h2><br>" % well_id + str(e) + '<plaintext>' + \
                tb + '</plaintext>'
