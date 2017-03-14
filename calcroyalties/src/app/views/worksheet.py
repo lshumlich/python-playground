@@ -64,7 +64,7 @@ def generate_worksheet(well_id, prod_month, rpba, product):
             raise AppError("There were no monthly records for " + str(well_id) + str(prod_month) + product)
         monthly = monthly_array[0]  # if there are multiple pick the first one
 
-        ba = db.select1('BAInfo', BAid=monthly.RPBA)
+        ba = db.select1('BAInfo', BAid=monthly.RPBA, BAType='RTP')
         calc = db.select1('Calc', WellID=well_id, ProdMonth=prod_month, RPBA=monthly.RPBA, Product=product)
         rtp_info = db.select1('RTPInfo', WellEvent=well.WellEvent, Product=product, Payer=monthly.RPBA,
                               Date=prod_month_to_date(prod_month))
@@ -76,4 +76,6 @@ def generate_worksheet(well_id, prod_month, rpba, product):
     except Exception as e:
         print('views.worksheet: ***Error:', e)
         traceback.print_exc(file=sys.stdout)
-        return "<h2>Error displaying worksheet for well %s</h2><br>" % well_id + str(e)
+        tb = traceback.format_exe()
+        return "<h2>Error displaying worksheet for well %s</h2><br>" % well_id + str(e) + '<plaintext>' + \
+               tb + '</plaintext>'

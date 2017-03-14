@@ -66,14 +66,15 @@ class ProcessRoyalties(object):
         well = self.db.select1('WellRoyaltyMaster', ID=well_id)
         well_lease_link_array = self.db.select('WellLeaseLink', WellID=well_id)
         if len(well_lease_link_array) == 0:
-            raise AppError("There were no well_lease_link records for: " + str(well_id) + str(prod_month))
+            raise AppError("There were no well_lease_link records for Well ID: " + str(well_id) +
+                           " Prod Date: " + str(prod_month))
         well_lease_link = well_lease_link_array[0]
         royalty = self.db.select1('LeaseRoyaltymaster', ID=well_lease_link.LeaseID)
         lease = self.db.select1('Lease', ID=well_lease_link.LeaseID)
 
         # todo Create a test to ensure there is a RTPInfo for the well. raise an apperror if not
         # todo call the prod_month_to_date in the select and not everytime we use the select.
-        rtp_info_array = self.db.select('RTPInfo', WellEvent=well.WellEvent, Product='OIL',
+        rtp_info_array = self.db.select('RTPInfo', WellEvent=well.WellEvent, Product=product,
                                         Date=prod_month_to_date(prod_month))
         if len(rtp_info_array) == 0:
             raise AppError("Well not found in RTPInfo. Well ID: " + str(well_id) + " " + well.WellEvent +

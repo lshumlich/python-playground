@@ -122,7 +122,10 @@ process_xml_dir(config.get_temp_dir())
 # show_children(e)
 #
 
-wb.save(config.get_temp_dir() + 'lfsdata.xlsx')
+
+excel_file = config.get_temp_dir() + 'lfsdata.xlsx'
+print("Writing Excel file:", excel_file)
+wb.save(excel_file)
 
 
 
