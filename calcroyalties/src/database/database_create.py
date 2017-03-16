@@ -62,17 +62,23 @@ Database Change Log: Must be maintained so we can keep the database in sink:
 - Rename calc.ProvCrownRoyaltyVolume to BaseRoyaltyVolume
 2016-11-22
 - Remove Calc tab from sample.xlsx (The create database creates a blank one and the process creates updated ones.
-- Rename calc.IOGR1995RoyaltyVolume to BaseRoyaltyVolume
-- Rename calc.IOGR1995RoyaltyValue to BaseRoyaltyValue
-- Rename calc.SupplementaryRoyalties to SuppRoyaltyValue
-- Delete calc.IOGR1995RoyaltyRate
-- Delete calc.IOGR1995WellRoyaltyVolume
-- Delete calc.IOGR1995RoyaltyVolume
-- Delete calc.IOGR1995RoyaltyValue
-- Delete calc.GorrRoyaltyVolume
+- Rename Calc.IOGR1995RoyaltyVolume to BaseRoyaltyVolume
+- Rename Calc.IOGR1995RoyaltyValue to BaseRoyaltyValue
+- Rename Calc.SupplementaryRoyalties to SuppRoyaltyValue
+- Delete Calc.IOGR1995RoyaltyRate
+- Delete Calc.IOGR1995WellRoyaltyVolume
+- Delete Calc.IOGR1995RoyaltyVolume
+- Delete Calc.IOGR1995RoyaltyValue
+- Delete Calc.GorrRoyaltyVolume
 2017-02-19
 - Add calc.RoyaltySpecific
 - Add monthly.SalesVol
+2017-03-15
+- Add LeaseRoyatlyMaster.OilBasedOn
+  Add LeaseRoyatlyMaster.GasBasedOn
+  Add LeaseRoyatlyMaster.ProductsBasedOn
+  Add Monthly.GJ
+  Add Lookups table
 """
 import datetime
 
@@ -100,6 +106,8 @@ class DatabaseCreate(object):
             self.well_lease_link()
         if 'Monthly' not in tables:
             self.monthly()
+        if 'Lookups' not in tables:
+            self.lookups()
         if 'Calc' not in tables:
             self.calc()
         if 'ECONData' not in tables:
@@ -154,6 +162,9 @@ class DatabaseCreate(object):
              "CrownMultiplier" float,
              "CrownModifier" float,
              "ValuationMethod" text,
+             "OilBasedOn" text,
+             "GasBasedOn" text,
+             "ProductsBasedOn" text,
              "TransDeducted" text,
              "ProcessingDeducted" text,
              "GCADeducted" text,
@@ -201,6 +212,7 @@ class DatabaseCreate(object):
             "ProdHours" int,
             "ProdVol" int,
             "SalesVol" int,
+            "GJ" int,
             "RPBA" text,
             "RPVol" float,
             "SalesPrice" float,
@@ -209,7 +221,16 @@ class DatabaseCreate(object):
             "GCARate" float);
         """
         self.dbi.execute_statement(statement)
-        
+
+    def lookups(self):
+        statement = """
+            CREATE TABLE Lookups ('ID' integer primary key autoincrement,
+            "Name" text,
+            "ProdMonth" int,
+            "Value" int);
+        """
+        self.dbi.execute_statement(statement)
+
     def calc(self):
         statement = """
             CREATE TABLE Calc ('ID' integer primary key autoincrement,

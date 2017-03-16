@@ -81,7 +81,7 @@ class DatabaseUtilities(object):
 
         statement = """
             INSERT INTO LeaseRoyaltyMaster VALUES(1, '2001-01-08 00:00:00', '2016-01-07 00:00:00', 'All',
-            'SKProvCrownVar,GORR', 0.12, 0.02, 'SaskWellHead', 'Y', 'Y', 'Y',
+            'SKProvCrownVar,GORR', 0.12, 0.02, 'SaskWellHead', 'Prod', 'Sales', 'Prod', 'Y', 'Y', 'Y',
             'mprod,250,2,300,3,400,4,500,5,0,6',
             NULL, 0, 50, 50, NULL)
         """
@@ -107,18 +107,18 @@ class DatabaseUtilities(object):
 
         statement = """
             INSERT INTO Monthly Values(1, '2015-09-29 00:00:00', 201501, 1,
-                'OIL', 2, 740, 100, 90.0, "Payor1", 100.0, 221.123456, 2.123455, 0.123455, 0.0);
+                'OIL', 2, 740, 100, 90.0, 0, "Payor1", 100.0, 221.123456, 2.123455, 0.123455, 0.0);
             INSERT INTO Monthly Values(2, '2015-09-29 00:00:00', 201501, 4,
-                'OIL', 2, 740, 100, 90.0, "Payor1", 50.0, 221.123456, 2.123455, 0.123455, 0.0);
+                'OIL', 2, 740, 100, 90.0, 0, "Payor1", 50.0, 221.123456, 2.123455, 0.123455, 0.0);
             INSERT INTO Monthly Values(4, '2015-09-29 00:00:00', 201501, 4,
-                'OIL', 2, 740, 100, 90.0, "Payor1", 50.0, 221.123456, 2.123455, 0.123455, 0.0);
+                'OIL', 2, 740, 100, 90.0, 0, "Payor1", 50.0, 221.123456, 2.123455, 0.123455, 0.0);
         """
         self.db_instance.execute_statement(statement)
 
     def create_orphin_monthly(self):
         statement = """
             INSERT INTO Monthly Values(37, '2015-09-29 00:00:00', 201501, 1,
-                'Stuff', 2, 740, 100, "Payor1", 100.0, 221.123456, 2.123455, 0.123455, 0.0);
+                'Stuff', 2, 740, 100, 0, "Payor1", 100.0, 221.123456, 2.123455, 0.123455, 0.0);
         """
         self.db_instance.execute_statement(statement)
 
