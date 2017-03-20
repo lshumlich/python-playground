@@ -7,6 +7,7 @@ from .main import get_proddate_int
 from src.util.apperror import AppError
 from src.util.appdate import prod_month_to_date
 from src.util.app_formatter import format_gorr
+from src.database.data_structure import DataStructure
 
 worksheet = Blueprint('worksheet', __name__)
 
@@ -61,18 +62,21 @@ def generate_worksheet(well_id, prod_month, rpba, product):
         else:
             monthly_array = db.select('Monthly', WellID=well_id, prodMonth=prod_month, product=product)
         if len(monthly_array) == 0:
-            raise AppError("There were no monthly records for " + str(well_id) + str(prod_month) + product)
+            raise AppError("There were no monthly records for well: " + str(well_id) + " ProdDate: " +
+                           str(prod_month) + " Product: " + product)
         monthly = monthly_array[0]  # if there are multiple pick the first one
 
         ba = db.select1('BAInfo', BAid=monthly.RPBA, BAType='RTP')
         calc = db.select1('Calc', WellID=well_id, ProdMonth=prod_month, RPBA=monthly.RPBA, Product=product)
+        calc_specific = DataStructure(calc.RoyaltySpecific)
         rtp_info = db.select1('RTPInfo', WellEvent=well.WellEvent, Product=product, Payer=monthly.RPBA,
                               Date=prod_month_to_date(prod_month))
         # calc = calc_array[0]
         # print(monthly)
         return render_template('worksheet/calc_worksheet.html',
                                well=well, rm=royalty, m=monthly, lease=lease,
-                               calc=calc, well_lease_link=well_lease_link, ba=ba, rtp_info=rtp_info)
+                               calc=calc, calc_sp=calc_specific, well_lease_link=well_lease_link,
+                               ba=ba, rtp_info=rtp_info)
     except Exception as e:
         print('views.worksheet: ***Error:', e)
         traceback.print_exc(file=sys.stdout)

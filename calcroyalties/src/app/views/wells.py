@@ -58,10 +58,17 @@ def calculate():
     from src.calc.calcroyalties import ProcessRoyalties
     pr = ProcessRoyalties()
     well_id = int(request.args.get('WellId'))
-    try:
-        pr.process_one(well_id, get_proddate_int(), 'Oil')
-        return 'Calculation successful for %s, %i, %s' % (well_id, get_proddate_int(), 'Oil')
-    except Exception as e:
-        print(e)
-        return 'Something went wrong during calculation for %s, %i, %s:<br />%s' % \
-               (well_id, get_proddate_int(), 'Oil', str(e))
+    prod_date = int(request.args.get('ProdDate'))
+    print("We are in the calculate thing..... for ", well_id)
+    db = config.get_database()
+    for monthlyData in db.select('Monthly',WellId=well_id,ProdMonth=prod_date):
+        try:
+            print("about to calculate...")
+            pr.process_one(well_id, monthlyData.ProdMonth, monthlyData.Product)
+        except Exception as e:
+            print("We have an error")
+            print(e)
+            return 'Something went wrong during calculation for %s, %i, %s:<br />%s' % \
+                   (well_id, monthlyData.ProdMonth, monthlyData.Product, str(e))
+
+    return "Processing complete for well: %i %i" % (well_id, prod_date)

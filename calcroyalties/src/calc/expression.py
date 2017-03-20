@@ -27,19 +27,28 @@ Look at Sphinx for documentation generation.
 
 from py_expression_eval import Parser
 from src.util.apperror import AppError
+import config
 
 
-class Expression():
+class Expression:
 
-    def find_expression(selfs, s):
+    def __init__(self):
+        self.db = config.get_database()
+
+    @staticmethod
+    def find_expression(s):
         a = s.find('=(')
         if a < 0:
             raise AppError('No formula found in string: ' + s)
         brace_count = 1
+        i = 0
         for i in range(a + 2, len(s)):
-            if s[i] == ')' : brace_count -= 1
-            if s[i] == '(' : brace_count += 1
-            if brace_count == 0 : break
+            if s[i] == ')':
+                brace_count -= 1
+            if s[i] == '(':
+                brace_count += 1
+            if brace_count == 0:
+                break
 
         if brace_count != 0:
             raise AppError('The formula was not ended. Looking for matching ending ")" in string: ' + s)
@@ -50,17 +59,11 @@ class Expression():
         b, e = self.find_expression(s)
         return s[b+2:e]
 
-    def evaluate_expression(self, s, m):
-        e = self.get_expression(s)
-        parse = Parser()
-        expr = parse.parse(e)
-        print("tostring : ", expr.toString())
-        print("variables: ", expr. variables())
+    def lookup(self, name, prod_month):
+        lookup_data = self.db.select1('Lookups', Name=name, ProdMonth=prod_month)
+        return lookup_data.Value
 
-    def resolve_expression(self, s, m):
-        return "asdf"
-
-    def lookup(self, var_list, monthly):
+    def lookup_vars(self, var_list, monthly):
         var_values = {}
         for v in var_list:
             if v == "sales":
@@ -70,6 +73,37 @@ class Expression():
             elif v == "gj":
                 var_values[v] = monthly.GJ
             else:
-                var_values[v] = "wtf"
-            print(v)
+                if v[0:2] == 'm.':
+                    # v = v[2:]
+                    var_values[v] = self.lookup(v, monthly.ProdMonth)
+                else:
+                    var_values[v] = self.lookup(v, 0)
+            if not var_values[v]:
+                raise AppError("Looking up '{}' for a Formula but it was not found or it was 'None'".format(v))
+
         return var_values
+
+    def evaluate_expression(self, s, monthly):
+        parse = Parser()
+        e = self.get_expression(s)
+        expr = parse.parse(e)
+        vars = expr.variables()
+        resolved_vars = self.lookup_vars(vars, monthly)
+        print(resolved_vars)
+        value = expr.evaluate(resolved_vars)
+
+        return value
+
+    def resolve_expression(self, s, monthly):
+        parse = Parser()
+        e = self.get_expression(s)
+        expr = parse.parse(e)
+        vars = expr.variables()
+
+        resolved_vars = self.lookup_vars(vars, monthly)
+
+        new_e = s
+        for var in resolved_vars:
+            new_e = new_e.replace(var, str(resolved_vars[var]))
+
+        return new_e

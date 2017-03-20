@@ -79,6 +79,13 @@ Database Change Log: Must be maintained so we can keep the database in sink:
   Add LeaseRoyatlyMaster.ProductsBasedOn
   Add Monthly.GJ
   Add Lookups table
+2017-03-19
+  Add Calc.RTPInterest
+  Add Calc.PEFNInterest
+  Add Calc.LeaseID
+  Add Calc.RoyaltyBasedOn
+  Add Calc.RoyaltyBasedOnVol
+  Reorder Calc Table
 """
 import datetime
 
@@ -235,11 +242,19 @@ class DatabaseCreate(object):
         statement = """
             CREATE TABLE Calc ('ID' integer primary key autoincrement,
             "ProdMonth" int,
-            "WellID" id,
+            "WellID" int,
             "Product" text,
             "RPBA" text,
             "FNBandID" text,
             "FNReserveID" text,
+            "LeaseID" int,
+            "RoyaltyBasedOn" text,
+            "RoyaltyBasedOnVol" float,
+            "SalesPrice" float,
+            "RTPInterest" int,
+            "PEFNInterest" float,
+            "NetRoyaltyValue" float,
+            "GrossRoyaltyValue" float,
             "K" int,
             "X" int,
             "C" int,
@@ -258,8 +273,6 @@ class DatabaseCreate(object):
             "TransGorrValue" float,
             "ProcessingBaseValue" float,
             "ProcessingGorrValue" float,
-            "GrossRoyaltyValue" float,
-            "NetRoyaltyValue" float,
             "RoyaltyGCA" float,
             "RoyaltyDeductions" int,
             "CommencementPeriod" float,
@@ -321,7 +334,7 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
 
-        insert_statement = "insert into Users values(1,'admin','Admin Admin','info@thesolutionstack.com',201604, \
+        insert_statement = "insert into Users values(1,'admin','Admin Admin','info@leanminds.com',201609, \
                            ' ,well_view,well_edit,wellevent_view,wellevent_edit,facility_view,lease_view,lease_edit," \
                            "welllease_view,welllease_edit,data_view,data_edit,users_view,users_edit');"
         self.dbi.execute(insert_statement)

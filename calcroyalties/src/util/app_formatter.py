@@ -16,6 +16,8 @@ def format_gorr(gorr):
                 msg = 'Monthly Prod:'
             elif w == 'rev':
                 msg = 'Revenue:'
+            elif w[:2] == '=(':
+                msg = w + ":"
             else:
                 msg = 'GORR:"' + w + '" not known'
         elif i % 2 == 0:
@@ -23,10 +25,12 @@ def format_gorr(gorr):
                 w = 'max'
                 msg += '(>' + start_vol
             else:
-                msg += ' (' + start_vol + '-' + w
+                msg += ' (<=' + w
+                # msg += ' (' + start_vol + '-' + w
             start_vol = w
         else:
-            msg += ':' + w + '%)'
+            msg += ': ' + '{:.1%}'.format(float(w)) + ')'
+            # msg += ':' + w + '%)'
 
 
     return msg

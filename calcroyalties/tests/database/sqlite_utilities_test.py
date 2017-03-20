@@ -166,3 +166,13 @@ class DatabaseUtilities(object):
                 'Payor1', 'MinOwership',100);
         """
         self.db_instance.execute_statement(statement)
+
+    def delete_lookups(self):
+        statement = """
+            delete from Lookups;
+        """
+        self.db_instance.execute_statement(statement)
+
+    def insert_lookups(self, name, prod_month, value):
+        statement = "insert into Lookups (Name, ProdMonth, Value) values('" + name + "'," + str(prod_month) + ',' + str(value) + ');'
+        self.db_instance.execute_statement(statement)
