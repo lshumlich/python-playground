@@ -67,3 +67,5 @@ Usefull Sqlite Commands:
 select * from sqlite_master;
 Pragma table_info(well);
 
+Run Python Documentation
+- python -m pydoc src.calc.calcroyalties

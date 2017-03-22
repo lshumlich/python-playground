@@ -132,7 +132,14 @@ fmath {
                     </tr>
                 {% endif %}
                 <tr>
-                    <th align="right">Valuation Method:</th> <td> {{ rm.ValuationMethod }} </td>
+                    <th align="right">Valuation Method:</th>
+                    <td>
+                        {% if calc.RoyaltyPriceExplanation %}
+                            {{ calc.RoyaltyPriceExplanation }}
+                        {% else %}
+                            {{ rm.ValuationMethod }}
+                        {% endif %}
+                    </td>
                 </tr>
                 {% if well.CommencementDate != None %}
                     <tr>

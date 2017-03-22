@@ -86,7 +86,10 @@ Database Change Log: Must be maintained so we can keep the database in sink:
   Add Calc.RoyaltyBasedOn
   Add Calc.RoyaltyBasedOnVol
   Reorder Calc Table
+2017-03-21
+  add Calc.RoyaltyPriceExplanation
 """
+
 import datetime
 
 import config
@@ -261,6 +264,7 @@ class DatabaseCreate(object):
             "D" int,
             "RoyaltyClassification" text,
             "RoyaltyPrice" float,
+            "RoyaltyPriceExplanation" text,
             "RoyaltyVolume" int,
             "BaseRoyaltyCalcRate" int,
             "BaseRoyaltyRate" int,

@@ -313,7 +313,7 @@ class ProcessRoyalties(object):
     def calc_sask_oil_prov_crown_royalty_volume_value(self, m, fn_interest, rp_interest, lease_rm, calc):
         # todo: If there is no sales. Use last months sales value... Not included in this code
 
-        calc.RoyaltyPrice = self.determine_royalty_price(lease_rm.ValuationMethod, m)
+        calc.RoyaltyPrice, calc.RoyaltyPriceExplanation = self.determine_royalty_price(lease_rm.ValuationMethod, m)
 
         calc.BaseRoyaltyRate = calc.BaseRoyaltyCalcRate
 
@@ -456,7 +456,7 @@ class ProcessRoyalties(object):
         else:
             calc.BaseRoyaltyVolume = self.calc_sask_oil_iogr_subsection3(calc.RoyaltyBasedOnVol)
 
-        calc.RoyaltyPrice = round(self.determine_royalty_price(valuation_method, m), 6)
+        calc.RoyaltyPrice, calc.RoyaltyPriceExplanation = self.determine_royalty_price(valuation_method, m)
 
         calc.BaseRoyaltyValue = round(crown_multiplier *
                                       calc.BaseRoyaltyVolume *
@@ -528,8 +528,8 @@ class ProcessRoyalties(object):
 
         return roy_vol
 
-    @staticmethod
-    def determine_royalty_price(method, monthly):
+    # @staticmethod
+    def determine_royalty_price(self, method, monthly):
         """
         As we understand more about pricing we will develop this further. We know we need a method we just don't
         quite no what to do with it.
@@ -543,10 +543,15 @@ class ProcessRoyalties(object):
 
         # return royalty_price
         # This needs some development
-        if method == '0':
-            return 0.0
+        if method[:2] == '=(':
+            value = self.expression.evaluate_expression(method, monthly)
+            explanation = 'Formula ' + method + " " + self.expression.resolve_expression(method, monthly) \
+                       + " =" + str(value)
+        else:
+            value = monthly.SalesPrice
+            explanation = None
 
-        return monthly.SalesPrice
+        return value,explanation
 
     @staticmethod
     def ensure_date(d):
@@ -673,7 +678,7 @@ class ProcessRoyalties(object):
             royalty_classification = well.RoyaltyClassification
         # We need econ oil data
         # Note: If there is no sales. Use last months sales value... Not included in this code
-        calc.RoyaltyPrice = self.determine_royalty_price(royalty.ValuationMethod, monthly)
+        calc.RoyaltyPrice, calc.RoyaltyPriceExplanation = self.determine_royalty_price(royalty.ValuationMethod, monthly)
         self.calc_sask_gas_prov_crown_royalty_rate(calc, econ_gas_data, royalty_classification, calc.RoyaltyBasedOnVol,
                                                    well.SRC, well.WellType)
 
@@ -761,7 +766,7 @@ class ProcessRoyalties(object):
         # copied from the Oil function
         # todo: If there is no sales. Use last months sales value... Not included in this code
 
-        calc.RoyaltyPrice = self.determine_royalty_price(lease_rm.ValuationMethod, m)
+        calc.RoyaltyPrice, calc.RoyaltyPriceExplanation = self.determine_royalty_price(lease_rm.ValuationMethod, m)
 
         calc.BaseRoyaltyRate = calc.BaseRoyaltyCalcRate
 

@@ -482,18 +482,18 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
 
         calc.SalesPrice = 20
         pr.calc_sask_gas_iogr1995(calc)
-        self.assertEqual(calc.SuppRoyaltyValue, 2.1)
+        self.assertEqual(calc.SuppRoyaltyValue, 147.26)
         self.assertEqual(calc.BaseRoyaltyValue, 350)
 
         calc.SalesPrice = 50
         pr.calc_sask_gas_iogr1995(calc)
-        self.assertEqual(calc.SuppRoyaltyValue, 13.57)
+        self.assertEqual(calc.SuppRoyaltyValue, 949.86)
         self.assertEqual(calc.BaseRoyaltyValue, 875)
 
         calc.RTPInterest = .1
         calc.PEFNInterest = .2
         pr.calc_sask_gas_iogr1995(calc)
-        self.assertEqual(calc.SuppRoyaltyValue, .27)
+        self.assertEqual(calc.SuppRoyaltyValue, 19.0)
         self.assertEqual(calc.BaseRoyaltyValue, 17.5)
 
     def test_calcSaskPenIOGR1995(self):
@@ -576,13 +576,13 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         m.ProcessingRate = 0.123455
 
         pr = ProcessRoyalties()
-        self.assertAlmostEqual(pr.determine_royalty_price('ActSales', m), 221.123456)
+        self.assertEqual((221.123456, None), pr.determine_royalty_price('ActSales', m))
 
-        m.WellHeadPrice = 225
-        m.TransRate = 3
-        m.ProcessingRate = 1
+        m.ProdVol = 4.0
+        m.SalesVol = 2.0
 
-        self.assertAlmostEqual(pr.determine_royalty_price('ActSales', m), 221.123456)
+        self.assertEqual((10.0, "Formula =((prod - sales) * 5) =((4.0 - 2.0) * 5) =10.0"),
+                         pr.determine_royalty_price('=((prod - sales) * 5)', m))
 
     def test_calcGorrPercent(self):
         pr = ProcessRoyalties()
@@ -890,17 +890,3 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         pr.determine_based_on(leaserm, monthly, calc)
         self.assertEqual("Unknown", calc.RoyaltyBasedOn)
         self.assertEqual(0.0, calc.RoyaltyBasedOnVol)
-
-""" From Calc
-            "RoyaltyBasedOn" text,
-            "RoyaltyBasedOnVol" float,
-        Monthly
-            "ProdVol" int,
-            "SalesVol" int,
-            "GJ" int,
-        LeaseRM
-             "OilBasedOn" text,
-             "GasBasedOn" text,
-             "ProductsBasedOn" text,
-
-"""
