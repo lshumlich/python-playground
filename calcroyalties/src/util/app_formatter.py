@@ -29,7 +29,8 @@ def format_gorr(gorr):
                 # msg += ' (' + start_vol + '-' + w
             start_vol = w
         else:
-            msg += ': ' + '{:.1%}'.format(float(w)) + ')'
+            msg += ': ' + w + ')'
+            # msg += ': ' + '{:.1%}'.format(float(w)) + ')'
             # msg += ':' + w + '%)'
 
 

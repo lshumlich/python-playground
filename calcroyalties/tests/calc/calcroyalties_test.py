@@ -584,7 +584,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual((10.0, "Formula =((prod - sales) * 5) =((4.0 - 2.0) * 5) =10.0"),
                          pr.determine_royalty_price('=((prod - sales) * 5)', m))
 
-    def test_calcGorrPercent(self):
+    def test_calc_gorr_calc_type(self):
         pr = ProcessRoyalties()
         m = DataStructure()
         calc = DataStructure()
@@ -592,74 +592,80 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         m.ProdVol = 400
         m.ProdHours = 10
         gorr = "bad string,0,2"
-        self.assertRaises(AppError, pr.calc_gorr_percent, m, gorr, calc)
+        self.assertRaises(AppError, pr.get_gorr_calc_type, m, gorr, calc)
         m.ProdVol = None
-        self.assertRaises(AppError, pr.calc_gorr_percent, m, gorr, calc)
+        self.assertRaises(AppError, pr.get_gorr_calc_type, m, gorr, calc)
 
         gorr = None, "0,2"
-        self.assertRaises(AttributeError, pr.calc_gorr_percent, m, gorr, calc)
+        self.assertRaises(AttributeError, pr.get_gorr_calc_type, m, gorr, calc)
+
+
+        m.ProdVol = 0
+        gorr = "mprod,250,%.02,300,%.03,400,%.04,500,%.05,0,%.06"
+        self.assertEqual(pr.get_gorr_calc_type(m, gorr, calc),
+                         ('%.02', 'mprod = 0'))
 
         m.ProdVol = 600
         m.ProdHours = 10
-        gorr = "dprod,250,.02,300,.03,400,.04,500,.05,0,.06"
-        self.assertEqual(pr.calc_gorr_percent(m, gorr, calc),
-                         (.02, 'dprod = mprod / 30.5 days; 19.67 is > 0.0 and <= 250.0 for a RoyRate of 2.00%'))
+        gorr = "dprod,250,%.02,300,%.03,400,%.04,500,%.05,0,%.06"
+        self.assertEqual(pr.get_gorr_calc_type(m, gorr, calc),
+                         ('%.02', 'dprod = mprod / 30.5 days; 19.67 is <= 250.0'))
         m.ProdVol = 8235
         m.ProdHours = 3
-        self.assertEqual(pr.calc_gorr_percent(m, gorr, calc),
-                         (.03, 'dprod = mprod / 30.5 days; 270.00 is > 250.0 and <= 300.0 for a RoyRate of 3.00%'))
+        self.assertEqual(pr.get_gorr_calc_type(m, gorr, calc),
+                         ('%.03', 'dprod = mprod / 30.5 days; 270.00 is > 250.0 and <= 300.0'))
         m.ProdVol = 10065
         m.ProdHours = 30.5
-        self.assertEqual(pr.calc_gorr_percent(m, gorr, calc),
-                         (.04, 'dprod = mprod / 30.5 days; 330.00 is > 300.0 and <= 400.0 for a RoyRate of 4.00%'))
+        self.assertEqual(pr.get_gorr_calc_type(m, gorr, calc),
+                         ('%.04', 'dprod = mprod / 30.5 days; 330.00 is > 300.0 and <= 400.0'))
         m.ProdVol = 13725
         m.ProdHours = 5
-        self.assertEqual(pr.calc_gorr_percent(m, gorr, calc),
-                         (.05, 'dprod = mprod / 30.5 days; 450.00 is > 400.0 and <= 500.0 for a RoyRate of 5.00%'))
+        self.assertEqual(pr.get_gorr_calc_type(m, gorr, calc),
+                         ('%.05', 'dprod = mprod / 30.5 days; 450.00 is > 400.0 and <= 500.0'))
 
         m.ProdVol = None
         m.ProdHours = 10
-        self.assertRaises(TypeError, pr.calc_gorr_percent, m, gorr)
+        self.assertRaises(TypeError, pr.get_gorr_calc_type, m, gorr)
 
-        gorr = "mprod,250,.02,300,.03,400,.04,500,.05,0,.06"
+        gorr = "mprod,250,%.02,300,%.03,400,%.04,500,%.05,0,%.06"
         m.ProdVol = 200
         m.ProdHours = 10
-        self.assertEqual(pr.calc_gorr_percent(m, gorr, calc),
-                         (.02, 'mprod = 200 is > 0.0 and <= 250.0 for a RoyRate of 2.00%'))
+        self.assertEqual(pr.get_gorr_calc_type(m, gorr, calc),
+                         ('%.02', 'mprod = 200 is <= 250.0'))
         m.ProdVol = 300
         m.ProdHours = 4
-        self.assertEqual(pr.calc_gorr_percent(m, gorr, calc),
-                         (.03, 'mprod = 300 is > 250.0 and <= 300.0 for a RoyRate of 3.00%'))
+        self.assertEqual(pr.get_gorr_calc_type(m, gorr, calc),
+                         ('%.03', 'mprod = 300 is > 250.0 and <= 300.0'))
         m.ProdVol = 350.6
         m.ProdHours = 1
-        self.assertEqual(pr.calc_gorr_percent(m, gorr, calc),
-                         (.04, 'mprod = 350.6 is > 300.0 and <= 400.0 for a RoyRate of 4.00%'))
+        self.assertEqual(pr.get_gorr_calc_type(m, gorr, calc),
+                         ('%.04', 'mprod = 350.6 is > 300.0 and <= 400.0'))
         m.ProdVol = 410
         m.ProdHours = 2
-        self.assertEqual(pr.calc_gorr_percent(m, gorr, calc),
-                         (.05, 'mprod = 410 is > 400.0 and <= 500.0 for a RoyRate of 5.00%'))
+        self.assertEqual(pr.get_gorr_calc_type(m, gorr, calc),
+                         ('%.05', 'mprod = 410 is > 400.0 and <= 500.0'))
         m.ProdVol = 10000
         m.ProdHours = 17
-        self.assertEqual(pr.calc_gorr_percent(m, gorr, calc),
-                         (.06, 'mprod = 10000 is > 500.0 for a RoyRate of 6.00%'))
+        self.assertEqual(pr.get_gorr_calc_type(m, gorr, calc),
+                         ('%.06', 'mprod = 10000 is > 500.0'))
 
-        gorr = "hprod,250,.02,300,.03,400,.04,500,.05,0,.06"
+        gorr = "hprod,250,%.02,300,%.03,400,%.04,500,%.05,0,%.06"
         m.ProdVol = 200
         m.ProdHours = 10
-        self.assertEqual(pr.calc_gorr_percent(m, gorr, calc),
-                         (.02, 'hprod = mprod / hours; 20.00 is > 0.0 and <= 250.0 for a RoyRate of 2.00%'))
+        self.assertEqual(pr.get_gorr_calc_type(m, gorr, calc),
+                         ('%.02', 'hprod = mprod / hours; 20.00 is <= 250.0'))
 
         m.ProdVol = 200
         m.SalesVol = 100
         m.ProdHours = 10
-        gorr = "=((prod - sales) * 5),250,.02,300,.03,400,.04,500,.05,0,.06"
-        self.assertEqual(pr.calc_gorr_percent(m, gorr, calc), (.05,
-            'Formula =((prod - sales) * 5) =((200 - 100) * 5) =500.0 is > 400.0 and <= 500.0 for a RoyRate of 5.00%'))
+        gorr = "=((prod - sales) * 5),250,%.02,300,%.03,400,%.04,500,%.05,0,%.06"
+        self.assertEqual(pr.get_gorr_calc_type(m, gorr, calc),
+                         ('%.05','Formula =((prod - sales) * 5) =((200 - 100) * 5) =500.0 is > 400.0 and <= 500.0'))
         m.ProdVol = 10000
         m.SalesVol = 10000
         m.ProdHours = 4
-        self.assertEqual(pr.calc_gorr_percent(m, gorr, calc), (.02,
-            'Formula =((prod - sales) * 5) =((10000 - 10000) * 5) =0.0 for a RoyRate of 2.00%'))
+        self.assertEqual(pr.get_gorr_calc_type(m, gorr, calc),
+                         ('%.02','Formula =((prod - sales) * 5) =((10000 - 10000) * 5) =0.0'))
 
     def test_gorr_royalty(self):
 
@@ -672,7 +678,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         monthly.ProdHours = 10.0
         monthly.TransRate = .1234
         leaserm.TransDeducted = 'All'
-        leaserm.Gorr = "fixed,0,.02"
+        leaserm.Gorr = "fixed,0,%.02"
 
         calc.RTPInterest = 1.0
         calc.PEFNInterest = 1.0
@@ -685,6 +691,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         pr.calc_gorr(leaserm, calc, monthly)
         self.assertEqual(400.0, calc.GorrRoyaltyValue)
         self.assertEqual(.25, calc.TransGorrValue)
+        self.assertEqual("fixed for a Royalty Rate of 2.00%", calc.GorrMessage)
 
         monthly.ProdVol = 100.0
         calc.RTPInterest = .5
@@ -692,6 +699,34 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         pr.calc_gorr(leaserm, calc, monthly)
         self.assertEqual(200.0, calc.GorrRoyaltyValue)
         self.assertEqual(.12, calc.TransGorrValue)
+        self.assertEqual("fixed for a Royalty Rate of 2.00%", calc.GorrMessage)
+
+        leaserm.Gorr = "fixed,0,$500.02"
+        pr.calc_gorr(leaserm, calc, monthly)
+        self.assertEqual(500.02, calc.GorrRoyaltyValue)
+        self.assertEqual(.12, calc.TransGorrValue)
+        self.assertEqual("fixed for a Royalty Value of $500.02", calc.GorrMessage)
+
+        monthly.ProdVol = 100.0
+        monthly.SalesVol = 90.0
+        leaserm.Gorr = "fixed,0,$=((prod - sales) * 100)"
+        pr.calc_gorr(leaserm, calc, monthly)
+        self.assertEqual(1000.00, calc.GorrRoyaltyValue)
+        self.assertEqual(.12, calc.TransGorrValue)
+        self.assertEqual("fixed for a Royalty Value of Formula $=((prod - sales) * 100) $=((100.0 - 90.0) * 100) "
+                         "=1000.0 for a Royalty Value of $1000.00", calc.GorrMessage)
+
+        # leaserm.Gorr = '=(price),7.5,$=(.15*prod*price),0,$=(.15*(7.50*prod)+.25*((price-7.50)*prod))'
+        leaserm.Gorr = '=(price),7.5,$=(.15*prod*price),0,$=(0.15 * (7.50 * prod) + 0.25 * ((price - 7.50) * prod))'
+        monthly.ProdVol = 100.0
+        calc.RoyaltyPrice = 200.0
+        pr.calc_gorr(leaserm, calc, monthly)
+        self.assertEqual(4925.00, calc.GorrRoyaltyValue)
+        self.assertEqual(.12, calc.TransGorrValue)
+        self.assertEqual("Formula =(price) =(200.0) =200.0 is > 7.5 for a Royalty Value of Formula "
+                         "$=(0.15 * (7.50 * prod) + 0.25 * ((price - 7.50) * prod)) "
+                         "$=(0.15 * (7.50 * 100.0) + 0.25 * ((200.0 - 7.50) * 100.0)) =4925.0 "
+                         "for a Royalty Value of $4925.00", calc.GorrMessage)
 
     def test_calcSupplementaryRoyaltiesIOGR1995(self):
         reference_price = {'Pigeon Lake Indian': 24.04, 'Reserve no.138A': 25.37,

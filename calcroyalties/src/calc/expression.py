@@ -85,23 +85,23 @@ class Expression:
 
         return var_values
 
-    def evaluate_expression(self, s, monthly):
+    def evaluate_expression(self, s, monthly, calc=None):
         parse = Parser()
         e = self.get_expression(s)
         expr = parse.parse(e)
         vars = expr.variables()
-        resolved_vars = self.lookup_vars(vars, monthly)
+        resolved_vars = self.lookup_vars(vars, monthly, calc)
         value = expr.evaluate(resolved_vars)
 
         return value
 
-    def resolve_expression(self, s, monthly):
+    def resolve_expression(self, s, monthly, calc=None):
         parse = Parser()
         e = self.get_expression(s)
         expr = parse.parse(e)
         vars = expr.variables()
 
-        resolved_vars = self.lookup_vars(vars, monthly)
+        resolved_vars = self.lookup_vars(vars, monthly, calc)
 
         new_e = s
         for var in resolved_vars:

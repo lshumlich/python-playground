@@ -194,20 +194,72 @@ class ProcessRoyalties(object):
 
     # @staticmethod
     def calc_gorr(self, leaserm, calc, monthly):
-        calc.GorrRoyaltyRate, calc.GorrMessage = self.calc_gorr_percent(monthly, leaserm.Gorr, calc)
-        #
-        # calc.GorrRoyaltyValue = round(monthly.RPVol * well_lease_link.PEFNInterest *
-        #                               calc.GorrRoyaltyRate * calc.RoyaltyPrice, 2)
-        # calc.GorrRoyaltyVolume = round(monthly.RPVol * well_lease_link.PEFNInterest *
-        #                                calc.GorrRoyaltyRate, 6)
-        # calc.GrossRoyaltyValue += calc.GorrRoyaltyValue
-        # calc.NetRoyaltyValue = calc.GrossRoyaltyValue
+        """
+        For an explanation of the various formats that this can handle please see the help documentation found at
+        LeaseRoyaltyMaster.Gorr. (Note to self... This may become the documentation...
 
-        calc.GorrRoyaltyValue = round(calc.GorrRoyaltyRate *
-                                      calc.RoyaltyBasedOnVol *
-                                      calc.PEFNInterest *
-                                      calc.RTPInterest *
-                                      calc.RoyaltyPrice, 2)
+        The format is as follows "PartA,gorr_numN,gorr_calc_typeN,gorr_numN+1,gorr_calc_typeN+1" as many sets as needed.
+        An example is: "mprod,250,%.02,300,%.03,400,%.04,500,%.05,0,%.06"
+
+        PartA - Can be one of the following:
+         - dprod - Daily Production
+         - mprod - Monthly Production
+         - hprod - Hourly Production
+         - =( --> which means it is a formula and it will resolve to a value. Look for the documentation in
+           code src.calc.expression.py
+
+        gorr_numn, gorr_calc_typeN (Always come in pairs) There can be an unlimited number of pairs separated by a ','.
+        in the above example the pairs are as follows:
+         <= 250 , %.02
+         <= 300 , %.03
+         <= 400 , %.04
+         <= 500 , %.05
+         > 500 , %.06 (note: the last one is always 0 but means above the last value
+        The first pair that satisfies criteria is selected.
+
+        gorr_calc_typeN --> The first character explains what to do when this pair is selected.
+        The possible first characters are:
+         '%' - It is a Royalty %. It will be multiplied by the "Royalty Based On" value. Documentation in here.
+         '$' - It is the Royalty Amount.
+                The Royalty Amount can be followed by a value or by a formula that is resolved to determine the
+                Royalty Amount.
+
+        The above may sound complicated but the following are some valid examples:
+
+        "mprod,100,$100.00,200,$200.00,0,$1000.00"
+            This is silly but it says that based on Monthly Production:
+            <= 100, $100.00
+            <= 200, $200.00
+            > 200, $1,000.00
+        The first pair is selected
+
+        "=(prod - sales),10,$=((prod - sales) * 10),0,$(prod - sales) * 100)
+            this is sillier but it says that based on production - sales:
+            <= 10, the royalty will be (production - sales) * $10
+            > 10, the royalty will be (production - sales) * $100
+
+        If the above doesn't make sense. Track down Lorraine (403)681-9586. She was suppose to make this gibberish
+        make sense. She promised, or I asked her to, one or the other.
+        """
+        gorr_calc_type, calc.GorrMessage = self.get_gorr_calc_type(monthly, leaserm.Gorr, calc)
+
+        if gorr_calc_type[0] == '%':
+            calc.GorrRoyaltyRate = float(gorr_calc_type[1:])
+            calc.GorrMessage += ' for a Royalty Rate of ' + '{:.2%}'.format(calc.GorrRoyaltyRate)
+            calc.GorrRoyaltyValue = round(calc.GorrRoyaltyRate *
+                                          calc.RoyaltyBasedOnVol *
+                                          calc.PEFNInterest *
+                                          calc.RTPInterest *
+                                          calc.RoyaltyPrice, 2)
+        elif gorr_calc_type[0] == '$':
+            if gorr_calc_type[1:3] == '=(':
+                calc.GorrRoyaltyValue = self.expression.evaluate_expression(gorr_calc_type, monthly, calc)
+                calc.GorrMessage += ' for a Royalty Value of Formula ' + gorr_calc_type + " " + \
+                                    self.expression.resolve_expression(gorr_calc_type, monthly, calc) + \
+                                    " =" + str(calc.GorrRoyaltyValue)
+            else:
+                calc.GorrRoyaltyValue = float(gorr_calc_type[1:])
+            calc.GorrMessage += ' for a Royalty Value of ' + '${:.2f}'.format(calc.GorrRoyaltyValue)
 
         if leaserm.TransDeducted == 'All' or leaserm.TransDeducted == 'GORR':
             calc.TransGorrValue = round(calc.GorrRoyaltyRate *
@@ -219,8 +271,8 @@ class ProcessRoyalties(object):
             calc.TransGorrValue = 0.0
 
     # @staticmethod
-    def calc_gorr_percent(self, monthly, gorr, calc):
-        """ returns the rr% based on the GORR base and an explanation string  """
+    def get_gorr_calc_type(self, monthly, gorr, calc):
+        """ returns the calc type based on the GORR base and an explanation string  """
         words = gorr.split(",")
         # gorr_percent = 0.0
         gorr_max_vol = 0.0
@@ -244,8 +296,8 @@ class ProcessRoyalties(object):
                 elif s == 'fixed':
                     gorr_explain = 'fixed'
                 elif s[:2] == '=(':
-                    eval_vol = self.expression.evaluate_expression(s, monthly)
-                    gorr_explain = 'Formula ' + s + " " + self.expression.resolve_expression(s, monthly) \
+                    eval_vol = self.expression.evaluate_expression(s, monthly, calc)
+                    gorr_explain = 'Formula ' + s + " " + self.expression.resolve_expression(s, monthly, calc) \
                                    + " =" + str(eval_vol)
                 else:
                     raise AppError('GORR Base is not known: ' + s)
@@ -253,20 +305,17 @@ class ProcessRoyalties(object):
                 last_gorr_max_vol = gorr_max_vol
                 gorr_max_vol = float(s)
             else:
-                gorr_percent = float(s)
                 if eval_vol == 0:
-                    gorr_explain += ' for a RoyRate of ' + '{:.2%}'.format(gorr_percent)
-                    # gorr_explain += ' for a RoyRate of ' + str(gorr_percent) + '%'
-
-                    return round(gorr_percent, 6), gorr_explain
+                    return s, gorr_explain
                 elif gorr_max_vol == 0:
-                    gorr_explain += ' is > ' + str(last_gorr_max_vol) + ' for a RoyRate of ' + \
-                                    '{:.2%}'.format(gorr_percent)
-                    return round(gorr_percent, 6), gorr_explain
+                    gorr_explain += ' is > ' + str(last_gorr_max_vol)
+                    return s, gorr_explain
                 elif eval_vol <= gorr_max_vol:
-                    gorr_explain += ' is > ' + str(last_gorr_max_vol) + ' and <= ' + str(
-                        gorr_max_vol) + ' for a RoyRate of ' + '{:.2%}'.format(gorr_percent)
-                    return round(gorr_percent, 6), gorr_explain
+                    if last_gorr_max_vol == 0:
+                        gorr_explain += ' is <= ' + str(gorr_max_vol)
+                    else:
+                        gorr_explain += ' is > ' + str(last_gorr_max_vol) + ' and <= ' + str(gorr_max_vol)
+                    return s, gorr_explain
         raise AppError('GORR Logic Error. We should never ever get here: ')
 
     @staticmethod

@@ -86,12 +86,13 @@ def run_code_coverage():
 
 
 if __name__ == "__main__":
-    run_code_coverage()
+    # run_code_coverage()
     # start_logging()
     # t1 = datetime.datetime.now()
     # logging.info('Batch started: ' + str(t1))
 
-    # drop_create_tables()
+    drop_create_tables()
+    print("Should be done")
     # drop_table("DataDictionary")
     # load_sheet(config.get_temp_dir() + "DataDictionary.xlsx")
     # load_sheet("K:\\lms\\Analysis and Design\\Sample Data Saved\\DataDictionary.xlsx")

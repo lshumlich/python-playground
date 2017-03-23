@@ -42,6 +42,12 @@ class DatabaseUtilities(object):
     def __init__(self):
         self.db_instance = config.get_database_instance()
         self.db_create = DatabaseCreate()
+
+    def table_exists(self, name):
+        tables = self.db_instance.get_table_names()
+        if name not in tables:
+            return False
+        return True
     
     def delete_all_tables(self):
         """ Used only for unit tests. It was put here so the database itself did not have distructive code in it """
@@ -168,10 +174,13 @@ class DatabaseUtilities(object):
         self.db_instance.execute_statement(statement)
 
     def delete_lookups(self):
-        statement = """
-            delete from Lookups;
-        """
-        self.db_instance.execute_statement(statement)
+        if not self.table_exists("Lookups"):
+            self.db_create.lookups()
+        else:
+            statement = """
+                delete from Lookups;
+            """
+            self.db_instance.execute_statement(statement)
 
     def insert_lookups(self, name, prod_month, value):
         statement = "insert into Lookups (Name, ProdMonth, Value) values('" + name + "'," + str(prod_month) + ',' + str(value) + ');'
