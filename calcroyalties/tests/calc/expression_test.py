@@ -12,7 +12,6 @@ class TestExpresion(unittest.TestCase):
     def test_stuff(self):
         parser = Parser()
         v = parser.parse('m.myvalue * m.yourvalue').evaluate({"m.myvalue": 3, 'm.yourvalue': 4})
-        print(v)
 
     def test_find_expression(self):
         expression = Expression()
@@ -54,12 +53,15 @@ class TestExpresion(unittest.TestCase):
         monthly.ProdVol = 100
         monthly.SalesVol = 90
         monthly.GJ = 1000
+        calc = DataStructure()
+        calc.RoyaltyPrice = 27.12
 
-        rv = expression.lookup_vars({"prod", "sales", "gj", "somevalue", "m.monthval"}, monthly)
+        rv = expression.lookup_vars({"prod", "sales", "gj", "price", "somevalue", "m.monthval"}, monthly, calc)
 
         self.assertEqual(100, rv["prod"])
         self.assertEqual(90, rv["sales"])
         self.assertEqual(1000, rv["gj"])
+        self.assertEqual(27.12, rv["price"])
         self.assertEqual(1234, rv["somevalue"])
         self.assertEqual(5678, rv["m.monthval"])
 
@@ -68,7 +70,7 @@ class TestExpresion(unittest.TestCase):
         monthly.GJ = None
         self.assertRaises(AppError, expression.lookup_vars, {"gj", "sales"}, monthly)
 
-    def test_evaluate_expression(self):
+    def test_evaluate_and_resolve_expression(self):
         expression = Expression()
 
         util = DatabaseUtilities()

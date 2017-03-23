@@ -63,7 +63,7 @@ class Expression:
         lookup_data = self.db.select1('Lookups', Name=name, ProdMonth=prod_month)
         return lookup_data.Value
 
-    def lookup_vars(self, var_list, monthly):
+    def lookup_vars(self, var_list, monthly, calc=None):
         var_values = {}
         for v in var_list:
             if v == "sales":
@@ -72,6 +72,8 @@ class Expression:
                 var_values[v] = monthly.ProdVol
             elif v == "gj":
                 var_values[v] = monthly.GJ
+            elif v == "price":
+                var_values[v] = calc.RoyaltyPrice
             else:
                 if v[0:2] == 'm.':
                     # v = v[2:]
@@ -89,7 +91,6 @@ class Expression:
         expr = parse.parse(e)
         vars = expr.variables()
         resolved_vars = self.lookup_vars(vars, monthly)
-        print(resolved_vars)
         value = expr.evaluate(resolved_vars)
 
         return value

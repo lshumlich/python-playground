@@ -194,8 +194,7 @@ class ProcessRoyalties(object):
 
     # @staticmethod
     def calc_gorr(self, leaserm, calc, monthly):
-        calc.GorrRoyaltyRate, calc.GorrMessage = \
-            self.calc_gorr_percent(monthly, leaserm.Gorr, calc)
+        calc.GorrRoyaltyRate, calc.GorrMessage = self.calc_gorr_percent(monthly, leaserm.Gorr, calc)
         #
         # calc.GorrRoyaltyValue = round(monthly.RPVol * well_lease_link.PEFNInterest *
         #                               calc.GorrRoyaltyRate * calc.RoyaltyPrice, 2)
@@ -218,6 +217,57 @@ class ProcessRoyalties(object):
                                         monthly.TransRate, 2)
         else:
             calc.TransGorrValue = 0.0
+
+    # @staticmethod
+    def calc_gorr_percent(self, monthly, gorr, calc):
+        """ returns the rr% based on the GORR base and an explanation string  """
+        words = gorr.split(",")
+        # gorr_percent = 0.0
+        gorr_max_vol = 0.0
+        last_gorr_max_vol = 0.0
+        gorr_explain = ''
+
+        i = 0
+        eval_vol = 0
+        for s in words:
+            i += 1
+            if i == 1:
+                if s == 'dprod':
+                    eval_vol = round(monthly.ProdVol / 30.5, 2)
+                    gorr_explain = 'dprod = mprod / 30.5 days; ' + '{:.2f}'.format(eval_vol)
+                elif s == 'mprod':
+                    eval_vol = monthly.ProdVol
+                    gorr_explain = 'mprod = ' + str(eval_vol)
+                elif s == 'hprod':
+                    eval_vol = round(monthly.ProdVol / monthly.ProdHours, 2)
+                    gorr_explain = 'hprod = mprod / hours; ' + '{:.2f}'.format(eval_vol)
+                elif s == 'fixed':
+                    gorr_explain = 'fixed'
+                elif s[:2] == '=(':
+                    eval_vol = self.expression.evaluate_expression(s, monthly)
+                    gorr_explain = 'Formula ' + s + " " + self.expression.resolve_expression(s, monthly) \
+                                   + " =" + str(eval_vol)
+                else:
+                    raise AppError('GORR Base is not known: ' + s)
+            elif i % 2 == 0:
+                last_gorr_max_vol = gorr_max_vol
+                gorr_max_vol = float(s)
+            else:
+                gorr_percent = float(s)
+                if eval_vol == 0:
+                    gorr_explain += ' for a RoyRate of ' + '{:.2%}'.format(gorr_percent)
+                    # gorr_explain += ' for a RoyRate of ' + str(gorr_percent) + '%'
+
+                    return round(gorr_percent, 6), gorr_explain
+                elif gorr_max_vol == 0:
+                    gorr_explain += ' is > ' + str(last_gorr_max_vol) + ' for a RoyRate of ' + \
+                                    '{:.2%}'.format(gorr_percent)
+                    return round(gorr_percent, 6), gorr_explain
+                elif eval_vol <= gorr_max_vol:
+                    gorr_explain += ' is > ' + str(last_gorr_max_vol) + ' and <= ' + str(
+                        gorr_max_vol) + ' for a RoyRate of ' + '{:.2%}'.format(gorr_percent)
+                    return round(gorr_percent, 6), gorr_explain
+        raise AppError('GORR Logic Error. We should never ever get here: ')
 
     @staticmethod
     def calc_sask_oil_prov_crown_royalty_rate(calc, econ_oil_data,
@@ -581,57 +631,6 @@ class ProcessRoyalties(object):
                                     (0.75 * (well_head_price - reference_price - 12.58) + 6.29)
 
         return round(supplementary_royalty, 2)
-
-    # @staticmethod
-    def calc_gorr_percent(self, monthly, gorr, calc):
-        """ returns the rr% based on the GORR base and an explanation string  """
-        words = gorr.split(",")
-        # gorr_percent = 0.0
-        gorr_max_vol = 0.0
-        last_gorr_max_vol = 0.0
-        gorr_explain = ''
-
-        i = 0
-        eval_vol = 0
-        for s in words:
-            i += 1
-            if i == 1:
-                if s == 'dprod':
-                    eval_vol = round(monthly.ProdVol / 30.5, 2)
-                    gorr_explain = 'dprod = mprod / 30.5 days; ' + '{:.2f}'.format(eval_vol)
-                elif s == 'mprod':
-                    eval_vol = monthly.ProdVol
-                    gorr_explain = 'mprod = ' + str(eval_vol)
-                elif s == 'hprod':
-                    eval_vol = round(monthly.ProdVol / monthly.ProdHours, 2)
-                    gorr_explain = 'hprod = mprod / hours; ' + '{:.2f}'.format(eval_vol)
-                elif s == 'fixed':
-                    gorr_explain = 'fixed'
-                elif s[:2] == '=(':
-                    eval_vol = self.expression.evaluate_expression(s, monthly)
-                    gorr_explain = 'Formula ' + s + " " + self.expression.resolve_expression(s, monthly) \
-                                   + " =" + str(eval_vol)
-                else:
-                    raise AppError('GORR Base is not known: ' + s)
-            elif i % 2 == 0:
-                last_gorr_max_vol = gorr_max_vol
-                gorr_max_vol = float(s)
-            else:
-                gorr_percent = float(s)
-                if eval_vol == 0:
-                    gorr_explain += ' for a RoyRate of ' + '{:.2%}'.format(gorr_percent)
-                    # gorr_explain += ' for a RoyRate of ' + str(gorr_percent) + '%'
-
-                    return round(gorr_percent, 6), gorr_explain
-                elif gorr_max_vol == 0:
-                    gorr_explain += ' is > ' + str(last_gorr_max_vol) + ' for a RoyRate of ' + \
-                                    '{:.2%}'.format(gorr_percent)
-                    return round(gorr_percent, 6), gorr_explain
-                elif eval_vol <= gorr_max_vol:
-                    gorr_explain += ' is > ' + str(last_gorr_max_vol) + ' and <= ' + str(
-                        gorr_max_vol) + ' for a RoyRate of ' + '{:.2%}'.format(gorr_percent)
-                    return round(gorr_percent, 6), gorr_explain
-        raise AppError('GORR Logic Error. We should never ever get here: ')
 
     '''
     Sask Oil Royalty Calculation
