@@ -1,43 +1,60 @@
 {% extends 'layout.html' %}
 {% block body %}
 
-<form id="leaseForm">
+{% if not lease %}
+{% set lease = None %}
+{% endif %}
+{% if not royaltymaster %}
+{% set royaltymaster = None %}
+{% endif %}
+
+<form id="leaseForm" method="POST">
     <fieldset>
         <legend><h3>Lease {{ lease.Lease }}</h3></legend>
         <table cellpadding="5">
             <tr>
                 <td><label for="LeaseType">Lease Type</label></td>
-                <td><input type="text" id="LeaseType" value="{{ lease.LeaseType }}" /></td>
+                <td><input type="text" name="LeaseType" value="{{ lease.LeaseType }}" /></td>
                 <td><label for="ID">ID</label></td>
-                <td><input type="text" id="ID" value="{{ lease.ID }}" /></td>
+                <td><input type="text" name="ID" value="{{ lease.ID }}" disabled /></td>
             </tr>
             <tr>
                 <td><label for="Province">Province</label></td>
-                <td><input type="text" id="Province" value="{{ lease.Prov }}" /></td>
+                <td><input type="text" name="Prov" value="{{ lease.Prov }}" /></td>
                 <td><label for="FNReserve">FNReserve</label></td>
-                <td><input type="text" id="FNReserve" value="{{ lease.FNReserve }}" /></td>
+                <td><input type="text" name="FNReserveID" value="{{ lease.FNReserveID }}" /></td>
             </tr>
             <tr>
                 <td><label for="FNBandID">FNBandID</label></td>
-                <td><input type="text" id="FNBandID" value="{{ lease.FNBandID }}" /></td>
-                <td><label for="Lessor">Lessor</label></td>
-                <td><input type="text" id="Lessor" value="{{ lease.Lessor }}" /></td>
+                <td><input type="text" name="FNBandID" value="{{ lease.FNBandID }}" /></td>
             </tr>
             <tr>
                 <td><label for="Notes">Notes</label></td>
-                <td colspan="3"><input style="width:100%" type="text" id="Notes" value="{{ lease.Notes }}" /></td>
+                <td colspan="3"><input style="width:100%" type="text" name="Notes" value="{{ lease.Notes }}" /></td>
             </tr>
+            {% if royaltymaster %}
             <tr>
                 <td><label for="RightsGranted">Rights Granted</label></td>
-                <td><input type="text" id="RightsGranted" value="{{ royaltymaster.RightsGranted }}" /></td>
+                <td><input type="text" name="RightsGranted" value="{{ royaltymaster.RightsGranted }}" /></td>
                 <td><label for="RoyaltyScheme">Royalty Scheme</label></td>
-                <td><input type="text" id="RoyaltyScheme" value="{{ royaltymaster.RoyaltyScheme }}" /></td>
+                <td><input type="text" name="RoyaltyScheme" value="{{ royaltymaster.RoyaltyScheme }}" /></td>
             </tr>
             <tr>
                 <td><label for="CrownMultiplier">Crown Multiplier</label></td>
-                <td><input type="text" id="CrownMultiplier" value="{{ royaltymaster.CrownMultiplier }}" /></td>
+                <td><input type="text" name="CrownMultiplier" value="{{ royaltymaster.CrownMultiplier }}" /></td>
                 <td><label for="ValuationMethod">Valuation Method</label></td>
-                <td><input type="text" id="ValuationMethod" value="{{ royaltymaster.ValuationMethod }}" /></td>
+                <td><input type="text" name="ValuationMethod" value="{{ royaltymaster.ValuationMethod }}" /></td>
+            </tr>
+            {% endif %}
+            <tr>
+                <td colspan="2">&nbsp;</td>
+                {% if new == False %}
+                <td><button type="submit" name="action" value="delete">Delete</button></td>
+                <td><button type="submit" name="action" value="update">Update</button></td>
+                {% else %}
+                <td><button type="submit" name="action" value="cancel">Cancel</button></td>
+                <td><button type="submit" name="action" value="add">Add</button></td>
+                {% endif %}
             </tr>
         </table>
     </fieldset>

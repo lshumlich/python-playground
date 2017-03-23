@@ -139,6 +139,7 @@ class Database(object):
         ds.ID = self.dbi.get_id()
         
         self.commit()
+        return ds.ID
 
     def update(self, ds):
         # Rule 1: all tables that can be updated must have an ID attrabute that is the primary key.
