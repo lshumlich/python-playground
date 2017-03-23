@@ -88,6 +88,8 @@ Database Change Log: Must be maintained so we can keep the database in sink:
   Reorder Calc Table
 2017-03-21
   add Calc.RoyaltyPriceExplanation
+2017-03-23
+  add Monthly.Heat
 """
 
 import datetime
@@ -222,6 +224,7 @@ class DatabaseCreate(object):
             "ProdHours" int,
             "ProdVol" int,
             "SalesVol" int,
+            "Heat" int,
             "GJ" int,
             "RPBA" text,
             "RPVol" float,

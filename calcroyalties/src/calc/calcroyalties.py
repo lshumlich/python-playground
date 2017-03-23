@@ -199,6 +199,7 @@ class ProcessRoyalties(object):
         LeaseRoyaltyMaster.Gorr. (Note to self... This may become the documentation...
 
         The format is as follows "PartA,gorr_numN,gorr_calc_typeN,gorr_numN+1,gorr_calc_typeN+1" as many sets as needed.
+        The double quotes are not part of the format.
         An example is: "mprod,250,%.02,300,%.03,400,%.04,500,%.05,0,%.06"
 
         PartA - Can be one of the following:
@@ -209,7 +210,7 @@ class ProcessRoyalties(object):
            code src.calc.expression.py
 
         gorr_numn, gorr_calc_typeN (Always come in pairs) There can be an unlimited number of pairs separated by a ','.
-        in the above example the pairs are as follows:
+        In the above example the pairs are interpreted as follows:
          <= 250 , %.02
          <= 300 , %.03
          <= 400 , %.04
