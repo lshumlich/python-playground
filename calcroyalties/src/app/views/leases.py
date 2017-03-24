@@ -34,11 +34,13 @@ def search():
 
 @leases.route('/leases/<lease_num>', methods=['GET', 'POST'])
 def details(lease_num):
-    print(request.form)
     db = config.get_database()
     if request.method == 'POST' and request.form['action'] == 'delete':
+        print(request.form)
+        print('about to delete')
         try:
             lease_id = int(request.form['ID'])
+            print(lease_id)
             db.delete('Lease', lease_id)
             db.delete('LeaseRoyaltyMaster', lease_id)
             flash('Successfully deleted lease ' + str(lease_id))

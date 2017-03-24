@@ -37,7 +37,7 @@
         <input id='Prov' name="Prov" value="{% if search_terms %}{{ search_terms['Prov'] }}{% endif %}" />
         <br>
         <br>
-        <button type="submit" id='search-basic'>Search</button>
+          <button type="submit" id='search-basic'>Search</button>&nbsp;<a href="{{ url_for('leases.new') }}">Create new</a>
        </form>
   	  </div>
 
