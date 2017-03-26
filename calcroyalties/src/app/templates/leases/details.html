@@ -1,13 +1,6 @@
 {% extends 'layout.html' %}
 {% block body %}
 
-{% if not lease %}
-{% set lease = None %}
-{% endif %}
-{% if not royaltymaster %}
-{% set royaltymaster = None %}
-{% endif %}
-
 <form id="leaseForm" method="POST">
     <fieldset>
         <legend><h3>Lease {{ lease.Lease }}</h3></legend>

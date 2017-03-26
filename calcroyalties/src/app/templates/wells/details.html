@@ -1,21 +1,32 @@
 {% extends 'layout.html' %}
 {% block body %}
 
-<form>
+<form id="wellForm" method="POST">
+    <input type="hidden" name="ID" value="{{ well.ID }}" />
     <fieldset>
         <legend><h3>Well {{ well.ID }}</h3></legend>
         <table cellpadding="5">
             <tr>
                 <td><label for="Prov">Province</label></td>
-                <td><input type="text" id="Prov" value="{{ well.Prov }}" /></td>
+                <td><input type="text" name="Prov" value="{{ well.Prov }}" /></td>
                 <td><label for="WellType">Well Type</label></td>
-                <td><input type="text" id="WellType" value="{{ well.WellType }}" /></td>
+                <td><input type="text" name="WellType" value="{{ well.WellType }}" /></td>
             </tr>
             <tr>
                 <td><label for="RoyaltyClassification">Royalty Classification</label></td>
-                <td><input type="text" id="RoyaltyClassification" value="{{ well.RoyaltyClassification }}" /></td>
+                <td><input type="text" name="RoyaltyClassification" value="{{ well.RoyaltyClassification }}" /></td>
                 <td><label for="Classification">Classification</label></td>
-                <td><input type="text" id="Classification" value="{{ well.Classification }}" /></td>
+                <td><input type="text" name="Classification" value="{{ well.Classification }}" /></td>
+            </tr>
+            <tr>
+                <td colspan="2">&nbsp;</td>
+                {% if new == False %}
+                <td><button type="submit" name="action" value="delete">Delete</button></td>
+                <td><button type="submit" name="action" value="update">Update</button></td>
+                {% else %}
+                <td><button type="submit" name="action" value="cancel">Cancel</button></td>
+                <td><button type="submit" name="action" value="add">Add</button></td>
+                {% endif %}
             </tr>
         </table>
     </fieldset>

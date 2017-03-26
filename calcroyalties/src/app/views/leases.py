@@ -7,7 +7,7 @@ from .main import get_proddate
 
 leases = Blueprint('leases', __name__)
 
-@leases.route('/leases')
+@leases.route('/leases/')
 def search():
     if not request.args: return render_template('leases/search.html')
     try:
@@ -84,7 +84,7 @@ def details(lease_num):
 def new():
     db = config.get_database()
     if request.method == 'GET':
-        return render_template('leases/details.html', new = True)
+        return render_template('leases/details.html', new = True, lease = None, royaltymaster = None)
     elif request.method == 'POST' and request.form['action'] == 'cancel':
         return redirect(url_for('leases.search'))
     elif request.method == 'POST' and request.form['action'] == 'add':

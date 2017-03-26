@@ -154,7 +154,7 @@ function showHelp() {
         <input id="FNBandID" name="FNBandID" value="{% if search_terms %}{{ search_terms['FNBandID'] }}{% endif %}"/><input type="button" id="band-lookup-button" value="..."/>
         <br>
         <br>
-        <button type="submit" id='search-basic'>Search</button>
+        <button type="submit" id='search-basic'>Search</button>&nbsp;<a href="{{ url_for('wells.new') }}">Create new</a>
         </form>
   	  </div>
 

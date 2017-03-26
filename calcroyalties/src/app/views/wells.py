@@ -1,12 +1,13 @@
-from flask import Blueprint, request, render_template, abort, flash
+from flask import Blueprint, request, render_template, abort, flash, redirect, url_for
 
 import config
 from .main import get_proddate, get_proddate_int
+from src.database.data_structure import DataStructure
 
 wells = Blueprint('wells', __name__)
 
 
-@wells.route('/wells')
+@wells.route('/wells/')
 # @PermissionHandler('well_view')
 def search():
     if not request.args:
@@ -42,15 +43,76 @@ def search():
         abort(404)
 
 
-@wells.route('/wells/<well_num>')
+# @wells.route('/wells/<well_num>', methods=['GET','POST'])
+# def details(well_num):
+#     try:
+#         db = config.get_database()
+#         result = db.select1('WellRoyaltyMaster', ID=well_num)
+#         return render_template('wells/details.html', new = False, well=result)
+#     except Exception as e:
+#         print(e)
+#         abort(404)
+
+@wells.route('/wells/<well_num>', methods=['GET', 'POST'])
 def details(well_num):
-    try:
-        db = config.get_database()
-        result = db.select1('WellRoyaltyMaster', ID=well_num)
-        return render_template('wells/details.html', well=result)
-    except Exception as e:
-        print(e)
-        abort(404)
+    db = config.get_database()
+    if request.method == 'POST' and request.form['action'] == 'delete':
+        try:
+            print('about to delete')
+            well_id = int(request.form['ID'])
+            print(well_id)
+            db.delete('WellRoyaltyMaster', well_id)
+            flash('Successfully deleted well ' + str(well_id))
+            return redirect(url_for('wells.search'))
+        except Exception as e:
+            print('Failed to delete well ' + request.form['ID'], e)
+            flash('Failed to delete well ' + request.form['ID'])
+            return redirect(url_for('wells.search'))
+    elif request.method == 'POST' and request.form['action'] == 'update':
+        ds = db.select1('WellRoyaltyMaster', ID=well_num)
+        try:
+            for i in request.form:
+                if i != 'action':
+                    setattr(ds, i, request.form[i])
+            db.update(ds)
+            flash('Successfully updated well ' + well_num)
+            return redirect(url_for('wells.details', well_num = well_num))
+        except Exception as e:
+            flash('Couldn\'t update a well')
+            print('Couldn\'t update a well: ', e)
+            return redirect(url_for('wells.search'))
+    elif request.method == 'GET':
+        try:
+            db = config.get_database()
+            result = db.select1('WellRoyaltyMaster', ID=well_num)
+            return render_template('wells/details.html', new = False, well=result)
+        except Exception as e:
+            print(e)
+            abort(404)
+
+@wells.route('/wells/new', methods=['GET', 'POST'])
+def new():
+    db = config.get_database()
+    if request.method == 'GET':
+        return render_template('wells/details.html', new = True, well = None)
+    elif request.method == 'POST' and request.form['action'] == 'cancel':
+        return redirect(url_for('wells.search'))
+    elif request.method == 'POST' and request.form['action'] == 'add':
+        ds = DataStructure()
+        setattr(ds, '_table_name', 'WellRoyaltyMaster')
+        setattr(ds, 'StartDate', '1999-01-01 00:00:00')
+        setattr(ds, 'EndDate', '9999-01-01 00:00:00')
+        for i in request.form:
+            if i != 'action':
+                setattr(ds, i, request.form[i])
+        try:
+            new_id = db.insert(ds)
+            flash('Well successfully added')
+            return redirect(url_for('wells.details', well_num=new_id))
+        except Exception as e:
+            flash('Couldn\'t add a new well')
+            print('Couldn\'t add a new well: ', e)
+            return redirect(url_for('wells.search'))
 
 
 @wells.route('/well/calculate')
