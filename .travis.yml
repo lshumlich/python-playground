@@ -10,8 +10,8 @@ script: py.test calcroyalties/ --ignore=calcroyalties/src/tool/performance_test.
 notifications:
   email:
     recipients:
-      - konstantin.lazutin@thesolutionstack.com
-      - larry.shumlich@thesolutionstack.com
+      - klazutin@gmail.com
+      - lshumlich@gmail.com
 
 before_install:
   - pip install codecov
