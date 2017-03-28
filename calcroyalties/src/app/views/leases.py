@@ -80,6 +80,18 @@ def details(lease_num):
             print(e)
             abort(404)
 
+@leases.route('/leases/<lease_num>/wells.json', methods=['GET', 'POST'])
+def wellevents(lease_num):
+    db = config.get_database()
+    wells_statement = """SELECT WellRoyaltyMaster.* FROM WellRoyaltyMaster, WellLeaseLink
+               WHERE WellLeaseLink.LeaseID="%s"
+               AND WellRoyaltyMaster.ID=WellLeaseLink.WellID"""
+    wells = db.select_sql(wells_statement % lease_num)
+    result = []
+    for w in wells:
+        result.append(w.json_dumps())
+    return json.dumps(result)
+
 @leases.route('/leases/new', methods=['GET', 'POST'])
 def new():
     db = config.get_database()
