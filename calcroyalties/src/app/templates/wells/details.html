@@ -32,4 +32,45 @@
     </fieldset>
 </form>
 
+<br>
+<div id="leasesAccordion">
+    <h3>Show leases</h3>
+    <div id="leases"></div>
+</div>
+
+<script>
+    $(function() {
+        $('#leasesAccordion').accordion({
+            collapsible:true,
+            active:false,
+            heightStyle:'auto',
+            animate:false
+        });
+    });
+
+    var leases_cache;  // store wells so we don't run the request every time we open/close the accordion
+    $('#leasesAccordion').click(function(e){
+            if (leases_cache) {
+                console.log('cache hit');
+                $('#lease').html('<ul>' + leases_cache + '</ul>');
+                $('#wellsAccordion').accordion('refresh');
+            } else {
+                console.log('request');
+                $.get('/wells/' + '{{ well.ID }}' + '/leases.json', function(data){
+                    data = JSON.parse(data);
+                    var items = [];
+                    $.each(data, function (id, item) {
+                        item = JSON.parse(item);
+                        items.push('<li><a href="/leases/' + item.ID +'">' + item.ID + '</a></li>');
+                    });
+                    leases_cache = items.join('');
+                    $('#leases').html('<ul>' + leases_cache + '</ul>');
+                    $('#leasesAccordion').accordion('refresh');
+                })
+            }
+        }
+    )
+
+</script>
+
 {% endblock %}

@@ -81,7 +81,7 @@ def details(lease_num):
             abort(404)
 
 @leases.route('/leases/<lease_num>/wells.json', methods=['GET', 'POST'])
-def wellevents(lease_num):
+def wells(lease_num):
     db = config.get_database()
     wells_statement = """SELECT WellRoyaltyMaster.* FROM WellRoyaltyMaster, WellLeaseLink
                WHERE WellLeaseLink.LeaseID="%s"

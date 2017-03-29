@@ -71,21 +71,19 @@
 
     var wells_cache;  // store wells so we don't run the request every time we open/close the accordion
     $('#wellsAccordion').click(function(e){
-            console.log('activating');
             if (wells_cache) {
-                $('#wells').html(wells_cache);
+                $('#wells').html('<ul>' + wells_cache + '</ul>');
                 $('#wellsAccordion').accordion('refresh');
             } else {
                 $.get('/leases/' + '{{ lease.ID }}' + '/wells.json', function(data){
-                    console.log('sending request');
                     data = JSON.parse(data);
                     var items = [];
                     $.each(data, function (id, item) {
                         item = JSON.parse(item);
-                        items.push('<a href="/wells/' + item.ID +'"><li>' + item.ID + '</li></a>');
+                        items.push('<li><a href="/wells/' + item.ID +'">' + item.ID + '</a></li>');
                     });
                     wells_cache = items.join('');
-                    $('#wells').html(wells_cache);
+                    $('#wells').html('<ul>' + wells_cache + '</ul>');
                     $('#wellsAccordion').accordion('refresh');
                 })
             }
