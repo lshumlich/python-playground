@@ -53,16 +53,43 @@
     </fieldset>
 </form>
 
-{% if wellevents %}
-<br />
-<fieldset>
-<legend><h3><b>{{wellevents|length}}</b> well events attached:</h3></legend>
-    <ul>
-    {% for wellevent in wellevents %}
-    <li><a href="/wellevent/{{ wellevent.WellEvent }}">{{ wellevent.WellEvent }}</a></li>
-    {% endfor %}
-    </ul>
-</fieldset>
-{% endif %}
+<br>
+<div id="wellsAccordion">
+    <h3>Show wells</h3>
+    <div id="wells"></div>
+</div>
+
+<script>
+    $(function() {
+        $('#wellsAccordion').accordion({
+            collapsible:true,
+            active:false,
+            heightStyle:'auto',
+            animate:false
+        });
+    });
+
+    var wells_cache;  // store wells so we don't run the request every time we open/close the accordion
+    $('#wellsAccordion').click(function(e){
+            if (wells_cache) {
+                $('#wells').html('<ul>' + wells_cache + '</ul>');
+                $('#wellsAccordion').accordion('refresh');
+            } else {
+                $.get('/leases/' + '{{ lease.ID }}' + '/wells.json', function(data){
+                    data = JSON.parse(data);
+                    var items = [];
+                    $.each(data, function (id, item) {
+                        item = JSON.parse(item);
+                        items.push('<li><a href="/wells/' + item.ID +'">' + item.ID + '</a></li>');
+                    });
+                    wells_cache = items.join('');
+                    $('#wells').html('<ul>' + wells_cache + '</ul>');
+                    $('#wellsAccordion').accordion('refresh');
+                })
+            }
+        }
+    )
+
+</script>
 
 {% endblock %}

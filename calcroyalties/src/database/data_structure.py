@@ -1,6 +1,7 @@
 #!/bin/env python3
 
 import json
+from datetime import datetime
 
 """
 DataStructure is the base object for all the data objects in the system.
@@ -32,6 +33,9 @@ class DataStructure(object):
     def json_dumps(self):
         d = dict(self.__dict__)
         del d['_format']
+        for i in d:
+            if isinstance(d[i], datetime):
+                d[i] = d[i].isoformat()
         return json.dumps(d, sort_keys=True)
 
     @property

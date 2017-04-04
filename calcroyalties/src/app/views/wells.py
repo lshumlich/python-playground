@@ -1,4 +1,4 @@
-from flask import Blueprint, request, render_template, abort, flash, redirect, url_for
+from flask import Blueprint, request, render_template, abort, flash, redirect, url_for, json
 
 import config
 from .main import get_proddate, get_proddate_int
@@ -114,6 +114,17 @@ def new():
             print('Couldn\'t add a new well: ', e)
             return redirect(url_for('wells.search'))
 
+@wells.route('/wells/<lease_num>/leases.json', methods=['GET', 'POST'])
+def leases(lease_num):
+    db = config.get_database()
+    leases_statement = """SELECT LeaseRoyaltyMaster.* FROM LeaseRoyaltyMaster, WellLeaseLink
+               WHERE WellLeaseLink.WellID="%s"
+               AND LeaseRoyaltyMaster.ID=WellLeaseLink.LeaseID"""
+    leases = db.select_sql(leases_statement % lease_num)
+    result = []
+    for l in leases:
+        result.append(l.json_dumps())
+    return json.dumps(result)
 
 @wells.route('/well/calculate')
 def calculate():

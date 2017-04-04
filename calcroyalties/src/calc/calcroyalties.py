@@ -714,21 +714,28 @@ class ProcessRoyalties(object):
                                                                        royalty, calc)
 
     def calc_sask_gas_prov_crown(self, monthly, well, royalty, calc):
-
-        calc.CommencementPeriod = self.determine_commencement_period(monthly.ProdMonth, well.CommencementDate)
-        econ_gas_data = self.db.select1("ECONGas", ProdMonth=monthly.ProdMonth)
-        if royalty.OverrideRoyaltyClassification:
+        # print('GAS FOUND')
+        if royalty.OverrideRoyaltyClassification is not None:
             calc.RoyaltyClassification = royalty.OverrideRoyaltyClassification
         else:
             calc.RoyaltyClassification = well.RoyaltyClassification
-
+        calc.CommencementPeriod = self.determine_commencement_period(monthly.ProdMonth, well.CommencementDate)
+        econ_gas_data = self.db.select1("ECONGas", ProdMonth=monthly.ProdMonth)
+        if royalty.OverrideRoyaltyClassification:
+            royalty_classification = royalty.OverrideRoyaltyClassification
+        else:
+            royalty_classification = well.RoyaltyClassification
+        # We need econ oil data
         # Note: If there is no sales. Use last months sales value... Not included in this code
         calc.RoyaltyPrice, calc.RoyaltyPriceExplanation = self.determine_royalty_price(royalty.ValuationMethod, monthly)
-        self.calc_sask_gas_prov_crown_royalty_rate(calc, econ_gas_data, calc.RoyaltyClassification, calc.RoyaltyBasedOnVol,
+        self.calc_sask_gas_prov_crown_royalty_rate(calc, econ_gas_data, royalty_classification, calc.RoyaltyBasedOnVol,
                                                    well.SRC, well.WellType)
 
-        self.calc_sask_gas_prov_crown_royalty_volume_value(monthly, royalty, calc)
-        print('GAS DONE: interest is ', calc.BaseRoyaltyCalcRate)
+        self.calc_sask_gas_prov_crown_royalty_volume_value(monthly, calc.PEFNInterest,
+                                                           calc.RTPInterest,
+                                                           royalty,
+                                                           calc)
+        # print('GAS DONE')
 
     @staticmethod
     def calc_sask_gas_prov_crown_royalty_rate(calc, econ_gas_data,
@@ -804,7 +811,7 @@ class ProcessRoyalties(object):
         calc.BaseRoyaltyCalcRate = round(calc.BaseRoyaltyCalcRate / 100, 6)
         return calc.BaseRoyaltyCalcRate
 
-    def calc_sask_gas_prov_crown_royalty_volume_value(self, m, lease_rm, calc):
+    def calc_sask_gas_prov_crown_royalty_volume_value(self, m, fn_interest, rp_interest, lease_rm, calc):
         # copied from the Oil function
         # todo: If there is no sales. Use last months sales value... Not included in this code
 
@@ -830,8 +837,8 @@ class ProcessRoyalties(object):
         calc.BaseRoyaltyValue = round(calc.BaseRoyaltyRate *
                                       lease_rm.CrownMultiplier *
                                       calc.RoyaltyBasedOnVol *
-                                      calc.PEFNInterest *
-                                      calc.RTPInterest *
+                                      fn_interest *
+                                      rp_interest *
                                       calc.RoyaltyPrice, 2)
 
         if lease_rm.MinRoyaltyDollar:
