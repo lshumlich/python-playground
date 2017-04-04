@@ -135,8 +135,9 @@ class ProcessRoyalties(object):
             self.calc_sask_gas_prov_crown(monthly, well, royalty, calc)
 
         else:
-            raise AppError("No calculation for " + str(well.ID) + ' ' + str(monthly.ProdMonth) + ' ' +
-                           str(monthly.Product) + ' ' + str(royalty.RoyaltyScheme))
+            raise AppError("No calculation for Lease: " + str(royalty.id) + " Well: " + str(well.ID) + ' ' +
+                           str(monthly.ProdMonth) + ' ' +
+                           str(monthly.Product) + ' Royalty Scheme: ' + str(royalty.RoyaltyScheme))
 
         # if monthly.Product == 'OIL' and 'GORR' in royalty.RoyaltyScheme:
         if 'GORR' in royalty.RoyaltyScheme:
@@ -728,7 +729,7 @@ class ProcessRoyalties(object):
         # We need econ oil data
         # Note: If there is no sales. Use last months sales value... Not included in this code
         calc.RoyaltyPrice, calc.RoyaltyPriceExplanation = self.determine_royalty_price(royalty.ValuationMethod, monthly)
-        self.calc_sask_gas_prov_crown_royalty_rate(calc, econ_gas_data, royalty_classification, calc.RoyaltyBasedOnVol,
+        self.calc_sask_gas_prov_crown_royalty_rate(calc, econ_gas_data, royalty_classification, monthly.ProdVol,
                                                    well.SRC, well.WellType)
 
         self.calc_sask_gas_prov_crown_royalty_volume_value(monthly, calc.PEFNInterest,
@@ -808,7 +809,7 @@ class ProcessRoyalties(object):
                 'Royalty Classification: "' + well_royalty_classification + '" not known for "' + well_type +
                 '" Royalty not calculated.')
 
-        calc.BaseRoyaltyCalcRate = round(calc.BaseRoyaltyCalcRate / 100, 6)
+        calc.BaseRoyaltyCalcRate = round(calc.BaseRoyaltyCalcRate / 100, 8)
         return calc.BaseRoyaltyCalcRate
 
     def calc_sask_gas_prov_crown_royalty_volume_value(self, m, fn_interest, rp_interest, lease_rm, calc):
