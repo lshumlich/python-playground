@@ -110,10 +110,9 @@ Sept.,201509,0.1185,2.96,24.39,1578,0.1434,33.10,1910,0.1593,36.77,2121,0.2062,4
         calc = DataStructure()
         calc.BaseRoyaltyRate = .25
         calc.BaseRoyaltyCalcRate = .25
-        calc.RoyaltyPrice = 210
+        calc.RoyaltyPrice = 223.370366
         calc.BaseRoyaltyVolume = 0.0
         calc.BaseRoyaltyValue = 0.0
-        m.SalesPrice = 223.370366
         m.TransRate = 2.123455
         m.ProcessingRate = 0.123455
 
@@ -152,7 +151,7 @@ Sept.,201509,0.1185,2.96,24.39,1578,0.1434,33.10,1910,0.1593,36.77,2121,0.2062,4
         # Reset to normal again
         lease_rm.CrownModifier = .0
         calc.BaseRoyaltyCalcRate = .25
-        calc.RoyaltyPrice = 210
+        calc.RoyaltyPrice = 223.370366
         calc.BaseRoyaltyVolume = 0.0
         calc.BaseRoyaltyValue = 0.0
         pr.calc_sask_gas_prov_crown_royalty_volume_value(m, lease_rm, calc)
@@ -257,7 +256,6 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
     def test_calc_sask_oil_prov_crown_royalty_volume_value(self):
         pr = ProcessRoyalties()
         m = DataStructure()
-        # m.ProdVol = 100
 
         lease_rm = DataStructure()
         lease_rm.MinRoyaltyRate = 0.0
@@ -269,11 +267,10 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         calc = DataStructure()
         calc.BaseRoyaltyRate = .25
         calc.BaseRoyaltyCalcRate = .25
-        calc.RoyaltyPrice = 210
+        calc.RoyaltyPrice = 223.370366
         calc.BaseRoyaltyVolume = 0.0
         calc.BaseRoyaltyValue = 0.0
         calc.RoyaltyBasedOnVol = 100
-        m.SalesPrice = 223.370366
         m.TransRate = 2.123455
         m.ProcessingRate = 0.123455
 
@@ -312,7 +309,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         # Reset to normal again
         lease_rm.CrownModifier = .0
         calc.BaseRoyaltyCalcRate = .25
-        calc.RoyaltyPrice = 210
+        calc.RoyaltyPrice = 223.370366
         calc.BaseRoyaltyVolume = 0.0
         calc.BaseRoyaltyValue = 0.0
         pr.calc_sask_oil_prov_crown_royalty_volume_value(m, fn_interest, rp_interest, lease_rm, calc)
@@ -381,6 +378,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         calc.BaseRoyaltyVolume = 0.0
         calc.RoyaltyPrice = 0.0
         calc.RoyaltyBasedOnVol = 70
+        calc.RoyaltyPrice = 221.123456
 
         crown_multiplier = 1.2
         fn_interest = .25

@@ -14,6 +14,7 @@ the tokens / or values
  - prod --> Prod from Monthly Data
  - sales --> Sales from Monthly Data
  - gj --> GJ from Monthly Data
+ - heat --> Heat from Monthly Data
  - whatever --> will lookup the string "whatever" with a ProdMonth of 0 in the table called Lookups
  - m.whatever --> will lookup the string "whatever" with a ProdMonth of the prod month in the table called Lookups
 
@@ -72,6 +73,8 @@ class Expression:
                 var_values[v] = monthly.ProdVol
             elif v == "gj":
                 var_values[v] = monthly.GJ
+            elif v == "heat":
+                var_values[v] = monthly.Heat
             elif v == "price":
                 var_values[v] = calc.RoyaltyPrice
             else:

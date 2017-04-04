@@ -53,14 +53,16 @@ class TestExpresion(unittest.TestCase):
         monthly.ProdVol = 100
         monthly.SalesVol = 90
         monthly.GJ = 1000
+        monthly.Heat = 65.01
         calc = DataStructure()
         calc.RoyaltyPrice = 27.12
 
-        rv = expression.lookup_vars({"prod", "sales", "gj", "price", "somevalue", "m.monthval"}, monthly, calc)
+        rv = expression.lookup_vars({"prod", "sales", "gj", "heat", "price", "somevalue", "m.monthval"}, monthly, calc)
 
         self.assertEqual(100, rv["prod"])
         self.assertEqual(90, rv["sales"])
         self.assertEqual(1000, rv["gj"])
+        self.assertEqual(65.01, rv["heat"])
         self.assertEqual(27.12, rv["price"])
         self.assertEqual(1234, rv["somevalue"])
         self.assertEqual(5678, rv["m.monthval"])
@@ -83,11 +85,12 @@ class TestExpresion(unittest.TestCase):
         monthly.ProdVol = 100
         monthly.SalesVol = 90
         monthly.GJ = 1000
+        monthly.Heat = 65.01
 
-        s = "asdf =(prod + sales + gj + somevalue + m.monthval) more stuff in here"
+        s = "asdf =(prod + sales + gj + heat + somevalue + m.monthval) more stuff in here"
 
-        self.assertEqual(1196, expression.evaluate_expression(s, monthly))
-        self.assertEqual("asdf =(100 + 90 + 1000 + 2 + 4) more stuff in here", expression.resolve_expression(s, monthly))
+        self.assertEqual(1196 + 65.01, expression.evaluate_expression(s, monthly))
+        self.assertEqual("asdf =(100 + 90 + 1000 + 65.01 + 2 + 4) more stuff in here", expression.resolve_expression(s, monthly))
 
         s = "asdf =(prod + sales + gj + notfoundvalue) more stuff in here"
         self.assertRaises(AppError, expression.evaluate_expression, s, monthly)

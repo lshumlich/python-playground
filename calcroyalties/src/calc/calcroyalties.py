@@ -115,6 +115,10 @@ class ProcessRoyalties(object):
 
         self.determine_based_on(royalty, monthly, calc)
         calc.SalesPrice = monthly.SalesPrice
+
+        # todo: If there is no sales. Use last months sales value... Not included in this code
+        calc.RoyaltyPrice, calc.RoyaltyPriceExplanation = self.determine_royalty_price(royalty.ValuationMethod, monthly)
+
         if monthly.Product == 'OIL' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
             self.calc_sask_oil_prov_crown(monthly, well, royalty, calc)
 
@@ -411,9 +415,6 @@ class ProcessRoyalties(object):
         return calc.BaseRoyaltyCalcRate
 
     def calc_sask_oil_prov_crown_royalty_volume_value(self, m, fn_interest, rp_interest, lease_rm, calc):
-        # todo: If there is no sales. Use last months sales value... Not included in this code
-
-        calc.RoyaltyPrice, calc.RoyaltyPriceExplanation = self.determine_royalty_price(lease_rm.ValuationMethod, m)
 
         calc.BaseRoyaltyRate = calc.BaseRoyaltyCalcRate
 
@@ -556,8 +557,6 @@ class ProcessRoyalties(object):
         else:
             calc.BaseRoyaltyVolume = self.calc_sask_oil_iogr_subsection3(calc.RoyaltyBasedOnVol)
 
-        calc.RoyaltyPrice, calc.RoyaltyPriceExplanation = self.determine_royalty_price(valuation_method, m)
-
         calc.BaseRoyaltyValue = round(crown_multiplier *
                                       calc.BaseRoyaltyVolume *
                                       fn_interest *
@@ -651,7 +650,7 @@ class ProcessRoyalties(object):
             value = monthly.SalesPrice
             explanation = None
 
-        return value,explanation
+        return value, explanation
 
     @staticmethod
     def ensure_date(d):
@@ -714,7 +713,7 @@ class ProcessRoyalties(object):
                                                                        royalty, calc)
 
     def calc_sask_gas_prov_crown(self, monthly, well, royalty, calc):
-        # print('GAS FOUND')
+
         if royalty.OverrideRoyaltyClassification is not None:
             calc.RoyaltyClassification = royalty.OverrideRoyaltyClassification
         else:
@@ -725,18 +724,13 @@ class ProcessRoyalties(object):
             royalty_classification = royalty.OverrideRoyaltyClassification
         else:
             royalty_classification = well.RoyaltyClassification
-        # We need econ oil data
-        # Note: If there is no sales. Use last months sales value... Not included in this code
-        calc.RoyaltyPrice, calc.RoyaltyPriceExplanation = self.determine_royalty_price(royalty.ValuationMethod, monthly)
+
         self.calc_sask_gas_prov_crown_royalty_rate(calc, econ_gas_data, royalty_classification, calc.RoyaltyBasedOnVol,
                                                    well.SRC, well.WellType)
 
-        self.calc_sask_gas_prov_crown_royalty_volume_value(monthly, calc.PEFNInterest,
-                                                           calc.RTPInterest,
+        self.calc_sask_gas_prov_crown_royalty_volume_value(monthly,
                                                            royalty,
                                                            calc)
-        # print('GAS DONE')
-
     @staticmethod
     def calc_sask_gas_prov_crown_royalty_rate(calc, econ_gas_data,
                                               well_royalty_classification, mgp, src, well_type):
@@ -811,11 +805,7 @@ class ProcessRoyalties(object):
         calc.BaseRoyaltyCalcRate = round(calc.BaseRoyaltyCalcRate / 100, 6)
         return calc.BaseRoyaltyCalcRate
 
-    def calc_sask_gas_prov_crown_royalty_volume_value(self, m, fn_interest, rp_interest, lease_rm, calc):
-        # copied from the Oil function
-        # todo: If there is no sales. Use last months sales value... Not included in this code
-
-        calc.RoyaltyPrice, calc.RoyaltyPriceExplanation = self.determine_royalty_price(lease_rm.ValuationMethod, m)
+    def calc_sask_gas_prov_crown_royalty_volume_value(self, m, lease_rm, calc):
 
         calc.BaseRoyaltyRate = calc.BaseRoyaltyCalcRate
 
@@ -837,8 +827,8 @@ class ProcessRoyalties(object):
         calc.BaseRoyaltyValue = round(calc.BaseRoyaltyRate *
                                       lease_rm.CrownMultiplier *
                                       calc.RoyaltyBasedOnVol *
-                                      fn_interest *
-                                      rp_interest *
+                                      calc.PEFNInterest *
+                                      calc.RTPInterest *
                                       calc.RoyaltyPrice, 2)
 
         if lease_rm.MinRoyaltyDollar:
