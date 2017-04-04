@@ -30,5 +30,9 @@ class Test(unittest.TestCase):
                 # print(template.render())
                 assert 'Aliquam nunc sapien' in template.render()
                 assert 'Hi, Larry!' not in template.render()
+
+                print(template.render())
+
+                print ("Templates:", templates[0])
             # assert template.name == 'index.html'
             # assert len(context['items']) == 10

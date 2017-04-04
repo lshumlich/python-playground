@@ -117,29 +117,28 @@ Sept.,201509,0.1185,2.96,24.39,1578,0.1434,33.10,1910,0.1593,36.77,2121,0.2062,4
         m.TransRate = 2.123455
         m.ProcessingRate = 0.123455
 
-        fn_interest = 1.0
-        rp_interest = 1.0
-
         calc.RoyaltyBasedOnVol = 100
-        pr.calc_sask_gas_prov_crown_royalty_volume_value(m, fn_interest, rp_interest, lease_rm, calc)
+        calc.PEFNInterest = 1.0
+        calc.RTPInterest = 1.0
+        pr.calc_sask_gas_prov_crown_royalty_volume_value(m, lease_rm, calc)
         self.assertEqual(calc.BaseRoyaltyVolume, 0.0)
         self.assertEqual(calc.BaseRoyaltyValue, 5584.26)
 
         calc.BaseRoyaltyCalcRate = -.01
         calc.BaseRoyaltyRate = -.01
         lease_rm.MinRoyaltyRate = None
-        pr.calc_sask_gas_prov_crown_royalty_volume_value(m, fn_interest, rp_interest, lease_rm, calc)
+        pr.calc_sask_gas_prov_crown_royalty_volume_value(m, lease_rm, calc)
         self.assertEqual(calc.BaseRoyaltyRate, 0)
 
         calc.BaseRoyaltyCalcRate = -.01
         calc.BaseRoyaltyRate = -.01
         lease_rm.MinRoyaltyRate = .02
-        pr.calc_sask_gas_prov_crown_royalty_volume_value(m, fn_interest, rp_interest, lease_rm, calc)
+        pr.calc_sask_gas_prov_crown_royalty_volume_value(m, lease_rm, calc)
         self.assertEqual(calc.BaseRoyaltyRate, .02)
         self.assertEqual(calc.BaseRoyaltyValue, 446.74)
 
         lease_rm.MinRoyaltyDollar = 500.0
-        pr.calc_sask_gas_prov_crown_royalty_volume_value(m, fn_interest, rp_interest, lease_rm, calc)
+        pr.calc_sask_gas_prov_crown_royalty_volume_value(m, lease_rm, calc)
         self.assertEqual(calc.BaseRoyaltyValue, 500.0)
 
         lease_rm.MinRoyaltyDollar = None
@@ -147,7 +146,7 @@ Sept.,201509,0.1185,2.96,24.39,1578,0.1434,33.10,1910,0.1593,36.77,2121,0.2062,4
         calc.BaseRoyaltyCalcRate = .35
         lease_rm.CrownModifier = .02
         calc.BaseRoyaltyRate = None
-        pr.calc_sask_gas_prov_crown_royalty_volume_value(m, fn_interest, rp_interest, lease_rm, calc)
+        pr.calc_sask_gas_prov_crown_royalty_volume_value(m, lease_rm, calc)
         self.assertEqual(calc.BaseRoyaltyRate, .37)
 
         # Reset to normal again
@@ -156,22 +155,22 @@ Sept.,201509,0.1185,2.96,24.39,1578,0.1434,33.10,1910,0.1593,36.77,2121,0.2062,4
         calc.RoyaltyPrice = 210
         calc.BaseRoyaltyVolume = 0.0
         calc.BaseRoyaltyValue = 0.0
-        pr.calc_sask_gas_prov_crown_royalty_volume_value(m, fn_interest, rp_interest, lease_rm, calc)
+        pr.calc_sask_gas_prov_crown_royalty_volume_value(m, lease_rm, calc)
         self.assertEqual(calc.BaseRoyaltyVolume, 0.0)
         self.assertEqual(calc.BaseRoyaltyValue, 5584.26)
 
         # m.ProdVol = 100
         calc.RoyaltyBasedOnVol = 100
-        rp_interest = .50
-        pr.calc_sask_gas_prov_crown_royalty_volume_value(m, fn_interest, rp_interest, lease_rm, calc)
+        calc.RTPInterest = .50
+        pr.calc_sask_gas_prov_crown_royalty_volume_value(m, lease_rm, calc)
         self.assertEqual(calc.BaseRoyaltyVolume, 0.0)
         self.assertEqual(calc.BaseRoyaltyValue, 2792.13)
 
         # m.ProdVol = 100
         calc.RoyaltyBasedOnVol = 100
-        rp_interest = .50
-        fn_interest = 0.5
-        pr.calc_sask_gas_prov_crown_royalty_volume_value(m, fn_interest, rp_interest, lease_rm, calc)
+        calc.PEFNInterest =.5
+        calc.RTPInterest = .5
+        pr.calc_sask_gas_prov_crown_royalty_volume_value(m, lease_rm, calc)
         self.assertEqual(calc.BaseRoyaltyVolume, 0.0)
         self.assertEqual(calc.BaseRoyaltyValue, 1396.06)
 

@@ -14,7 +14,7 @@ class UnittestConfigTest(unittest.TestCase):
     """
 
     def test_execute_statement_delete_table(self):
-        self.assertEqual(config.get_environment(), 'unittest')  # Distructive Tests must run in unittest enviornment
+        self.assertEqual(config.get_environment(), 'unittest')  # Destructive Tests must run in unittest environment
         dbi = config.get_database_instance()
         dbu = DatabaseUtilities()
         dbu.delete_all_tables()
