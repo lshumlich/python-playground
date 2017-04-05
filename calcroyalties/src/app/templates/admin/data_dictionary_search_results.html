@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<script src="https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js"></script>
+
+<div id="modal">
+</div>
+
+<!--<table style="width:100%" class="table-striped">-->
+<table class="table-striped">
+  <tr>
+    <th>Subject</th>
+    <th>Order</th>
+    <th>Attribute</th>
+    <th>Actions</th>
+  </tr>
+  {% for dic in datadic %}
+  <tr>
+    <td>{{ dic.TableName }}</td>
+    <td>{{ dic.Order }}</td>
+    <td>{{ dic.Attribute }}</td>
+    <td>
+    <a href="#" class="icon icon-edit" onclick=getItem({{ dic.ID }})></a>
+    &nbsp;
+    <a href="#" class="icon icon-delete" onclick=confirmDelete({{ dic.ID }})></a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+<br>
+<button id="addItem" onclick="createItem()">Add Item</button>
+<br>
+<script>
+function getItem(id) {
+  var idObject = {ID:id};
+  $.ajax({
+    url: "/admin/datadictionary/",
+    method: "GET",
+    data: idObject,
+  })
+  .done(function(data){
+    $('#modal').html(data)
+  });
+  };
+
+function createUser() {
+  $.ajax({
+    url: "/api/users",
+    method: "PATCH",
+  })
+  .done(function(data){
+    $('#modal').html(data)
+  });
+  };
+
+function confirmDelete(id){
+  var r = confirm('Are you sure you want to delete this user?');
+  if (r == true) {deleteUser(id)}
+  else {};
+  };
+
+function deleteUser(id) {
+  var idObject = {ID:id};
+  $.ajax({
+    url: "/api/users",
+    method: "DELETE",
+    data: idObject,
+  })
+  .done(function(data){
+    updateUsers();
+  });
+  };
+</script>
+{% endblock %}

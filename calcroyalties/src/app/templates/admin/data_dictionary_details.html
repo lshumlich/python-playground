@@ -1,0 +1,114 @@
+<div id="dialog">
+  <p class="errors" style="color:red"></p>
+  <form name="form_user">
+    <fieldset>
+      <legend>Data Dictionary</legend>
+      <table class="wellmodal" cellpadding=5>
+        <tr>
+          <td><label for="Subject">Subject</label></td>
+          <td><input type="text" id="Subject" name="Subject" value="{{datadic.TableName}}"></td>
+        </tr>
+        <tr>
+          <td><label for="Order">Order</label></td>
+          <td><input type="text" id="Order" name="Order" value="{{datadic.Order}}"></td>
+        </tr>
+        <tr>
+          <td><label for="Attribute">Attribute</label></td>
+          <td><input type="text" id="Attribute" name="Attribute" value="{{datadic.Attribute}}"></td>
+        </tr>
+      </table>
+      <!-- allows to submit a form by pressing enter; actual submission is handled in JS-->
+      <input type="hidden" id="ID" name="ID" value="{{datadic.ID}}">
+      <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+    </fieldset>
+    <fieldset>
+      <legend>Description</legend>
+        <textarea name="editor1"> {{datadic.Documentation}} </textarea>
+    </fieldset>
+  </form>
+</div>
+
+<script>
+
+CKEDITOR.replace( 'editor1' );
+
+$(function(){
+  var permissions = [];
+
+
+  // creates a modal window
+  dialog = $("#dialog").dialog({
+    autoOpen: true,
+    height: 600,
+    width: 800,
+    modal: true,
+    title: "Edit user",
+    close: function() {form[0].reset(); dialog.remove()},
+    buttons: {
+      Cancel: function() {dialog.dialog("close"); dialog.remove()},
+      "Save": function() {formSave()}
+    }
+  });
+
+
+  // handles form submission with traditional methods, i.e. pressing enter
+  form = dialog.find( "form" ).on( "submit", function( event ) {
+    event.preventDefault();
+    formSave();
+  });
+
+
+  // verifies form before submission; relies on formtools.js included in layout.html
+  function formVerify(){
+    var valid = true;
+
+    valid = valid && checkEntered($( "#Subject" ));
+    valid = valid && checkEntered($( "#Order" ));
+    valid = valid && checkEntered($( "#Attribute" ));
+    if (valid) {
+      return true;
+    }
+  }
+
+  function formSave(){
+    if ($("#ID").attr("value") != "") {
+      var ajax_method = "POST";
+    } else {
+      var ajax_method = "PUT";
+    }
+
+    if (formVerify()){
+      $.ajax({
+        url: "/admin/datadictionary/add",
+        method: ajax_method,
+        contentType: "application/json",
+        data: JSON.stringify(formToDict(document.forms["form_user"])),
+      })
+      .done(function(data){
+      });
+      updateUsers();
+      dialog.dialog("close");
+      dialog.remove();
+    }
+  };
+
+  function formToDict(oForm) {
+    var dict = {};
+    for (i = 0; i < oForm.length; i++) {
+      if (oForm.elements[i].name != '') {
+        if (oForm.elements[i].type == 'text' || oForm.elements[i].type == 'hidden') {
+          dict[oForm.elements[i].name] = oForm.elements[i].value;
+        } else if (oForm.elements[i].type == 'textarea') {
+          dict['Description'] = CKEDITOR.instances.editor1.getData();
+        } else if (oForm.elements[i].type == 'checkbox') {
+          dict[oForm.elements[i].name] = oForm.elements[i].checked;
+        } else {
+          console.log('*** did not handle: ' + oForm.elements[i].name + "," + oForm.elements[i].value + "," + oForm.elements[i].type)
+        };
+      }
+    }
+    return dict
+  }
+
+})
+</script>

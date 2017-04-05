@@ -6,6 +6,7 @@ import traceback, sys
 
 admin = Blueprint('admin', __name__)
 
+
 @admin.route('/admin/users')
 def user_list():
     """ display user search form"""
@@ -57,6 +58,46 @@ def user_details():
         return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
     else:
         abort(400)
+
+
+@admin.route('/admin/datadictionary/')
+def data_dictionary_list():
+    print("request args-->", request.args)
+    print("request args ID-->",request.args.get('ID'))
+    req_data = request.get_json()
+    print('----> ', req_data)
+    db = config.get_database()
+    if request.method == 'GET' and not request.args:
+        """ get an entire dictionary list """
+        results = db.select('DataDictionary')
+        return render_template('admin/data_dictionary_search_results.html', datadic=results)
+    else:
+        results = db.select1('DataDictionary', ID=request.args.get('ID'))
+        return render_template('admin/data_dictionary_details.html', datadic=results)
+
+
+@admin.route('/admin/datadictionary/add',  methods=['GET', 'POST', 'PUT'])
+def data_dictionary_add():
+    print("add request args-->", request.args)
+    print("add request args ID-->",request.args.get('ID'))
+    print("add method -->", request.method)
+
+    req_data = request.get_json()
+    print('-- req_data -->', req_data)
+    db = config.get_database()
+    id = req_data['ID']
+    if id:
+        datadic = db.select1('DataDictionary', ID=int(req_data['ID']))
+        print("datadic = ", datadic)
+        datadic.Table = req_data['Subject']
+        datadic.Order = int(req_data['Order'])
+        datadic.Attribute = req_data['Attribute']
+        datadic.Documentation = req_data['Description']
+        db.update(datadic)
+        print("and now datadic = ", datadic)
+        print("Should have updated it.")
+
+    return "<h1>from larry</h1>"
 
 
 # Data Browser below:
