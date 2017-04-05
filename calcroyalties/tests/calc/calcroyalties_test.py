@@ -669,6 +669,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         pr = ProcessRoyalties()
         leaserm = DataStructure()
         calc = DataStructure()
+        calc_specific = DataStructure()
         monthly = DataStructure()
 
         monthly.ProdVol = 100.0
@@ -685,7 +686,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         calc.TransGorrValue = 0.0
         calc.RoyaltyBasedOnVol = 100
 
-        pr.calc_gorr(leaserm, calc, monthly)
+        pr.calc_gorr(leaserm, monthly, calc, calc_specific)
         self.assertEqual(400.0, calc.GorrRoyaltyValue)
         self.assertEqual(.25, calc.TransGorrValue)
         self.assertEqual("fixed for a Royalty Rate of 2.00%", calc.GorrMessage)
@@ -693,37 +694,40 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         monthly.ProdVol = 100.0
         calc.RTPInterest = .5
         calc.TransGorrValue = 0.0
-        pr.calc_gorr(leaserm, calc, monthly)
+
+        pr.calc_gorr(leaserm, monthly, calc, calc_specific)
         self.assertEqual(200.0, calc.GorrRoyaltyValue)
         self.assertEqual(.12, calc.TransGorrValue)
         self.assertEqual("fixed for a Royalty Rate of 2.00%", calc.GorrMessage)
 
+        calc.PEFNInterest = 1.0
+        calc.RTPInterest = .5
         leaserm.Gorr = "fixed,0,$500.02"
-        pr.calc_gorr(leaserm, calc, monthly)
-        self.assertEqual(500.02, calc.GorrRoyaltyValue)
+        pr.calc_gorr(leaserm, monthly, calc, calc_specific)
+        self.assertEqual(250.01, calc.GorrRoyaltyValue)
         self.assertEqual(.12, calc.TransGorrValue)
-        self.assertEqual("fixed for a Royalty Value of $500.02", calc.GorrMessage)
+        self.assertEqual("fixed for a Base Royalty Value of $250.01", calc.GorrMessage)
 
         monthly.ProdVol = 100.0
         monthly.SalesVol = 90.0
         leaserm.Gorr = "fixed,0,$=((prod - sales) * 100)"
-        pr.calc_gorr(leaserm, calc, monthly)
-        self.assertEqual(1000.00, calc.GorrRoyaltyValue)
+        pr.calc_gorr(leaserm, monthly, calc, calc_specific)
+        self.assertEqual(500.00, calc.GorrRoyaltyValue)
         self.assertEqual(.12, calc.TransGorrValue)
         self.assertEqual("fixed for a Royalty Value of Formula $=((prod - sales) * 100) $=((100.0 - 90.0) * 100) "
-                         "=1000.0 for a Royalty Value of $1000.00", calc.GorrMessage)
+                         "=1000.0 for a Base Royalty Value of $500.00", calc.GorrMessage)
 
         # leaserm.Gorr = '=(price),7.5,$=(.15*prod*price),0,$=(.15*(7.50*prod)+.25*((price-7.50)*prod))'
         leaserm.Gorr = '=(price),7.5,$=(.15*prod*price),0,$=(0.15 * (7.50 * prod) + 0.25 * ((price - 7.50) * prod))'
         monthly.ProdVol = 100.0
         calc.RoyaltyPrice = 200.0
-        pr.calc_gorr(leaserm, calc, monthly)
-        self.assertEqual(4925.00, calc.GorrRoyaltyValue)
+        pr.calc_gorr(leaserm, monthly, calc, calc_specific)
+        self.assertEqual(2462.5, calc.GorrRoyaltyValue)
         self.assertEqual(.12, calc.TransGorrValue)
         self.assertEqual("Formula =(price) =(200.0) =200.0 is > 7.5 for a Royalty Value of Formula "
                          "$=(0.15 * (7.50 * prod) + 0.25 * ((price - 7.50) * prod)) "
                          "$=(0.15 * (7.50 * 100.0) + 0.25 * ((200.0 - 7.50) * 100.0)) =4925.0 "
-                         "for a Royalty Value of $4925.00", calc.GorrMessage)
+                         "for a Base Royalty Value of $2462.50", calc.GorrMessage)
 
     def test_calcSupplementaryRoyaltiesIOGR1995(self):
         reference_price = {'Pigeon Lake Indian': 24.04, 'Reserve no.138A': 25.37,
@@ -791,20 +795,20 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         calc.TransGorrValue = 0.0
         calc.SalesPrice = 210.0
 
-        pr.calc_royalties(well, royalty, calc, monthly)
+        pr.calc_royalties(well, royalty, monthly, calc)
 
         royalty.RoyaltyScheme = 'IOGR1995'
-        pr.calc_royalties(well, royalty, calc, monthly)
+        pr.calc_royalties(well, royalty, monthly, calc)
 
         royalty.RoyaltyScheme = 'IOGR1995,GORR'
         royalty.Gorr = "fixed,0,.02"
-        pr.calc_royalties(well, royalty, calc, monthly)
+        pr.calc_royalties(well, royalty, monthly, calc)
 
         monthly.Product = 'GAS'
         royalty.RoyaltyScheme = 'IOGR1995'
         royalty.Gorr = None
         royalty.GCADeducted = 'N'
-        pr.calc_royalties(well, royalty, calc, monthly)
+        pr.calc_royalties(well, royalty, monthly, calc)
 
         monthly.Product = 'GAS'
         royalty.RoyaltyScheme = 'SKProvCrownVar'
@@ -815,19 +819,19 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         royalty.GCADeducted = 'Y'
         well.WellType = 'Gas'
         well.RoyaltyClassification = 'New'
-        pr.calc_royalties(well, royalty, calc, monthly)
+        pr.calc_royalties(well, royalty, monthly, calc)
 
         monthly.Product = 'PEN'
         royalty.RoyaltyScheme = 'IOGR1995'
-        pr.calc_royalties(well, royalty, calc, monthly)
+        pr.calc_royalties(well, royalty, monthly, calc)
 
         monthly.Product = 'SUL'
         royalty.RoyaltyScheme = 'IOGR1995'
-        pr.calc_royalties(well, royalty, calc, monthly)
+        pr.calc_royalties(well, royalty, monthly, calc)
 
         monthly.Product = 'OIL'
         royalty.RoyaltyScheme = 'Bad One'
-        self.assertRaises(AppError, pr.calc_royalties, well, royalty, calc, monthly)
+        self.assertRaises(AppError, pr.calc_royalties, well, royalty, monthly, calc)
 
     def test_process_all(self):
         db = config.get_database()

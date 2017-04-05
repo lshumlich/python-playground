@@ -102,7 +102,7 @@ class ProcessRoyalties(object):
                                        Date=prod_month_to_date(prod_month))
             calc.RTPInterest = rtp_info.Percent / 100
 
-            self.calc_royalties(well, royalty, calc, monthly)
+            self.calc_royalties(well, royalty, monthly, calc)
 
             calc.RPBA = monthly.RPBA
             calc.FNReserveID = lease.FNReserveID
@@ -111,10 +111,11 @@ class ProcessRoyalties(object):
 
             self.db.insert(calc)
 
-    def calc_royalties(self, well, royalty, calc, monthly):
+    def calc_royalties(self, well, royalty, monthly, calc):
 
         self.determine_based_on(royalty, monthly, calc)
         calc.SalesPrice = monthly.SalesPrice
+        calc_specific = DataStructure()
 
         # todo: If there is no sales. Use last months sales value... Not included in this code
         calc.RoyaltyPrice, calc.RoyaltyPriceExplanation = self.determine_royalty_price(royalty.ValuationMethod, monthly)
@@ -144,7 +145,7 @@ class ProcessRoyalties(object):
 
         # if monthly.Product == 'OIL' and 'GORR' in royalty.RoyaltyScheme:
         if 'GORR' in royalty.RoyaltyScheme:
-            self.calc_gorr(royalty, calc, monthly)
+            self.calc_gorr(royalty, monthly, calc, calc_specific)
 
         calc.GrossRoyaltyValue = calc.BaseRoyaltyValue + calc.SuppRoyaltyValue + calc.GorrRoyaltyValue
         calc.NetRoyaltyValue = calc.GrossRoyaltyValue - calc.TransBaseValue - calc.TransGorrValue
@@ -170,6 +171,8 @@ class ProcessRoyalties(object):
                 calc.RoyaltyGCA = round(calc.RoyaltyVolume * monthly.GCARate, 2)
                 calc.RoyaltyDeductions += calc.RoyaltyGCA
                 calc.NetRoyaltyValue -= calc.RoyaltyGCA
+
+        calc.RoyaltySpecific = calc_specific.json_dumps()
 
     def determine_based_on(self, leaserm, monthly, calc):
         calc.RoyaltyBasedOnVol = 0.0
@@ -197,7 +200,7 @@ class ProcessRoyalties(object):
             calc.RoyaltyBasedOnVol = 0.0
 
     # @staticmethod
-    def calc_gorr(self, leaserm, calc, monthly):
+    def calc_gorr(self, leaserm, monthly, calc, calc_specific):
         """
         For an explanation of the various formats that this can handle please see the help documentation found at
         LeaseRoyaltyMaster.Gorr. (Note to self... This may become the documentation...
@@ -249,6 +252,7 @@ class ProcessRoyalties(object):
         gorr_calc_type, calc.GorrMessage = self.get_gorr_calc_type(monthly, leaserm.Gorr, calc)
 
         if gorr_calc_type[0] == '%':
+            calc_specific.GorrValOrPer = '%'
             calc.GorrRoyaltyRate = float(gorr_calc_type[1:])
             calc.GorrMessage += ' for a Royalty Rate of ' + '{:.2%}'.format(calc.GorrRoyaltyRate)
             calc.GorrRoyaltyValue = round(calc.GorrRoyaltyRate *
@@ -257,14 +261,19 @@ class ProcessRoyalties(object):
                                           calc.RTPInterest *
                                           calc.RoyaltyPrice, 2)
         elif gorr_calc_type[0] == '$':
+            calc_specific.GorrValOrPer = '$'
             if gorr_calc_type[1:3] == '=(':
-                calc.GorrRoyaltyValue = self.expression.evaluate_expression(gorr_calc_type, monthly, calc)
+                calc_specific.GorrBaseRoyalty = round(self.expression.evaluate_expression(gorr_calc_type, monthly, calc),2)
                 calc.GorrMessage += ' for a Royalty Value of Formula ' + gorr_calc_type + " " + \
                                     self.expression.resolve_expression(gorr_calc_type, monthly, calc) + \
-                                    " =" + str(calc.GorrRoyaltyValue)
+                                    " =" + str(calc_specific.GorrBaseRoyalty)
             else:
-                calc.GorrRoyaltyValue = float(gorr_calc_type[1:])
-            calc.GorrMessage += ' for a Royalty Value of ' + '${:.2f}'.format(calc.GorrRoyaltyValue)
+                calc_specific.GorrBaseRoyalty = float(gorr_calc_type[1:])
+
+            calc.GorrRoyaltyValue = round(calc_specific.GorrBaseRoyalty *
+                                          calc.PEFNInterest *
+                                          calc.RTPInterest, 2)
+            calc.GorrMessage += ' for a Base Royalty Value of ' + '${:.2f}'.format(calc.GorrRoyaltyValue)
 
         if leaserm.TransDeducted == 'All' or leaserm.TransDeducted == 'GORR':
             calc.TransGorrValue = round(calc.GorrRoyaltyRate *
@@ -487,11 +496,6 @@ class ProcessRoyalties(object):
         calc.SuppRoyaltyValue = round(supplementary_royalty * calc.RTPInterest * calc.PEFNInterest, 2)
         calc.BaseRoyaltyValue = round(basic_gross_royalty * calc.RTPInterest * calc.PEFNInterest, 2)
 
-        # ??? Just Playing Right Now
-        calc_specific = DataStructure()
-        calc_specific.BaseRoyaltyValue = calc.BaseRoyaltyValue
-        calc.RoyaltySpecific = calc_specific.json_dumps()
-
         return
 
     def calc_sask_pen_iogr1995(self, calc):
@@ -643,7 +647,7 @@ class ProcessRoyalties(object):
         # return royalty_price
         # This needs some development
         if method[:2] == '=(':
-            value = self.expression.evaluate_expression(method, monthly)
+            value = round(self.expression.evaluate_expression(method, monthly),2)
             explanation = 'Formula ' + method + " " + self.expression.resolve_expression(method, monthly) \
                        + " =" + str(value)
         else:
