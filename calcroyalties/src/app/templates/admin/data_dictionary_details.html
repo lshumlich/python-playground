@@ -10,7 +10,7 @@
         </tr>
         <tr>
           <td><label for="Order">Order</label></td>
-          <td><input type="text" id="Order" name="Order" value="{{datadic.Order}}"></td>
+          <td><input type="text" id="Order" name="Order" value="{{datadic.SortOrder}}"></td>
         </tr>
         <tr>
           <td><label for="Attribute">Attribute</label></td>
@@ -33,8 +33,6 @@
 CKEDITOR.replace( 'editor1' );
 
 $(function(){
-  var permissions = [];
-
 
   // creates a modal window
   dialog = $("#dialog").dialog({
@@ -86,7 +84,7 @@ $(function(){
       })
       .done(function(data){
       });
-      updateUsers();
+      updateList();
       dialog.dialog("close");
       dialog.remove();
     }

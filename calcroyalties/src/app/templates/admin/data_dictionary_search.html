@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<script src="https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js"></script>
+
+<div id="results-container">
+</div>
+
+<script>
+function updateList(){
+    $.ajax({
+    url: "/admin/datadictionary/get",
+    dataType: "html"
+  })
+    .done(function(msg){
+      $('#results-container').html(msg);
+    })
+}
+
+$(document).ready(function(){
+  updateList();
+  
+})
+</script>
+{% endblock %}

@@ -60,20 +60,32 @@ def user_details():
         abort(400)
 
 
-@admin.route('/admin/datadictionary/')
-def data_dictionary_list():
+@admin.route('/admin/datadictionary/show')
+def data_dictionary():
+    print("in datadic")
+    """ display search form """
+    return render_template('admin/data_dictionary_search.html')
+
+
+@admin.route('/admin/datadictionary/get')
+def data_dictionary_get():
     print("request args-->", request.args)
     print("request args ID-->",request.args.get('ID'))
     req_data = request.get_json()
     print('----> ', req_data)
     db = config.get_database()
-    if request.method == 'GET' and not request.args:
+    if not request.args:
         """ get an entire dictionary list """
         results = db.select('DataDictionary')
         return render_template('admin/data_dictionary_search_results.html', datadic=results)
     else:
-        results = db.select1('DataDictionary', ID=request.args.get('ID'))
-        return render_template('admin/data_dictionary_details.html', datadic=results)
+        """ get one entry """
+        id = request.args.get('ID')
+        if id == '0':
+            return render_template('admin/data_dictionary_details.html', datadic=None)
+        else:
+            results = db.select1('DataDictionary', ID=request.args.get('ID'))
+            return render_template('admin/data_dictionary_details.html', datadic=results)
 
 
 @admin.route('/admin/datadictionary/add',  methods=['GET', 'POST', 'PUT'])
@@ -86,18 +98,30 @@ def data_dictionary_add():
     print('-- req_data -->', req_data)
     db = config.get_database()
     id = req_data['ID']
-    if id:
+    if id:  # This means there is an id so it is an update
         datadic = db.select1('DataDictionary', ID=int(req_data['ID']))
-        print("datadic = ", datadic)
-        datadic.Table = req_data['Subject']
-        datadic.Order = int(req_data['Order'])
-        datadic.Attribute = req_data['Attribute']
-        datadic.Documentation = req_data['Description']
-        db.update(datadic)
-        print("and now datadic = ", datadic)
-        print("Should have updated it.")
+    else:
+        class DataDic():
+            None
+        req_data = request.get_json()
+        datadic = DataDic()
+        datadic._table_name = 'DataDictionary'
 
-    return "<h1>from larry</h1>"
+    # Add or Update do the move
+    print("datadic = ", datadic)
+    datadic.TableName = req_data['Subject']
+    datadic.SortOrder = int(req_data['Order'])
+    datadic.Attribute = req_data['Attribute']
+    datadic.Documentation = req_data['Description']
+    if id:
+        db.update(datadic)
+    else:
+        db.insert(datadic)
+
+    print("and now datadic = ", datadic)
+    print("Should have updated it.")
+
+    return "ok from datadic"
 
 
 # Data Browser below:

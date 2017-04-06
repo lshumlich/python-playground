@@ -90,6 +90,8 @@ Database Change Log: Must be maintained so we can keep the database in sink:
   add Calc.RoyaltyPriceExplanation
 2017-03-23
   add Monthly.Heat
+2017-03-23
+  Change DataDictionary.Order to SortOrder
 """
 
 import datetime
@@ -130,6 +132,8 @@ class DatabaseCreate(object):
             self.users()
         if 'RTPInfo' not in tables:
             self.rtp_info()
+        if 'DataDictionary' not in tables:
+            self.data_dictionary()
 
         self.dbi.commit()
 
@@ -357,5 +361,16 @@ class DatabaseCreate(object):
                 "Payer"	    TEXT,
                 "MineralOwnershipType"	TEXT,
                 "Percent"	Float)
+        """
+        self.dbi.execute_statement(statement)
+
+    def data_dictionary(self):
+        statement = """
+            CREATE TABLE DataDictionary (
+                "ID"	        INTEGER PRIMARY KEY AUTOINCREMENT,
+                "TableName"	    TEXT,
+                "SortOrder"	    int,
+                "Attribute"	    TEXT,
+                "Documentation"	TEXT)
         """
         self.dbi.execute_statement(statement)

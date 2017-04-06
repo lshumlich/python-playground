@@ -1,8 +1,3 @@
-{% extends "layout.html" %}
-
-{% block body %}
-
-<script src="https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js"></script>
 
 <div id="modal">
 </div>
@@ -18,7 +13,7 @@
   {% for dic in datadic %}
   <tr>
     <td>{{ dic.TableName }}</td>
-    <td>{{ dic.Order }}</td>
+    <td>{{ dic.SortOrder }}</td>
     <td>{{ dic.Attribute }}</td>
     <td>
     <a href="#" class="icon icon-edit" onclick=getItem({{ dic.ID }})></a>
@@ -35,7 +30,7 @@
 function getItem(id) {
   var idObject = {ID:id};
   $.ajax({
-    url: "/admin/datadictionary/",
+    url: "/admin/datadictionary/get",
     method: "GET",
     data: idObject,
   })
@@ -44,10 +39,12 @@ function getItem(id) {
   });
   };
 
-function createUser() {
+function createItem() {
+  var idObject = {ID:"0"};
   $.ajax({
-    url: "/api/users",
-    method: "PATCH",
+    url: "/admin/datadictionary/get",
+    method: "GET",
+    data: idObject,
   })
   .done(function(data){
     $('#modal').html(data)
@@ -72,4 +69,3 @@ function deleteUser(id) {
   });
   };
 </script>
-{% endblock %}
