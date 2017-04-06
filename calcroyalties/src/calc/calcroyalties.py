@@ -729,7 +729,7 @@ class ProcessRoyalties(object):
         else:
             royalty_classification = well.RoyaltyClassification
 
-        self.calc_sask_gas_prov_crown_royalty_rate(calc, econ_gas_data, royalty_classification, calc.RoyaltyBasedOnVol,
+        self.calc_sask_gas_prov_crown_royalty_rate(calc, econ_gas_data, royalty_classification, monthly.ProdVol,
                                                    well.SRC, well.WellType)
 
         self.calc_sask_gas_prov_crown_royalty_volume_value(monthly,

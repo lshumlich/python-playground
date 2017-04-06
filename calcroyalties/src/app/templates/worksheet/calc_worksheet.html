@@ -131,6 +131,11 @@ fmath {
                         <th align="right">Royalty/Tax Classification:</th> <td> {{ well.RoyaltyClassification }} </td>
                     </tr>
                 {% endif %}
+                {% if well.WellType != None and 'SKProvCrownVar' in rm.RoyaltyScheme %}
+                    <tr>
+                        <th align="right">Well Type:</th> <td> {{ well.WellType }} </td>
+                    </tr>
+                {% endif %}
                 <tr>
                     <th align="right">Valuation Method:</th>
                     <td>
@@ -162,7 +167,7 @@ fmath {
                     </tr>
                 {% endif %}
                     <tr>
-                        <th align="right">{{ calc.RoyaltyBasedOn }}:</th> <td> {{ '{:.2f}'.format(calc.RoyaltyBasedOnVol) }} </td>
+                        <th align="right">Royalty Based On:</th> <td> {{ calc.RoyaltyBasedOn }} </td>
                     </tr>
                 </table>
             </td>
