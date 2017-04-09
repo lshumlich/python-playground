@@ -92,6 +92,13 @@ Database Change Log: Must be maintained so we can keep the database in sink:
   add Monthly.Heat
 2017-03-23
   Change DataDictionary.Order to SortOrder
+2017-04-07
+  Change LeaseRoyaltyMaster.ValuationMethod --> OilPriceBasedOn
+  Add LeaseRoyaltyMaster.GasPriceBasedOn
+  Add LeaseRoyaltyMaster.ProductsPriceBasedOn
+  Add LeaseRoyaltyMaster.GasValueBasedOn
+  Add LeaseRoyaltyMaster.OilValueBasedOn
+  Add LeaseRoyaltyMaster.ProductsValueBasedOn
 """
 
 import datetime
@@ -177,7 +184,12 @@ class DatabaseCreate(object):
              "RoyaltyScheme" text,
              "CrownMultiplier" float,
              "CrownModifier" float,
-             "ValuationMethod" text,
+             "OilPriceBasedOn" text,
+             "GasPriceBasedOn" text,
+             "ProductsPriceBasedOn" text,
+             "OilValueBasedOn" text,
+             "GasValueBasedOn" text,
+             "ProductsValueBasedOn" text,
              "OilBasedOn" text,
              "GasBasedOn" text,
              "ProductsBasedOn" text,

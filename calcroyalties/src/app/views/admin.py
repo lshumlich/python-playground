@@ -69,33 +69,32 @@ def data_dictionary():
 
 @admin.route('/admin/datadictionary/get')
 def data_dictionary_get():
-    print("request args-->", request.args)
-    print("request args ID-->",request.args.get('ID'))
-    req_data = request.get_json()
-    print('----> ', req_data)
     db = config.get_database()
-    if not request.args:
-        """ get an entire dictionary list """
-        results = db.select('DataDictionary')
-        return render_template('admin/data_dictionary_search_results.html', datadic=results)
-    else:
-        """ get one entry """
-        id = request.args.get('ID')
-        if id == '0':
-            return render_template('admin/data_dictionary_details.html', datadic=None)
-        else:
-            results = db.select1('DataDictionary', ID=request.args.get('ID'))
-            return render_template('admin/data_dictionary_details.html', datadic=results)
+
+    if request.args:
+        if request.args.get('Subject'):
+            # results = db.select('DataDictionary', TableName=request.args.get('Subject'))
+            results = db.select_sql("SELECT * from DataDictionary where TableName = \'{}\' order by SortOrder".format
+                                    (request.args.get('Subject')))
+            return render_template('admin/data_dictionary_search_results.html', datadic=results,subject=request.args.get('Subject'))
+        elif request.args.get('ID'):
+            id = request.args.get('ID')
+            if id == '0':
+                return render_template('admin/data_dictionary_details.html', datadic=None)
+            else:
+                results = db.select1('DataDictionary', ID=request.args.get('ID'))
+                return render_template('admin/data_dictionary_details.html', datadic=results)
+
+    """ get an entire dictionary list """
+    results = db.select('DataDictionary')
+    return render_template('admin/data_dictionary_search_results.html', datadic=results,subject=request.args.get('Subject'))
 
 
-@admin.route('/admin/datadictionary/add',  methods=['GET', 'POST', 'PUT'])
-def data_dictionary_add():
-    print("add request args-->", request.args)
-    print("add request args ID-->",request.args.get('ID'))
-    print("add method -->", request.method)
+# @admin.route('/admin/datadictionary/save',  methods=['GET', 'POST', 'PUT'])
+@admin.route('/admin/datadictionary/save', methods=['POST'])
+def data_dictionary_save():
 
     req_data = request.get_json()
-    print('-- req_data -->', req_data)
     db = config.get_database()
     id = req_data['ID']
     if id:  # This means there is an id so it is an update
@@ -108,7 +107,6 @@ def data_dictionary_add():
         datadic._table_name = 'DataDictionary'
 
     # Add or Update do the move
-    print("datadic = ", datadic)
     datadic.TableName = req_data['Subject']
     datadic.SortOrder = int(req_data['Order'])
     datadic.Attribute = req_data['Attribute']
@@ -118,10 +116,17 @@ def data_dictionary_add():
     else:
         db.insert(datadic)
 
-    print("and now datadic = ", datadic)
-    print("Should have updated it.")
-
     return "ok from datadic"
+
+
+@admin.route('/admin/datadictionary/delete')
+def data_dictionary_delete():
+    db = config.get_database()
+    id = request.args.get('Subject')
+
+    results = db.delete('DataDictionary', int(request.args.get('ID')))
+
+    return "ok from data_dictionary_delete"
 
 
 # Data Browser below:

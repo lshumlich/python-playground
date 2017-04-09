@@ -97,8 +97,9 @@ class Loader(object):
         for h in header_row:
             cell = row[i]
             if type(cell.value) is str:
+                data = data + "'" + str(cell.value).replace('\'','\'\'') + "',"
                 # data = data + "'" + cell.value + "',"
-                data = data + '"' + cell.value + '",'
+                # data = data + '"' + cell.value + '",'
             elif type(cell.value) is int:
                 data = data + str(cell.value) + ','
             elif type(cell.value) is float:

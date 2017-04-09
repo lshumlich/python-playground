@@ -87,7 +87,11 @@ class DatabaseUtilities(object):
 
         statement = """
             INSERT INTO LeaseRoyaltyMaster VALUES(1, '2001-01-08 00:00:00', '2016-01-07 00:00:00', 'All',
-            'SKProvCrownVar,GORR', 0.12, 0.02, 'SaskWellHead', 'Prod', 'Sales', 'Prod', 'Y', 'Y', 'Y',
+            'SKProvCrownVar,GORR', 0.12, 0.02,
+            'price', 'price', 'price',
+            'price * sales', 'price * sales', 'price * sales',
+            'prod', 'sales', 'prod',
+            'Y', 'Y', 'Y',
             'mprod,250,2,300,3,400,4,500,5,0,6',
             NULL, 0, 50, 50, NULL)
         """

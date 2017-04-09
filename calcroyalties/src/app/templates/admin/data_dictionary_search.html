@@ -3,23 +3,81 @@
 
 <script src="https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js"></script>
 
-<div id="results-container">
-</div>
-
 <script>
+
+$(function() {
+
+  <!--updateList();-->
+
+
+  $('#tabs').tabs();
+
+  $('#search-accordion').accordion({
+    collapsible:true,
+    heightStyle:'content',
+    animate:false
+  });
+
+    $( "#search-basic" ).on( "click", function() {
+        Subject = $("#Subjectxxx").val()
+        updateList()
+    });
+
+    $( "#create" ).on( "click", function() {
+        myMsg()
+    });
+
+  $('#search-basic').button({
+    icons: {primary: 'ui-icon-search'}
+  });
+
+})
+
+var Subject = ""
+
 function updateList(){
     $.ajax({
     url: "/admin/datadictionary/get",
-    dataType: "html"
+    dataType: "html",
+    data: {Subject:Subject}
   })
     .done(function(msg){
       $('#results-container').html(msg);
+      $("#search-accordion").accordion("option", "active", false);
     })
 }
 
-$(document).ready(function(){
-  updateList();
-  
-})
+function myMsg() {
+    alert("Hello! I am an alert box!" + Subject);
+}
+
 </script>
+
+
+<div id="search-accordion">
+  <h3>Search Criteria</h3>
+  <div>
+  	<div id="tabs">
+  	  <ul>
+  	    <li><a href="#tabs-basic">Basic search</a></li>
+  	  </ul>
+
+  	  <div id="tabs-basic">
+  	    Subject<sup><i data-help="DataDictionary.TableName" class="fa fa-question-circle help"></i></sup>
+        <br>
+        <input id="Subjectxxx"/>
+        <br>
+        <br>
+        <br>
+        <button id='search-basic'>Search</button>&nbsp;<button id="create">Create new</button>
+  	  </div>
+
+  	</div>
+  </div>
+</div>
+
+
+<div id="results-container">
+</div>
+
 {% endblock %}

@@ -76,7 +76,15 @@ class Expression:
             elif v == "heat":
                 var_values[v] = monthly.Heat
             elif v == "price":
+                var_values[v] = monthly.SalesPrice
+            elif v == "royalty_price":
                 var_values[v] = calc.RoyaltyPrice
+            elif v == "trans":
+                var_values[v] = monthly.TransRate
+            elif v == "processing":
+                var_values[v] = monthly.ProcessingRate
+            elif v == "gca":
+                var_values[v] = monthly.GCARate
             else:
                 if v[0:2] == 'm.':
                     # v = v[2:]

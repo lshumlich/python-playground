@@ -8,6 +8,7 @@
     <th>Subject</th>
     <th>Order</th>
     <th>Attribute</th>
+    <th>Description</th>
     <th>Actions</th>
   </tr>
   {% for dic in datadic %}
@@ -15,6 +16,7 @@
     <td>{{ dic.TableName }}</td>
     <td>{{ dic.SortOrder }}</td>
     <td>{{ dic.Attribute }}</td>
+    <td>{{ dic.Documentation | safe }}</td>
     <td>
     <a href="#" class="icon icon-edit" onclick=getItem({{ dic.ID }})></a>
     &nbsp;
@@ -25,7 +27,7 @@
 </table>
 <br>
 <button id="addItem" onclick="createItem()">Add Item</button>
-<br>
+<a href="{{ url_for('admin.data_dictionary_get') }}?Subject={{ subject }}" target="_blank">Print</a><br>
 <script>
 function getItem(id) {
   var idObject = {ID:id};
@@ -48,24 +50,23 @@ function createItem() {
   })
   .done(function(data){
     $('#modal').html(data)
+    $("#Subject").val(Subject)
   });
   };
 
 function confirmDelete(id){
-  var r = confirm('Are you sure you want to delete this user?');
-  if (r == true) {deleteUser(id)}
+  var r = confirm('Are you sure you want to delete Item?');
+  if (r == true) {deleteItem(id)}
   else {};
   };
 
-function deleteUser(id) {
-  var idObject = {ID:id};
+function deleteItem(id) {
   $.ajax({
-    url: "/api/users",
-    method: "DELETE",
-    data: idObject,
+    url: "/admin/datadictionary/delete",
+    data: {ID:id}
   })
   .done(function(data){
-    updateUsers();
+    updateList();
   });
   };
 </script>

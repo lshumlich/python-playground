@@ -104,7 +104,7 @@ Sept.,201509,0.1185,2.96,24.39,1578,0.1434,33.10,1910,0.1593,36.77,2121,0.2062,4
         lease_rm.MinRoyaltyRate = 0.0
         lease_rm.MinRoyaltyDollar = 0.0
         lease_rm.CrownMultiplier = 1
-        lease_rm.ValuationMethod = 'ActSales'
+        lease_rm.PriceBasedOn = 'ActSales'
         lease_rm.CrownModifier = None
 
         calc = DataStructure()
@@ -261,7 +261,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         lease_rm.MinRoyaltyRate = 0.0
         lease_rm.MinRoyaltyDollar = 0.0
         lease_rm.CrownMultiplier = 1
-        lease_rm.ValuationMethod = 'ActSales'
+        lease_rm.PriceBasedOn = 'ActSales'
         lease_rm.CrownModifier = None
 
         calc = DataStructure()
@@ -275,7 +275,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         m.ProcessingRate = 0.123455
 
         fn_interest = 1.0
-        rp_interest = 100.0
+        rp_interest = 1.0
 
         pr.calc_sask_oil_prov_crown_royalty_volume_value(m, fn_interest, rp_interest, lease_rm, calc)
         self.assertEqual(calc.BaseRoyaltyVolume, 0.0)
@@ -318,14 +318,14 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
 
         # m.ProdVol = 100
         calc.RoyaltyBasedOnVol = 100
-        rp_interest = 50.0
+        rp_interest = .5
         pr.calc_sask_oil_prov_crown_royalty_volume_value(m, fn_interest, rp_interest, lease_rm, calc)
         self.assertEqual(calc.BaseRoyaltyVolume, 0.0)
         self.assertEqual(calc.BaseRoyaltyValue, 2792.13)
 
         # m.ProdVol = 100
         calc.RoyaltyBasedOnVol = 100
-        rp_interest = 50.0
+        rp_interest = .5
         fn_interest = 0.5
         pr.calc_sask_oil_prov_crown_royalty_volume_value(m, fn_interest, rp_interest, lease_rm, calc)
         self.assertEqual(calc.BaseRoyaltyVolume, 0.0)
@@ -348,7 +348,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         lease_royalty_master.CrownMultiplier = 1.0
 
         fn_interest = 1.0
-        rp_interest = 100.0
+        rp_interest = 1.0
 
         # Note: this is a round even situation... it's questionable
         self.assertEqual(1.84,
@@ -358,7 +358,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         lease_royalty_master.CrownMultiplier = .9
 
         fn_interest = .8
-        rp_interest = 90.
+        rp_interest = .90
 
         self.assertEqual(1.2, pr.calc_sask_oil_prov_crown_deductions(m, fn_interest, rp_interest,
                                                                      lease_royalty_master, calc))
@@ -382,11 +382,11 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
 
         crown_multiplier = 1.2
         fn_interest = .25
-        rp_interest = 100
+        rp_interest = 1
 
         pr = ProcessRoyalties()
         # all tests for SaskWellHead
-        pr.calc_sask_oil_iogr1995(datetime(2015, 1, 1), "SaskWellHead",
+        pr.calc_sask_oil_iogr1995(datetime(2015, 1, 1),
                                   crown_multiplier, fn_interest, rp_interest, m, calc)
         self.assertEqual(464.36, calc.BaseRoyaltyValue)
         self.assertEqual(calc.CommencementPeriod, 0)
@@ -397,8 +397,8 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         calc.RoyaltyBasedOnVol = 100
         crown_multiplier = 0.25
         fn_interest = 3
-        rp_interest = 100
-        pr.calc_sask_oil_iogr1995(datetime(2015, 4, 2), "SaskWellHead",
+        rp_interest = 1
+        pr.calc_sask_oil_iogr1995(datetime(2015, 4, 2),
                                   crown_multiplier, fn_interest, rp_interest, m, calc)
         self.assertEqual(calc.BaseRoyaltyValue, 1990.11)
 
@@ -406,8 +406,8 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         calc.RoyaltyBasedOnVol = 170
         crown_multiplier = 1.0
         fn_interest = 1
-        rp_interest = 100
-        pr.calc_sask_oil_iogr1995(datetime(2015, 5, 1), "SaskWellHead",
+        rp_interest = 1
+        pr.calc_sask_oil_iogr1995(datetime(2015, 5, 1),
                                   crown_multiplier, fn_interest, rp_interest, m, calc)
         self.assertEqual(calc.BaseRoyaltyValue, 5881.88)
 
@@ -415,8 +415,8 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         calc.RoyaltyBasedOnVol = 79.9
         crown_multiplier = 3
         fn_interest = 2
-        rp_interest = 100
-        pr.calc_sask_oil_iogr1995(datetime(2010, 1, 1), "SaskWellHead",
+        rp_interest = 1
+        pr.calc_sask_oil_iogr1995(datetime(2010, 1, 1),
                                   crown_multiplier, fn_interest, rp_interest, m, calc)
         self.assertEqual(calc.BaseRoyaltyValue, 10600.66)
 
@@ -424,8 +424,8 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         calc.RoyaltyBasedOnVol = 150
         crown_multiplier = 2
         fn_interest = 4
-        rp_interest = 100
-        pr.calc_sask_oil_iogr1995(datetime(2009, 7, 3), "SaskWellHead",
+        rp_interest = 1
+        pr.calc_sask_oil_iogr1995(datetime(2009, 7, 3),
                                   crown_multiplier, fn_interest, rp_interest, m, calc)
         self.assertEqual(calc.BaseRoyaltyValue, 38917.73)
 
@@ -433,8 +433,8 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         calc.RoyaltyBasedOnVol = 500
         crown_multiplier = 1
         fn_interest = 5
-        rp_interest = 100
-        pr.calc_sask_oil_iogr1995(datetime(2007, 8, 2), "SaskWellHead",
+        rp_interest = 1
+        pr.calc_sask_oil_iogr1995(datetime(2007, 8, 2),
                                   crown_multiplier, fn_interest, rp_interest, m, calc)
         self.assertEqual(calc.BaseRoyaltyValue, 124271.38)
 
@@ -442,8 +442,8 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         calc.RoyaltyBasedOnVol = 800
         crown_multiplier = 5
         fn_interest = 0.1
-        rp_interest = 100
-        pr.calc_sask_oil_iogr1995(datetime(2008, 9, 9), "SaskWellHead",
+        rp_interest = 1
+        pr.calc_sask_oil_iogr1995(datetime(2008, 9, 9),
                                   crown_multiplier, fn_interest, rp_interest, m, calc)
         self.assertEqual(calc.BaseRoyaltyValue, 21117.29)
 
@@ -451,8 +451,8 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         calc.RoyaltyBasedOnVol = 800
         crown_multiplier = 5
         fn_interest = 0.1
-        rp_interest = 50
-        pr.calc_sask_oil_iogr1995(datetime(2008, 9, 9), "SaskWellHead",
+        rp_interest = .50
+        pr.calc_sask_oil_iogr1995(datetime(2008, 9, 9),
                                   crown_multiplier, fn_interest, rp_interest, m, calc)
         self.assertEqual(calc.BaseRoyaltyValue, 10558.65)
 
@@ -565,21 +565,37 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual(pr.calc_sask_oil_iogr_subsection3(200), 24 + .26 * (200 - 160))
         self.assertEqual(pr.calc_sask_oil_iogr_subsection3(2000), 189 + .4 * (2000 - 795))
 
-    def test_determineRoyaltyPrice(self):
-
-        m = DataStructure()
-        m.SalesPrice = 221.123456
-        m.TransRate = 2.123455
-        m.ProcessingRate = 0.123455
+    def test_determine_royalty_price(self):
 
         pr = ProcessRoyalties()
-        self.assertEqual((221.123456, None), pr.determine_royalty_price('ActSales', m))
 
-        m.ProdVol = 4.0
-        m.SalesVol = 2.0
+        leaserm = DataStructure()
+        calc = DataStructure()
+        calc_sp = DataStructure()
+        monthly = DataStructure()
 
-        self.assertEqual((10.0, "Formula =((prod - sales) * 5) =((4.0 - 2.0) * 5) =10.0"),
-                         pr.determine_royalty_price('=((prod - sales) * 5)', m))
+        monthly.SalesPrice = 130.0
+        monthly.TransRate = 10.0
+
+        monthly.Product = "OIL"
+        leaserm.OilPriceBasedOn = "=(price)"
+        pr.determine_royalty_price(leaserm, monthly, calc, calc_sp)
+        self.assertEqual(130.0, calc.RoyaltyPrice)
+        self.assertEqual("Formula =(price) =(130.0) =130.0", calc.RoyaltyPriceExplanation)
+
+        monthly.Product = "OIL"
+        leaserm.OilPriceBasedOn = "=(price - trans)"
+        pr.determine_royalty_price(leaserm, monthly, calc, calc_sp)
+        self.assertEqual(120.0, calc.RoyaltyPrice)
+        self.assertEqual('Formula =(price - trans) =(130.0 - 10.0) =120.0', calc.RoyaltyPriceExplanation)
+
+        monthly.ProdVol = 4.0
+        monthly.SalesVol = 2.0
+        leaserm.OilPriceBasedOn = "=((prod - sales) * 5)"
+        pr.determine_royalty_price(leaserm, monthly, calc, calc_sp)
+        self.assertEqual(10.0, calc.RoyaltyPrice)
+        self.assertEqual('Formula =((prod - sales) * 5) =((4.0 - 2.0) * 5) =10.0', calc.RoyaltyPriceExplanation)
+
 
     def test_calc_gorr_calc_type(self):
         pr = ProcessRoyalties()
@@ -718,14 +734,14 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
                          "=1000.0 for a Base Royalty Value of $500.00", calc.GorrMessage)
 
         # leaserm.Gorr = '=(price),7.5,$=(.15*prod*price),0,$=(.15*(7.50*prod)+.25*((price-7.50)*prod))'
-        leaserm.Gorr = '=(price),7.5,$=(.15*prod*price),0,$=(0.15 * (7.50 * prod) + 0.25 * ((price - 7.50) * prod))'
+        leaserm.Gorr = '=(royalty_price),7.5,$=(.15 * prod * royalty_price),0,$=(0.15 * (7.50 * prod) + 0.25 * ((royalty_price - 7.50) * prod))'
         monthly.ProdVol = 100.0
         calc.RoyaltyPrice = 200.0
         pr.calc_gorr(leaserm, monthly, calc, calc_specific)
         self.assertEqual(2462.5, calc.GorrRoyaltyValue)
         self.assertEqual(.12, calc.TransGorrValue)
-        self.assertEqual("Formula =(price) =(200.0) =200.0 is > 7.5 for a Royalty Value of Formula "
-                         "$=(0.15 * (7.50 * prod) + 0.25 * ((price - 7.50) * prod)) "
+        self.assertEqual("Formula =(royalty_price) =(200.0) =200.0 is > 7.5 for a Royalty Value of Formula "
+                         "$=(0.15 * (7.50 * prod) + 0.25 * ((royalty_price - 7.50) * prod)) "
                          "$=(0.15 * (7.50 * 100.0) + 0.25 * ((200.0 - 7.50) * 100.0)) =4925.0 "
                          "for a Base Royalty Value of $2462.50", calc.GorrMessage)
 
@@ -774,7 +790,9 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         monthly.SalesPrice = 210.0
         royalty.RoyaltyScheme = 'SKProvCrownVar'
         royalty.OverrideRoyaltyClassification = None
-        royalty.ValuationMethod = 'ActSales'
+        royalty.OilPriceBasedOn = 'ActSales'
+        royalty.GasPriceBasedOn = 'ActSales'
+        royalty.ProductsPriceBasedOn = 'ActSales'
         royalty.CrownModifier = None
         royalty.MinRoyaltyRate = None
         royalty.CrownMultiplier = 1.0
@@ -907,22 +925,23 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         leaserm.ProductsBasedOn = "gj"
 
         monthly.Product = "OIL"
-        pr.determine_based_on(leaserm, monthly, calc)
+        pr.determine_royalty_based_on(leaserm, monthly, calc)
         self.assertEqual("Prod Vol", calc.RoyaltyBasedOn)
         self.assertEqual(100.0, calc.RoyaltyBasedOnVol)
 
         monthly.Product = "GAS"
-        pr.determine_based_on(leaserm, monthly, calc)
+        pr.determine_royalty_based_on(leaserm, monthly, calc)
         self.assertEqual("Sales Vol", calc.RoyaltyBasedOn)
         self.assertEqual(90.0, calc.RoyaltyBasedOnVol)
 
         monthly.Product = "BUT"
-        pr.determine_based_on(leaserm, monthly, calc)
+        pr.determine_royalty_based_on(leaserm, monthly, calc)
         self.assertEqual("GJs", calc.RoyaltyBasedOn)
         self.assertEqual(1000.0, calc.RoyaltyBasedOnVol)
 
         leaserm.ProductsBasedOn = "stuff"
         monthly.Product = "BUT"
-        pr.determine_based_on(leaserm, monthly, calc)
+        pr.determine_royalty_based_on(leaserm, monthly, calc)
         self.assertEqual("Unknown", calc.RoyaltyBasedOn)
         self.assertEqual(0.0, calc.RoyaltyBasedOnVol)
+

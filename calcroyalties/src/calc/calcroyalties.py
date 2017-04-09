@@ -113,18 +113,18 @@ class ProcessRoyalties(object):
 
     def calc_royalties(self, well, royalty, monthly, calc):
 
-        self.determine_based_on(royalty, monthly, calc)
+        self.determine_royalty_based_on(royalty, monthly, calc)
         calc.SalesPrice = monthly.SalesPrice
         calc_specific = DataStructure()
 
         # todo: If there is no sales. Use last months sales value... Not included in this code
-        calc.RoyaltyPrice, calc.RoyaltyPriceExplanation = self.determine_royalty_price(royalty.ValuationMethod, monthly)
+        self.determine_royalty_price(royalty, monthly, calc, calc_specific)
 
         if monthly.Product == 'OIL' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
             self.calc_sask_oil_prov_crown(monthly, well, royalty, calc)
 
         elif monthly.Product == 'OIL' and 'IOGR1995' in royalty.RoyaltyScheme:
-            self.calc_sask_oil_iogr1995(well.CommencementDate, royalty.ValuationMethod, royalty.CrownMultiplier,
+            self.calc_sask_oil_iogr1995(well.CommencementDate, royalty.CrownMultiplier,
                                         calc.PEFNInterest, calc.RTPInterest, monthly, calc)
 
         elif monthly.Product == 'GAS' and 'IOGR1995' in royalty.RoyaltyScheme:
@@ -174,7 +174,7 @@ class ProcessRoyalties(object):
 
         calc.RoyaltySpecific = calc_specific.json_dumps()
 
-    def determine_based_on(self, leaserm, monthly, calc):
+    def determine_royalty_based_on(self, leaserm, monthly, calc):
         calc.RoyaltyBasedOnVol = 0.0
         calc.RoyaltyBasedOn = "WhatEver"
         basedOn = 'WhatEver'
@@ -446,7 +446,7 @@ class ProcessRoyalties(object):
                                       lease_rm.CrownMultiplier *
                                       calc.RoyaltyBasedOnVol *
                                       fn_interest *
-                                      (rp_interest / 100) *
+                                      rp_interest *
                                       calc.RoyaltyPrice, 2)
 
         if lease_rm.MinRoyaltyDollar:
@@ -462,7 +462,7 @@ class ProcessRoyalties(object):
                          lease_rm.CrownMultiplier *
                          calc.RoyaltyBasedOnVol *
                          fn_interest *
-                         (rp_interest / 100) *
+                         rp_interest *
                          m.TransRate,
                          2)
         else:
@@ -548,7 +548,7 @@ class ProcessRoyalties(object):
         calc.BaseRoyaltyValue = round(basic_gross_royalty, 2)
         return
 
-    def calc_sask_oil_iogr1995(self, commencement_date, valuation_method, crown_multiplier,
+    def calc_sask_oil_iogr1995(self, commencement_date, crown_multiplier,
                                fn_interest, rp_interest, m, calc):
         """
         Calculated Based on regulations described:
@@ -564,7 +564,7 @@ class ProcessRoyalties(object):
         calc.BaseRoyaltyValue = round(crown_multiplier *
                                       calc.BaseRoyaltyVolume *
                                       fn_interest *
-                                      (rp_interest / 100) *
+                                      rp_interest *
                                       calc.RoyaltyPrice, 2)
 
         # todo incorporate rp_interest into supplementary royalties
@@ -631,30 +631,26 @@ class ProcessRoyalties(object):
 
         return roy_vol
 
-    # @staticmethod
-    def determine_royalty_price(self, method, monthly):
-        """
-        As we understand more about pricing we will develop this further. We know we need a method we just don't
-        quite no what to do with it.
-        """
+    def determine_royalty_price(self, lease_rm, monthly, calc, calc_sp):
 
-        # royalty_price = 0.0
-        # if method == 'ActSales':
-        #     royalty_price = monthly.WellHeadPrice + monthly.TransRate + monthly.ProcessingRate
-        # else:
-        #     royalty_price = monthly.WellHeadPrice
+        if monthly.Product == 'OIL':
+            calc_sp.PriceBasedOn = lease_rm.OilPriceBasedOn
+        elif monthly.Product == 'GAS':
+            calc_sp.PriceBasedOn = lease_rm.GasPriceBasedOn
+        else:
+            calc_sp.PriceBasedOn = lease_rm.ProductsPriceBasedOn
 
-        # return royalty_price
-        # This needs some development
-        if method[:2] == '=(':
-            value = round(self.expression.evaluate_expression(method, monthly),2)
-            explanation = 'Formula ' + method + " " + self.expression.resolve_expression(method, monthly) \
+        if calc_sp.PriceBasedOn and calc_sp.PriceBasedOn[:2] == '=(':
+            value = round(self.expression.evaluate_expression(calc_sp.PriceBasedOn, monthly),2)
+            explanation = 'Formula ' + calc_sp.PriceBasedOn + " " + \
+                          self.expression.resolve_expression(calc_sp.PriceBasedOn, monthly) \
                        + " =" + str(value)
         else:
             value = monthly.SalesPrice
             explanation = None
 
-        return value, explanation
+        calc.RoyaltyPrice = value
+        calc.RoyaltyPriceExplanation = explanation
 
     @staticmethod
     def ensure_date(d):

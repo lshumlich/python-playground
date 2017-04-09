@@ -77,8 +77,9 @@ $(function(){
 
     if (formVerify()){
       $.ajax({
-        url: "/admin/datadictionary/add",
-        method: ajax_method,
+        url: "/admin/datadictionary/save",
+        <!--method: ajax_method,-->
+        method: "POST",
         contentType: "application/json",
         data: JSON.stringify(formToDict(document.forms["form_user"])),
       })

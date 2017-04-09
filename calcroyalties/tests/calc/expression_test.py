@@ -54,16 +54,25 @@ class TestExpresion(unittest.TestCase):
         monthly.SalesVol = 90
         monthly.GJ = 1000
         monthly.Heat = 65.01
+        monthly.SalesPrice = 50.00
+        monthly.TransRate = 10.00
+        monthly.ProcessingRate = 5.00
+        monthly.GCARate = 3.00
         calc = DataStructure()
         calc.RoyaltyPrice = 27.12
 
-        rv = expression.lookup_vars({"prod", "sales", "gj", "heat", "price", "somevalue", "m.monthval"}, monthly, calc)
+        rv = expression.lookup_vars({"prod", "sales", "gj", "heat", "price", "trans", "processing", "gca",
+                                     "royalty_price", "somevalue", "m.monthval"}, monthly, calc)
 
         self.assertEqual(100, rv["prod"])
         self.assertEqual(90, rv["sales"])
         self.assertEqual(1000, rv["gj"])
         self.assertEqual(65.01, rv["heat"])
-        self.assertEqual(27.12, rv["price"])
+        self.assertEqual(50, rv["price"])
+        self.assertEqual(10, rv["trans"])
+        self.assertEqual(5, rv["processing"])
+        self.assertEqual(3, rv["gca"])
+        self.assertEqual(27.12, rv["royalty_price"])
         self.assertEqual(1234, rv["somevalue"])
         self.assertEqual(5678, rv["m.monthval"])
 
