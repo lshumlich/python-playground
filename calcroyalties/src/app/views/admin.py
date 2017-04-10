@@ -76,6 +76,7 @@ def data_dictionary_get():
             # results = db.select('DataDictionary', TableName=request.args.get('Subject'))
             results = db.select_sql("SELECT * from DataDictionary where TableName = \'{}\' order by SortOrder".format
                                     (request.args.get('Subject')))
+            resolve_lookups(results)
             return render_template('admin/data_dictionary_search_results.html', datadic=results,subject=request.args.get('Subject'))
         elif request.args.get('ID'):
             id = request.args.get('ID')
@@ -89,6 +90,37 @@ def data_dictionary_get():
     results = db.select('DataDictionary')
     return render_template('admin/data_dictionary_search_results.html', datadic=results,subject=request.args.get('Subject'))
 
+def resolve_lookups(results):
+    for r in results:
+        s = resolve_lookups_in_description(r.Documentation)
+        r.Documentation = s
+
+def resolve_lookups_in_description(s):
+    db = config.get_database()
+    donethat = {}
+    while True:
+        b = s.find('{{')
+        if b < 0:
+            break
+        e = s.find('}}')
+        if e < 0:
+            break
+        lookup = s[b+2:e]
+        print(lookup)
+        parts = lookup.split('.')
+        if parts[0] == 'DataDictionary':
+            dic_key = parts[1] + '.' + parts[2]
+            if dic_key in donethat:
+                s = s.replace('{{' + lookup + '}}', '?? ***' + dic_key + ' has been done already ***  ??')
+                break
+            donethat[dic_key] = "Done"
+            print(donethat)
+            try:
+                datadic = db.select1('DataDictionary', TableName=parts[1], Attribute=parts[2])
+                s = s.replace('{{' + lookup + '}}', datadic.Documentation)
+            except:
+                s = s.replace('{{' + lookup + '}}', '??' + parts[1] + '.' + parts[2] + ' *** Not Found in DataDictionary *** ??')
+    return s
 
 # @admin.route('/admin/datadictionary/save',  methods=['GET', 'POST', 'PUT'])
 @admin.route('/admin/datadictionary/save', methods=['POST'])
