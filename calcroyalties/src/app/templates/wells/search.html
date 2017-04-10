@@ -3,13 +3,12 @@
 <script>
 $(function() {
   $('.help').on('click', function(){showHelp()});
-
   $("#help-modal").dialog({
-  modal: true,
-  autoOpen: false,
-  buttons: {
-    OK: function() {$(this).dialog("close")}
-  }
+    modal: true,
+    autoOpen: false,
+    buttons: {
+      OK: function() {$(this).dialog("close")}
+    }
   });
 
   $('#tabs').tabs();

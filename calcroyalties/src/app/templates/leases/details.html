@@ -6,9 +6,9 @@
         <legend><h3>Lease {{ lease.Lease }}</h3></legend>
         <table cellpadding="5">
             <tr>
-                <td><label for="LeaseType">Lease Type</label></td>
+                <td><label for="LeaseType">Lease Type</label> <sup><i data-help="LeaseRoyaltyMaster.LeaseType" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="LeaseType" value="{{ lease.LeaseType }}" /></td>
-                <td><label for="ID">ID</label></td>
+                <td><label for="ID">ID</label><sup><i data-help="LeaseRoyaltyMaster.ID" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="ID" value="{{ lease.ID }}" readonly /></td>
             </tr>
             <tr>
@@ -27,9 +27,9 @@
             </tr>
             {% if royaltymaster %}
             <tr>
-                <td><label for="RightsGranted">Rights Granted</label></td>
+                <td><label for="RightsGranted">Rights Granted</label> <sup><i data-help="LeaseRoyaltyMaster.RightsGranted" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="RightsGranted" value="{{ royaltymaster.RightsGranted }}" /></td>
-                <td><label for="RoyaltyScheme">Royalty Scheme</label></td>
+                <td><label for="RoyaltyScheme">Royalty Scheme</label><sup><i data-help="LeaseRoyaltyMaster.RoyaltyScheme" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="RoyaltyScheme" value="{{ royaltymaster.RoyaltyScheme }}" /></td>
             </tr>
             <tr>
@@ -61,6 +61,16 @@
 
 <script>
     $(function() {
+  $('.help').on('click', function(){showHelp()});
+
+  $("#help-modal").dialog({
+    modal: true,
+    autoOpen: false,
+    buttons: {
+      OK: function() {$(this).dialog("close")}
+    }
+  });
+
         $('#wellsAccordion').accordion({
             collapsible:true,
             active:false,
@@ -90,6 +100,26 @@
         }
     )
 
+function showHelp() {
+  var helpItem = $(event.target).data('help');
+  $.get('/lookups/help', {item: helpItem})
+    .done(function(data) {
+      $('#help-modal-text').html(data);
+    })
+    .fail(function(data) {
+      $('#help-modal-text').html('Failed to get help for ', helpItem);
+    })
+    .always(function(data) {
+      $('#help-modal').dialog({title: 'Help for ' + helpItem});
+      $('#help-modal').dialog('open');
+    });
+ }
+
 </script>
+<div id="help-modal">
+  <div id="help-modal-text">
+
+  </div>
+</div>
 
 {% endblock %}
