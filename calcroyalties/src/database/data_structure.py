@@ -73,3 +73,6 @@ class Formatter(object):
             return dt.strftime('%Y-%m-%d')
         else:
             return ""
+
+    def html_lf(self, s):
+        return s.replace(';','<br>')

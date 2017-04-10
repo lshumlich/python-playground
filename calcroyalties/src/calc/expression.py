@@ -40,8 +40,10 @@ class Expression:
     def find_expression(s):
         a = s.find('=(')
         if a < 0:
-            raise AppError('No formula found in string: ' + s)
-        brace_count = 1
+            brace_count = 0
+            # raise AppError('No formula found in string: ' + s)
+        else:
+            brace_count = 1
         i = 0
         for i in range(a + 2, len(s)):
             if s[i] == ')':
@@ -54,11 +56,16 @@ class Expression:
         if brace_count != 0:
             raise AppError('The formula was not ended. Looking for matching ending ")" in string: ' + s)
 
+        if a == -1:
+            return 0, len(s)
         return a, i
 
     def get_expression(self, s):
         b, e = self.find_expression(s)
-        return s[b+2:e]
+        if(s[b:b+2] == '=('):
+            return s[b+2:e]
+        else:
+            return s
 
     def lookup(self, name, prod_month):
         lookup_data = self.db.select1('Lookups', Name=name, ProdMonth=prod_month)

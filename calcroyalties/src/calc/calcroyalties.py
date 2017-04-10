@@ -120,8 +120,10 @@ class ProcessRoyalties(object):
         # todo: If there is no sales. Use last months sales value... Not included in this code
         self.determine_royalty_price(royalty, monthly, calc, calc_specific)
 
+        self.determine_well_value_for_royalties(royalty, monthly, calc, calc_specific)
+
         if monthly.Product == 'OIL' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
-            self.calc_sask_oil_prov_crown(monthly, well, royalty, calc)
+            self.calc_sask_oil_prov_crown(monthly, well, royalty, calc, calc_specific)
 
         elif monthly.Product == 'OIL' and 'IOGR1995' in royalty.RoyaltyScheme:
             self.calc_sask_oil_iogr1995(well.CommencementDate, royalty.CrownMultiplier,
@@ -423,7 +425,7 @@ class ProcessRoyalties(object):
 
         return calc.BaseRoyaltyCalcRate
 
-    def calc_sask_oil_prov_crown_royalty_volume_value(self, m, fn_interest, rp_interest, lease_rm, calc):
+    def calc_sask_oil_prov_crown_royalty_volume_value(self, m, fn_interest, rp_interest, lease_rm, calc, calc_specific):
 
         calc.BaseRoyaltyRate = calc.BaseRoyaltyCalcRate
 
@@ -437,17 +439,12 @@ class ProcessRoyalties(object):
             if lease_rm.MinRoyaltyRate > calc.BaseRoyaltyRate:
                 calc.BaseRoyaltyRate = lease_rm.MinRoyaltyRate
 
-        # Should not need this volume for anything.....
-        # calc.BaseRoyaltyVolume = round((calc.BaseRoyaltyRate *
-        #                                      lease_rm.CrownMultiplier *
-        #                                      m.RPVol * fn_interest), 6)
 
         calc.BaseRoyaltyValue = round(calc.BaseRoyaltyRate *
                                       lease_rm.CrownMultiplier *
-                                      calc.RoyaltyBasedOnVol *
                                       fn_interest *
                                       rp_interest *
-                                      calc.RoyaltyPrice, 2)
+                                      calc_specific.WellValueForRoyalty, 2)
 
         if lease_rm.MinRoyaltyDollar:
             if lease_rm.MinRoyaltyDollar > calc.BaseRoyaltyValue:
@@ -652,6 +649,28 @@ class ProcessRoyalties(object):
         calc.RoyaltyPrice = value
         calc.RoyaltyPriceExplanation = explanation
 
+    def determine_well_value_for_royalties(self, lease_rm, monthly, calc, calc_sp):
+
+        if monthly.Product == 'OIL':
+            calc_sp.ValueBasedOn = lease_rm.OilValueBasedOn
+        elif monthly.Product == 'GAS':
+            calc_sp.ValueBasedOn = lease_rm.GasValueBasedOn
+        else:
+            calc_sp.ValueBasedOn = lease_rm.ProductsValueBasedOn
+
+        if calc_sp.ValueBasedOn:
+            value = round(self.expression.evaluate_expression(calc_sp.ValueBasedOn, monthly),2)
+            explanation = calc_sp.ValueBasedOn + ";" + \
+                          self.expression.resolve_expression(calc_sp.ValueBasedOn, monthly) \
+                       + ";=" + str(value)
+        else:
+            value = round(monthly.SalesPrice * monthly.SalesVol,2)
+            explanation = 'sales * price;' + str(monthly.SalesPrice) + " * " + str(monthly.SalesVol) + \
+                ";=" + '{:>10,.2f}'.format(value)
+
+        calc_sp.WellValueForRoyalty = value
+        calc_sp.WellValueForRoyaltyExplanation = explanation
+
     @staticmethod
     def ensure_date(d):
         if isinstance(d, datetime):
@@ -690,7 +709,7 @@ class ProcessRoyalties(object):
       OilFactors.pdf
     '''
 
-    def calc_sask_oil_prov_crown(self, monthly, well, royalty, calc):
+    def calc_sask_oil_prov_crown(self, monthly, well, royalty, calc, calc_specific):
         calc.CommencementPeriod = self.determine_commencement_period(monthly.ProdMonth, well.CommencementDate)
         econ_oil_data = self.db.select1("ECONOil", ProdMonth=monthly.ProdMonth)
 
@@ -705,7 +724,8 @@ class ProcessRoyalties(object):
         self.calc_sask_oil_prov_crown_royalty_volume_value(monthly, calc.PEFNInterest,
                                                            calc.RTPInterest,
                                                            royalty,
-                                                           calc)
+                                                           calc,
+                                                           calc_specific)
 
         calc.TransBaseValue = self.calc_sask_oil_prov_crown_deductions(monthly,
                                                                        calc.PEFNInterest,

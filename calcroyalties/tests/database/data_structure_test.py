@@ -60,6 +60,11 @@ class Test(unittest.TestCase):
         # If there is no attribute in the object called 'LeaseID' use the ID attribute to format the lease string
         self.assertEqual(well._format.ProdMonth, '2016-02')
 
+    def test_html_lf(self):
+        well = DataStructure()
+        well.Msg = 'abc;def;geh;'
+        self.assertEqual('abc<br>def<br>geh<br>',well._format.html_lf(well.Msg))
+
     def test_json(self):
         well = DataStructure(json_string='{"ID": 123, "LeaseType": "OL"}')
         self.assertEqual(123,well.ID)

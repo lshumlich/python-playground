@@ -191,7 +191,7 @@ table, th, td {
         </colgroup>
 
 
-	<caption><br><b>Monthly Data</b><br><br></caption>
+	<h3>Monthly Data</h3>
 
     {#
         --- Monthly Data
@@ -248,6 +248,7 @@ table, th, td {
     #}
 
     {% if 'SKProvCrownVar' in rm.RoyaltyScheme and m.Product == 'OIL' %}
+        <h3>SKProv Crown Oil</h3>
         <br>
         <TABLE>
 
@@ -283,8 +284,9 @@ table, th, td {
 
     {% if 'SKProvCrownVar' in rm.RoyaltyScheme and m.Product == 'GAS' %}
 
-        <br>
-            Product: {{ m.Product }} Well Type: {{ well.WellType }} Royalty Classification: {{ calc.RoyaltyClassification }}
+        <h3>SKProv Crown Gas</h3>
+
+        Product: {{ m.Product }} Well Type: {{ well.WellType }} Royalty Classification: {{ calc.RoyaltyClassification }}
         <TABLE>
             <!--{% set well_type = 'Oil' %}-->
             {% if calc.RoyaltyClassification == 'Fourth Tier' and well.WellType == 'Gas' %}
@@ -324,9 +326,15 @@ table, th, td {
 
         </TABLE>
     {% endif %}
+
     {% if 'SKProvCrownVar' in rm.RoyaltyScheme %}
 
-    <h3> Let's do the Valuation Thing </h3>
+        <h3>SKProvCrown Valuation</h3>
+
+        {{ calc_sp._format.html_lf(calc_sp.WellValueForRoyaltyExplanation) | safe}}
+        <br>
+
+    {% endif %}
 
     {% if 'SKProvCrownVar' in rm.RoyaltyScheme and m.Product == 'GAS' %}
 
@@ -338,8 +346,6 @@ table, th, td {
                 <td style="text-align:center">*</td>
                 <td style="text-align:center">CMult</td>
                 <td style="text-align:center">*</td>
-                <td style="text-align:center">{{calc.RoyaltyBasedOn}}</td>
-                <td style="text-align:center">*</td>
                 <td style="text-align:center">PE FN %</td>
                 <td style="text-align:center">*</td>
                 <td style="text-align:center">RP %</td>
@@ -349,8 +355,6 @@ table, th, td {
             <tr>
                 <td> </td>
                 <td style="text-align:center"> {{ '{:.6%}'.format(calc.BaseRoyaltyRate) }}</td>
-                <td style="text-align:center">*</td>
-                <td style="text-align:center">{{ rm.CrownMultiplier }}</td>
                 <td style="text-align:center">*</td>
                 <td style="text-align:center">{{ '{:.2f}'.format(calc.RoyaltyBasedOnVol) }}</td>
                 <td>*</td>
@@ -358,14 +362,13 @@ table, th, td {
                 <td>*</td>
                 <td>{{ '{:.6f}%'.format(rtp_info.Percent)}}</td>
                 <td>*</td>
-                <td>{{ '{:>10,.6f}\n'.format(calc.RoyaltyPrice) }}</td>
+                <td>{{ '{:>10,.2f}\n'.format(calc_sp.WellValueForRoyalty) }}</td>
             </tr>
             <tr>
                 <td> </td>
                 <td style="text-align:center">$ {{ '{:>10,.2f}\n'.format(calc.BaseRoyaltyValue)}}</td>
             </tr>
         </table>
-
     {% endif %}
 
     {#
@@ -373,6 +376,7 @@ table, th, td {
     #}
 
     {% if m.Product == 'OIL' and 'SKProvCrownVar' in rm.RoyaltyScheme %}
+        <br>
         <table>
             <tr>
                 <td>Base Royalty =</td>
@@ -380,13 +384,11 @@ table, th, td {
                 <td style="text-align:center">*</td>
                 <td style="text-align:center">CMult</td>
                 <td style="text-align:center">*</td>
-                <td style="text-align:center">Prod Vol</td>
-                <td style="text-align:center">*</td>
                 <td style="text-align:center">PE FN %</td>
                 <td style="text-align:center">*</td>
                 <td style="text-align:center">RP %</td>
                 <td style="text-align:center">*</td>
-                <td style="text-align:center">RVal</td>
+                <td style="text-align:center">Value</td>
             </tr>
             <tr>
                 <td> </td>
@@ -394,13 +396,11 @@ table, th, td {
                 <td style="text-align:center">*</td>
                 <td style="text-align:center">{{ rm.CrownMultiplier }}</td>
                 <td style="text-align:center">*</td>
-                <td style="text-align:center">{{ '{:.2f}'.format(m.ProdVol) }}</td>
-                <td>*</td>
                 <td>{{ '{:.6%}'.format(well_lease_link.PEFNInterest) }}</td>
                 <td>*</td>
                 <td>{{ '{:.6f}%'.format(rtp_info.Percent)}}</td>
                 <td>*</td>
-                <td>{{ '{:>10,.6f}\n'.format(calc.RoyaltyPrice) }}</td>
+                <td>{{ '{:>10,.2f}\n'.format(calc_sp.WellValueForRoyalty) }}</td>
             </tr>
             <tr>
                 <td> </td>
@@ -773,7 +773,7 @@ table, th, td {
                     <td style="text-align:center">$ {{ '{:>10,.2f}\n'.format(calc.GorrRoyaltyValue)}}</td>
                 </tr>
             </table>
-         {% else %}
+        {% else %}
             <table>
                 <tr>
                     <td>GORR $</td>
@@ -877,7 +877,6 @@ table, th, td {
         {*** Note: Handle Incentives} <br>
         {*** Note: Handle Previous Paid Amount?} <br>
     </div>
-
     <div align="center">
 
     <h1>---------- Test Area -------------</h1>

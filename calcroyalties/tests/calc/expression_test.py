@@ -16,9 +16,6 @@ class TestExpresion(unittest.TestCase):
     def test_find_expression(self):
         expression = Expression()
 
-        s = "no formula in here"
-        self.assertRaises(AppError, expression.find_expression, s)  # Note there is no expression
-
         s = "asdf =(abc + (def * 3)) more stuff in here"
         self.assertEqual((5, 22), expression.find_expression(s))
 
@@ -33,9 +30,6 @@ class TestExpresion(unittest.TestCase):
 
     def test_get_expression(self):
         expression = Expression()
-
-        s = "no formula in here"
-        self.assertRaises(AppError, expression.get_expression, s)  # Note there is no expression
 
         s = "asdf =(abc + (def * 3)) more stuff in here"
         self.assertEqual("abc + (def * 3)", expression.get_expression(s))
@@ -103,3 +97,16 @@ class TestExpresion(unittest.TestCase):
 
         s = "asdf =(prod + sales + gj + notfoundvalue) more stuff in here"
         self.assertRaises(AppError, expression.evaluate_expression, s, monthly)
+
+    def test_string_is_formula(self):
+        expression = Expression()
+
+        s = "prod + sales + gj"
+        monthly = DataStructure()
+        monthly.ProdVol = 100
+        monthly.SalesVol = 90
+        monthly.GJ = 1000
+
+        self.assertEqual(1190, expression.evaluate_expression(s, monthly))
+        self.assertEqual("100 + 90 + 1000", expression.resolve_expression(s, monthly))
+
