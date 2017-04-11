@@ -822,7 +822,7 @@ class ProcessRoyalties(object):
                 'Royalty Classification: "' + well_royalty_classification + '" not known for "' + well_type +
                 '" Royalty not calculated.')
 
-        calc.BaseRoyaltyCalcRate = round(calc.BaseRoyaltyCalcRate / 100, 6)
+        calc.BaseRoyaltyCalcRate = round(calc.BaseRoyaltyCalcRate / 100, 8)
         return calc.BaseRoyaltyCalcRate
 
     def calc_sask_gas_prov_crown_royalty_volume_value(self, m, lease_rm, calc):
