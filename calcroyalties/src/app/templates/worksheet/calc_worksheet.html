@@ -80,11 +80,6 @@ fmath {
                 <tr>
                     <th align="right">Royalty Base:</th> <td>{{ rm.RoyaltyScheme }}</td>
                 </tr>
-                {% if rm.Gorr %}
-                    <tr>
-                        <th align="right">GORR:</th> <td>{{ rm.format_gorr  }}</td>
-                    </tr>
-                {%endif%}
                 <tr>
                     <th align="right">Crown Multiplier:</th> <td>{{ '{:.2f}'.format(rm.CrownMultiplier) }}</td>
                 </tr>
@@ -284,7 +279,7 @@ table, th, td {
 
     {% if 'SKProvCrownVar' in rm.RoyaltyScheme and m.Product == 'GAS' %}
 
-        <h3>SKProv Crown Gas</h3>
+        <h3>SKProvCrown Gas</h3>
 
         Product: {{ m.Product }} Well Type: {{ well.WellType }} Royalty Classification: {{ calc.RoyaltyClassification }}
         <TABLE>
@@ -329,7 +324,7 @@ table, th, td {
 
     {% if 'SKProvCrownVar' in rm.RoyaltyScheme %}
 
-        <h3>SKProvCrown Valuation</h3>
+        <h3>Well Valuation</h3>
 
         {{ calc_sp._format.html_lf(calc_sp.WellValueForRoyaltyExplanation) | safe}}
         <br>
@@ -338,7 +333,7 @@ table, th, td {
 
     {% if 'SKProvCrownVar' in rm.RoyaltyScheme and m.Product == 'GAS' %}
 
-        <br>
+        <h3>SKProvCrown Valuation</h3>
         <table>
             <tr>
                 <td>Base Royalty =</td>
@@ -356,11 +351,11 @@ table, th, td {
                 <td> </td>
                 <td style="text-align:center"> {{ '{:.6%}'.format(calc.BaseRoyaltyRate) }}</td>
                 <td style="text-align:center">*</td>
-                <td style="text-align:center">{{ '{:.2f}'.format(calc.RoyaltyBasedOnVol) }}</td>
+                <td style="text-align:center">{{ '{:.2f}'.format(rm.CrownMultiplier) }}</td>
                 <td>*</td>
-                <td>{{ '{:.6%}'.format(well_lease_link.PEFNInterest) }}</td>
+                <td>{{ '{:.6%}'.format(calc.PEFNInterest) }}</td>
                 <td>*</td>
-                <td>{{ '{:.6f}%'.format(rtp_info.Percent)}}</td>
+                <td>{{ '{:.6%}'.format(calc.RTPInterest)}}</td>
                 <td>*</td>
                 <td>{{ '{:>10,.2f}\n'.format(calc_sp.WellValueForRoyalty) }}</td>
             </tr>
@@ -739,8 +734,14 @@ table, th, td {
 
     {% if 'GORR' in rm.RoyaltyScheme %}
 
-    	<caption><br><b>GORR</b><br><br></caption>
-        {{ calc.GorrMessage }}
+        <hr>
+
+    	<h3>GORR</h3>
+
+        {{ rm._format.html_lf(rm.format_gorr) | safe}}
+        <br>
+        {{ calc._format.html_lf(calc.GorrMessage) | safe}}
+
         <br>
         {% if calc_sp.GorrValOrPer == '%' %}
             <table>
