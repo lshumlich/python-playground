@@ -1,8 +1,16 @@
-from flask import Blueprint, render_template, request, abort, json
+from flask import Blueprint
+from flask import render_template
+from flask import request
+from flask import abort
+from flask import json
 
+# from .permission_handler import PermissionHandler
+import traceback
+import sys
+
+from src.util.data_dictionary import resolve_lookups_in_description
 import config
-from .permission_handler import PermissionHandler
-import traceback, sys
+from src.database.data_structure import DataStructure
 
 admin = Blueprint('admin', __name__)
 
@@ -12,10 +20,12 @@ def user_list():
     """ display user search form"""
     return render_template('admin/users_search.html')
 
+
 @admin.route('/api/users', methods=['GET', 'DELETE', 'POST', 'PUT', 'PATCH'])
 def user_details():
     """ handles all user-related ajax calls, both for user list and individual users """
-    if not request.is_xhr: abort(404)
+    if not request.is_xhr:
+        abort(404)
     db = config.get_database()
     if request.method == 'GET' and not request.args:
         """ get an entire user list """
@@ -32,7 +42,6 @@ def user_details():
     elif request.method == 'POST':
         """ update info for a user """
         req_data = request.get_json()
-        print(req_data)
         user = db.select1('Users', ID=req_data['ID'])
         user.Login = req_data['Login']
         user.Name = req_data['Name']
@@ -45,8 +54,8 @@ def user_details():
         return render_template('admin/users_details.html', user=None)
     elif request.method == 'PUT':
         """ create new user """
-        class User():
-            None
+        class User:
+            pass
         req_data = request.get_json()
         user = User()
         user._table_name = 'Users'
@@ -62,7 +71,6 @@ def user_details():
 
 @admin.route('/admin/datadictionary/show')
 def data_dictionary():
-    print("in datadic")
     """ display search form """
     return render_template('admin/data_dictionary_search.html')
 
@@ -77,50 +85,29 @@ def data_dictionary_get():
             results = db.select_sql("SELECT * from DataDictionary where TableName = \'{}\' order by SortOrder".format
                                     (request.args.get('Subject')))
             resolve_lookups(results)
-            return render_template('admin/data_dictionary_search_results.html', datadic=results,subject=request.args.get('Subject'))
+            return render_template('admin/data_dictionary_search_results.html',
+                                   datadic=results, subject=request.args.get('Subject'))
         elif request.args.get('ID'):
-            id = request.args.get('ID')
-            if id == '0':
+            _id = request.args.get('ID')
+            if _id == '0':
                 return render_template('admin/data_dictionary_details.html', datadic=None)
             else:
                 results = db.select1('DataDictionary', ID=request.args.get('ID'))
                 return render_template('admin/data_dictionary_details.html', datadic=results)
 
     """ get an entire dictionary list """
-    results = db.select('DataDictionary')
-    return render_template('admin/data_dictionary_search_results.html', datadic=results,subject=request.args.get('Subject'))
+    # results = db.select('DataDictionary')
+    results = db.select_sql("SELECT * from DataDictionary order by TableName,SortOrder")
+
+    return render_template('admin/data_dictionary_search_results.html',
+                           datadic=results, subject=request.args.get('Subject'))
+
 
 def resolve_lookups(results):
     for r in results:
         s = resolve_lookups_in_description(r.Documentation)
         r.Documentation = s
 
-def resolve_lookups_in_description(s):
-    db = config.get_database()
-    donethat = {}
-    while True:
-        b = s.find('{{')
-        if b < 0:
-            break
-        e = s.find('}}')
-        if e < 0:
-            break
-        lookup = s[b+2:e]
-        print(lookup)
-        parts = lookup.split('.')
-        if parts[0] == 'DataDictionary':
-            dic_key = parts[1] + '.' + parts[2]
-            if dic_key in donethat:
-                s = s.replace('{{' + lookup + '}}', '?? ***' + dic_key + ' has been done already ***  ??')
-                break
-            donethat[dic_key] = "Done"
-            print(donethat)
-            try:
-                datadic = db.select1('DataDictionary', TableName=parts[1], Attribute=parts[2])
-                s = s.replace('{{' + lookup + '}}', datadic.Documentation)
-            except:
-                s = s.replace('{{' + lookup + '}}', '??' + parts[1] + '.' + parts[2] + ' *** Not Found in DataDictionary *** ??')
-    return s
 
 # @admin.route('/admin/datadictionary/save',  methods=['GET', 'POST', 'PUT'])
 @admin.route('/admin/datadictionary/save', methods=['POST'])
@@ -128,12 +115,12 @@ def data_dictionary_save():
 
     req_data = request.get_json()
     db = config.get_database()
-    id = req_data['ID']
-    if id:  # This means there is an id so it is an update
+    _id = req_data['ID']
+    if _id:  # This means there is an id so it is an update
         datadic = db.select1('DataDictionary', ID=int(req_data['ID']))
     else:
-        class DataDic():
-            None
+        class DataDic:
+            pass
         req_data = request.get_json()
         datadic = DataDic()
         datadic._table_name = 'DataDictionary'
@@ -154,15 +141,13 @@ def data_dictionary_save():
 @admin.route('/admin/datadictionary/delete')
 def data_dictionary_delete():
     db = config.get_database()
-    id = request.args.get('Subject')
 
-    results = db.delete('DataDictionary', int(request.args.get('ID')))
+    db.delete('DataDictionary', int(request.args.get('ID')))
 
     return "ok from data_dictionary_delete"
 
 
 # Data Browser below:
-from src.database.data_structure import DataStructure
 
 class Shower(object):
 
@@ -174,17 +159,17 @@ class Shower(object):
     def connect(self):
         self.dbi = config.get_database_instance()
 
-    def show_table(self,tableName, attr=None, key=None):
-        stmt = 'select * from ' + tableName
+    def show_table(self, table_name, attr=None, key=None):
+        stmt = 'select * from ' + table_name
         if key:
-            ctype = self.column_type(tableName, attr)
+            ctype = self.column_type(table_name, attr)
             where = ''
             if ctype == 'int':
                 where = attr + "=" + key
-            elif ctype =='text':
+            elif ctype == 'text':
                 where = attr + "='" + key + "'"
             else:
-                print('***** Type not delt with:', type,tableName,attr)
+                print('***** Type not delt with:', type, table_name, attr)
 
             stmt = stmt + " where " + where
         elif attr:
@@ -196,14 +181,13 @@ class Shower(object):
             table_rows.append(row)
         return table_rows
 
-    def show_columns(self, tableName):
-        stmt = 'pragma table_info(' + tableName + ')'
+    def show_columns(self, table_name):
+        stmt = 'pragma table_info(' + table_name + ')'
         values = self.dbi.execute(stmt)
         columns = []
         for row in values:
             columns.append(row[1])
-        return (columns)
-
+        return columns
 
     def column_type(self, table, column):
         stmt = 'pragma table_info(' + table + ')'
@@ -211,12 +195,13 @@ class Shower(object):
         for row in values:
             if row[1] == column:
                 return row[2]
-        return (None)
+        return None
 
 
 class Utils(object):
 
-    def obj_to_dict(self,obj,dic = None):
+    @staticmethod
+    def obj_to_dict(obj, dic=None):
         """
         This will append or create a dictionary object with property attributes of an object
         The dictionary object is returned for convenience.
@@ -228,7 +213,8 @@ class Utils(object):
                 dic[attr] = obj. __dict__[attr]
         return dic
 
-    def dict_to_obj(self,dic,obj=None):
+    @staticmethod
+    def dict_to_obj(dic, obj=None):
         if not obj:
             obj = DataStructure()
         for k in dic:
@@ -236,8 +222,8 @@ class Utils(object):
 
         return obj
 
-
-    def json_decode(self,req):
+    @staticmethod
+    def json_decode(req):
         """
         This is used primarly in the browser app.
         Do not remove this method. In the app we could use request.json
@@ -245,9 +231,9 @@ class Utils(object):
         this but... and it's a big but... flask unit testing does not
         suport the request.json method we wrote this.
         """
-        reqDataBytes = req.data
-        reqDataString = reqDataBytes.decode(encoding='UTF-8')
-        return json.loads(reqDataString)
+        req_data_bytes = req.data
+        req_data_string = req_data_bytes.decode(encoding='UTF-8')
+        return json.loads(req_data_string)
 
 
 @admin.route("/admin/data/", methods=['GET', 'POST'])
@@ -260,14 +246,13 @@ def data():
         table = request.args.get('table')
         attr = request.args.get('attr')
         key = request.args.get('key')
-        links = {}
+        links = dict()
         links['BAid'] = '?table=BAInfo&attr=BAid&key='
         links['WellEvent'] = '?table=WellInfo&attr=Well&key='
 
         tables = db_instance.get_table_names()
         header = None
         rows = None
-        print('Table:', table)
         if table:
             header = shower.show_columns(table)
             rows = shower.show_table(table, attr, key)
@@ -277,20 +262,21 @@ def data():
         traceback.print_exc(file=sys.stdout)
     return html
 
+
 @admin.route("/admin/data/updateLinkRow.json", methods=['POST'])
 def update_link_row():
     utils = Utils()
     db = config.get_database()
     return_data = dict()
     try:
-        print('AppServer.update_link_row running', request.method)
-        data = utils.json_decode(request)
-        print('data:', data)
+        # print('AppServer.update_link_row running', request.method)
+        _data = utils.json_decode(request)
+        # print('data:', data)
         linktab = db.get_data_structure('LinkTab')
-        utils.dict_to_obj(data, linktab)
-        print('just before if data:', data)
-        print('just before if data:', data['ID'])
-        if data['ID'] == '0':
+        utils.dict_to_obj(_data, linktab)
+        print('just before if data:', _data)
+        print('just before if data:', _data['ID'])
+        if _data['ID'] == '0':
             db.insert(linktab)
         else:
             db.update(linktab)
@@ -304,6 +290,7 @@ def update_link_row():
         return_data['Message'] = str(e)
         return json.dumps(return_data)
 
+
 @admin.route("/admin/data/getLinkRow.json", methods=['POST'])
 def get_link_row():
     utils = Utils()
@@ -312,34 +299,35 @@ def get_link_row():
         print('AppServer.get_link_row running', request.method)
         print('Instance:', config.get_database_name(), config.get_environment())
         print('Tables', config.get_database_instance().get_table_names())
-        data = utils.json_decode(request)
-        link = db.select("LinkTab", TabName=data['TabName'], AttrName=data['AttrName'])
+        _data = utils.json_decode(request)
+        link = db.select("LinkTab", TabName=_data['TabName'], AttrName=_data['AttrName'])
         print('link', link)
         if not link:
-            data['ID'] = 0
-            data['LinkName'] = ''
-            data['BaseTab'] = 0
-            data['ShowAttrs'] = ''
+            _data['ID'] = 0
+            _data['LinkName'] = ''
+            _data['BaseTab'] = 0
+            _data['ShowAttrs'] = ''
         else:
-            data['ID'] = link[0].ID
-            data['LinkName'] = link[0].LinkName
-            data['BaseTab'] = link[0].BaseTab
-            data['ShowAttrs'] = link[0].ShowAttrs
+            _data['ID'] = link[0].ID
+            _data['LinkName'] = link[0].LinkName
+            _data['BaseTab'] = link[0].BaseTab
+            _data['ShowAttrs'] = link[0].ShowAttrs
 
-        return json.dumps(data)
+        return json.dumps(_data)
 
     except Exception as e:
         print('AppServer.link: ***Error:', e)
         traceback.print_exc(file=sys.stdout)
+
 
 @admin.route("/admin/data/getLinkData.json", methods=['POST'])
 def get_link_data():
     utils = Utils()
     db = config.get_database()
     try:
-        data = utils.json_decode(request)
+        _data = utils.json_decode(request)
         #             print('data', data)
-        link = db.select("LinkTab", TabName=data['TabName'], AttrName=data['AttrName'])
+        link = db.select("LinkTab", TabName=_data['TabName'], AttrName=_data['AttrName'])
         #             print('link',link)
         if len(link) > 0:
             result_rows = db.select("LinkTab", LinkName=link[0].LinkName, BaseTab=1)
@@ -351,7 +339,7 @@ def get_link_data():
                 print('We have a base table')
                 attrs_to_show = result.ShowAttrs.split(',')
                 args = dict()
-                args[result.AttrName] = data['AttrValue']
+                args[result.AttrName] = _data['AttrValue']
                 key_data_rows = db.select(result.TabName, **args)
                 rows = []
                 for keyData in key_data_rows:
@@ -367,18 +355,14 @@ def get_link_data():
 
             rows = []
             for result in result_rows:
-                row = []
-                row.append(result.TabName)
-                row.append(result.AttrName)
+                row = [result.TabName, result.AttrName]
                 rows.append(row)
-            data['Links'] = rows
+            _data['Links'] = rows
 
         else:
-            data["Message"] = data['AttrName'] + " has not been linked."
-        return json.dumps(data)
+            _data["Message"] = _data['AttrName'] + " has not been linked."
+        return json.dumps(_data)
         #
     except Exception as e:
         print('AppServer.link: ***Error:', e)
         traceback.print_exc(file=sys.stdout)
-
-    print("hello")

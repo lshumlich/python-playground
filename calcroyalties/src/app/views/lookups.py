@@ -3,6 +3,8 @@ from flask import Blueprint, request, config, render_template
 import config
 from .main import get_proddate
 
+from src.util.data_dictionary import resolve_lookups_in_description
+
 lookups = Blueprint('lookups', __name__)
 
 
@@ -15,6 +17,8 @@ def app_help():
         data = db.select1('DataDictionary', TableName=v[0], Attribute=v[1])
         if not data.Documentation:
             data.Documentation = 'Help text has not been entered for ' + help_item
+        else:
+            data.Documentation = resolve_lookups_in_description(data.Documentation)
         return data.Documentation
     except Exception as e:
         print(e)

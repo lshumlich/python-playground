@@ -288,11 +288,11 @@ table, th, td {
                 {% if m.ProdVol <= 25.0 %}
                     <tr><td>{{ calc.Message }}<td><tr>
                 {% elif m.ProdVol <= 115.4 %}
-                    <tr><td align="right">CR% =</td> <td align="center">(C * MGP) - D</td></tr>
+                    <tr><td align="right">CR% =</td> <td align="center">$$(C_g * MGP) - D_g$$</td></tr>
                     <tr><td align="right">CR% =</td> <td align="center">&nbsp;&nbsp;({{ '{:.4f}'.format(calc.C) }} * {{ '{:.2f}'.format(m.ProdVol) }}) - {{'{:.2f}'.format(calc.D)}}</td></tr>
                     <tr><td align="right">CR% =</td> <td align="center"> {{'{:.6%}'.format(calc.BaseRoyaltyCalcRate) }}</td></tr>
                 {% else %}
-                    <tr><td align="left"> CR% = </td> <td>$$ (K - X / {MGP} ) $$ </td></tr>
+                    <tr><td align="left"> CR% = </td> <td>$$ (K_g - X_g / {MGP} ) $$ </td></tr>
                     <tr><td align="left"> CR% = </td> <td>$$ ( {{'{:.2f}'.format(calc.K)}} -
                         {{ calc.X }} / {{ '{:.2f}'.format(m.ProdVol) }} ) $$ </td></tr>
                     <tr><td align="left"> CR% = </td><td align="center"> {{ '{:.6%}'.format(calc.BaseRoyaltyCalcRate) }} </td></tr>
@@ -301,18 +301,18 @@ table, th, td {
                 {% if m.ProdVol <= 64.7 %}
                     <tr><td> {{ calc.Message }}<td><tr>
                 {% else %}
-                    <tr><td align="left"> CR% = </td> <td>$$ (K - X / {MGP} ) $$ </td></tr>
+                    <tr><td align="left"> CR% = </td> <td>$$ (K_g - X_g / {MGP} ) $$ </td></tr>
                     <tr><td align="left"> CR% = </td> <td>$$ ( {{'{:.2f}'.format(calc.K)}} -
                         {{ calc.X }} / {{ '{:.2f}'.format(m.ProdVol) }} ) $$ </td></tr>
                     <tr><td align="left"> CR% = </td><td align="center"> {{ '{:.6%}'.format(calc.BaseRoyaltyCalcRate) }} </td></tr>
                 {% endif %}
             {% elif calc.RoyaltyClassification == 'Third Tier' or calc.RoyaltyClassification == 'New' or calc.RoyaltyClassification == 'Old' %}
                 {% if m.ProdVol <= 115.4 %}
-                    <tr><td align="right">CR% =</td> <td align="center">(C * MGP) - SRC</td></tr>
+                    <tr><td align="right">CR% =</td> <td align="center">$$(C_g * MGP) - SRC$$</td></tr>
                     <tr><td align="right">CR% =</td> <td align="center">&nbsp;&nbsp;({{ '{:.4f}'.format(calc.C) }} * {{ '{:.2f}'.format(m.ProdVol) }}) - {{'{:.2f}'.format(well.SRC)}}</td></tr>
                     <tr><td align="right">CR% =</td> <td align="center"> {{'{:.6%}'.format(calc.BaseRoyaltyCalcRate) }}</td></tr>
                 {% else %}
-                    <tr><td align="left"> CR% = </td> <td>$$ ((K - X / {MGP} ) - SRС) $$ </td></tr>
+                    <tr><td align="left"> CR% = </td> <td>$$ ((K_g - X_g / {MGP} ) - SRС) $$ </td></tr>
                     <tr><td align="left"> CR% = </td> <td>$$ ( ({{'{:.2f}'.format(calc.K)}} -
                         {{ calc.X }} / {{ '{:.2f}'.format(m.ProdVol) }}) - SRC ) $$ </td></tr>
                     <tr><td align="left"> CR% = </td><td align="center"> {{ '{:.6%}'.format(calc.BaseRoyaltyCalcRate) }} </td></tr>
