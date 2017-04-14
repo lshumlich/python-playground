@@ -39,13 +39,16 @@ class Loader(object):
             if len(ws.rows) > 1:
                 header_row = None
                 for row in ws.rows:
-                    if not header_row:
-                        header_row = row
-                        if table_name not in self.dbi.get_table_names():
-                            self.create_table(table_name, header_row, ws.rows[1])
-                    else:
-                        record_no += 1
-                        self.insert_data(table_name, row, header_row)
+                    try:
+                        if not header_row:
+                            header_row = row
+                            if table_name not in self.dbi.get_table_names():
+                                self.create_table(table_name, header_row, ws.rows[1])
+                        else:
+                            record_no += 1
+                            self.insert_data(table_name, row, header_row)
+                    except Exception as e:
+                        logging.error('*** sqlite_load_excel.load_worksheet -- Tab: ' + tab_name + ' ' + str(e) +  ' row: ' + str((record_no + 1)))
                 self.dbi.commit()
                 #             else:
                 #                 print('*** No data to load for tab:', tabName)

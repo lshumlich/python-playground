@@ -19,7 +19,8 @@ $(function() {
   });
 
     $( "#search-basic" ).on( "click", function() {
-        Subject = $("#Subjectxxx").val()
+        Subject = $("#Subject").val()
+        Resolve = $("#Resolvexxx").prop('checked')
         updateList()
     });
 
@@ -34,12 +35,13 @@ $(function() {
 })
 
 var Subject = ""
+var Resolve = "What"
 
 function updateList(){
     $.ajax({
     url: "/admin/datadictionary/get",
     dataType: "html",
-    data: {Subject:Subject}
+    data: {Resolve:Resolve,Subject:Subject}
   })
     .done(function(msg){
       $('#results-container').html(msg);
@@ -63,10 +65,19 @@ function myMsg() {
   	  </ul>
 
   	  <div id="tabs-basic">
-  	    Subject<sup><i data-help="DataDictionary.TableName" class="fa fa-question-circle help"></i></sup>
-        <br>
-        <input id="Subjectxxx"/>
-        <br>
+        <table>
+            <tr>
+                <td>
+                    Subject<sup><i data-help="DataDictionary.TableName" class="fa fa-question-circle help"></i></sup>
+                    <br>
+                    <input id="Subject"/>
+                </td>
+                <td>
+                    <input type="checkbox" id="Resolvexxx" checked="yes">
+                    <i data-help="DataDictionary.Resolve" class="fa fa-question-circle help"></i></sup> Resolve Lookups
+                </td>
+            </tr>
+        </table>
         <br>
         <br>
         <button id='search-basic'>Search</button>&nbsp;<button id="create">Create new</button>

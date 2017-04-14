@@ -26,6 +26,7 @@ def browse_file():
     if os.name != "posix":
         subprocess.call(['notepad.exe', config.get_temp_dir() + 'log.txt'])
 
+
 def drop_create_tables():
     from tests.database.sqlite_utilities_test import DatabaseUtilities
     dbu = DatabaseUtilities()
@@ -44,6 +45,7 @@ def drop_table(table_name):
     dbu = DatabaseUtilities()
     dbu.delete_table(table_name)
 
+
 def load_sample_data():
     from tests.database.sqlite_utilities_test import DatabaseUtilities
     dbu = DatabaseUtilities()
@@ -53,7 +55,8 @@ def load_sample_data():
 
 
 def start_logging():
-    import logging, sys
+    import logging
+    import sys
     import config
 
     logging.basicConfig(filename=config.get_temp_dir() + 'calc.log', filemode='w', level=logging.INFO)

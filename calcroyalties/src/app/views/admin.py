@@ -78,13 +78,18 @@ def data_dictionary():
 @admin.route('/admin/datadictionary/get')
 def data_dictionary_get():
     db = config.get_database()
+    # print("--- args", request.args)
+    # print("---> subject", request.args.get('Subject'))
+    # print("---> ID", request.args.get('ID'))
+    # print("---> Resolve", request.args.get('Resolve'))
 
     if request.args:
         if request.args.get('Subject'):
             # results = db.select('DataDictionary', TableName=request.args.get('Subject'))
             results = db.select_sql("SELECT * from DataDictionary where TableName = \'{}\' order by SortOrder".format
                                     (request.args.get('Subject')))
-            resolve_lookups(results)
+            if request.args.get('Resolve') == 'true':
+                resolve_lookups(results)
             return render_template('admin/data_dictionary_search_results.html',
                                    datadic=results, subject=request.args.get('Subject'))
         elif request.args.get('ID'):
@@ -98,6 +103,9 @@ def data_dictionary_get():
     """ get an entire dictionary list """
     # results = db.select('DataDictionary')
     results = db.select_sql("SELECT * from DataDictionary order by TableName,SortOrder")
+
+    if request.args.get('Resolve') == 'true':
+        resolve_lookups(results)
 
     return render_template('admin/data_dictionary_search_results.html',
                            datadic=results, subject=request.args.get('Subject'))
