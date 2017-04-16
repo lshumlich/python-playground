@@ -161,6 +161,11 @@ fmath {
                         <th align="right">Processing Deduction:</th> <td> {{ rm.ProcessingDeducted }} </td>
                     </tr>
                 {% endif %}
+                {% if m.Product == 'GAS' and rm.GCADeducted %}
+                    <tr>
+                        <th align="right">GCA Deducted:</th> <td> {{ rm.GCADeducted }} </td>
+                    </tr>
+                {% endif %}
                     <tr>
                         <th align="right">Royalty Based On:</th> <td> {{ calc.RoyaltyBasedOn }} </td>
                     </tr>
@@ -202,6 +207,7 @@ table, th, td {
        {% if m.Product == 'GAS' %}
     	   <th>Heat</th>
     	   <th>GJ</th>
+    	   <th>GCA Rate</th>
        {% endif %}
 	   <th>Sales Price</th>
 	   <th>Trans Price</th>
@@ -226,6 +232,13 @@ table, th, td {
             <td align="center">
             {% if m.GJ %}
                 {{ '{:.2f}'.format(m.GJ) }}
+            {% else %}
+                0.0
+            {% endif %}
+            </td>
+            <td align="center">
+            {% if m.GCARate %}
+                {{ '{:.2f}'.format(m.GCARate) }}
             {% else %}
                 0.0
             {% endif %}
@@ -302,8 +315,7 @@ table, th, td {
                     <tr><td> {{ calc.Message }}<td><tr>
                 {% else %}
                     <tr><td align="left"> CR% = </td> <td>$$ (K_g - X_g / {MGP} ) $$ </td></tr>
-                    <tr><td align="left"> CR% = </td> <td>$$ ( {{'{:.2f}'.format(calc.K)}} -
-                        {{ calc.X }} / {{ '{:.2f}'.format(m.ProdVol) }} ) $$ </td></tr>
+                    <tr><td align="left"> CR% = </td> <td>$$ ( {{'{:.2f}'.format(calc.K)}} - {{ calc.X }} / {{ '{:.2f}'.format(m.ProdVol) }} ) $$ </td></tr>
                     <tr><td align="left"> CR% = </td><td align="center"> {{ '{:.6%}'.format(calc.BaseRoyaltyCalcRate) }} </td></tr>
                 {% endif %}
             {% elif calc.RoyaltyClassification == 'Third Tier' or calc.RoyaltyClassification == 'New' or calc.RoyaltyClassification == 'Old' %}
@@ -726,6 +738,27 @@ table, th, td {
             {% endif %}
 
         </table>
+    {% endif %}
+
+    {#
+       Gas Cost Allowance GCA
+    #}
+    {% if m.Product == 'GAS' and calc.BaseGCA > 0.0 %}
+
+    	<h3>Gas Cost Allowance</h3>
+
+        {{ calc_sp._format.html_lf(calc_sp.BaseGCAMessage) | safe}}
+
+    {% endif %}
+    {#
+       Base Net Royalty
+    #}
+    {% if calc.BaseNetRoyaltyValue != calc.BaseRoyaltyValue %}
+
+    	<h3>Base Net Royalty</h3>
+
+        {{ calc_sp._format.html_lf(calc_sp.BaseNetRoyaltyMessage) | safe}}
+
     {% endif %}
 
     {#

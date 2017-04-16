@@ -381,9 +381,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
                                   crown_multiplier, fn_interest, rp_interest, m, calc)
         self.assertEqual(calc.BaseRoyaltyValue, 10558.65)
 
-    # todo These royalties need to be checked by the business
     def test_calc_sask_gas_iogr1995(self):
-
 
         pr = ProcessRoyalties()
 
@@ -441,7 +439,6 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
 
     def test_calcSaskSulIOGR1995(self):
         pr = ProcessRoyalties()
-        m = DataStructure()
         calc = DataStructure()
 
         calc.BaseRoyaltyValue = 0.0
@@ -498,6 +495,9 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         calc_sp = DataStructure()
         monthly = DataStructure()
 
+        calc.RoyaltyPrice = None
+        calc.RoyaltyPriceExplanation = None
+
         monthly.SalesPrice = 130.0
         monthly.TransRate = 10.0
 
@@ -526,6 +526,9 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         calc = DataStructure()
         calc_sp = DataStructure()
         monthly = DataStructure()
+
+        calc_sp.WellValueForRoyalty = None
+        calc_sp.WellValueForRoyaltyExplanation = None
 
         monthly.SalesPrice = 130.0
         monthly.SalesVol = 10.0
@@ -576,7 +579,6 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
 
         gorr = None, "0,2"
         self.assertRaises(AttributeError, pr.get_gorr_calc_type, m, gorr, calc)
-
 
         m.ProdVol = 0
         gorr = "mprod,250,%.02,300,%.03,400,%.04,500,%.05,0,%.06"
@@ -638,19 +640,20 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         m.ProdHours = 10
         gorr = "=((prod - sales) * 5),250,%.02,300,%.03,400,%.04,500,%.05,0,%.06"
         self.assertEqual(pr.get_gorr_calc_type(m, gorr, calc),
-                         ('%.05','Result =((prod - sales) * 5); =((200 - 100) * 5); =500.0 is > 400.0 and <= 500.0;'))
+                         ('%.05', 'Result =((prod - sales) * 5); =((200 - 100) * 5); =500.0 is > 400.0 and <= 500.0;'))
         m.ProdVol = 10000
         m.SalesVol = 10000
         m.ProdHours = 4
         self.assertEqual(pr.get_gorr_calc_type(m, gorr, calc),
-                         ('%.02','Result =((prod - sales) * 5); =((10000 - 10000) * 5); =0.0;'))
+                         ('%.02', 'Result =((prod - sales) * 5); =((10000 - 10000) * 5); =0.0;'))
 
         m.ProdVol = 200
         m.SalesVol = 100
         m.ProdHours = 10
         gorr = "=((prod - sales) * 5),250,$=(sales * price * .1),0,$=(sales * price * .2)"
         self.assertEqual(pr.get_gorr_calc_type(m, gorr, calc),
-                         ('$=(sales * price * .2)','Result =((prod - sales) * 5); =((200 - 100) * 5); =500.0 is > 250.0;'))
+                         ('$=(sales * price * .2)',
+                          'Result =((prod - sales) * 5); =((200 - 100) * 5); =500.0 is > 250.0;'))
 
     def test_gorr_royalty(self):
 
@@ -673,6 +676,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         calc.GorrRoyaltyValue = 0.0
         calc.TransGorrValue = 0.0
         calc.RoyaltyBasedOnVol = 100
+        calc.GorrMessage = None
 
         pr.calc_gorr(leaserm, monthly, calc, calc_specific)
         self.assertEqual(400.0, calc.GorrRoyaltyValue)
@@ -706,7 +710,9 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
                          " =1000.0;", calc.GorrMessage)
 
         # leaserm.Gorr = '=(price),7.5,$=(.15*prod*price),0,$=(.15*(7.50*prod)+.25*((price-7.50)*prod))'
-        leaserm.Gorr = '=(royalty_price),7.5,$=(.15 * prod * royalty_price),0,$=(0.15 * (7.50 * prod) + 0.25 * ((royalty_price - 7.50) * prod))'
+        leaserm.Gorr = '=(royalty_price),' \
+                       '7.5,$=(.15 * prod * royalty_price),' \
+                       '0,$=(0.15 * (7.50 * prod) + 0.25 * ((royalty_price - 7.50) * prod))'
         monthly.ProdVol = 100.0
         calc.RoyaltyPrice = 200.0
         pr.calc_gorr(leaserm, monthly, calc, calc_specific)
@@ -714,8 +720,8 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual(.12, calc.TransGorrValue)
         self.assertEqual("Result =(royalty_price); =(200.0); =200.0 is > 7.5; "
                          "$=(0.15 * (7.50 * prod) + 0.25 * ((royalty_price - 7.50) * prod)); "
-                         "$=(0.15 * (7.50 * 100.0) + 0.25 * ((200.0 - 7.50) * 100.0)); =4925.0;"
-                         , calc.GorrMessage)
+                         "$=(0.15 * (7.50 * 100.0) + 0.25 * ((200.0 - 7.50) * 100.0)); =4925.0;",
+                         calc.GorrMessage)
 
     def test_calcSupplementaryRoyaltiesIOGR1995(self):
         reference_price = {'Pigeon Lake Indian': 24.04, 'Reserve no.138A': 25.37,
@@ -751,7 +757,6 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         well = DataStructure()
         royalty = DataStructure()
         calc = DataStructure()
-        calc_specific = DataStructure()
         monthly = DataStructure()
 
         monthly.Product = 'OIL'
@@ -856,7 +861,8 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         log = AppLogger()
         pr.process_all()
         msg = log.stop_capture()
-        self.assertEqual(msg[:83],'"sqlite_database.select1 should have only found 1, but we found 0 in table: RTPInfo')
+        self.assertEqual(msg[:83],
+                         '"sqlite_database.select1 should have only found 1, but we found 0 in table: RTPInfo')
 
     def test_process_one(self):
 
@@ -899,6 +905,8 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         leaserm.OilBasedOn = "prod"
         leaserm.GasBasedOn = "sales"
         leaserm.ProductsBasedOn = "gj"
+        calc.RoyaltyBasedOn = None
+        calc.RoyaltyBasedOnVol = None
 
         monthly.Product = "OIL"
         pr.determine_royalty_based_on(leaserm, monthly, calc)
@@ -921,3 +929,118 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual("Unknown", calc.RoyaltyBasedOn)
         self.assertEqual(0.0, calc.RoyaltyBasedOnVol)
 
+    def test_calc_sask_prov_crown_gca(self):
+
+        pr = ProcessRoyalties()
+
+        leaserm = DataStructure()
+        calc = DataStructure()
+        calc_sp = DataStructure()
+        monthly = DataStructure()
+
+        leaserm.GCADeducted = 100.0
+        monthly.SalesVol = 12.0
+        calc.BaseRoyaltyRate = .3
+        calc.PEFNInterest = .5
+        calc.RTPInterest = .25
+        calc.BaseRoyaltyValue = 1000.00
+
+        pr.calc_sask_prov_crown_gca(leaserm,monthly,calc,calc_sp)
+        self.assertEqual('GCA = Sales Vol * GCA Rate * CR% * PE FN% * RP %;'
+                         'GCA = 12.00 * 100.000000 * 30.000000% * 50.000000% * 25.000000%;'
+                         'GCA = $45.00;', calc_sp.BaseGCAMessage)
+        self.assertEqual(45.0, calc.BaseGCA)
+
+        calc.BaseRoyaltyValue = 60.00
+        pr.calc_sask_prov_crown_gca(leaserm,monthly,calc,calc_sp)
+        self.assertEqual('GCA = Sales Vol * GCA Rate * CR% * PE FN% * RP %;'
+                         'GCA = 12.00 * 100.000000 * 30.000000% * 50.000000% * 25.000000%;'
+                         'GCA = $45.00;'
+                         'GCA > 50% of Royalty therefore GCA = $30.00;', calc_sp.BaseGCAMessage)
+        self.assertEqual(30.0, calc.BaseGCA)
+
+    def test_determine_gca_rate(self):
+
+        pr = ProcessRoyalties()
+
+        leaserm = DataStructure()
+        calc = DataStructure()
+        monthly = DataStructure()
+
+        leaserm.GCADeducted = None
+
+        pr.determine_gca_rate(leaserm, monthly, calc)
+        self.assertEqual(0.0, calc.BaseGCARate)
+
+        pr.determine_gca_rate(leaserm, monthly, calc)
+        self.assertEqual(0.0, calc.BaseGCARate)
+
+        leaserm.GCADeducted = 'asdf'
+        self.assertRaises(AppError, pr.determine_gca_rate, leaserm, monthly, calc)
+
+        leaserm.GCADeducted = 10.0
+        pr.determine_gca_rate(leaserm, monthly, calc)
+        self.assertEqual(10.0, calc.BaseGCARate)
+
+        leaserm.GCADeducted = "Annual"
+        self.assertRaises(AppError, pr.determine_gca_rate, leaserm, monthly, calc)
+
+        monthly.GCARate = 10.0
+        pr.determine_gca_rate(leaserm, monthly, calc)
+        self.assertEqual(10.0, calc.BaseGCARate)
+
+    def test_base_net_royalty(self):
+
+        pr = ProcessRoyalties()
+
+        leaserm = DataStructure()
+        monthly = DataStructure()
+        calc = DataStructure()
+        calc_sp = DataStructure()
+
+        calc.BaseRoyaltyValue = 100.00
+        calc.BaseGCA = 0.00
+
+        pr.calc_base_net_royalty(calc, calc_sp)
+        self.assertEqual('',calc_sp.BaseNetRoyaltyMessage)
+
+        calc.BaseGCA = 10.00
+        pr.calc_base_net_royalty(calc, calc_sp)
+        self.assertEqual('Base Net Royalty = Base Royalty Value - GCA;'
+                         'Base Net Royalty = $100.00 - $10.00;'
+                         'Base Net Royalty = $90.00;', calc_sp.BaseNetRoyaltyMessage)
+
+    def test_number_formats(self):
+
+        pr = ProcessRoyalties()
+        self.assertEqual('$10.11', pr.fm_value(10.111))
+        self.assertEqual('$10.12', pr.fm_value(10.115))
+        self.assertEqual('$100.12', pr.fm_value(100.12))
+        self.assertEqual('$1,000.12', pr.fm_value(1000.12))
+
+        self.assertEqual('10.11', pr.fm_vol(10.111))
+        self.assertEqual('10.12', pr.fm_vol(10.115))
+        self.assertEqual('100.12', pr.fm_vol(100.12))
+        self.assertEqual('1,000.12', pr.fm_vol(1000.12))
+
+        self.assertEqual('100.000000%', pr.fm_percent(1.))
+        self.assertEqual('12.345678%', pr.fm_percent(.12345678))
+        self.assertEqual('12.345679%', pr.fm_percent(.123456789))
+        self.assertEqual('1,011.100000%', pr.fm_percent(10.111))
+
+        self.assertEqual('1.000000', pr.fm_rate(1.))
+        self.assertEqual('0.123457', pr.fm_rate(.12345678))
+        self.assertEqual('10.111000', pr.fm_rate(10.111))
+
+"""
+This is some documentation:
+
+http://localhost:5000/worksheet?WellId=1&ProdDate=201501&RPBA=72838&Product=GAS
+
+
+
+
+
+
+
+"""

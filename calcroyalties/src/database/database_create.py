@@ -99,6 +99,10 @@ Database Change Log: Must be maintained so we can keep the database in sink:
   Add LeaseRoyaltyMaster.GasValueBasedOn
   Add LeaseRoyaltyMaster.OilValueBasedOn
   Add LeaseRoyaltyMaster.ProductsValueBasedOn
+2017-04-14
+  Add Calc.BaseGCA
+  add Calc.BaseNetRoyaltyValue
+
 """
 
 import datetime
@@ -290,6 +294,8 @@ class DatabaseCreate(object):
             "GorrRoyaltyRate" int,
             "BaseRoyaltyVolume" int,
             "BaseRoyaltyValue" float,
+            "BaseGCA" float,
+            "BaseNetRoyaltyValue", float,
             "SuppRoyaltyValue" int,
             "GorrRoyaltyValue" float,
             "TransBaseValue" float,

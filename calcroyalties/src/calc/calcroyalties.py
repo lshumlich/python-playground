@@ -95,14 +95,15 @@ class ProcessRoyalties(object):
             self.db.delete('Calc', calc.ID)
 
         for monthly in monthly_list:
-            calc = self.zero_royalty_calc(prod_month, well_id, product)
+            calc, calc_specific = self.zero_royalty_calc(prod_month, well_id, product)
+
             calc.PEFNInterest = well_lease_link.PEFNInterest
 
             rtp_info = self.db.select1('RTPInfo', WellEvent=well.WellEvent, Product=product, Payer=monthly.RPBA,
                                        Date=prod_month_to_date(prod_month))
             calc.RTPInterest = rtp_info.Percent / 100
 
-            self.calc_royalties(well, royalty, monthly, calc)
+            self.calc_royalties(well, royalty, monthly, calc, calc_specific)
 
             calc.RPBA = monthly.RPBA
             calc.FNReserveID = lease.FNReserveID
@@ -111,11 +112,10 @@ class ProcessRoyalties(object):
 
             self.db.insert(calc)
 
-    def calc_royalties(self, well, royalty, monthly, calc):
+    def calc_royalties(self, well, royalty, monthly, calc, calc_specific):
 
         self.determine_royalty_based_on(royalty, monthly, calc)
         calc.SalesPrice = monthly.SalesPrice
-        calc_specific = DataStructure()
 
         # todo: If there is no sales. Use last months sales value... Not included in this code
         self.determine_royalty_price(royalty, monthly, calc, calc_specific)
@@ -145,9 +145,13 @@ class ProcessRoyalties(object):
             raise AppError("No calculation for " + str(well.ID) + ' ' + str(monthly.ProdMonth) + ' ' +
                            str(monthly.Product) + ' ' + str(royalty.RoyaltyScheme))
 
+        self.calc_base_net_royalty(calc, calc_specific)
+
         # if monthly.Product == 'OIL' and 'GORR' in royalty.RoyaltyScheme:
         if 'GORR' in royalty.RoyaltyScheme:
             self.calc_gorr(royalty, monthly, calc, calc_specific)
+
+        # todo replace this, i don't think we want to mix base and gorr royalties together
 
         calc.GrossRoyaltyValue = calc.BaseRoyaltyValue + calc.SuppRoyaltyValue + calc.GorrRoyaltyValue
         calc.NetRoyaltyValue = calc.GrossRoyaltyValue - calc.TransBaseValue - calc.TransGorrValue
@@ -168,11 +172,13 @@ class ProcessRoyalties(object):
         #     calc.RoyaltyDeductions += calc.RoyaltyProcessing
         #     calc.NetRoyaltyValue -= calc.RoyaltyProcessing
 
-        if monthly.Product == 'GAS':
-            if royalty.GCADeducted == 'Y':
-                calc.RoyaltyGCA = round(calc.RoyaltyVolume * monthly.GCARate, 2)
-                calc.RoyaltyDeductions += calc.RoyaltyGCA
-                calc.NetRoyaltyValue -= calc.RoyaltyGCA
+
+        # Commented out 2017-04-15
+        # if monthly.Product == 'GAS':
+        #     if royalty.GCADeducted == 'Y':
+        #         calc.RoyaltyGCA = round(calc.RoyaltyVolume * monthly.GCARate, 2)
+        #         calc.RoyaltyDeductions += calc.RoyaltyGCA
+        #         calc.NetRoyaltyValue -= calc.RoyaltyGCA
 
         calc.RoyaltySpecific = calc_specific.json_dumps()
 
@@ -750,6 +756,9 @@ class ProcessRoyalties(object):
                                                        royalty,
                                                        calc,
                                                        calc_specific)
+
+        self.calc_sask_prov_crown_gca(royalty, monthly, calc, calc_specific)
+
     @staticmethod
     def calc_sask_gas_prov_crown_royalty_rate(calc, econ_gas_data,
                                               well_royalty_classification, mgp, src, well_type):
@@ -824,9 +833,81 @@ class ProcessRoyalties(object):
         calc.BaseRoyaltyCalcRate = round(calc.BaseRoyaltyCalcRate / 100, 8)
         return calc.BaseRoyaltyCalcRate
 
-    '''
-    Royalty Calculation
-    '''
+    def calc_base_net_royalty(self, calc, calc_sp):
+        calc.BaseNetRoyaltyValue = calc.BaseRoyaltyValue
+
+        part1 = 'Base Net Royalty = Base Royalty Value'
+        part2 = 'Base Net Royalty = ' + self.fm_value(calc.BaseNetRoyaltyValue)
+
+        if calc.BaseGCA > 0:
+            calc.BaseNetRoyaltyValue -= calc.BaseGCA
+            part1 += ' - GCA'
+            part2 += ' - ' + self.fm_value(calc.BaseGCA)
+
+        if calc.BaseNetRoyaltyValue == calc.BaseRoyaltyValue:
+            calc_sp.BaseNetRoyaltyMessage = ''        # No explanation necessary
+        else:
+            calc_sp.BaseNetRoyaltyMessage = part1 + ';' + \
+                                     part2 + ';' + \
+                                     'Base Net Royalty = ' + \
+                                     self.fm_value(calc.BaseNetRoyaltyValue) + ';'
+
+    def calc_sask_prov_crown_gca(self, lease_rm, monthly, calc, calc_sp):
+
+        self.determine_gca_rate(lease_rm, monthly, calc_sp)
+
+        calc.BaseGCA = round(monthly.SalesVol *
+                            calc_sp.BaseGCARate *
+                            calc.BaseRoyaltyRate *
+                            calc.PEFNInterest *
+                            calc.RTPInterest, 2)
+
+        calc_sp.BaseGCAMessage = 'GCA = Sales Vol * GCA Rate * CR% * PE FN% * RP %;' + \
+            'GCA = ' + self.fm_vol(monthly.SalesVol) + ' * ' + \
+                          self.fm_rate(calc_sp.BaseGCARate) + ' * ' + \
+                          self.fm_percent(calc.BaseRoyaltyRate) + ' * ' + \
+                          self.fm_percent(calc.PEFNInterest) + ' * ' + \
+                          self.fm_percent(calc.RTPInterest) + ';' + \
+            'GCA = ' + self.fm_value(calc.BaseGCA) + ';'
+
+        max_gca = round(calc.BaseRoyaltyValue * .5,2)
+
+        if calc.BaseGCA > max_gca:
+            calc.BaseGCAMessage += 'GCA > 50% of Royalty therefore GCA = ' + self.fm_value(max_gca) + ';'
+            calc.BaseGCA = max_gca
+
+    def determine_gca_rate(self, lease_rm, monthly, calc_sp):
+        calc_sp.BaseGCARate = 0
+
+        if not lease_rm.GCADeducted:
+            return
+        try:
+            if lease_rm.GCADeducted == 'Annual':
+                calc_sp.BaseGCARate = monthly.GCARate
+            else:
+                calc_sp.BaseGCARate = float(lease_rm.GCADeducted)
+
+        except Exception as e:
+            logging.error("Error determining GCA rate: " + str(e))
+            raise AppError("Error determining GCA rate: " + str(e))
+
+        return
+
+    @staticmethod
+    def fm_value(num):
+        return '${:0,.2f}'.format(num)
+
+    @staticmethod
+    def fm_percent(num):
+        return '{:0,.6%}'.format(num)
+
+    @staticmethod
+    def fm_rate(num):
+        return '{:0,.6f}'.format(num)
+
+    @staticmethod
+    def fm_vol(num):
+        return '{:0,.2f}'.format(num)
 
     def zero_royalty_calc(self, month, well_id, product, rc=None):
         if rc is None:
@@ -856,6 +937,8 @@ class ProcessRoyalties(object):
         setattr(rc, 'BaseRoyaltyVolume', 0.0)
 
         setattr(rc, 'BaseRoyaltyValue', 0.0)
+        setattr(rc, 'BaseNetRoyaltyValue', 0.0)
+        setattr(rc, 'BaseGCA', 0.0)
         setattr(rc, 'SuppRoyaltyValue', 0.0)
         setattr(rc, 'GorrRoyaltyValue', 0.0)
 
@@ -871,6 +954,8 @@ class ProcessRoyalties(object):
         setattr(rc, 'Message', None)
         setattr(rc, 'GorrMessage', None)
 
-        return rc
+        calc_specific = DataStructure()
+
+        return rc, calc_specific
 
 # Note: to run the royalties in batch use batch.py
