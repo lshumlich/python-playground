@@ -6,7 +6,7 @@
 	<link rel="stylesheet" href={{url_for("static", filename="css/jqmath-0.4.3.css")}}>
 
 	<script src={{url_for("static", filename="js/jquery-2.1.4.min.js")}}></script>
-	<script src={{url_for("static", filename="js/jqmath-etc-0.4.3.min.js")}}></script>
+	<script src={{url_for("static", filename="js/jqmath-etc-0.4.6.min.js")}}></script>
 <style>
 
 h1 {
@@ -257,7 +257,6 @@ table, th, td {
 
     {% if 'SKProvCrownVar' in rm.RoyaltyScheme and m.Product == 'OIL' %}
         <h3>SKProv Crown Oil</h3>
-        <br>
         <TABLE>
 
             {% if calc.RoyaltyClassification == 'Fourth Tier' and m.ProdVol <= 25.0 %}
@@ -282,7 +281,6 @@ table, th, td {
             {%endif%}
 
         </TABLE>
-        <br>
 
     {% endif %}
 
@@ -360,7 +358,7 @@ table, th, td {
                 <td style="text-align:center">RVal</td>
             </tr>
             <tr>
-                <td> </td>
+                <td>Base Royalty =</td>
                 <td style="text-align:center"> {{ '{:.6%}'.format(calc.BaseRoyaltyRate) }}</td>
                 <td style="text-align:center">*</td>
                 <td style="text-align:center">{{ '{:.2f}'.format(rm.CrownMultiplier) }}</td>
@@ -372,8 +370,8 @@ table, th, td {
                 <td>{{ '{:>10,.2f}\n'.format(calc_sp.WellValueForRoyalty) }}</td>
             </tr>
             <tr>
-                <td> </td>
-                <td style="text-align:center">$ {{ '{:>10,.2f}\n'.format(calc.BaseRoyaltyValue)}}</td>
+                <td>Base Royalty =</td>
+                <td style="text-align:center">\$ {{ '{:>10,.2f}'.format(calc.BaseRoyaltyValue)}}</td>
             </tr>
         </table>
     {% endif %}
@@ -398,7 +396,7 @@ table, th, td {
                 <td style="text-align:center">Value</td>
             </tr>
             <tr>
-                <td> </td>
+                <td>Base Royalty =</td>
                 <td style="text-align:center"> {{ '{:.6%}'.format(calc.BaseRoyaltyRate) }}</td>
                 <td style="text-align:center">*</td>
                 <td style="text-align:center">{{ rm.CrownMultiplier }}</td>
@@ -410,8 +408,8 @@ table, th, td {
                 <td>{{ '{:>10,.2f}\n'.format(calc_sp.WellValueForRoyalty) }}</td>
             </tr>
             <tr>
-                <td> </td>
-                <td style="text-align:center">$ {{ '{:>10,.2f}\n'.format(calc.BaseRoyaltyValue)}}</td>
+                <td>Base Royalty =</td>
+                <td style="text-align:center">\$ {{ '{:>10,.2f}'.format(calc.BaseRoyaltyValue)}}</td>
             </tr>
         </table>
 
@@ -450,7 +448,7 @@ table, th, td {
                 </tr>
                 <tr>
                     <td> </td>
-                    <td style="text-align:center">$ {{ '{:>10,.2f}\n'.format(calc.TransBaseValue)}}</td>
+                    <td style="text-align:center">\$ {{ '{:>10,.2f}'.format(calc.TransBaseValue)}}</td>
                 </tr>
             </table>
         {% endif %}
@@ -550,7 +548,7 @@ table, th, td {
         <br>
         <table>
              <tr align="center">
-                 <td>R$</td>
+                 <td>R\$</td>
                  <td>=</td>
                  <td>CrownMult</td>
                  <td>*</td>
@@ -563,7 +561,7 @@ table, th, td {
                  <td>RVal</td>
              </tr>
             <tr align="center">
-                <td>R$</td>
+                <td>R\$</td>
                 <td>=</td>
                 <td>{{ rm.CrownMultiplier }}</td>
                 <td>*</td>
@@ -576,9 +574,9 @@ table, th, td {
                 <td>{{ '{:>10,.6f}\n'.format(calc.RoyaltyPrice) }}</td>
             </tr>
             <tr align="center">
-                <td>R$</td>
+                <td>R\$</td>
                 <td>=</td>
-                <td> $ {{ '{:>10,.2f}\n'.format(calc.BaseRoyaltyValue) }}</td>
+                <td> \$ {{ '{:>10,.2f}\n'.format(calc.BaseRoyaltyValue) }}</td>
             </tr>
         </table>
     {% endif %}
@@ -593,7 +591,7 @@ table, th, td {
             IOGR1995 Supplementary Royalties<br>
             <table>
                 <tr align="center">
-                    <td>S$</td>
+                    <td>S\$</td>
                     <td>=</td>
                     <td>(T</td>
                     <td>-</td>
@@ -606,7 +604,7 @@ table, th, td {
                     <td>R)</td>
                 </tr>
                 <tr align="center">
-                    <td>S$</td>
+                    <td>S\$</td>
                     <td>=</td>
                     <td>({{ '{:.2f}'.format(m.ProdVol) }}</td>
                     <td>-</td>
@@ -619,9 +617,9 @@ table, th, td {
                     <td> 25.00)</td>
                 </tr>
                 <tr align="center">
-                    <td>S$</td>
+                    <td>S\$</td>
                     <td>=</td>
-                    <td> $ {{ '{:>10,.2f}\n'.format(calc.SuppRoyaltyValue) }}</td>
+                    <td> \$ {{ '{:>10,.2f}\n'.format(calc.SuppRoyaltyValue) }}</td>
                 </tr>
             </table>
         {% endif %}
@@ -637,7 +635,7 @@ table, th, td {
         <table>
 
             {% if m.SalesPrice <= 10.65 %}
-                Sales Price <= $10.65
+                Sales Price <= \$10.65
                 <table>
                     <tr>
                         <td align ="right">Supplementary Royalty</td>
@@ -651,7 +649,7 @@ table, th, td {
                     </tr>
                 </table>
             {% elif m.SalesPrice < 24.85 %}
-                Sales Price is > $10.65 and <= $24.85:
+                Sales Price is > \$10.65 and <= \$24.85:
             ??? Big Note... Fix this royalty display. It needs PEFNPercent and Volume and RTPPercent added ????
                 <table>
                     <tr>
@@ -712,10 +710,10 @@ table, th, td {
         <table>
 
             {% if m.SalesPrice < 27.68 %}
-                <tr><td align ="right">Sales Price < $27.68: Supplementary Royalty</td> <td align="center">=</td> <td align="left">0</td></tr>
+                <tr><td align ="right">Sales Price < \$27.68: Supplementary Royalty</td> <td align="center">=</td> <td align="left">0</td></tr>
                 <tr><td align ="right">Supplementary Royalty</td> <td align="center">=</td> <td align="left">{{ calc.SuppRoyaltyValue }}</td></tr>
             {% elif m.SalesPrice > 27.68 %}
-                <tr><td align ="right">SalesPrice > $27.68: Supplementary Royalty</td> <td align="center">=</td> <td align="left">75% *  50% * (SalesPrice - \$27.68))</td></tr>
+                <tr><td align ="right">SalesPrice > \$27.68: Supplementary Royalty</td> <td align="center">=</td> <td align="left">75% *  50% * (SalesPrice - \$27.68))</td></tr>
                 <tr><td align ="right">Supplementary Royalty</td><td align="center">=</td><td align="left">75% * 50% * (\${{ '{:.2f}'.format(m.SalesPrice) }} - \$27.68))</td></tr>
                 <tr><td align ="right">Supplementary Royalty</td> <td align="center">=</td> <td align="left">\$ {{ calc.SuppRoyaltyValue }}</td></tr>
             {% endif %}
@@ -729,10 +727,10 @@ table, th, td {
         <table>
 
             {% if m.SalesPrice < 39.37 %}
-                <tr><td align ="right">Sales Price < $39.37: Supplementary Royalty</td> <td align="center">=</td> <td align="left">0</td></tr>
+                <tr><td align ="right">Sales Price < \$39.37: Supplementary Royalty</td> <td align="center">=</td> <td align="left">0</td></tr>
                 <tr><td align ="right">Supplementary Royalty</td> <td align="center">=</td> <td align="left">{{ calc.SuppRoyaltyValue }}</td></tr>
             {% elif m.SalesPrice > 39.37 %}
-                <tr><td align ="right">SalesPrice > $39.37: Supplementary Royalty</td> <td align="center">=</td> <td align="left">75% *  50% * (SalesPrice - \$39.37))</td></tr>
+                <tr><td align ="right">SalesPrice > \$39.37: Supplementary Royalty</td> <td align="center">=</td> <td align="left">75% *  50% * (SalesPrice - \$39.37))</td></tr>
                 <tr><td align ="right">Supplementary Royalty</td><td align="center">=</td><td align="left">75% * 50% * (\${{ '{:.2f}'.format(m.SalesPrice) }} - \$39.37))</td></tr>
                 <tr><td align ="right">Supplementary Royalty</td> <td align="center">=</td> <td align="left">\$ {{ calc.SuppRoyaltyValue }}</td></tr>
             {% endif %}
@@ -804,13 +802,13 @@ table, th, td {
                 </tr>
                 <tr>
                     <td> </td>
-                    <td style="text-align:center">$ {{ '{:>10,.2f}\n'.format(calc.GorrRoyaltyValue)}}</td>
+                    <td style="text-align:center">\$ {{ '{:>10,.2f}\n'.format(calc.GorrRoyaltyValue)}}</td>
                 </tr>
             </table>
         {% else %}
             <table>
                 <tr>
-                    <td>GORR $</td>
+                    <td>GORR \$</td>
                     <td>Base Royalty</td>
                     <td>*</td>
                     <td>PE FN %</td>
@@ -819,7 +817,7 @@ table, th, td {
                 </tr>
                 <tr>
                     <td> </td>
-                    <td>$ {{ '{:>10,.2f}'.format(calc_sp.GorrBaseRoyalty) }}</td>
+                    <td>\$ {{ '{:>10,.2f}'.format(calc_sp.GorrBaseRoyalty) }}</td>
                     <td>*</td>
                     <td>{{ '{:.6%}'.format(well_lease_link.PEFNInterest) }}</td>
                     <td>*</td>
@@ -827,7 +825,7 @@ table, th, td {
                 </tr>
                 <tr>
                     <td> </td>
-                    <td>$ {{ '{:>10,.2f}\n'.format(calc.GorrRoyaltyValue)}}</td>
+                    <td>\$ {{ '{:>10,.2f}\n'.format(calc.GorrRoyaltyValue)}}</td>
                 </tr>
             </table>
          {% endif %}
@@ -863,7 +861,7 @@ table, th, td {
                 </tr>
                 <tr>
                     <td> </td>
-                    <td style="text-align:center">$ {{ '{:>10,.2f}\n'.format(calc.TransGorrValue)}}</td>
+                    <td style="text-align:center">\$ {{ '{:>10,.2f}\n'.format(calc.TransGorrValue)}}</td>
                 </tr>
             </table>
         {% endif %}
@@ -880,7 +878,7 @@ table, th, td {
             <tr>
                 <td colspan="2"><b>Gross Royalty: </b> </td>
                 <td colspan="5"> </td>
-                <td align="right"> <b>${{ '{:>10,.2f}\n'.format(calc.GrossRoyaltyValue) }} </b> </td>
+                <td align="right"> <b>\${{ '{:>10,.2f}\n'.format(calc.GrossRoyaltyValue) }} </b> </td>
             </tr>
         {% endif %}
 
@@ -888,7 +886,7 @@ table, th, td {
             <tr>
                 <td>&nbsp&nbsp&nbsp&nbsp</td>
                 <td>Less Base Transportation:</td>
-                <td align="right">${{ '{:>10,.2f}\n'.format(calc.TransBaseValue) }}</td>
+                <td align="right">\${{ '{:>10,.2f}\n'.format(calc.TransBaseValue) }}</td>
                 <td> </td>
             </tr>
         {% endif %}
@@ -897,14 +895,14 @@ table, th, td {
             <tr>
                 <td>&nbsp&nbsp&nbsp&nbsp</td>
                 <td>Less GORR Transportation:</td>
-                <td align="right">${{ '{:>10,.2f}\n'.format(calc.TransGorrValue) }}</td>
+                <td align="right">\${{ '{:>10,.2f}\n'.format(calc.TransGorrValue) }}</td>
                 <td> </td>
             </tr>
         {% endif %}
 
         <tr>
             <td colspan="2"> <b>Net Royalty: </b> </td>
-            <td colspan="6" align="right"> <b> ${{ '{:>10,.2f}\n'.format(calc.NetRoyaltyValue) }} </b> </td>
+            <td colspan="6" align="right"> <b> \${{ '{:>10,.2f}\n'.format(calc.NetRoyaltyValue) }} </b> </td>
         </tr>
     </table>
         <br>

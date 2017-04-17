@@ -1,7 +1,4 @@
 
-<div id="modal">
-</div>
-
 <!--<table style="width:100%" class="table-striped">-->
 <table class="table-striped" border="1">
   <tr>
@@ -38,19 +35,6 @@ function getItem(id) {
   })
   .done(function(data){
     $('#modal').html(data)
-  });
-  };
-
-function createItem() {
-  var idObject = {ID:"0"};
-  $.ajax({
-    url: "/admin/datadictionary/get",
-    method: "GET",
-    data: idObject,
-  })
-  .done(function(data){
-    $('#modal').html(data)
-    $("#Subject").val(Subject)
   });
   };
 

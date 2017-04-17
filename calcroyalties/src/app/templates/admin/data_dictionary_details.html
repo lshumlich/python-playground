@@ -6,15 +6,15 @@
       <table class="wellmodal" cellpadding=5>
         <tr>
           <td><label for="Subject">Subject</label></td>
-          <td><input type="text" id="Subject" name="Subject" value="{{datadic.TableName}}"></td>
+          <td><input type="text" id="SubjectEd" name="Subject" value="{{datadic.TableName}}"></td>
         </tr>
         <tr>
           <td><label for="Order">Order</label></td>
-          <td><input type="text" id="Order" name="Order" value="{{datadic.SortOrder}}"></td>
+          <td><input type="text" id="OrderEd" name="Order" value="{{datadic.SortOrder}}"></td>
         </tr>
         <tr>
           <td><label for="Attribute">Attribute</label></td>
-          <td><input type="text" id="Attribute" name="Attribute" value="{{datadic.Attribute}}"></td>
+          <td><input type="text" id="AttributeEd" name="Attribute" value="{{datadic.Attribute}}"></td>
         </tr>
       </table>
       <!-- allows to submit a form by pressing enter; actual submission is handled in JS-->
@@ -40,7 +40,7 @@ $(function(){
     height: 600,
     width: 800,
     modal: true,
-    title: "Edit user",
+    title: "Edit Dictionary",
     close: function() {form[0].reset(); dialog.remove()},
     buttons: {
       Cancel: function() {dialog.dialog("close"); dialog.remove()},
@@ -60,9 +60,9 @@ $(function(){
   function formVerify(){
     var valid = true;
 
-    valid = valid && checkEntered($( "#Subject" ));
-    valid = valid && checkEntered($( "#Order" ));
-    valid = valid && checkEntered($( "#Attribute" ));
+    valid = valid && checkEntered($( "#SubjectEd" ));
+    valid = valid && checkEntered($( "#OrderEd" ));
+    valid = valid && checkEntered($( "#AttributeEd" ));
     if (valid) {
       return true;
     }

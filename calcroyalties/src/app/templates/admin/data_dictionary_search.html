@@ -3,6 +3,10 @@
 
 <script src="https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js"></script>
 
+<div id="modal">
+</div>
+
+
 <script>
 
 $(function() {
@@ -25,7 +29,7 @@ $(function() {
     });
 
     $( "#create" ).on( "click", function() {
-        myMsg()
+        createItem()
     });
 
   $('#search-basic').button({
@@ -48,6 +52,19 @@ function updateList(){
       $("#search-accordion").accordion("option", "active", false);
     })
 }
+
+function createItem() {
+  var idObject = {ID:"0"};
+  $.ajax({
+    url: "/admin/datadictionary/get",
+    method: "GET",
+    data: idObject,
+  })
+  .done(function(data){
+    $('#modal').html(data)
+    $("#Subject").val(Subject)
+  });
+  };
 
 function myMsg() {
     alert("Hello! I am an alert box!" + Subject);
@@ -73,7 +90,7 @@ function myMsg() {
                     <input id="Subject"/>
                 </td>
                 <td>
-                    <input type="checkbox" id="Resolvexxx" checked="yes">
+                    <input type="checkbox" id="Resolvexxx">
                     <i data-help="DataDictionary.Resolve" class="fa fa-question-circle help"></i></sup> Resolve Lookups
                 </td>
             </tr>

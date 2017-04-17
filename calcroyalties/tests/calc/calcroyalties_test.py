@@ -540,30 +540,35 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         leaserm.OilValueBasedOn = None
         pr.determine_well_value_for_royalties(leaserm, monthly, calc, calc_sp)
         self.assertEqual(1300, calc_sp.WellValueForRoyalty)
-        self.assertEqual('sales * price;130.0 * 10.0;=$  1,300.00', calc_sp.WellValueForRoyaltyExplanation)
+        self.assertEqual('Well Value = Sales Vol * Price;Well Value = 10.00 * 130.00; Well Value = $1,300.00;',
+                         calc_sp.WellValueForRoyaltyExplanation)
 
         leaserm.OilValueBasedOn = "=(price * sales)"
         pr.determine_well_value_for_royalties(leaserm, monthly, calc, calc_sp)
         self.assertEqual(1300, calc_sp.WellValueForRoyalty)
-        self.assertEqual('=(price * sales);=(130.0 * 10.0);=$  1,300.00', calc_sp.WellValueForRoyaltyExplanation)
+        self.assertEqual('Well Value =(price * sales); Well Value =(130.0 * 10.0); Well Value = $1,300.00;',
+                         calc_sp.WellValueForRoyaltyExplanation)
 
         monthly.Product = "GAS"
         leaserm.GasValueBasedOn = "=(price * gj)"
         pr.determine_well_value_for_royalties(leaserm, monthly, calc, calc_sp)
-        self.assertEqual('=(price * gj);=(130.0 * 1000);=$130,000.00', calc_sp.WellValueForRoyaltyExplanation)
+        self.assertEqual('Well Value =(price * gj); Well Value =(130.0 * 1000); Well Value = $130,000.00;',
+                         calc_sp.WellValueForRoyaltyExplanation)
         self.assertEqual(130000.0, calc_sp.WellValueForRoyalty)
 
         monthly.Product = "BUT"
         leaserm.ProductsValueBasedOn = "=(price * prod)"
         pr.determine_well_value_for_royalties(leaserm, monthly, calc, calc_sp)
         self.assertEqual(2600.0, calc_sp.WellValueForRoyalty)
-        self.assertEqual('=(price * prod);=(130.0 * 20.0);=$  2,600.00', calc_sp.WellValueForRoyaltyExplanation)
+        self.assertEqual('Well Value =(price * prod); Well Value =(130.0 * 20.0); Well Value = $2,600.00;',
+                         calc_sp.WellValueForRoyaltyExplanation)
 
         monthly.Product = "BUT"
         leaserm.ProductsValueBasedOn = "price * prod"
         pr.determine_well_value_for_royalties(leaserm, monthly, calc, calc_sp)
         self.assertEqual(2600.0, calc_sp.WellValueForRoyalty)
-        self.assertEqual('price * prod;130.0 * 20.0;=$  2,600.00', calc_sp.WellValueForRoyaltyExplanation)
+        self.assertEqual('Well Value price * prod; Well Value 130.0 * 20.0; Well Value = $2,600.00;',
+                         calc_sp.WellValueForRoyaltyExplanation)
 
     def test_calc_gorr_calc_type(self):
         pr = ProcessRoyalties()
@@ -754,10 +759,11 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         dbu.create_some_test_econgas()
 
         pr = ProcessRoyalties()
-        well = DataStructure()
         royalty = DataStructure()
-        calc = DataStructure()
         monthly = DataStructure()
+        well = DataStructure()
+        calc = DataStructure()
+        calc_specific = DataStructure()
 
         monthly.Product = 'OIL'
         monthly.ProdMonth = 201501
@@ -793,21 +799,22 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         calc.GorrRoyaltyValue = 0.0
         calc.TransGorrValue = 0.0
         calc.SalesPrice = 210.0
+        calc.BaseGCA = 0.0
 
-        pr.calc_royalties(well, royalty, monthly, calc)
+        pr.calc_royalties(well, royalty, monthly, calc, calc_specific)
 
         royalty.RoyaltyScheme = 'IOGR1995'
-        pr.calc_royalties(well, royalty, monthly, calc)
+        pr.calc_royalties(well, royalty, monthly, calc, calc_specific)
 
         royalty.RoyaltyScheme = 'IOGR1995,GORR'
         royalty.Gorr = "fixed,0,.02"
-        pr.calc_royalties(well, royalty, monthly, calc)
+        pr.calc_royalties(well, royalty, monthly, calc, calc_specific)
 
         monthly.Product = 'GAS'
         royalty.RoyaltyScheme = 'IOGR1995'
         royalty.Gorr = None
         royalty.GCADeducted = 'N'
-        pr.calc_royalties(well, royalty, monthly, calc)
+        pr.calc_royalties(well, royalty, monthly, calc, calc_specific)
 
         monthly.Product = 'GAS'
         royalty.RoyaltyScheme = 'SKProvCrownVar'
@@ -815,22 +822,22 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         calc.RoyaltyVolume = 10.5
         monthly.GCARate = 1.15
         calc.RoyaltyDeductions = 0.0
-        royalty.GCADeducted = 'Y'
+        royalty.GCADeducted = ''
         well.WellType = 'Gas'
         well.RoyaltyClassification = 'New'
-        pr.calc_royalties(well, royalty, monthly, calc)
+        pr.calc_royalties(well, royalty, monthly, calc, calc_specific)
 
         monthly.Product = 'PEN'
         royalty.RoyaltyScheme = 'IOGR1995'
-        pr.calc_royalties(well, royalty, monthly, calc)
+        pr.calc_royalties(well, royalty, monthly, calc, calc_specific)
 
         monthly.Product = 'SUL'
         royalty.RoyaltyScheme = 'IOGR1995'
-        pr.calc_royalties(well, royalty, monthly, calc)
+        pr.calc_royalties(well, royalty, monthly, calc, calc_specific)
 
         monthly.Product = 'OIL'
         royalty.RoyaltyScheme = 'Bad One'
-        self.assertRaises(AppError, pr.calc_royalties, well, royalty, monthly, calc)
+        self.assertRaises(AppError, pr.calc_royalties, well, royalty, monthly, calc, calc_specific)
 
     def test_process_all(self):
         db = config.get_database()
@@ -944,15 +951,18 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         calc.PEFNInterest = .5
         calc.RTPInterest = .25
         calc.BaseRoyaltyValue = 1000.00
+        calc.BaseGCA = None
 
-        pr.calc_sask_prov_crown_gca(leaserm,monthly,calc,calc_sp)
+        calc_sp.BaseGCAMessage = None
+
+        pr.calc_sask_prov_crown_gca(leaserm, monthly, calc, calc_sp)
         self.assertEqual('GCA = Sales Vol * GCA Rate * CR% * PE FN% * RP %;'
                          'GCA = 12.00 * 100.000000 * 30.000000% * 50.000000% * 25.000000%;'
                          'GCA = $45.00;', calc_sp.BaseGCAMessage)
         self.assertEqual(45.0, calc.BaseGCA)
 
         calc.BaseRoyaltyValue = 60.00
-        pr.calc_sask_prov_crown_gca(leaserm,monthly,calc,calc_sp)
+        pr.calc_sask_prov_crown_gca(leaserm, monthly, calc, calc_sp)
         self.assertEqual('GCA = Sales Vol * GCA Rate * CR% * PE FN% * RP %;'
                          'GCA = 12.00 * 100.000000 * 30.000000% * 50.000000% * 25.000000%;'
                          'GCA = $45.00;'
@@ -968,6 +978,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         monthly = DataStructure()
 
         leaserm.GCADeducted = None
+        calc.BaseGCARate = None
 
         pr.determine_gca_rate(leaserm, monthly, calc)
         self.assertEqual(0.0, calc.BaseGCARate)
@@ -993,16 +1004,15 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
 
         pr = ProcessRoyalties()
 
-        leaserm = DataStructure()
-        monthly = DataStructure()
         calc = DataStructure()
         calc_sp = DataStructure()
 
         calc.BaseRoyaltyValue = 100.00
         calc.BaseGCA = 0.00
+        calc_sp.BaseNetRoyaltyMessage = None
 
         pr.calc_base_net_royalty(calc, calc_sp)
-        self.assertEqual('',calc_sp.BaseNetRoyaltyMessage)
+        self.assertEqual('', calc_sp.BaseNetRoyaltyMessage)
 
         calc.BaseGCA = 10.00
         pr.calc_base_net_royalty(calc, calc_sp)
@@ -1031,16 +1041,3 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual('1.000000', pr.fm_rate(1.))
         self.assertEqual('0.123457', pr.fm_rate(.12345678))
         self.assertEqual('10.111000', pr.fm_rate(10.111))
-
-"""
-This is some documentation:
-
-http://localhost:5000/worksheet?WellId=1&ProdDate=201501&RPBA=72838&Product=GAS
-
-
-
-
-
-
-
-"""

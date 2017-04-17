@@ -65,6 +65,9 @@ class Test(unittest.TestCase):
         well.Msg = 'abc;def;geh;'
         self.assertEqual('abc<br>def<br>geh<br>',well._format.html_lf(well.Msg))
 
+        well.Msg = '$abc;$def;$geh;'
+        self.assertEqual('\$abc<br>\$def<br>\$geh<br>',well._format.html_lf(well.Msg))
+
     def test_json(self):
         well = DataStructure(json_string='{"ID": 123, "LeaseType": "OL"}')
         self.assertEqual(123,well.ID)

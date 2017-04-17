@@ -75,4 +75,5 @@ class Formatter(object):
             return ""
 
     def html_lf(self, s):
+        s = s.replace('$','\$')
         return s.replace(';','<br>')

@@ -14,12 +14,10 @@ from src.database.data_structure import DataStructure
 
 admin = Blueprint('admin', __name__)
 
-
 @admin.route('/admin/users')
 def user_list():
     """ display user search form"""
     return render_template('admin/users_search.html')
-
 
 @admin.route('/api/users', methods=['GET', 'DELETE', 'POST', 'PUT', 'PATCH'])
 def user_details():
@@ -138,7 +136,9 @@ def data_dictionary_save():
     datadic.SortOrder = int(req_data['Order'])
     datadic.Attribute = req_data['Attribute']
     datadic.Documentation = req_data['Description']
-    if id:
+    print('--->', req_data)
+    print('---ID:', _id)
+    if _id:
         db.update(datadic)
     else:
         db.insert(datadic)

@@ -665,13 +665,14 @@ class ProcessRoyalties(object):
 
         if calc_sp.ValueBasedOn:
             value = round(self.expression.evaluate_expression(calc_sp.ValueBasedOn, monthly),2)
-            explanation = calc_sp.ValueBasedOn + ";" + \
+            explanation = 'Well Value ' + calc_sp.ValueBasedOn + "; Well Value " + \
                           self.expression.resolve_expression(calc_sp.ValueBasedOn, monthly) \
-                       + ";=" + '${:10,.2f}'.format(value)
+                       + "; Well Value = " + self.fm_value(value) + ';'
         else:
             value = round(monthly.SalesPrice * monthly.SalesVol,2)
-            explanation = 'sales * price;' + str(monthly.SalesPrice) + " * " + str(monthly.SalesVol) + \
-                ";=" + '${:10,.2f}'.format(value)
+            explanation = 'Well Value = Sales Vol * Price;' + \
+                          'Well Value = ' + self.fm_vol(monthly.SalesVol) + " * " + self.fm_vol(monthly.SalesPrice) + \
+                          '; Well Value = ' + self.fm_value(value) + ';'
 
         calc_sp.WellValueForRoyalty = value
         calc_sp.WellValueForRoyaltyExplanation = explanation
@@ -873,7 +874,7 @@ class ProcessRoyalties(object):
         max_gca = round(calc.BaseRoyaltyValue * .5,2)
 
         if calc.BaseGCA > max_gca:
-            calc.BaseGCAMessage += 'GCA > 50% of Royalty therefore GCA = ' + self.fm_value(max_gca) + ';'
+            calc_sp.BaseGCAMessage += 'GCA > 50% of Royalty therefore GCA = ' + self.fm_value(max_gca) + ';'
             calc.BaseGCA = max_gca
 
     def determine_gca_rate(self, lease_rm, monthly, calc_sp):
