@@ -54,7 +54,6 @@ def generate_worksheet(well_id, prod_month, rpba, product):
             raise AppError("There were no well_lease_link records for " + str(well_id) + str(prod_month))
         well_lease_link = well_lease_link_array[0]
         royalty = db.select1('LeaseRoyaltyMaster', ID=well_lease_link.LeaseID)
-        royalty.format_gorr = format_gorr(royalty.Gorr)
         lease = db.select1('Lease', ID=well_lease_link.LeaseID)
 
         if rpba:
@@ -71,6 +70,7 @@ def generate_worksheet(well_id, prod_month, rpba, product):
         calc_specific = DataStructure(calc.RoyaltySpecific)
         rtp_info = db.select1('RTPInfo', WellEvent=well.WellEvent, Product=product, Payer=monthly.RPBA,
                               Date=prod_month_to_date(prod_month))
+        royalty.format_gorr = format_gorr(calc.Gorr)
         # calc = calc_array[0]
         # print(monthly)
         return render_template('worksheet/calc_worksheet.html',

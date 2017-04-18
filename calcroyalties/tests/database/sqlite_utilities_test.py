@@ -91,7 +91,8 @@ class DatabaseUtilities(object):
             'price', 'price', 'price',
             'price * sales', 'price * sales', 'price * sales',
             'prod', 'sales', 'prod',
-            'Y', 'Y', 'Y',
+            'sales', 'sales', 'sales', 'sales',
+            'mprod,250,2,300,3,400,4,500,5,0,6',
             'mprod,250,2,300,3,400,4,500,5,0,6',
             NULL, 0, 50, 50, NULL)
         """

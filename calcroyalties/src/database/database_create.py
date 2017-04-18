@@ -100,9 +100,21 @@ Database Change Log: Must be maintained so we can keep the database in sink:
   Add LeaseRoyaltyMaster.OilValueBasedOn
   Add LeaseRoyaltyMaster.ProductsValueBasedOn
 2017-04-14
-  Add Calc.BaseGCA
-  add Calc.BaseNetRoyaltyValue
-
+  Add Calc.BaseGCAValue
+  change calc.TransBaseValue to  Calc.BaseTransValue
+  Add Calc.GorrGCAValue
+  Add Calc.GorrTransValue
+  Add Calc.BaseNetRoyaltyValue
+2017-04-17
+  change LeaseRoyaltyMaster.GCADeducted to BaseGCA
+  change LeaseRoyaltyMaster.TransDeducted to BaseTrans
+  Add LeaseRoyaltyMaster.GorrGCA
+  Add LeaseRoyaltyMaster.GorrTrans
+  Change LeaseRoyaltyMaster.Gorr to LeaseRoyaltyMaster.OilGorr
+  Add LeaseRoyaltyMaster.GasGorr
+  change LeaseRoyaltyMaster.OilBasedOn to OilRoyaltyBasedOn
+  change LeaseRoyaltyMaster.GasBasedOn to GasRoyaltyBasedOn
+  change LeaseRoyaltyMaster.ProductsBasedOn to ProductsRoyaltyBasedOn
 """
 
 import datetime
@@ -194,13 +206,15 @@ class DatabaseCreate(object):
              "OilValueBasedOn" text,
              "GasValueBasedOn" text,
              "ProductsValueBasedOn" text,
-             "OilBasedOn" text,
-             "GasBasedOn" text,
-             "ProductsBasedOn" text,
-             "TransDeducted" text,
-             "ProcessingDeducted" text,
-             "GCADeducted" text,
-             "Gorr" text,
+             "OilRoyaltyBasedOn" text,
+             "GasRoyaltyBasedOn" text,
+             "ProductsRoyaltyBasedOn" text,
+             "BaseTrans" text,
+             "GorrTrans" text,
+             "BaseGCA" text,
+             "GorrGCA" text,
+             "OilGorr" text,
+             "GasGorr" text,
              "OverrideRoyaltyClassification" text,
              "MinRoyaltyRate" float,
              "MaxRoyaltyRate" float,
@@ -291,21 +305,23 @@ class DatabaseCreate(object):
             "RoyaltyVolume" int,
             "BaseRoyaltyCalcRate" int,
             "BaseRoyaltyRate" int,
-            "GorrRoyaltyRate" int,
             "BaseRoyaltyVolume" int,
             "BaseRoyaltyValue" float,
-            "BaseGCA" float,
-            "BaseNetRoyaltyValue", float,
-            "SuppRoyaltyValue" int,
+            "BaseGCAValue" float,
+            "BaseTransValue" float,
+            "BaseNetRoyaltyValue" float,
+            "IogrSuppRoyaltyValue" int,
+            "IogrBaseRoyaltyValue" float,
+            "GorrRoyaltyRate" int,
             "GorrRoyaltyValue" float,
-            "TransBaseValue" float,
-            "TransGorrValue" float,
+            "GorrTransValue" float,
             "ProcessingBaseValue" float,
             "ProcessingGorrValue" float,
             "RoyaltyGCA" float,
             "RoyaltyDeductions" int,
             "CommencementPeriod" float,
             "Message" text,
+            "Gorr" text,
             "GorrMessage" text,
             "RoyaltySpecific" text);
         """
