@@ -2,6 +2,8 @@
 
 from datetime import date
 from datetime import datetime
+import sys
+import os
 import logging
 
 import config
@@ -58,7 +60,12 @@ class ProcessRoyalties(object):
 
             except AppError as e:
                 logging.error(str(e))
+            except Exception as e:
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                logging.error(fname + ' ' + str(exc_tb.tb_lineno) + ' ' + str(exc_type) + ' ' + str(e))
 
+                logging.error(sys.exc_info())
     """
     Process a single royalty
     """
@@ -898,16 +905,22 @@ class ProcessRoyalties(object):
 
     def calc_deduction(self, what, deduction, option, rr_desc, rr, monthly, calc):
 
+        if not option or option.strip() == '':
+            return 0.0, ''
+
         result_msg = what + ' ' + deduction + ' = '
 
         msg_1 = result_msg
         msg_2 = result_msg
-        if not option or option.strip() == '':
-            return 0.0, ''
-        elif option[0:5] == 'sales':
+
+        options = option.split(',')
+
+        print('--- options:', options)
+
+        if options[0] == 'sales':
             vol = monthly.SalesVol
             msg_1 += 'Sales Vol'
-        elif option[0:5] == 'prod':
+        elif options[0] == 'prod':
             vol = monthly.ProdVol
             msg_1 += 'Prod Vol'
         else:
@@ -918,8 +931,8 @@ class ProcessRoyalties(object):
         msg_1 += ' * ' + deduction + ' Rate'
 
         rate = 0.0
-        if len(option) > 5 and option[5] == ',':
-            rate = option[6:]
+        if len(options) > 1:
+            rate = float(options[1])
         elif deduction == 'GCA':
             rate = monthly.GCARate
         elif deduction == 'Trans':
@@ -927,7 +940,10 @@ class ProcessRoyalties(object):
         else:
             raise AppError(what + ' ' + deduction + ' can not be calculated: ' + '"' + deduction + '" not understood.')
 
-        msg_2 +=  self.fm_vol(vol) + ' * ' + self.fm_rate(rate)
+        if not rate:
+            raise AppError(what + ' ' + deduction + ' can not be calculated: Rate can not be found.')
+
+        msg_2 += self.fm_vol(vol) + ' * ' + self.fm_rate(rate)
 
         msg_1 += ' * ' + rr_desc
         msg_2 += ' * ' + self.fm_percent(rr)

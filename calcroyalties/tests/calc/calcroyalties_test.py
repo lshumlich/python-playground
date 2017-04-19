@@ -3,6 +3,8 @@
 import unittest
 from datetime import date
 from datetime import datetime
+import sys
+import os
 
 import config
 from src.calc.calcroyalties import ProcessRoyalties
@@ -1083,7 +1085,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         pr.determine_gca_rate(leaserm, monthly, calc)
         self.assertEqual(10.0, calc.BaseGCARate)
 
-    def test_calculate_deduction(self):
+    def test_calc_deduction(self):
 
         pr = ProcessRoyalties()
         monthly = DataStructure()
@@ -1101,6 +1103,13 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
 
         self.assertRaises(AppError, pr.calc_deduction, "Base", "GCAs", "sales", 'CR %', .30, monthly, calc)
 
+        monthly.GCARate = None
+        self.assertRaises(AppError, pr.calc_deduction, "Base", "GCA", "sales", 'CR %', .30, monthly, calc)
+
+        monthly.GCARate = ''
+        self.assertRaises(AppError, pr.calc_deduction, "Base", "GCA", "sales", 'CR %', .30, monthly, calc)
+
+        monthly.GCARate = 23.45
         self.assertEqual((0.0, ""), pr.calc_deduction("Base", "GCA", "     ", 'CR %', .30, monthly, calc))
 
         self.assertEqual((0.0, ""), pr.calc_deduction("Base", "GCA", None, 'CR %', .30, monthly, calc))
@@ -1119,6 +1128,17 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
                                   "Base Trans = 100.00 * 12.340000 * 30.000000% * 60.000000% * 90.000000%;"
                                   "Base Trans = $199.91;"),
                          pr.calc_deduction("Base", "Trans", "prod", 'Eff CR %', .30, monthly, calc))
+
+        monthly.TransRate = None
+        self.assertEqual((179.98, "Base Trans = Prod Vol * Trans Rate * Eff CR % * PE FN% * RP %;"
+                                  "Base Trans = 100.00 * 11.110000 * 30.000000% * 60.000000% * 90.000000%;"
+                                  "Base Trans = $179.98;"),
+                         pr.calc_deduction("Base", "Trans", "prod,11.11", 'Eff CR %', .30, monthly, calc))
+
+        self.assertEqual((323.97, "Base Trans = Sales Vol * Trans Rate * Eff CR % * PE FN% * RP %;"
+                                  "Base Trans = 90.00 * 22.220000 * 30.000000% * 60.000000% * 90.000000%;"
+                                  "Base Trans = $323.97;"),
+                         pr.calc_deduction("Base", "Trans", "sales,22.22", 'Eff CR %', .30, monthly, calc))
 
     def test_base_net_royalty(self):
 
