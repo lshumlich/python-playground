@@ -282,6 +282,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         monthly.SalesPrice = 210.0
         royalty.RoyaltyScheme = 'SKProvCrownVar'
         royalty.OverrideRoyaltyClassification = None
+        royalty.OilRoyaltyBasedOn = None
         royalty.OilValueBasedOn = None
         royalty.GasValueBasedOn = None
         royalty.ProductsValueBasedOn = None
@@ -584,6 +585,12 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual(10.0, calc.RoyaltyPrice)
         self.assertEqual('Formula =((prod - sales) * 5) =((4.0 - 2.0) * 5) =10.0', calc.RoyaltyPriceExplanation)
 
+        # Default to sales
+        leaserm.OilPriceBasedOn = "asdf"
+        pr.determine_royalty_price(leaserm, monthly, calc, calc_sp)
+        self.assertEqual(130.0, calc.RoyaltyPrice)
+        self.assertEqual(None, calc.RoyaltyPriceExplanation)
+
     def test_determine_well_value_for_royalties(self):
         pr = ProcessRoyalties()
         leaserm = DataStructure()
@@ -627,12 +634,9 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual('Well Value =(price * prod); Well Value =(130.0 * 20.0); Well Value = $2,600.00;',
                          calc_sp.WellValueForRoyaltyExplanation)
 
-        monthly.Product = "BUT"
-        leaserm.ProductsValueBasedOn = "price * prod"
-        pr.determine_well_value_for_royalties(leaserm, monthly, calc, calc_sp)
-        self.assertEqual(2600.0, calc_sp.WellValueForRoyalty)
-        self.assertEqual('Well Value price * prod; Well Value 130.0 * 20.0; Well Value = $2,600.00;',
-                         calc_sp.WellValueForRoyaltyExplanation)
+
+        leaserm.ProductsValueBasedOn = "asdf"
+        self.assertRaises(AppError, pr.determine_well_value_for_royalties, leaserm, monthly, calc, calc_sp)
 
     def test_calc_gorr_calc_type(self):
         pr = ProcessRoyalties()
@@ -727,7 +731,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
                          ('$=(sales * price * .2)',
                           'Result =((prod - sales) * 5); =((200 - 100) * 5); =500.0 is > 250.0;'))
 
-    def test_gorr_royalty(self):
+    def test_calc_gorr(self):
 
         pr = ProcessRoyalties()
         leaserm = DataStructure()
@@ -739,76 +743,130 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         monthly.ProdVol = 100.0
         monthly.ProdHours = 10.0
         monthly.TransRate = .1234
-        leaserm.TransDeducted = 'All'
-        leaserm.OilGorr = "fixed,0,%.02"
+        monthly.GCARate = 10.00
 
-        calc.RTPInterest = 1.0
-        calc.PEFNInterest = 1.0
+        leaserm.GorrTrans = 'prod'
+        leaserm.GorrGCA = 'prod'
+
+        calc.PEFNInterest = .6
+        calc.RTPInterest = .25
         calc.RoyaltyPrice = 200.0
-        calc.TransGorralue = 0.0
-        calc.GorrRoyaltyValue = 0.0
-        calc.TransGorrValue = 0.0
+        calc.GorrTransValue = 0.0
+        # calc.GorrRoyaltyValue = 0.0
         calc.RoyaltyBasedOnVol = 100
         calc.GorrMessage = None
 
+        calc_specific.WellValueForRoyalty = 1000.00
+        calc_specific.GorrGCAValue = 0.0
+
+        leaserm.OilGorr = "fixed,0,%.02"
         pr.calc_gorr(leaserm, monthly, calc, calc_specific)
-        self.assertEqual(400.0, calc.GorrRoyaltyValue)
-        # todo Fix this
-        # self.assertEqual(.25, calc.TransGorrValue)
-        self.assertEqual("fixed; for a Royalty Rate of 2.00%", calc.GorrMessage)
+        self.assertEqual(.02, calc.GorrRoyaltyRate)
+        self.assertEqual(20.00, calc_specific.GorrBaseRoyalty)
+        self.assertEqual(3.00, calc.GorrGrossRoyaltyValue)
+        self.assertEqual(.04, calc_specific.GorrTransValue)
+        self.assertEqual(2.96, calc.GorrNetRoyaltyValue)
+        self.assertEqual("fixed; for a Royalty Rate of 2.000000%", calc.GorrMessage)
+        self.assertEqual("$ GORR = GORR % * Well Value * PE FN% * RP%;"
+                         "$ GORR = 2.000000% * $1,000.00 * 60.000000% * 25.000000%;"
+                         "$ GORR = $3.00", calc_specific.GorrRoyaltyGrossMessage)
+        self.assertEqual("GORR Trans = Prod Vol * Trans Rate * GORR % * PE FN% * RP %;"
+                         "GORR Trans = 100.00 * 0.123400 * 2.000000% * 60.000000% * 25.000000%;"
+                         "GORR Trans = $0.04;", calc_specific.GorrTransMessage)
+        print('====', calc_specific.GorrNetRoyaltyMessage, '====')
+        self.assertEqual('GORR Net Royalty = GORR Royalty Value - Trans;'
+                         'GORR Net Royalty = $3.00 - $0.04;'
+                         'GORR Net Royalty = $2.96;', calc_specific.GorrNetRoyaltyMessage)
 
-        monthly.Product = 'GAS'
-        leaserm.GasGorr = "fixed,0,%.02"
-        pr.calc_gorr(leaserm, monthly, calc, calc_specific)
-        self.assertEqual(400.0, calc.GorrRoyaltyValue)
-        # todo Fix this
-        # self.assertEqual(.25, calc.TransGorrValue)
-        self.assertEqual("fixed; for a Royalty Rate of 2.00%", calc.GorrMessage)
-
-        monthly.Product = 'OIL'
-        monthly.ProdVol = 100.0
-        calc.RTPInterest = .5
-        calc.TransGorrValue = 0.0
-
-        pr.calc_gorr(leaserm, monthly, calc, calc_specific)
-        self.assertEqual(200.0, calc.GorrRoyaltyValue)
-        # todo Fix this
-        # self.assertEqual(.12, calc.TransGorrValue)
-        self.assertEqual("fixed; for a Royalty Rate of 2.00%", calc.GorrMessage)
-
-        calc.PEFNInterest = 1.0
-        calc.RTPInterest = .5
         leaserm.OilGorr = "fixed,0,$500.02"
         pr.calc_gorr(leaserm, monthly, calc, calc_specific)
-        self.assertEqual(250.01, calc.GorrRoyaltyValue)
-        # todo Fix this
-        # self.assertEqual(.12, calc.TransGorrValue)
+        self.assertEqual(0.50002, calc.GorrRoyaltyRate)
+        self.assertEqual(500.02, calc_specific.GorrBaseRoyalty)
+        self.assertEqual(75.00, calc.GorrGrossRoyaltyValue)
+        self.assertEqual(.93, calc_specific.GorrTransValue)
+        self.assertEqual(74.07, calc.GorrNetRoyaltyValue)
         self.assertEqual("fixed;", calc.GorrMessage)
+        self.assertEqual("$ GORR = Base Royalty * PE FN% * RP%;"
+                         "$ GORR = $500.02 * 60.000000% * 25.000000%;"
+                         "$ GORR = $75.00", calc_specific.GorrRoyaltyGrossMessage)
+        self.assertEqual("GORR Trans = Prod Vol * Trans Rate * GORR % * PE FN% * RP %;"
+                         "GORR Trans = 100.00 * 0.123400 * 50.002000% * 60.000000% * 25.000000%;"
+                         "GORR Trans = $0.93;", calc_specific.GorrTransMessage)
+        self.assertEqual('GORR Net Royalty = GORR Royalty Value - Trans;'
+                         'GORR Net Royalty = $75.00 - $0.93;'
+                         'GORR Net Royalty = $74.07;', calc_specific.GorrNetRoyaltyMessage)
+
 
         monthly.ProdVol = 100.0
         monthly.SalesVol = 90.0
         leaserm.OilGorr = "fixed,0,$=((prod - sales) * 100)"
         pr.calc_gorr(leaserm, monthly, calc, calc_specific)
-        self.assertEqual(500.00, calc.GorrRoyaltyValue)
-        # todo Fix this
-        # self.assertEqual(.12, calc.TransGorrValue)
-        self.assertEqual("fixed; $=((prod - sales) * 100); $=((100.0 - 90.0) * 100);"
-                         " =1000.0;", calc.GorrMessage)
+        self.assertEqual(1.0, calc.GorrRoyaltyRate)
+        self.assertEqual(1000.00, calc_specific.GorrBaseRoyalty)
+        self.assertEqual(150.00, calc.GorrGrossRoyaltyValue)
+        self.assertEqual(1.85, calc_specific.GorrTransValue)
+        self.assertEqual(148.15, calc.GorrNetRoyaltyValue)
+        self.assertEqual("fixed; "
+                         "$=((prod - sales) * 100); "
+                         "$=((100.0 - 90.0) * 100); "
+                         "=1000.0;", calc.GorrMessage)
+        self.assertEqual("$ GORR = Base Royalty * PE FN% * RP%;"
+                         "$ GORR = $1,000.00 * 60.000000% * 25.000000%;"
+                         "$ GORR = $150.00", calc_specific.GorrRoyaltyGrossMessage)
+        self.assertEqual("GORR Trans = Prod Vol * Trans Rate * GORR % * PE FN% * RP %;"
+                         "GORR Trans = 100.00 * 0.123400 * 100.000000% * 60.000000% * 25.000000%;"
+                         "GORR Trans = $1.85;", calc_specific.GorrTransMessage)
+        self.assertEqual('GORR Net Royalty = GORR Royalty Value - Trans;'
+                         'GORR Net Royalty = $150.00 - $1.85;'
+                         'GORR Net Royalty = $148.15;', calc_specific.GorrNetRoyaltyMessage)
 
-        # leaserm.Gorr = '=(price),7.5,$=(.15*prod*price),0,$=(.15*(7.50*prod)+.25*((price-7.50)*prod))'
         leaserm.OilGorr = '=(royalty_price),' \
                        '7.5,$=(.15 * prod * royalty_price),' \
                        '0,$=(0.15 * (7.50 * prod) + 0.25 * ((royalty_price - 7.50) * prod))'
         monthly.ProdVol = 100.0
         calc.RoyaltyPrice = 200.0
         pr.calc_gorr(leaserm, monthly, calc, calc_specific)
-        self.assertEqual(2462.5, calc.GorrRoyaltyValue)
-        # todo Fix this
-        # self.assertEqual(.12, calc.TransGorrValue)
-        self.assertEqual("Result =(royalty_price); =(200.0); =200.0 is > 7.5; "
+        self.assertEqual(4.925, calc.GorrRoyaltyRate)
+        self.assertEqual(4925.00, calc_specific.GorrBaseRoyalty)
+        self.assertEqual(738.75, calc.GorrGrossRoyaltyValue)
+        self.assertEqual(9.12, calc_specific.GorrTransValue)
+        self.assertEqual("Result =(royalty_price); "
+                         "=(200.0); "
+                         "=200.0 is > 7.5; "
                          "$=(0.15 * (7.50 * prod) + 0.25 * ((royalty_price - 7.50) * prod)); "
-                         "$=(0.15 * (7.50 * 100.0) + 0.25 * ((200.0 - 7.50) * 100.0)); =4925.0;",
+                         "$=(0.15 * (7.50 * 100.0) + 0.25 * ((200.0 - 7.50) * 100.0)); "
+                         "=4925.0;",
                          calc.GorrMessage)
+        self.assertEqual("$ GORR = Base Royalty * PE FN% * RP%;"
+                         "$ GORR = $4,925.00 * 60.000000% * 25.000000%;"
+                         "$ GORR = $738.75", calc_specific.GorrRoyaltyGrossMessage)
+        self.assertEqual("GORR Trans = Prod Vol * Trans Rate * GORR % * PE FN% * RP %;"
+                         "GORR Trans = 100.00 * 0.123400 * 492.500000% * 60.000000% * 25.000000%;"
+                         "GORR Trans = $9.12;", calc_specific.GorrTransMessage)
+        self.assertEqual('GORR Net Royalty = GORR Royalty Value - Trans;'
+                         'GORR Net Royalty = $738.75 - $9.12;'
+                         'GORR Net Royalty = $729.63;', calc_specific.GorrNetRoyaltyMessage)
+
+        monthly.Product = 'GAS'
+        leaserm.GasGorr = "fixed,0,$500.02"
+        pr.calc_gorr(leaserm, monthly, calc, calc_specific)
+        self.assertEqual(0.50002, calc.GorrRoyaltyRate)
+        self.assertEqual(500.02, calc_specific.GorrBaseRoyalty)
+        self.assertEqual(75.00, calc.GorrGrossRoyaltyValue)
+        self.assertEqual(0.0, calc_specific.GorrTransValue)
+        self.assertEqual(37.50, calc_specific.GorrGCAValue)
+        self.assertEqual(37.50, calc.GorrNetRoyaltyValue)
+        self.assertEqual("fixed;", calc.GorrMessage)
+        self.assertEqual("$ GORR = Base Royalty * PE FN% * RP%;"
+                         "$ GORR = $500.02 * 60.000000% * 25.000000%;"
+                         "$ GORR = $75.00", calc_specific.GorrRoyaltyGrossMessage)
+        self.assertEqual("GORR GCA = Prod Vol * GCA Rate * GORR % * PE FN% * RP %;"
+                         "GORR GCA = 100.00 * 10.000000 * 50.002000% * 60.000000% * 25.000000%;"
+                         "GORR GCA = $75.00;"
+                         "GCA > 50% of Royalty therefore GCA = $37.50;", calc_specific.GorrGCAMessage)
+        self.assertEqual('GORR Net Royalty = GORR Royalty Value - GCA;'
+                         'GORR Net Royalty = $75.00 - $37.50;'
+                         'GORR Net Royalty = $37.50;', calc_specific.GorrNetRoyaltyMessage)
 
     def test_calcSupplementaryRoyaltiesIOGR1995(self):
         reference_price = {'Pigeon Lake Indian': 24.04, 'Reserve no.138A': 25.37,
@@ -867,6 +925,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         royalty.CrownMultiplier = 1.0
         royalty.MinRoyaltyDollar = None
         royalty.BaseTrans = None
+        royalty.GorrTrans = None
         royalty.OilRoyaltyBasedOn = "prod"
         royalty.GasRoyaltyBasedOn = "sales"
         royalty.ProductsRoyaltyBasedOn = "gj"
@@ -889,7 +948,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         pr.calc_royalties(well, royalty, monthly, calc, calc_specific)
 
         royalty.RoyaltyScheme = 'IOGR1995,GORR'
-        royalty.OilGorr = "fixed,0,.02"
+        royalty.OilGorr = "fixed,0,%.02"
         pr.calc_royalties(well, royalty, monthly, calc, calc_specific)
 
         monthly.Product = 'GAS'
@@ -1099,46 +1158,52 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         calc.PEFNInterest = .6
         calc.RTPInterest = .9
 
-        self.assertRaises(AppError, pr.calc_deduction, "Base", "GCA", "xxsales", 'CR %', .30, monthly, calc)
+        self.assertRaises(AppError, pr.calc_deduction, "Base", "GCA", "xxsales", 'CR %', .30, 1000, monthly, calc)
 
-        self.assertRaises(AppError, pr.calc_deduction, "Base", "GCAs", "sales", 'CR %', .30, monthly, calc)
+        self.assertRaises(AppError, pr.calc_deduction, "Base", "GCAs", "sales", 'CR %', .30, 1000, monthly, calc)
 
         monthly.GCARate = None
-        self.assertRaises(AppError, pr.calc_deduction, "Base", "GCA", "sales", 'CR %', .30, monthly, calc)
+        self.assertRaises(AppError, pr.calc_deduction, "Base", "GCA", "sales", 'CR %', .30, 1000, monthly, calc)
 
         monthly.GCARate = ''
-        self.assertRaises(AppError, pr.calc_deduction, "Base", "GCA", "sales", 'CR %', .30, monthly, calc)
+        self.assertRaises(AppError, pr.calc_deduction, "Base", "GCA", "sales", 'CR %', .30, 1000, monthly, calc)
 
         monthly.GCARate = 23.45
-        self.assertEqual((0.0, ""), pr.calc_deduction("Base", "GCA", "     ", 'CR %', .30, monthly, calc))
+        self.assertEqual((0.0, ""), pr.calc_deduction("Base", "GCA", "     ", 'CR %', .30, 1000, monthly, calc))
 
-        self.assertEqual((0.0, ""), pr.calc_deduction("Base", "GCA", None, 'CR %', .30, monthly, calc))
+        self.assertEqual((0.0, ""), pr.calc_deduction("Base", "GCA", None, 'CR %', .30, 1000, monthly, calc))
 
         self.assertEqual((341.9, "Base GCA = Sales Vol * GCA Rate * CR % * PE FN% * RP %;"
                                  "Base GCA = 90.00 * 23.450000 * 30.000000% * 60.000000% * 90.000000%;"
                                  "Base GCA = $341.90;"),
-                         pr.calc_deduction("Base", "GCA", "sales", 'CR %', .30, monthly, calc))
+                         pr.calc_deduction("Base", "GCA", "sales", 'CR %', .30, 1000, monthly, calc))
+
+        self.assertEqual((250.00, "Base GCA = Sales Vol * GCA Rate * CR % * PE FN% * RP %;"
+                                 "Base GCA = 90.00 * 23.450000 * 30.000000% * 60.000000% * 90.000000%;"
+                                 "Base GCA = $341.90;"
+                                 "GCA > 50% of Royalty therefore GCA = $250.00;"),
+                         pr.calc_deduction("Base", "GCA", "sales", 'CR %', .30, 500, monthly, calc))
 
         self.assertEqual((379.89, "Base GCA = Prod Vol * GCA Rate * Eff CR % * PE FN% * RP %;"
                                   "Base GCA = 100.00 * 23.450000 * 30.000000% * 60.000000% * 90.000000%;"
                                   "Base GCA = $379.89;"),
-                         pr.calc_deduction("Base", "GCA", "prod", 'Eff CR %', .30, monthly, calc))
+                         pr.calc_deduction("Base", "GCA", "prod", 'Eff CR %', .30, 1000, monthly, calc))
 
         self.assertEqual((199.91, "Base Trans = Prod Vol * Trans Rate * Eff CR % * PE FN% * RP %;"
                                   "Base Trans = 100.00 * 12.340000 * 30.000000% * 60.000000% * 90.000000%;"
                                   "Base Trans = $199.91;"),
-                         pr.calc_deduction("Base", "Trans", "prod", 'Eff CR %', .30, monthly, calc))
+                         pr.calc_deduction("Base", "Trans", "prod", 'Eff CR %', .30, 1000, monthly, calc))
 
         monthly.TransRate = None
         self.assertEqual((179.98, "Base Trans = Prod Vol * Trans Rate * Eff CR % * PE FN% * RP %;"
                                   "Base Trans = 100.00 * 11.110000 * 30.000000% * 60.000000% * 90.000000%;"
                                   "Base Trans = $179.98;"),
-                         pr.calc_deduction("Base", "Trans", "prod,11.11", 'Eff CR %', .30, monthly, calc))
+                         pr.calc_deduction("Base", "Trans", "prod,11.11", 'Eff CR %', .30, 1000, monthly, calc))
 
         self.assertEqual((323.97, "Base Trans = Sales Vol * Trans Rate * Eff CR % * PE FN% * RP %;"
                                   "Base Trans = 90.00 * 22.220000 * 30.000000% * 60.000000% * 90.000000%;"
                                   "Base Trans = $323.97;"),
-                         pr.calc_deduction("Base", "Trans", "sales,22.22", 'Eff CR %', .30, monthly, calc))
+                         pr.calc_deduction("Base", "Trans", "sales,22.22", 'Eff CR %', .30, 1000, monthly, calc))
 
     def test_base_net_royalty(self):
 

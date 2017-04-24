@@ -89,11 +89,11 @@ class DatabaseUtilities(object):
             INSERT INTO LeaseRoyaltyMaster VALUES(1, '2001-01-08 00:00:00', '2016-01-07 00:00:00', 'All',
             'SKProvCrownVar,GORR', 0.12, 0.02,
             'price', 'price', 'price',
-            'price * sales', 'price * sales', 'price * sales',
+            NULL, NULL, NULL,
             'prod', 'sales', 'prod',
             'sales', 'sales', 'sales', 'sales',
-            'mprod,250,2,300,3,400,4,500,5,0,6',
-            'mprod,250,2,300,3,400,4,500,5,0,6',
+            'mprod,250,%.02,300,%.03,400,%.04,500,%.05,0,%.06',
+            'mprod,250,%.02,300,%.03,400,%.04,500,%.05,0,%.06',
             NULL, 0, 50, 50, NULL)
         """
 
