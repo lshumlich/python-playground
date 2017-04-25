@@ -69,3 +69,7 @@ Pragma table_info(well);
 
 Run Python Documentation
 - python -m pydoc src.calc.calcroyalties
+
+GIT
+
+git clone https://github.com/lshumlich/python-playground c:/$temp/code
