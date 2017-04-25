@@ -72,4 +72,11 @@ Run Python Documentation
 
 GIT
 
-git clone https://github.com/lshumlich/python-playground c:/$temp/code
+if using the portable no install git:
+
+ - Move to the directory with portable git
+ - git-cmd.exe
+ - git clone https://github.com/lshumlich/python-playground c:/$temp/code
+ - move to the directory with the local repository and enter:
+ - git pull
+ - exit to exit the portable git command line
