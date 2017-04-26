@@ -76,10 +76,11 @@ def data_dictionary():
 @admin.route('/admin/datadictionary/get')
 def data_dictionary_get():
     db = config.get_database()
-    # print("--- args", request.args)
-    # print("---> subject", request.args.get('Subject'))
+    print("--- args", request.args)
+    print("---> subject", request.args.get('Subject'))
     # print("---> ID", request.args.get('ID'))
-    # print("---> Resolve", request.args.get('Resolve'))
+    print("---> Resolve", request.args.get('Resolve'))
+    print("---> Print", request.args.get('Print'))
 
     if request.args:
         if request.args.get('Subject'):
@@ -89,7 +90,9 @@ def data_dictionary_get():
             if request.args.get('Resolve') == 'true':
                 resolve_lookups(results)
             return render_template('admin/data_dictionary_search_results.html',
-                                   datadic=results, subject=request.args.get('Subject'))
+                                   datadic=results,
+                                   subject=request.args.get('Subject'),
+                                   print=request.args.get('Print'))
         elif request.args.get('ID'):
             _id = request.args.get('ID')
             if _id == '0':
@@ -106,7 +109,9 @@ def data_dictionary_get():
         resolve_lookups(results)
 
     return render_template('admin/data_dictionary_search_results.html',
-                           datadic=results, subject=request.args.get('Subject'))
+                           datadic=results,
+                           subject=request.args.get('Subject'),
+                           print=request.args.get('Print'))
 
 
 def resolve_lookups(results):

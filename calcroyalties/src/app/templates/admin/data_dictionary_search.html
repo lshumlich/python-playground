@@ -24,7 +24,8 @@ $(function() {
 
     $( "#search-basic" ).on( "click", function() {
         Subject = $("#Subject").val()
-        Resolve = $("#Resolvexxx").prop('checked')
+        Resolve = $("#Resolve").prop('checked')
+        Print = $("#Print").prop('checked')
         updateList()
     });
 
@@ -39,13 +40,14 @@ $(function() {
 })
 
 var Subject = ""
-var Resolve = "What"
+var Resolve = ""
+var Print = "???"
 
 function updateList(){
     $.ajax({
     url: "/admin/datadictionary/get",
     dataType: "html",
-    data: {Resolve:Resolve,Subject:Subject}
+    data: {Resolve:Resolve,Subject:Subject,Print:Print}
   })
     .done(function(msg){
       $('#results-container').html(msg);
@@ -90,8 +92,12 @@ function myMsg() {
                     <input id="Subject"/>
                 </td>
                 <td>
-                    <input type="checkbox" id="Resolvexxx">
-                    <i data-help="DataDictionary.Resolve" class="fa fa-question-circle help"></i></sup> Resolve Lookups
+                    <input type="checkbox" id="Resolve">
+                    <sup><i data-help="DataDictionary.Resolve" class="fa fa-question-circle help"></i></sup> Resolve Lookups
+                </td>
+                <td>
+                    <input type="checkbox" id="Print">
+                    <sup><i data-help="DataDictionary.Print" class="fa fa-question-circle help"></i></sup> Print Format
                 </td>
             </tr>
         </table>

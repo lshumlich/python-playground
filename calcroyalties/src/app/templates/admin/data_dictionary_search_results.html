@@ -1,24 +1,35 @@
 
 <!--<table style="width:100%" class="table-striped">-->
+{% if print == 'true' %}
+  <h1>{{ subject }}</h1>
+{% endif %}
 <table class="table-striped" border="1">
   <tr>
-    <th>Subject</th>
-    <th>Order</th>
+    {% if not print == 'true' %}
+      <th>Subject</th>
+      <th>Order</th>
+    {% endif %}
     <th>Attribute</th>
     <th>Description</th>
-    <th>Actions</th>
+    {% if not print == 'true' %}
+      <th>Actions</th>
+    {% endif %}
   </tr>
   {% for dic in datadic %}
   <tr>
-    <td>{{ dic.TableName }}</td>
-    <td>{{ dic.SortOrder }}</td>
+    {% if not print == 'true' %}
+      <td>{{ dic.TableName }}</td>
+      <td>{{ dic.SortOrder }}</td>
+    {% endif %}
     <td>{{ dic.Attribute }}</td>
     <td>{{ dic.Documentation | safe }}</td>
-    <td>
-    <a href="#" class="icon icon-edit" onclick=getItem({{ dic.ID }})></a>
+    {% if not print == 'true' %}
+      <td>
+      <a href="#" class="icon icon-edit" onclick=getItem({{ dic.ID }})></a>
     &nbsp;
-    <a href="#" class="icon icon-delete" onclick=confirmDelete({{ dic.ID }})></a>
-    </td>
+      <a href="#" class="icon icon-delete" onclick=confirmDelete({{ dic.ID }})></a>
+      </td>
+    {% endif %}
   </tr>
   {% endfor %}
 </table>
