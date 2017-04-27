@@ -648,7 +648,7 @@ class ProcessRoyalties(object):
                                       calc.PEFNInterest * calc.RTPInterest, 2)
 
         calc.BaseRoyaltyRate = round((calc.IogrBaseRoyaltyValue + calc.IogrSuppRoyaltyValue) / \
-                                     (monthly.ProdVol * monthly.SalesPrice), 8)
+                                     (calc.RoyaltyBasedOnVol * monthly.SalesPrice), 8)
 
         calc.BaseTransValue, calc_specific.BaseTransMessage = \
             self.calc_deduction("Base", "Trans", royalty.BaseTrans,

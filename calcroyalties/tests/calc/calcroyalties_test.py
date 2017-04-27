@@ -347,6 +347,30 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
 
         # self.assertEqual(1.2, pr.calc_sask_oil_prov_crown_deductions(m, fn_interest, rp_interest,
         #                                                              lease_royalty_master, calc))
+    def test_calcSupplementaryRoyaltiesIOGR1995(self):
+        reference_price = {'Pigeon Lake Indian': 24.04, 'Reserve no.138A': 25.37,
+                           'Sawridge Indian': 25.13, 'Stony Plain Indian': 24.64}
+        pr = ProcessRoyalties()
+        # calc = DataStructure()
+
+        self.assertEqual(pr.calc_supplementary_royalties_iogr1995(3.5, 228, 80, 60,
+                                                                  reference_price['Pigeon Lake Indian']), 2039.6)
+        self.assertEqual(pr.calc_supplementary_royalties_iogr1995(5, 200, 90, 40,
+                                                                  reference_price['Reserve no.138A']), 4365.75)
+        self.assertEqual(pr.calc_supplementary_royalties_iogr1995(4, 221.123456, 100, 50,
+                                                                  reference_price['Sawridge Indian']), 4899.84)
+        self.assertEqual(pr.calc_supplementary_royalties_iogr1995(.2, 180, 80, 35,
+                                                                  reference_price['Stony Plain Indian']), 3495.6)
+
+        self.assertEqual(pr.calc_supplementary_royalties_iogr1995(6, 228, 80, 60,
+                                                                  reference_price['Pigeon Lake Indian']), 2996.5)
+        self.assertEqual(pr.calc_supplementary_royalties_iogr1995(5.5, 200, 90, 40,
+                                                                  reference_price['Reserve no.138A']), 6391.38)
+        self.assertEqual(pr.calc_supplementary_royalties_iogr1995(8, 221.123456, 100, 50,
+                                                                  reference_price['Sawridge Indian']), 7192.5)
+        self.assertEqual(pr.calc_supplementary_royalties_iogr1995(15, 180, 80, 35,
+                                                                  reference_price['Stony Plain Indian']), 5101.88)
+
 
     def test_calc_sask_oil_iogr1995(self):
         m = DataStructure()
@@ -355,17 +379,15 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         m.SalesPrice = 221.123456
         m.TransRate = 2.123455
         m.ProcessingRate = 0.123455
-        m.ProdVol = 70
 
         calc = DataStructure()
         calc.BaseRoyaltyValue = 0.0
         calc.CommencementPeriod = 0
         calc.BaseRoyaltyVolume = 0.0
         calc.RoyaltyPrice = 0.0
-        calc.RoyaltyBasedOnVol = 70
         calc.RoyaltyPrice = 221.123456
-        calc.PEFNInterest = .25
-        calc.RTPInterest = 1.0
+        calc.PEFNInterest = .2
+        calc.RTPInterest = .3
 
         royalty = DataStructure()
         royalty.CrownMultiplier = 1.2
@@ -374,40 +396,154 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         calc_sp = DataStructure()
 
         pr = ProcessRoyalties()
-        # all tests for SaskWellHead
+
+        # < 5 year commencement period
+
+        calc.RoyaltyBasedOnVol = 70
+        m.ProdVol = 70
         pr.calc_sask_oil_iogr1995(royalty, datetime(2015, 1, 1),
                                   m, calc, calc_sp)
-        self.assertEqual(464.36, calc.BaseRoyaltyValue)
-        self.assertEqual(464.36, calc.IogrBaseRoyaltyValue)
+        self.assertEqual(7.0, calc.BaseRoyaltyVolume)            # = 70 * 0.1
+        self.assertEqual(1857.44, calc.IogrBaseRoyaltyValue)     # = 7.0 * 1.2 * 221.123456
+        self.assertEqual(6177.89, calc.IogrSuppRoyaltyValue)     # = (70 - 7) * 0.5 * (221.123456 - 25)
+        self.assertEqual(482.12, calc.BaseRoyaltyValue)          # = (1857.44 + 6177.89) * 0.2 * 0.3
+        self.assertEqual(0.51912371, calc.BaseRoyaltyRate)       # = (1857.44 + 6177.89) / (70 * 221.123456)
+        self.assertEqual(4.63, calc.BaseTransValue)              # = 70 * 0.51912371 * 2.123455 * 0.2 * 0.3
         self.assertEqual(calc.CommencementPeriod, 0)
-        self.assertEqual(calc.BaseRoyaltyVolume, 7)
-        self.assertEqual(calc.RoyaltyPrice, 221.123456)
 
-        # m.ProdVol = 100
         calc.RoyaltyBasedOnVol = 100
-        royalty.CrownMultiplier = 0.25
-        calc.PEFNInterest = 3
-        calc.RTPInterest = 1
-        pr.calc_sask_oil_iogr1995(royalty, datetime(2015, 4, 2),
+        m.ProdVol = 100
+        pr.calc_sask_oil_iogr1995(royalty, datetime(2015, 1, 1),
                                   m, calc, calc_sp)
-        self.assertEqual(calc.IogrBaseRoyaltyValue, 1990.11)
+        self.assertEqual(12.0, calc.BaseRoyaltyVolume)           # = 8 + ((100 - 80) * .2)
+        self.assertEqual(3184.18, calc.IogrBaseRoyaltyValue)     # = 12.0 * 1.2 * 221.123456
+        self.assertEqual(8629.43, calc.IogrSuppRoyaltyValue)     # = (100 - 12) * 0.5 * (221.123456 - 25)
+        self.assertEqual(708.82, calc.BaseRoyaltyValue)          # = (3184.18 + 8629.43) * 0.2 * 0.3
+        self.assertEqual(0.53425404, calc.BaseRoyaltyRate)       # = (3184.18 + 8629.43) / (100 * 221.123456)
+        self.assertEqual(6.81, calc.BaseTransValue)              # = 100 * 0.53425404 * 2.123455 * 0.2 * 0.3
+        self.assertEqual(calc.CommencementPeriod, 0)
 
-        # m.ProdVol = 170
         calc.RoyaltyBasedOnVol = 170
-        royalty.CrownMultiplier = 1.0
-        calc.PEFNInterest = 1
-        calc.RTPInterest = 1
-        pr.calc_sask_oil_iogr1995(royalty, datetime(2015, 5, 1),
+        m.ProdVol = 170
+        pr.calc_sask_oil_iogr1995(royalty, datetime(2015, 1, 1),
                                   m, calc, calc_sp)
-        self.assertEqual(calc.IogrBaseRoyaltyValue, 5881.88)
+        self.assertEqual(26.6, calc.BaseRoyaltyVolume)           # = 24 + ((170 - 160) * .26)
+        self.assertEqual(7058.26, calc.IogrBaseRoyaltyValue)     # = 26.6 * 1.2 * 221.123456
+        self.assertEqual(14062.05, calc.IogrSuppRoyaltyValue)    # = (170 - 26.6) * 0.5 * (221.123456 - 25)
+        self.assertEqual(1267.22, calc.BaseRoyaltyValue)         # = (7058.26 + 14062.05) * 0.2 * 0.3
+        self.assertEqual(0.56184504, calc.BaseRoyaltyRate)       # = (7058.26 + 14062.05) / (170 * 221.123456)
+        self.assertEqual(12.17, calc.BaseTransValue)              # = 170 * 0.56184504 * 2.123455 * 0.2 * 0.3
+        self.assertEqual(calc.CommencementPeriod, 0)
 
-        # m.ProdVol = 79.9
+        calc.RoyaltyBasedOnVol = 1000
+        m.ProdVol = 1000
+        pr.calc_sask_oil_iogr1995(royalty, datetime(2015, 1, 1),
+                                  m, calc, calc_sp)
+        self.assertEqual(242.4, calc.BaseRoyaltyVolume)          # = 24 + ((1000 - 160) * .26)
+        self.assertEqual(64320.39, calc.IogrBaseRoyaltyValue)    # = 242.4 * 1.2 * 221.123456
+        self.assertEqual(74291.57, calc.IogrSuppRoyaltyValue)    # = (1000 - 242.4) * 0.5 * (221.123456 - 25)
+        self.assertEqual(8316.72, calc.BaseRoyaltyValue)         # = (64320.39 + 74291.57) * 0.2 * 0.3
+        self.assertEqual(0.62685326, calc.BaseRoyaltyRate)       # = ((64320.39 + 74291.57) / (1000 * 221.123456)
+        self.assertEqual(79.87, calc.BaseTransValue)              # = 1000 * 0.62685326 * 2.123455 * 0.2 * 0.3
+        self.assertEqual(calc.CommencementPeriod, 0)
+
+        # >= 5 year commencement period
+
+        calc.RoyaltyBasedOnVol = 70
+        m.ProdVol = 70
+        pr.calc_sask_oil_iogr1995(royalty, datetime(2010, 1, 1),
+                                  m, calc, calc_sp)
+        self.assertEqual(7.0, calc.BaseRoyaltyVolume)            # = 70 * 0.1
+        self.assertEqual(1857.44, calc.IogrBaseRoyaltyValue)     # = 7.0 * 1.2 * 221.123456
+        #
+        # Start working here... We need a second supplemental royalty
+        #
+        self.assertEqual(9072.48, calc.IogrSuppRoyaltyValue)     # = (70 - 7) * (0.75 * (221.123456 - 25 - 12.5) + 6.29)
+        self.assertEqual(482.12, calc.BaseRoyaltyValue)          # = (1857.44 + 6177.89) * 0.2 * 0.3
+        self.assertEqual(0.51912371, calc.BaseRoyaltyRate)       # = (1857.44 + 6177.89) / (70 * 221.123456)
+        self.assertEqual(4.63, calc.BaseTransValue)              # = 70 * 0.51912371 * 2.123455 * 0.2 * 0.3
+        self.assertEqual(calc.CommencementPeriod, 5)
+
+        calc.RoyaltyBasedOnVol = 100
+        m.ProdVol = 100
+        pr.calc_sask_oil_iogr1995(royalty, datetime(2010, 1, 1),
+                                  m, calc, calc_sp)
+        self.assertEqual(12.0, calc.BaseRoyaltyVolume)           # = 8 + ((100 - 80) * .2)
+        self.assertEqual(3184.18, calc.IogrBaseRoyaltyValue)     # = 12.0 * 1.2 * 221.123456
+        self.assertEqual(8629.43, calc.IogrSuppRoyaltyValue)     # = (100 - 12) * 0.5 * (221.123456 - 25)
+        self.assertEqual(708.82, calc.BaseRoyaltyValue)          # = (3184.18 + 8629.43) * 0.2 * 0.3
+        self.assertEqual(0.53425404, calc.BaseRoyaltyRate)       # = (3184.18 + 8629.43) / (100 * 221.123456)
+        self.assertEqual(6.81, calc.BaseTransValue)              # = 100 * 0.53425404 * 2.123455 * 0.2 * 0.3
+        self.assertEqual(calc.CommencementPeriod, 5)
+
+        calc.RoyaltyBasedOnVol = 170
+        m.ProdVol = 170
+        pr.calc_sask_oil_iogr1995(royalty, datetime(2010, 1, 1),
+                                  m, calc, calc_sp)
+        self.assertEqual(26.6, calc.BaseRoyaltyVolume)           # = 24 + ((170 - 160) * .26)
+        self.assertEqual(7058.26, calc.IogrBaseRoyaltyValue)     # = 26.6 * 1.2 * 221.123456
+        self.assertEqual(14062.05, calc.IogrSuppRoyaltyValue)    # = (170 - 26.6) * 0.5 * (221.123456 - 25)
+        self.assertEqual(1267.22, calc.BaseRoyaltyValue)         # = (7058.26 + 14062.05) * 0.2 * 0.3
+        self.assertEqual(0.56184504, calc.BaseRoyaltyRate)       # = (7058.26 + 14062.05) / (170 * 221.123456)
+        self.assertEqual(12.17, calc.BaseTransValue)              # = 170 * 0.56184504 * 2.123455 * 0.2 * 0.3
+        self.assertEqual(calc.CommencementPeriod, 5)
+
+        calc.RoyaltyBasedOnVol = 1000
+        m.ProdVol = 1000
+        pr.calc_sask_oil_iogr1995(royalty, datetime(2010, 1, 1),
+                                  m, calc, calc_sp)
+        self.assertEqual(242.4, calc.BaseRoyaltyVolume)          # = 24 + ((1000 - 160) * .26)
+        self.assertEqual(64320.39, calc.IogrBaseRoyaltyValue)    # = 242.4 * 1.2 * 221.123456
+        self.assertEqual(74291.57, calc.IogrSuppRoyaltyValue)    # = (1000 - 242.4) * 0.5 * (221.123456 - 25)
+        self.assertEqual(8316.72, calc.BaseRoyaltyValue)         # = (64320.39 + 74291.57) * 0.2 * 0.3
+        self.assertEqual(0.62685326, calc.BaseRoyaltyRate)       # = ((64320.39 + 74291.57) / (1000 * 221.123456)
+        self.assertEqual(79.87, calc.BaseTransValue)              # = 1000 * 0.62685326 * 2.123455 * 0.2 * 0.3
+        self.assertEqual(calc.CommencementPeriod, 5)
+
+        # ---------------------
+        calc.RoyaltyBasedOnVol = 70
+        pr.calc_sask_oil_iogr1995(royalty, datetime(2010, 1, 1),
+                                  m, calc, calc_sp)
+        self.assertEqual(7.0, calc.BaseRoyaltyVolume)            # = 70 * 0.1
+        self.assertEqual(1857.44, calc.IogrBaseRoyaltyValue)     # = 7.0 * 1.2 * 221.123456
+        self.assertEqual(6177.89, calc.IogrSuppRoyaltyValue)     # = (70 - 7) * 0.5 * (221.123456 - 25)
+        self.assertEqual(482.12, calc.BaseRoyaltyValue)          # = (1857.44 + 6177.89) * 0.2 * 0.3
+        self.assertEqual(calc.CommencementPeriod, 0)
+
+        calc.RoyaltyBasedOnVol = 100
+        pr.calc_sask_oil_iogr1995(royalty, datetime(2010, 1, 1),
+                                  m, calc, calc_sp)
+        self.assertEqual(12.0, calc.BaseRoyaltyVolume)           # = 8 + ((100 - 80) * .2)
+        self.assertEqual(3184.18, calc.IogrBaseRoyaltyValue)     # = 12.0 * 1.2 * 221.123456
+        self.assertEqual(8629.43, calc.IogrSuppRoyaltyValue)     # = (100 - 12) * 0.5 * (221.123456 - 25)
+        self.assertEqual(708.82, calc.BaseRoyaltyValue)          # = (3184.18 + 8629.43) * 0.2 * 0.3
+        self.assertEqual(calc.CommencementPeriod, 0)
+
+        calc.RoyaltyBasedOnVol = 170
+        pr.calc_sask_oil_iogr1995(royalty, datetime(2010, 1, 1),
+                                  m, calc, calc_sp)
+        self.assertEqual(26.6, calc.BaseRoyaltyVolume)           # = 24 + ((170 - 160) * .26)
+        self.assertEqual(7058.26, calc.IogrBaseRoyaltyValue)     # = 26.6 * 1.2 * 221.123456
+        self.assertEqual(14062.05, calc.IogrSuppRoyaltyValue)    # = (170 - 26.6) * 0.5 * (221.123456 - 25)
+        self.assertEqual(1267.22, calc.BaseRoyaltyValue)         # = (7058.26 + 14062.05) * 0.2 * 0.3
+        self.assertEqual(calc.CommencementPeriod, 0)
+
+        calc.RoyaltyBasedOnVol = 1000
+        pr.calc_sask_oil_iogr1995(royalty, datetime(2010, 1, 1),
+                                  m, calc, calc_sp)
+        self.assertEqual(242.4, calc.BaseRoyaltyVolume)          # = 24 + ((1000 - 160) * .26)
+        self.assertEqual(64320.39, calc.IogrBaseRoyaltyValue)    # = 242.4 * 1.2 * 221.123456
+        self.assertEqual(74291.57, calc.IogrSuppRoyaltyValue)    # = (1000 - 242.4) * 0.5 * (221.123456 - 25)
+        self.assertEqual(8316.72, calc.BaseRoyaltyValue)         # = (64320.39 + 74291.57) * 0.2 * 0.3
+        self.assertEqual(calc.CommencementPeriod, 0)
+
         calc.RoyaltyBasedOnVol = 79.9
         royalty.CrownMultiplier = 3
         calc.PEFNInterest = 2
         calc.RTPInterest = 1
         pr.calc_sask_oil_iogr1995(royalty, datetime(2010, 1, 1),
                                   m, calc, calc_sp)
+        self.assertEqual(calc.CommencementPeriod, 5.0)
         self.assertEqual(calc.IogrBaseRoyaltyValue, 10600.66)
 
         # m.ProdVol = 150
@@ -867,30 +1003,6 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual('GORR Net Royalty = GORR Royalty Value - GCA;'
                          'GORR Net Royalty = $75.00 - $37.50;'
                          'GORR Net Royalty = $37.50;', calc_specific.GorrNetRoyaltyMessage)
-
-    def test_calcSupplementaryRoyaltiesIOGR1995(self):
-        reference_price = {'Pigeon Lake Indian': 24.04, 'Reserve no.138A': 25.37,
-                           'Sawridge Indian': 25.13, 'Stony Plain Indian': 24.64}
-        pr = ProcessRoyalties()
-        # calc = DataStructure()
-
-        self.assertEqual(pr.calc_supplementary_royalties_iogr1995(3.5, 228, 80, 60,
-                                                                  reference_price['Pigeon Lake Indian']), 2039.6)
-        self.assertEqual(pr.calc_supplementary_royalties_iogr1995(5, 200, 90, 40,
-                                                                  reference_price['Reserve no.138A']), 4365.75)
-        self.assertEqual(pr.calc_supplementary_royalties_iogr1995(4, 221.123456, 100, 50,
-                                                                  reference_price['Sawridge Indian']), 4899.84)
-        self.assertEqual(pr.calc_supplementary_royalties_iogr1995(.2, 180, 80, 35,
-                                                                  reference_price['Stony Plain Indian']), 3495.6)
-
-        self.assertEqual(pr.calc_supplementary_royalties_iogr1995(6, 228, 80, 60,
-                                                                  reference_price['Pigeon Lake Indian']), 2996.5)
-        self.assertEqual(pr.calc_supplementary_royalties_iogr1995(5.5, 200, 90, 40,
-                                                                  reference_price['Reserve no.138A']), 6391.38)
-        self.assertEqual(pr.calc_supplementary_royalties_iogr1995(8, 221.123456, 100, 50,
-                                                                  reference_price['Sawridge Indian']), 7192.5)
-        self.assertEqual(pr.calc_supplementary_royalties_iogr1995(15, 180, 80, 35,
-                                                                  reference_price['Stony Plain Indian']), 5101.88)
 
     def test_calc_royalties(self):
         dbu = DatabaseUtilities()
