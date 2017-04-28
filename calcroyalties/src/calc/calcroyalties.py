@@ -628,7 +628,7 @@ class ProcessRoyalties(object):
         """
         # Calculate the Commencement Period
         calc.CommencementPeriod = self.determine_commencement_period(monthly.ProdMonth, commencement_date)
-        if calc.CommencementPeriod < 5:
+        if calc.CommencementPeriod <= 5:
             calc.BaseRoyaltyVolume = self.calc_sask_oil_iogr_subsection2(calc.RoyaltyBasedOnVol)
         else:
             calc.BaseRoyaltyVolume = self.calc_sask_oil_iogr_subsection3(calc.RoyaltyBasedOnVol)
