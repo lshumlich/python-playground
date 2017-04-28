@@ -6,7 +6,7 @@
 	<link rel="stylesheet" href={{url_for("static", filename="css/jqmath-0.4.3.css")}}>
 
 	<script src={{url_for("static", filename="js/jquery-2.1.4.min.js")}}></script>
-	<script src={{url_for("static", filename="js/jqmath-etc-0.4.6.min.js")}}></script>
+	<script src={{url_for("static", filename="js/jqmath-etc-0.4.3.min.js")}}></script>
 <style>
 
 h1 {
@@ -433,45 +433,8 @@ table, th, td {
 
     {% if 'IOGR1995' in rm.RoyaltyScheme and m.Product == 'OIL' %}
         <h3>IOGR1995 Oil</h3>
-
-        {% if calc.CommencementPeriod %}
-            {% if calc.CommencementPeriod < 5 %}
-                Royalty Calc Type: IOGR 1995 with Commencement Period < 5 Years:
-            {% else %}
-                Royalty Calc Type: IOGR 1995  with Commencement Period >=  5 Years:
-            {% endif %}
-        {% endif %}
-
-        <TABLE align="center" style="width:100">
-            <col width="20%">
-            <col width="1%">
-            <col width="20%">
-
-            {% if m.ProdVol < 80 %}
-                <tr><td align ="right">MOP < 80: RVol</td> <td align="center">=</td> <td align="left">10% * MOP</td></tr>
-                <tr><td align="right"> RVol</td><td align="center">=</td><td align="left">10% * {{ '{:.2f}'.format(m.ProdVol) }}</td></tr>
-                <tr><td align ="right">RVol</td> <td align="center">=</td> <td align="left">{{ calc.BaseRoyaltyVolume }}</td></tr>
-            {% elif m.ProdVol < 160 %}
-               <tr><td align="right"> MOP 80 to 160: RVol</td> <td align="center">=</td> <td align="left">8 + [20% * (MOP - 80)]</td></TR>
-               <tr><td align="right"> RVol</td><td align="center">=</td><td align="left">8 + [20% * ({{ '{:.2f}'.format(m.ProdVol) }} - 80)]</td></tr>
-               <tr><td align="right"> RVol</td><td align="center">=</td><td align="left">{{ '{:.2f}'.format(calc.BaseRoyaltyVolume) }}</td></tr>
-            {% elif calc.CommencementPeriod < 5 %}
-                <tr><td align="right"> MOP > 160: RVol</td> <td align="center">=</td> <td align="left">24 + [26% * (MOP - 160)]</td></tr>
-                <tr><td align="right"> RVol</td><td align="center">=</td><td align="left">24 + [26% * ({{ '{:.2f}'.format(m.ProdVol) }} - 160)]</td></tr>
-                <tr><td align="right"> RVol</td><td align="center">=</td></td><td align="left">{{ '{:.2f}'.format(calc.BaseRoyaltyVolume) }}</td></tr>
-            {% elif m.ProdVol < 795 %}
-                <tr><td align="right">MOP 160 to 795: RVol</td> <td align="center">=</td> <td align="left">24 + [26% * (MOP - 160)]</td></tr>
-                <tr><td align="right">RVol</td><td align="center">=</td> <td align="left">24 + [26% * ({{ '{:.2f}'.format(m.ProdVol) }} - 160)]</td></tr>
-                <tr><td align="right">RVol</td><td align="center">=</td> <td align="left">{{ '{:.2f}'.format(calc.BaseRoyaltyVolume) }}</td></tr>
-            {% else %}
-                <tr><td align="right">MOP > 795: RVol </td> <td align="center">=</td> <td align="left">189 + [40% * (MOP - 795)]</td></tr>
-                <tr><td align="right">RVol</td><td align="center">=</td> <td align="left">189 + [40% * ({{ '{:.2f}'.format(m.ProdVol) }} - 795)]</td></tr>
-                <tr><td align="right">RVol</td><td align="center">=</td> <td align="left">{{ '{:.2f}'.format(calc.BaseRoyaltyVolume) }}</td></tr>
-            {% endif %}
-
-        </TABLE>
+        {{ calc_sp._format.html_lf(calc_sp.BaseRoyaltyMessage) | safe}}
     {% endif %}
-
     {#
         --- IOGR 1995 --- Gas, Pen, Sul Royalty Volume
     #}
@@ -514,82 +477,6 @@ table, th, td {
     {% endif %}
 
 
-    {#
-        --- IOGR1995 --- Royalty $
-    #}
-
-    {% if m.Product == 'OIL' and 'IOGR1995' in rm.RoyaltyScheme%}
-        <br>
-        <table>
-             <tr align="center">
-                 <td>R\$</td>
-                 <td>=</td>
-                 <td>CrownMult</td>
-                 <td>*</td>
-                 <td>RVol</td>
-                 <td>*</td>
-                 <td>RVal</td>
-             </tr>
-            <tr align="center">
-                <td>R\$</td>
-                <td>=</td>
-                <td>{{ rm.CrownMultiplier }}</td>
-                <td>*</td>
-                <td>{{ '{:.2f}'.format(calc.BaseRoyaltyVolume) }}</td>
-                <td>*</td>
-                <td>{{ '{:>10,.6f}\n'.format(calc.RoyaltyPrice) }}</td>
-            </tr>
-            <tr align="center">
-                <td>R\$</td>
-                <td>=</td>
-                <td> \$ {{ '{:>10,.2f}\n'.format(calc.IogrBaseRoyaltyValue) }}</td>
-            </tr>
-        </table>
-    {% endif %}
-
-    {#
-        --- IOGR1995 --- Oil Supplementary Royalty
-    #}
-
-    {% if 'IOGR1995' in rm.RoyaltyScheme and m.Product == 'OIL'%}
-        {% if calc.CommencementPeriod <= 5 %}
-            <br>
-            IOGR1995 Supplementary Royalties<br>
-            <table>
-                <tr align="center">
-                    <td>S\$</td>
-                    <td>=</td>
-                    <td>(T</td>
-                    <td>-</td>
-                    <td>B)</td>
-                    <td>*</td>
-                    <td>0.50</td>
-                    <td>*</td>
-                    <td>(P</td>
-                    <td>-</td>
-                    <td>R)</td>
-                </tr>
-                <tr align="center">
-                    <td>S\$</td>
-                    <td>=</td>
-                    <td>({{ '{:.2f}'.format(m.ProdVol) }}</td>
-                    <td>-</td>
-                    <td>{{ '{:.2f}'.format(calc.BaseRoyaltyVolume) }})</td>
-                    <td>*</td>
-                    <td>0.50</td>
-                    <td>*</td>
-                    <td> ??? ({{ '{:>10,.6f}\n'.format(m.SalesPrice) }}</td>
-                    <td>-</td>
-                    <td> 25.00)</td>
-                </tr>
-                <tr align="center">
-                    <td>S\$</td>
-                    <td>=</td>
-                    <td> \$ {{ '{:>10,.2f}\n'.format(calc.IogrSuppRoyaltyValue) }}</td>
-                </tr>
-            </table>
-        {% endif %}
-    {% endif %}
 
     {#
         IOGR1995 Supplemental GAS and other products
