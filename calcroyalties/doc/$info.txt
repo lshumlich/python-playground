@@ -46,6 +46,9 @@ To review code coverage:
     if all else fails:
         batch.py run_code_coverage
 
+When creating a new environment in pycharm:
+- update File/Settings
+  - remove the existing content-root and add python-playground/calcroyalties as a new content-root
 
 Using the SQL database
 
