@@ -14,6 +14,10 @@ worksheet = Blueprint('worksheet', __name__)
 
 @worksheet.route('/worksheet')
 def calc_worksheet():
+    if "ID" in request.args:
+        id = int(request.args["ID"])
+        return(generate_worksheet_from_id(id))
+
     if "ProdDate" in request.args:
         prod_month = int(request.args["ProdDate"])
     else:
@@ -43,7 +47,7 @@ def calc_worksheet():
     else:
         return "worksheet.calc_worksheet Something wasn't right"
 
-
+# todo delete me when the other generate works
 def generate_worksheet(well_id, prod_month, rpba, product):
     try:
         db = config.get_database()
@@ -82,4 +86,57 @@ def generate_worksheet(well_id, prod_month, rpba, product):
         traceback.print_exc(file=sys.stdout)
         tb = traceback.format_exc()
         return "<h2>Error displaying worksheet for well %s</h2><br>" % well_id + str(e) + '<plaintext>' + \
+               tb + '</plaintext>'
+
+
+def generate_worksheet_from_id(id):
+    print('You got here: ', id)
+    try:
+        db = config.get_database()
+        calc = db.select1('Calc', ID=id)
+        print(calc)
+        return generate_worksheet_from_calc(calc)
+    except Exception as e:
+        print('views.worksheet: ***Error:', e)
+        traceback.print_exc(file=sys.stdout)
+        tb = traceback.format_exc()
+        return "<h2>Error displaying worksheet for well %s</h2><br>" % calc.WellID + str(e) + '<plaintext>' + \
+               tb + '</plaintext>'
+
+
+def generate_worksheet_from_calc(calc):
+    try:
+        db = config.get_database()
+        # product = "SUL"
+        well = db.select1('WellRoyaltyMaster', ID=calc.WellID)
+        well_lease_link_array = db.select('WellLeaseLink', WellID=calc.WellID)
+        if len(well_lease_link_array) == 0:
+            raise AppError("There were no well_lease_link records for " + str(calc.WellID) + str(calc.ProdMonth))
+        well_lease_link = well_lease_link_array[0]
+        royalty = db.select1('LeaseRoyaltyMaster', ID=calc.LeaseID)
+        lease = db.select1('Lease', ID=calc.LeaseID)
+
+        monthly_array = db.select('Monthly', WellID=calc.WellID, prodMonth=calc.ProdMonth, product=calc.Product, RPBA=calc.RPBA)
+        if len(monthly_array) == 0:
+            raise AppError("There were no monthly records for well: " + str(calc.WellID) + " ProdDate: " +
+                           str(calc.ProdMonth) + " Product: " + calc.Product)
+        monthly = monthly_array[0]  # if there are multiple pick the first one
+
+        ba = db.select1('BAInfo', BAid=monthly.RPBA, BAType='RTP')
+        # calc = db.select1('Calc', WellID=calc.WellID, ProdMonth=calc.ProdMonth, RPBA=monthly.RPBA, Product=calc.Product)
+        calc_specific = DataStructure(calc.RoyaltySpecific)
+        rtp_info = db.select1('RTPInfo', WellEvent=well.WellEvent, Product=calc.Product, Payer=monthly.RPBA,
+                              Date=prod_month_to_date(calc.ProdMonth))
+        royalty.format_gorr = format_gorr(calc.Gorr)
+        # calc = calc_array[0]
+        # print(monthly)
+        return render_template('worksheet/calc_worksheet.html',
+                               well=well, rm=royalty, m=monthly, lease=lease,
+                               calc=calc, calc_sp=calc_specific, well_lease_link=well_lease_link,
+                               ba=ba, rtp_info=rtp_info)
+    except Exception as e:
+        print('views.worksheet: ***Error:', e)
+        traceback.print_exc(file=sys.stdout)
+        tb = traceback.format_exc()
+        return "<h2>Error displaying worksheet for well %s</h2><br>" % calc.WellID + str(e) + '<plaintext>' + \
                tb + '</plaintext>'

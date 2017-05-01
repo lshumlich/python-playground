@@ -36,7 +36,7 @@ tr.border_bottom td {
         <td align="right">{{ '{:>10,.2f}\n'.format(r.BaseNetRoyaltyValue) }} </td>
         <td align="right">{{ '{:>10,.2f}\n'.format(r.GorrNetRoyaltyValue) }} </td>
         <td>
-            <a  id="worksheet" href="{{ url_for('worksheet.calc_worksheet') }}?WellId={{ r.WellID }}&ProdDate={{ r.ProdMonth }}&RPBA={{ r.RPBA }}&Product={{ r.Product }}" title="Worksheet" class="icon icon-text-document"></a>
+            <a  id="worksheet" href="{{ url_for('worksheet.calc_worksheet') }}?ID={{ r.ID }}" title="Worksheet" class="icon icon-text-document"></a>
             &nbsp;
             <a href="{{ url_for('wells.calculate') }}?WellId={{ r.WellID }}&ProdDate={{ r.ProdMonth }}" title="Recalculate" class="icon icon-reload"></a>
         </td>

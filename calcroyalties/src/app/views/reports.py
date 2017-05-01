@@ -14,8 +14,10 @@ reports = Blueprint('reports', __name__)
 def royalties():
     db = config.get_database()
     proddate = get_proddate_int()
-    statement = """SELECT * from calc, wellleaselink where calc.wellid = wellleaselink.wellid
+    statement = """SELECT * from calc, WellRoyaltyMaster where calc.wellid = WellRoyaltyMaster.ID
                 and calc.prodmonth = {proddate}""".format(proddate=proddate)
+    # statement = """SELECT * from calc, wellleaselink where calc.wellid = wellleaselink.wellid
+    #             and calc.prodmonth = {proddate}""".format(proddate=proddate)
     result = db.select_sql(statement)
     if result:
         return render_template('reports/royalties.html', result=result)
