@@ -17,7 +17,6 @@ tr.border_bottom td {
         <th>Royalty Payor</th>
         <th>Product</th>
         <th>Well Event</th>
-        <th>Prod</th>
         <th>Base Royalty</th>
         <th>GORR Royalty</th>
         <th> </th>
@@ -32,7 +31,6 @@ tr.border_bottom td {
         <td>{{ r.RPBA }} </td>
         <td>{{ r.Product }}</td>
         <td>{{ r.WellEvent }}</td>
-        <td align="right">{{ '{:>10,.1f}\n'.format(r.ProdVol) }} </td>
         <td align="right">{{ '{:>10,.2f}\n'.format(r.BaseNetRoyaltyValue) }} </td>
         <td align="right">{{ '{:>10,.2f}\n'.format(r.GorrNetRoyaltyValue) }} </td>
         <td>

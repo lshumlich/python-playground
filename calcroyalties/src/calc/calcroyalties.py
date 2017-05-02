@@ -75,13 +75,6 @@ class ProcessRoyalties(object):
         logging.info('**** Processing *** {0:6d} {1:6d} {2:}'.format(well_id, prod_month, product))
         # errorCount = 0
         well = self.db.select1('WellRoyaltyMaster', ID=well_id)
-        well_lease_link_array = self.db.select('WellLeaseLink', WellID=well_id)
-        if len(well_lease_link_array) == 0:
-            raise AppError("There were no well_lease_link records for Well ID: " + str(well_id) +
-                           " Prod Date: " + str(prod_month))
-        well_lease_link = well_lease_link_array[0]
-        royalty = self.db.select1('LeaseRoyaltymaster', ID=well_lease_link.LeaseID)
-        lease = self.db.select1('Lease', ID=well_lease_link.LeaseID)
 
         # todo Create a test to ensure there is a RTPInfo for the well. raise an apperror if not
         # todo call the prod_month_to_date in the select and not everytime we use the select.
@@ -104,22 +97,32 @@ class ProcessRoyalties(object):
             self.db.delete('Calc', calc.ID)
 
         for monthly in monthly_list:
-            calc, calc_specific = self.zero_royalty_calc(prod_month, well_id, product)
 
-            calc.PEFNInterest = well_lease_link.PEFNInterest
+            well_lease_link_array = self.db.select('WellLeaseLink', WellID=well_id)
+            if len(well_lease_link_array) == 0:
+                raise AppError("There were no well_lease_link records for Well ID: " + str(well_id) +
+                               " Prod Date: " + str(prod_month))
 
-            rtp_info = self.db.select1('RTPInfo', WellEvent=well.WellEvent, Product=product, Payer=monthly.RPBA,
-                                       Date=prod_month_to_date(prod_month))
-            calc.RTPInterest = rtp_info.Percent / 100
+            for well_lease_link in well_lease_link_array:
+                royalty = self.db.select1('LeaseRoyaltymaster', ID=well_lease_link.LeaseID)
+                lease = self.db.select1('Lease', ID=well_lease_link.LeaseID)
 
-            self.calc_royalties(well, royalty, monthly, calc, calc_specific)
+                calc, calc_specific = self.zero_royalty_calc(prod_month, well_id, product)
 
-            calc.RPBA = monthly.RPBA
-            calc.FNReserveID = lease.FNReserveID
-            calc.FNBandID = lease.FNBandID
-            calc.LeaseID = lease.ID
+                calc.PEFNInterest = well_lease_link.PEFNInterest
 
-            self.db.insert(calc)
+                rtp_info = self.db.select1('RTPInfo', WellEvent=well.WellEvent, Product=product, Payer=monthly.RPBA,
+                                           Date=prod_month_to_date(prod_month))
+                calc.RTPInterest = rtp_info.Percent / 100
+
+                self.calc_royalties(well, royalty, monthly, calc, calc_specific)
+
+                calc.RPBA = monthly.RPBA
+                calc.FNReserveID = lease.FNReserveID
+                calc.FNBandID = lease.FNBandID
+                calc.LeaseID = lease.ID
+
+                self.db.insert(calc)
 
     def calc_royalties(self, well, royalty, monthly, calc, calc_specific):
 

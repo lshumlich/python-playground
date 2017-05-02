@@ -29,12 +29,18 @@ def royalties():
 #@PermissionHandler('well_view')
 def calc_list():
     db = config.get_database()
-    statement = """SELECT * from calc, wellroyaltymaster,monthly
+    xxxstatement = """SELECT * from calc, wellroyaltymaster, monthly
         where calc.wellid = wellroyaltymaster.id and
         calc.wellid = monthly.wellid  and
         calc.ProdMonth = monthly.ProdMonth and
         calc.Product = monthly.Product
         order by calc.prodMonth,calc.wellid
+    """
+    statement = """SELECT calc.ID, calc.ProdMonth, calc.BaseNetRoyaltyValue, calc.GorrNetRoyaltyValue,
+        calc.FNBandID, calc.FNReserveID, calc.LeaseID, calc.WellID, calc.RPBA, calc.Product, wrm.WellEvent
+        from calc, wellroyaltymaster wrm
+        where calc.wellid = wrm.id
+        order by calc.prodMonth, calc.wellid
     """
     result = db.select_sql(statement)
     print('we have found: ', len(result))
