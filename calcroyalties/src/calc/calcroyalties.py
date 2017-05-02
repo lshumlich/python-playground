@@ -143,7 +143,7 @@ class ProcessRoyalties(object):
                                         monthly, calc, calc_specific)
 
         elif monthly.Product == 'GAS' and 'IOGR1995' in royalty.RoyaltyScheme:
-            self.calc_sask_gas_iogr1995(calc)
+            self.calc_sask_gas_iogr1995(royalty, monthly, calc, calc_specific)
 
         elif monthly.Product == 'PEN' and 'IOGR1995' in royalty.RoyaltyScheme:
             self.calc_sask_pen_iogr1995(calc)
@@ -245,7 +245,6 @@ class ProcessRoyalties(object):
         gross_message_line1 = '$ GORR = '
         gross_message_line2 = gross_message_line1
         gross_message_line3 = gross_message_line1
-
 
         if gorr_calc_type[0] == '%':
             calc_specific.GorrValOrPer = '%'
@@ -490,8 +489,7 @@ class ProcessRoyalties(object):
             if lease_rm.MinRoyaltyDollar > calc.BaseRoyaltyValue:
                 calc.BaseRoyaltyValue = lease_rm.MinRoyaltyDollar
 
-    @staticmethod
-    def calc_sask_gas_iogr1995(calc):
+    def calc_sask_gas_iogr1995(self, lease_rm, monthly, calc, calc_specific):
         """
         1. Royalty Payable = Gross Royalty - (Gross Royalty / Total Value)
         2. Gross Royalty = Basic Gross Royalty + Supplementary Gross Royalty
@@ -505,19 +503,58 @@ class ProcessRoyalties(object):
             d. Other from gas source
             e. Other from non-gas source
         """
-        # basic
-        basic_gross_royalty = 0.25 * calc.RoyaltyBasedOnVol * calc.SalesPrice
+        # New Way basic
+        calc.IogrBaseRoyaltyValue = round(lease_rm.CrownMultiplier * 0.25 * calc.RoyaltyBasedOnVol * calc.RoyaltyPrice, 2)
+        calc_specific.BaseRoyaltyMessage = 'R$ = CrownMult * 0.25 * ' + calc.RoyaltyBasedOn + ' * Price;' + \
+            'R$ = ' + str(lease_rm.CrownMultiplier) + ' * 0.25 * ' + self.fm_vol(calc.RoyaltyBasedOnVol) + ' * ' \
+                                           + self.fm_rate(calc.RoyaltyPrice) + ';' + \
+            'R$ = ' + self.fm_value(calc.IogrBaseRoyaltyValue) + ';'
+
+
+
+
+            # basic
+        # basic_gross_royalty = 0.25 * calc.RoyaltyBasedOnVol * calc.SalesPrice
 
         # supplemental
-        if calc.SalesPrice <= 10.65:
-            supplementary_royalty = 0
-        elif calc.SalesPrice <= 24.85:
-            supplementary_royalty = 0.75 * calc.RoyaltyBasedOnVol * 0.3 * (calc.SalesPrice - 10.65)
+        if calc.RoyaltyPrice <= 10.65:
+            calc.IogrSuppRoyaltyValue = 0
+            calc_specific.BaseRoyaltyMessage += ';price < $10.65;' + \
+                                                'S = $0.00;'
+        elif calc.RoyaltyPrice <= 24.85:
+            calc.IogrSuppRoyaltyValue = round(0.75 * calc.RoyaltyBasedOnVol * 0.3 * (calc.RoyaltyPrice - 10.65), 2)
+            calc_specific.BaseRoyaltyMessage += ';price <= $10.65);' \
+                                                'S = (0.75 * ' + calc.RoyaltyBasedOn + ' * 30% * (price  - $10.65);' + \
+                                                'S = (0.75 * ' + self.fm_vol(calc.RoyaltyBasedOnVol) + ' * 30% * (' + \
+                                                self.fm_rate(calc.RoyaltyPrice) + ' - $10.65);' + \
+                                                'S = ' + self.fm_value(calc.IogrSuppRoyaltyValue) + ';'
         else:
-            supplementary_royalty = 0.75 * calc.RoyaltyBasedOnVol * (4.26 + 0.55 * (calc.SalesPrice - 24.85))
+            calc.IogrSuppRoyaltyValue = round(0.75 * calc.RoyaltyBasedOnVol *
+                                              (4.26 + 0.55 * (calc.RoyaltyPrice - 24.85)), 2)
+            calc_specific.BaseRoyaltyMessage += ';price > $10.65);' \
+                                                'S = (0.75 * ' + calc.RoyaltyBasedOn + ' * (4.26 + 0.55 * (price  - $24.85));' + \
+                                                'S = (0.75 * ' + self.fm_vol(calc.RoyaltyBasedOnVol) + ' * (4.26 + 0.55 * (' + self.fm_rate(calc.RoyaltyPrice)  + ' - $24.85));' + \
+                                                'S = ' + self.fm_value(calc.IogrSuppRoyaltyValue) + ';'
 
-        calc.IogrSuppRoyaltyValue = round(supplementary_royalty * calc.RTPInterest * calc.PEFNInterest, 2)
-        calc.IogrBaseRoyaltyValue = round(basic_gross_royalty * calc.RTPInterest * calc.PEFNInterest, 2)
+        calc.BaseRoyaltyValue = round((calc.IogrBaseRoyaltyValue + calc.IogrSuppRoyaltyValue) *
+                                      calc.PEFNInterest * calc.RTPInterest, 2)
+
+        calc_specific.BaseRoyaltyMessage += ';Royalty = (R$ + S$) * PE FN %	* RP %;' + \
+                                            'Royalty = (' + self.fm_value(calc.IogrBaseRoyaltyValue) + \
+                                            ' + ' + self.fm_value(calc.IogrSuppRoyaltyValue) + ') * ' + \
+                                            self.fm_percent(calc.PEFNInterest) + ' * ' + \
+                                            self.fm_percent(calc.RTPInterest) + ';' + \
+                                            'Royalty = ' + self.fm_value(calc.BaseRoyaltyValue) + ';'
+
+        calc.BaseRoyaltyRate = round((calc.IogrBaseRoyaltyValue + calc.IogrSuppRoyaltyValue) /
+                                     (calc.RoyaltyBasedOnVol * calc.RoyaltyPrice), 8)
+
+        calc.BaseGCAValue, calc_specific.BaseGCAMessage = \
+            self.calc_deduction("Base", "GCA", lease_rm.BaseGCA, 'Effective CR %', calc.BaseRoyaltyRate, calc.BaseRoyaltyValue,
+                                monthly, calc)
+
+        # calc.IogrSuppRoyaltyValue = round(supplementary_royalty * calc.RTPInterest * calc.PEFNInterest, 2)
+        # calc.IogrBaseRoyaltyValue = round(basic_gross_royalty * calc.RTPInterest * calc.PEFNInterest, 2)
 
         return
 
@@ -593,7 +630,7 @@ class ProcessRoyalties(object):
 
         calc_specific.BaseRoyaltyMessage += ';R$ = CrownMult * RVol * RVal;' + \
             'R$ = ' + str(royalty.CrownMultiplier) + ' * ' + self.fm_vol(calc.BaseRoyaltyVolume) + ' * ' \
-                                            + self.fm_rate(calc.RoyaltyPrice) + ';'\
+                    + self.fm_rate(calc.RoyaltyPrice) + ';'\
             'R$ = ' + self.fm_value(calc.IogrBaseRoyaltyValue) + ';'
 
         calc.IogrSuppRoyaltyValue = round(
@@ -604,7 +641,7 @@ class ProcessRoyalties(object):
                                                        self.reference_price['Onion Lake'],
                                                        calc_specific), 2)
 
-        calc.BaseRoyaltyValue = round((calc.IogrBaseRoyaltyValue + calc.IogrSuppRoyaltyValue) * \
+        calc.BaseRoyaltyValue = round((calc.IogrBaseRoyaltyValue + calc.IogrSuppRoyaltyValue) *
                                       calc.PEFNInterest * calc.RTPInterest, 2)
 
         calc_specific.BaseRoyaltyMessage += ';Royalty = (R$ + S$) * PE FN %	* RP %;' + \
@@ -614,7 +651,7 @@ class ProcessRoyalties(object):
                                             self.fm_percent(calc.RTPInterest) + ';' + \
                                             'Royalty = ' + self.fm_value(calc.BaseRoyaltyValue) + ';'
 
-        calc.BaseRoyaltyRate = round((calc.IogrBaseRoyaltyValue + calc.IogrSuppRoyaltyValue) / \
+        calc.BaseRoyaltyRate = round((calc.IogrBaseRoyaltyValue + calc.IogrSuppRoyaltyValue) /
                                      (calc.RoyaltyBasedOnVol * monthly.SalesPrice), 8)
 
         calc.BaseTransValue, calc_specific.BaseTransMessage = \
@@ -639,6 +676,7 @@ class ProcessRoyalties(object):
         2.      80 to 160           8 m3 plus 20% of the number of cubic metres in excess of 80
         3.      More than 160       24 m3 plus 26% of the number of cubic metres in excess of 160
         """
+        # todo Crap just noticed that RoyaltyBasedOnVol may not be MOP it should also handle sales. Bad Larry.
         if calc.RoyaltyBasedOnVol < 80.0:
             calc.BaseRoyaltyVolume = calc.RoyaltyBasedOnVol * .1
             calc_specific.BaseRoyaltyMessage = 'MOP < 80: RVol = 10% * MOP;' +\
@@ -646,14 +684,14 @@ class ProcessRoyalties(object):
                                                'RVol = ' + self.fm_vol(calc.BaseRoyaltyVolume) + ';'
         elif calc.RoyaltyBasedOnVol <= 160.0:
             calc.BaseRoyaltyVolume = 8 + (calc.RoyaltyBasedOnVol - 80) * .2
-            calc_specific.BaseRoyaltyMessage = 'MOP 80 to 160: RVol = 8 + (MOP - 80) * 20%;' +\
-                                               'RVol = 8 + (' + self.fm_vol(calc.RoyaltyBasedOnVol) + ' - 80) * 20%;' +\
-                                               'RVol = ' + self.fm_vol(calc.BaseRoyaltyVolume) + ';'
+            calc_specific.BaseRoyaltyMessage = 'MOP 80 to 160: RVol = 8 + (MOP - 80) * 20%;' + \
+                'RVol = 8 + (' + self.fm_vol(calc.RoyaltyBasedOnVol) + ' - 80) * 20%;' + \
+                'RVol = ' + self.fm_vol(calc.BaseRoyaltyVolume) + ';'
         else:
             calc.BaseRoyaltyVolume = 24 + (calc.RoyaltyBasedOnVol - 160) * .26
-            calc_specific.BaseRoyaltyMessage = 'MOP > 160: RVol = 24 + (MOP - 160) * 26%;' +\
-                                               'RVol = 24 + (' + self.fm_vol(calc.RoyaltyBasedOnVol) + ' - 160) * 26%;' +\
-                                               'RVol = ' + self.fm_vol(calc.BaseRoyaltyVolume) + ';'
+            calc_specific.BaseRoyaltyMessage = 'MOP > 160: RVol = 24 + (MOP - 160) * 26%;' + \
+                'RVol = 24 + (' + self.fm_vol(calc.RoyaltyBasedOnVol) + ' - 160) * 26%;' + \
+                'RVol = ' + self.fm_vol(calc.BaseRoyaltyVolume) + ';'
 
         calc.BaseRoyaltyVolume = round(calc.BaseRoyaltyVolume, 6)
 
@@ -711,7 +749,7 @@ class ProcessRoyalties(object):
                                                 'S = ' + self.fm_value(supplementary_royalty) + ';'
 
         else:
-            supplementary_royalty = round((prod_vol - royalty_regulation) * \
+            supplementary_royalty = round((prod_vol - royalty_regulation) *
                                     (0.75 * (well_head_price - reference_price - 12.58) + 6.29), 2)
             calc_specific.BaseRoyaltyMessage += ';S = (T - B) * (0.75 * (P - R - $12.58) + $6.29);' + \
                                                 'S = (' + self.fm_vol(prod_vol) + ' - ' + self.fm_vol(royalty_regulation) + \
@@ -759,6 +797,7 @@ class ProcessRoyalties(object):
                           + "; Well Value = " + self.fm_value(value) + ';'
         else:
             value = round(monthly.SalesPrice * monthly.SalesVol, 2)
+            calc_specific.ValueBasedOn = 'Sales'
             explanation = 'Well Value = Sales Vol * Price;' + \
                           'Well Value = ' + self.fm_vol(monthly.SalesVol) + " * " + self.fm_rate(monthly.SalesPrice) + \
                           '; Well Value = ' + self.fm_value(value) + ';'
@@ -820,12 +859,6 @@ class ProcessRoyalties(object):
             self.calc_deduction("Base", "Trans", royalty.BaseTrans, 'CR %', calc.BaseRoyaltyRate, calc.BaseRoyaltyValue,
                                 monthly, calc)
 
-        # todo delete this code i think
-        # calc.TransBaseValue = self.calc_sask_oil_prov_crown_deductions(monthly,
-        #                                                                calc.PEFNInterest,
-        #                                                                calc.RTPInterest,
-        #                                                                royalty, calc)
-
     def calc_sask_gas_prov_crown(self, monthly, well, royalty, calc, calc_specific):
 
         if royalty.OverrideRoyaltyClassification is not None:
@@ -850,9 +883,6 @@ class ProcessRoyalties(object):
         calc.BaseGCAValue, calc_specific.BaseGCAMessage = \
             self.calc_deduction("Base", "GCA", royalty.BaseGCA, 'CR %', calc.BaseRoyaltyRate, calc.BaseRoyaltyValue,
                                 monthly, calc)
-
-        # todo Delete me any anyone who looks like me
-        # self.calc_sask_prov_crown_gca(royalty, monthly, calc, calc_specific)
 
     @staticmethod
     def calc_sask_gas_prov_crown_royalty_rate(calc, econ_gas_data,
@@ -952,22 +982,6 @@ class ProcessRoyalties(object):
                                             'Base Net Royalty = ' + \
                                             self.fm_value(calc.BaseNetRoyaltyValue) + ';'
 
-    # todo delete me I think
-    @staticmethod
-    def calc_sask_oil_prov_trans_deduction(m, lease_rm, fn_interest, rp_interest, calc):
-        """ We have calculated a royalty rate. Therefore calculate based on that"""
-
-        if lease_rm.TransDeducted == "All" or lease_rm.TransDeducted == 'Base':
-            return round(calc.BaseRoyaltyRate *
-                         lease_rm.CrownMultiplier *
-                         calc.RoyaltyBasedOnVol *
-                         fn_interest *
-                         rp_interest *
-                         m.TransRate,
-                         2)
-        else:
-            return 0.0
-
     def calc_deduction(self, what, deduction, option, rr_desc, rr, gross_royalty, monthly, calc):
 
         if not option or option.strip() == '':
@@ -1035,50 +1049,6 @@ class ProcessRoyalties(object):
                 value = max_gca
 
         return value, msg
-
-    # delete me I think
-    def calc_sask_prov_crown_gca(self, lease_rm, monthly, calc, calc_specific):
-
-        self.determine_gca_rate(lease_rm, monthly, calc_specific)
-
-        calc.BaseGCA = round(monthly.SalesVol *
-                             calc_specific.BaseGCARate *
-                             calc.BaseRoyaltyRate *
-                             calc.PEFNInterest *
-                             calc.RTPInterest, 2)
-
-        calc_specific.BaseGCAMessage = 'GCA = Sales Vol * GCA Rate * CR% * PE FN% * RP %;' + \
-                                 'GCA = ' + self.fm_vol(monthly.SalesVol) + ' * ' + \
-                                 self.fm_rate(calc_specific.BaseGCARate) + ' * ' + \
-                                 self.fm_percent(calc.BaseRoyaltyRate) + ' * ' + \
-                                 self.fm_percent(calc.PEFNInterest) + ' * ' + \
-                                 self.fm_percent(calc.RTPInterest) + ';' + \
-                                 'GCA = ' + self.fm_value(calc.BaseGCA) + ';'
-
-        max_gca = round(calc.BaseRoyaltyValue * .5, 2)
-
-        if calc.BaseGCA > max_gca:
-            calc_specific.BaseGCAMessage += 'GCA > 50% of Royalty therefore GCA = ' + self.fm_value(max_gca) + ';'
-            calc.BaseGCA = max_gca
-
-    # todo delete me i think
-    @staticmethod
-    def determine_gca_rate(lease_rm, monthly, calc_specific):
-        calc_specific.BaseGCARate = 0
-
-        if not lease_rm.GCADeducted:
-            return
-        try:
-            if lease_rm.GCADeducted == 'Annual':
-                calc_specific.BaseGCARate = monthly.GCARate
-            else:
-                calc_specific.BaseGCARate = float(lease_rm.GCADeducted)
-
-        except Exception as e:
-            logging.error("Error determining GCA rate: " + str(e))
-            raise AppError("Error determining GCA rate: " + str(e))
-
-        return
 
     @staticmethod
     def fm_value(num):

@@ -462,6 +462,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         royalty.BaseTrans = 'prod'
 
         calc_sp = DataStructure()
+        calc_sp.BaseRoyaltyMessage = None
 
         pr = ProcessRoyalties()
 
@@ -662,38 +663,93 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
 
     def test_calc_sask_gas_iogr1995(self):
 
+        self.maxDiff = None
+
         pr = ProcessRoyalties()
+
+        lease_rm = DataStructure()
+        lease_rm.CrownMultiplier = 1.0
+        lease_rm.BaseGCA = 'sales'
+
+        monthly = DataStructure()
+        monthly.GCARate = 9.00
 
         calc = DataStructure()
         calc.RTPInterest = 1.0
         calc.PEFNInterest = 1.0
-        calc.IogrBaseRoyaltyValue = 0.0
-        calc.CommencementPeriod = 0
-        calc.BaseRoyaltyVolume = 0.0
-        calc.RoyaltyPrice = 0.0
         calc.IogrSuppRoyaltyValue = None
+        calc.IogrBaseRoyaltyValue = 0.0
+        calc.BaseRoyaltyValue = 0.0
+
+        calc_sp = DataStructure()
+        calc_sp.BaseRoyaltyMessage = None
 
         calc.RoyaltyBasedOnVol = 70
-        calc.SalesPrice = 5
-        pr.calc_sask_gas_iogr1995(calc)
+        monthly.SalesVol = 70
+        calc.RoyaltyBasedOn = 'Sales Vol'
+
+        calc.RoyaltyPrice = 5.0
+        pr.calc_sask_gas_iogr1995(lease_rm, monthly, calc, calc_sp)
         self.assertEqual(calc.IogrSuppRoyaltyValue, 0)
         self.assertEqual(calc.IogrBaseRoyaltyValue, 87.5)
+        self.assertEqual(calc.BaseRoyaltyValue, 87.5)
+        self.assertEqual('R$ = CrownMult * 0.25 * Sales Vol * Price;'
+                         'R$ = 1.0 * 0.25 * 70.00 * 5.000000;'
+                         'R$ = $87.50;;'
+                         'price < $10.65;S = $0.00;;'
+                         'Royalty = (R$ + S$) * PE FN %	* RP %;'
+                         'Royalty = ($87.50 + $0.00) * 100.000000% * 100.000000%;'
+                         'Royalty = $87.50;', calc_sp.BaseRoyaltyMessage)
 
-        calc.SalesPrice = 20
-        pr.calc_sask_gas_iogr1995(calc)
+        calc.RoyaltyPrice = 20
+        pr.calc_sask_gas_iogr1995(lease_rm, monthly, calc, calc_sp)
         self.assertEqual(calc.IogrSuppRoyaltyValue, 147.26)
         self.assertEqual(calc.IogrBaseRoyaltyValue, 350)
+        self.assertEqual(calc.BaseRoyaltyValue, 497.26)
+        self.assertEqual('R$ = CrownMult * 0.25 * Sales Vol * Price;'
+                         'R$ = 1.0 * 0.25 * 70.00 * 20.000000;'
+                         'R$ = $350.00;;'
+                         'price <= $10.65);'
+                         'S = (0.75 * Sales Vol * 30% * (price  - $10.65);'
+                         'S = (0.75 * 70.00 * 30% * (20.000000 - $10.65);'
+                         'S = $147.26;;'
+                         'Royalty = (R$ + S$) * PE FN %	* RP %;'
+                         'Royalty = ($350.00 + $147.26) * 100.000000% * 100.000000%;'
+                         'Royalty = $497.26;', calc_sp.BaseRoyaltyMessage)
 
-        calc.SalesPrice = 50
-        pr.calc_sask_gas_iogr1995(calc)
+        calc.RoyaltyPrice = 50
+        pr.calc_sask_gas_iogr1995(lease_rm, monthly, calc, calc_sp)
         self.assertEqual(calc.IogrSuppRoyaltyValue, 949.86)
         self.assertEqual(calc.IogrBaseRoyaltyValue, 875)
+        self.assertEqual(calc.BaseRoyaltyValue, 1824.86)
+        self.assertEqual('R$ = CrownMult * 0.25 * Sales Vol * Price;'
+                         'R$ = 1.0 * 0.25 * 70.00 * 50.000000;'
+                         'R$ = $875.00;;'
+                         'price > $10.65);'
+                         'S = (0.75 * Sales Vol * (4.26 + 0.55 * (price  - $24.85));'
+                         'S = (0.75 * 70.00 * (4.26 + 0.55 * (50.000000 - $24.85));'
+                         'S = $949.86;;'
+                         'Royalty = (R$ + S$) * PE FN %	* RP %;'
+                         'Royalty = ($875.00 + $949.86) * 100.000000% * 100.000000%;'
+                         'Royalty = $1,824.86;', calc_sp.BaseRoyaltyMessage)
 
         calc.RTPInterest = .1
         calc.PEFNInterest = .2
-        pr.calc_sask_gas_iogr1995(calc)
-        self.assertEqual(calc.IogrSuppRoyaltyValue, 19.0)
-        self.assertEqual(calc.IogrBaseRoyaltyValue, 17.5)
+        lease_rm.CrownMultiplier = .9
+        pr.calc_sask_gas_iogr1995(lease_rm, monthly, calc, calc_sp)
+        # todo Crown Multiplier is not used on Supplemental royalty... Should it be?
+        self.assertEqual(calc.IogrSuppRoyaltyValue, 949.86)
+        self.assertEqual(calc.IogrBaseRoyaltyValue, 787.5)
+        self.assertEqual(calc.BaseRoyaltyValue, 34.75)
+        self.assertEqual('R$ = CrownMult * 0.25 * Sales Vol * Price;'
+                         'R$ = 0.9 * 0.25 * 70.00 * 50.000000;'
+                         'R$ = $787.50;;'
+                         'price > $10.65);'
+                         'S = (0.75 * Sales Vol * (4.26 + 0.55 * (price  - $24.85));'
+                         'S = (0.75 * 70.00 * (4.26 + 0.55 * (50.000000 - $24.85));'
+                         'S = $949.86;;Royalty = (R$ + S$) * PE FN %	* RP %;'
+                         'Royalty = ($787.50 + $949.86) * 20.000000% * 10.000000%;'
+                         'Royalty = $34.75;', calc_sp.BaseRoyaltyMessage)
 
     def test_calcSaskPenIOGR1995(self):
 
@@ -1096,6 +1152,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         monthly.GJ = 1000
         monthly.ProdHours = 744
         monthly.SalesPrice = 210.0
+        monthly.GCARate = 9.0
         royalty.RoyaltyScheme = 'SKProvCrownVar'
         royalty.OverrideRoyaltyClassification = None
         royalty.OilValueBasedOn = None
@@ -1113,6 +1170,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         royalty.OilRoyaltyBasedOn = "prod"
         royalty.GasRoyaltyBasedOn = "sales"
         royalty.ProductsRoyaltyBasedOn = "gj"
+        royalty.BaseGCA = 'sales'
         well.ID = 123456
         well.CommencementDate = date(2015, 1, 22)
         well.RoyaltyClassification = 'Old'
@@ -1261,72 +1319,6 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         pr.determine_royalty_based_on(leaserm, monthly, calc)
         self.assertEqual("Unknown", calc.RoyaltyBasedOn)
         self.assertEqual(0.0, calc.RoyaltyBasedOnVol)
-
-    # todo delete me and replace the tests
-    def test_calc_sask_prov_crown_gca(self):
-
-        pr = ProcessRoyalties()
-
-        leaserm = DataStructure()
-        calc = DataStructure()
-        calc_sp = DataStructure()
-        monthly = DataStructure()
-
-        leaserm.GCADeducted = 100.0
-        monthly.SalesVol = 12.0
-        calc.BaseRoyaltyRate = .3
-        calc.PEFNInterest = .5
-        calc.RTPInterest = .25
-        calc.BaseRoyaltyValue = 1000.00
-        calc.BaseGCA = None
-
-        calc_sp.BaseGCAMessage = None
-
-        pr.calc_sask_prov_crown_gca(leaserm, monthly, calc, calc_sp)
-        self.assertEqual('GCA = Sales Vol * GCA Rate * CR% * PE FN% * RP %;'
-                         'GCA = 12.00 * 100.000000 * 30.000000% * 50.000000% * 25.000000%;'
-                         'GCA = $45.00;', calc_sp.BaseGCAMessage)
-        self.assertEqual(45.0, calc.BaseGCA)
-
-        calc.BaseRoyaltyValue = 60.00
-        pr.calc_sask_prov_crown_gca(leaserm, monthly, calc, calc_sp)
-        self.assertEqual('GCA = Sales Vol * GCA Rate * CR% * PE FN% * RP %;'
-                         'GCA = 12.00 * 100.000000 * 30.000000% * 50.000000% * 25.000000%;'
-                         'GCA = $45.00;'
-                         'GCA > 50% of Royalty therefore GCA = $30.00;', calc_sp.BaseGCAMessage)
-        self.assertEqual(30.0, calc.BaseGCA)
-
-    # todo delete me and replace the tests
-    def test_determine_gca_rate(self):
-
-        pr = ProcessRoyalties()
-
-        leaserm = DataStructure()
-        calc = DataStructure()
-        monthly = DataStructure()
-
-        leaserm.GCADeducted = None
-        calc.BaseGCARate = None
-
-        pr.determine_gca_rate(leaserm, monthly, calc)
-        self.assertEqual(0.0, calc.BaseGCARate)
-
-        pr.determine_gca_rate(leaserm, monthly, calc)
-        self.assertEqual(0.0, calc.BaseGCARate)
-
-        leaserm.GCADeducted = 'asdf'
-        self.assertRaises(AppError, pr.determine_gca_rate, leaserm, monthly, calc)
-
-        leaserm.GCADeducted = 10.0
-        pr.determine_gca_rate(leaserm, monthly, calc)
-        self.assertEqual(10.0, calc.BaseGCARate)
-
-        leaserm.GCADeducted = "Annual"
-        self.assertRaises(AppError, pr.determine_gca_rate, leaserm, monthly, calc)
-
-        monthly.GCARate = 10.0
-        pr.determine_gca_rate(leaserm, monthly, calc)
-        self.assertEqual(10.0, calc.BaseGCARate)
 
     def test_calc_deduction(self):
 
