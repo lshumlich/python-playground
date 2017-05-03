@@ -72,7 +72,6 @@ class ProcessRoyalties(object):
     """
 
     def process_one(self, well_id, prod_month, product):
-        logging.info('**** Processing *** {0:6d} {1:6d} {2:}'.format(well_id, prod_month, product))
         # errorCount = 0
         well = self.db.select1('WellRoyaltyMaster', ID=well_id)
 
@@ -104,6 +103,9 @@ class ProcessRoyalties(object):
                                " Prod Date: " + str(prod_month))
 
             for well_lease_link in well_lease_link_array:
+                logging.info('**** Processing *** {0:06d} {1:06d} {2:04d} {3:}'.
+                             format(prod_month, well_id, well_lease_link.LeaseID, product))
+
                 royalty = self.db.select1('LeaseRoyaltymaster', ID=well_lease_link.LeaseID)
                 lease = self.db.select1('Lease', ID=well_lease_link.LeaseID)
 
@@ -162,34 +164,6 @@ class ProcessRoyalties(object):
 
         if 'GORR' in royalty.RoyaltyScheme:
             self.calc_gorr(royalty, monthly, calc, calc_specific)
-
-        # todo replace this, i don't think we want to mix base and gorr royalties together
-
-        # calc.GrossRoyaltyValue = calc.BaseRoyaltyValue + calc.SuppRoyaltyValue + calc.GorrRoyaltyValue
-        # calc.NetRoyaltyValue = calc.GrossRoyaltyValue - calc.TransBaseValue - calc.TransGorrValue
-
-        # calc.RoyaltyVolume = (calc.BaseRoyaltyVolume +
-        #                       calc.GorrRoyaltyVolume)
-
-        # if royalty.TruckingDeducted == 'Y':
-        #     calc.RoyaltyTransportation = round(calc.RoyaltyVolume * monthly.TransRate, 2)
-        #     calc.RoyaltyDeductions += calc.RoyaltyTransportation
-        #     calc.NetRoyaltyValue -= calc.RoyaltyTransportation
-
-        # if (royalty.TruckingOverride != None):
-        #     calc.RoyaltyTransportation = royalty.TruckingOverride
-
-        # if royalty.ProcessingDeducted == 'Y':
-        #     calc.RoyaltyProcessing = round(calc.RoyaltyVolume * monthly.ProcessingRate, 2)
-        #     calc.RoyaltyDeductions += calc.RoyaltyProcessing
-        #     calc.NetRoyaltyValue -= calc.RoyaltyProcessing
-
-        # Commented out 2017-04-15
-        # if monthly.Product == 'GAS':
-        #     if royalty.GCADeducted == 'Y':
-        #         calc.RoyaltyGCA = round(calc.RoyaltyVolume * monthly.GCARate, 2)
-        #         calc.RoyaltyDeductions += calc.RoyaltyGCA
-        #         calc.NetRoyaltyValue -= calc.RoyaltyGCA
 
         calc.RoyaltySpecific = calc_specific.json_dumps()
 
@@ -504,9 +478,9 @@ class ProcessRoyalties(object):
             e. Other from non-gas source
         """
         # New Way basic
-        calc.IogrBaseRoyaltyValue = round(lease_rm.CrownMultiplier * 0.25 * calc.RoyaltyBasedOnVol * calc.RoyaltyPrice, 2)
-        calc_specific.BaseRoyaltyMessage = 'R$ = CrownMult * 0.25 * ' + calc.RoyaltyBasedOn + ' * Price;' + \
-            'R$ = ' + str(lease_rm.CrownMultiplier) + ' * 0.25 * ' + self.fm_vol(calc.RoyaltyBasedOnVol) + ' * ' \
+        calc.IogrBaseRoyaltyValue = round(0.25 * calc.RoyaltyBasedOnVol * calc.RoyaltyPrice, 2)
+        calc_specific.BaseRoyaltyMessage = 'R$ = 0.25 * ' + calc.RoyaltyBasedOn + ' * Price;' + \
+            'R$ = 0.25 * ' + self.fm_vol(calc.RoyaltyBasedOnVol) + ' * ' \
                                            + self.fm_rate(calc.RoyaltyPrice) + ';' + \
             'R$ = ' + self.fm_value(calc.IogrBaseRoyaltyValue) + ';'
 
@@ -628,8 +602,8 @@ class ProcessRoyalties(object):
                                           calc.BaseRoyaltyVolume *
                                           calc.RoyaltyPrice, 2)
 
-        calc_specific.BaseRoyaltyMessage += ';R$ = CrownMult * RVol * RVal;' + \
-            'R$ = ' + str(royalty.CrownMultiplier) + ' * ' + self.fm_vol(calc.BaseRoyaltyVolume) + ' * ' \
+        calc_specific.BaseRoyaltyMessage += ';R$ = RVol * RVal;' + \
+            'R$ = ' + self.fm_vol(calc.BaseRoyaltyVolume) + ' * ' \
                     + self.fm_rate(calc.RoyaltyPrice) + ';'\
             'R$ = ' + self.fm_value(calc.IogrBaseRoyaltyValue) + ';'
 
@@ -872,7 +846,13 @@ class ProcessRoyalties(object):
         else:
             royalty_classification = well.RoyaltyClassification
 
-        self.calc_sask_gas_prov_crown_royalty_rate(calc, econ_gas_data, royalty_classification, monthly.ProdVol,
+        # This seems like a duplicate but on the Worksheet we need these symbols for this royalty type
+        if royalty.GasRoyaltyBasedOn == "prod":
+            calc_specific.SaskProvBasedOn = "MGP"
+        elif royalty.GasRoyaltyBasedOn == "sales":
+            calc_specific.SaskProvBasedOn = "Sales"
+
+        self.calc_sask_gas_prov_crown_royalty_rate(calc, econ_gas_data, royalty_classification, calc.RoyaltyBasedOnVol,
                                                    well.SRC, well.WellType)
 
         self.calc_sask_prov_crown_royalty_volume_value(monthly,
@@ -1018,7 +998,8 @@ class ProcessRoyalties(object):
             raise AppError(what + ' ' + deduction + ' can not be calculated: ' + '"' + deduction + '" not understood.')
 
         if not rate:
-            raise AppError(what + ' ' + deduction + ' can not be calculated: Rate can not be found.')
+            rate = 0
+            # raise AppError(what + ' ' + deduction + ' can not be calculated: Rate can not be found.')
 
         msg_2 += self.fm_vol(vol) + ' * ' + self.fm_rate(rate)
 
@@ -1105,7 +1086,6 @@ class ProcessRoyalties(object):
         setattr(rc, 'ProcessingGorrValue', 0.0)
 
         setattr(rc, 'RoyaltyGCA', 0.0)
-        setattr(rc, 'RoyaltyDeductions', 0.0)
 
         setattr(rc, 'CommencementPeriod', None)
         setattr(rc, 'Message', None)

@@ -131,26 +131,34 @@ fmath {
                         <th align="right">Well Type:</th> <td> {{ well.WellType }} </td>
                     </tr>
                 {% endif %}
-                <tr>
-                    <th align="right">Price Based On:</th> <td> {{ calc_sp.PriceBasedOn }} </td>
-                </tr>
-                <tr>
-                    <th align="right">Value Based On:</th> <td> {{ calc_sp.ValueBasedOn }} </td>
-                </tr>
-                <tr>
-                    <th align="right">Royalty Based On:</th> <td> {{ calc.RoyaltyBasedOn }} </td>
-                </tr>
+                {% if calc_sp.PriceBasedOn %}
+                    <tr>
+                        <th align="right">Price Based On:</th> <td> {{ calc_sp.PriceBasedOn }} </td>
+                    </tr>
+                {% endif %}
+                {% if calc_sp.ValueBasedOn %}
+                    <tr>
+                        <th align="right">Value Based On:</th> <td> {{ calc_sp.ValueBasedOn }} </td>
+                    </tr>
+                {% endif %}
+                {% if calc_sp.RoyaltyBasedOn %}
+                    <tr>
+                        <th align="right">Royalty % Based On:</th> <td> {{ calc.RoyaltyBasedOn }} </td>
+                    </tr>
+                {% endif %}
 
-                <tr>
-                    <th align="right">Valuation Method:</th>
-                    <td>
-                        {% if calc.RoyaltyPriceExplanation %}
-                            {{ calc.RoyaltyPriceExplanation }}
-                        {% else %}
-                            {{ rm.PriceBasedOn }}
-                        {% endif %}
-                    </td>
-                </tr>
+                {% if calc_sp.PriceBasedOn %}
+                    <tr>
+                        <th align="right">Valuation Method:</th>
+                        <td>
+                            {% if calc.RoyaltyPriceExplanation %}
+                                {{ calc.RoyaltyPriceExplanation }}
+                            {% else %}
+                                {{ rm.PriceBasedOn }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
                 {% if well.CommencementDate != None %}
                     <tr>
                         <th align="right">Commencement Date:</th> <td> {{ well.CommencementDate }} </td>
@@ -202,8 +210,7 @@ table, th, td {
             <col span="8" width="100" align="right">
         </colgroup>
 
-
-	<h3>Monthly Data</h3>
+	<h3>Well Data</h3>
 
     {#
         --- Monthly Data
@@ -219,13 +226,7 @@ table, th, td {
        {% if m.Product == 'GAS' %}
     	   <th>Heat</th>
     	   <th>GJ</th>
-    	   <th>GCA Rate</th>
        {% endif %}
-	   <th>Sales Price</th>
-       {% if  m.Product == 'OIL' %}
-	       <th>Trans Price</th>
-       {% endif %}
-	   {# <th>Processing Price</th> #}
    </TR>
 
 	<tr>
@@ -250,20 +251,45 @@ table, th, td {
                 0.0
             {% endif %}
             </td>
-            <td align="center">
-            {% if m.GCARate %}
-                {{ '{:.2f}'.format(m.GCARate) }}
-            {% else %}
-                0.0
-            {% endif %}
-            </td>
        {% endif %}
-	    <td align="center">{{ '{:>10,.6f}\n'.format(m.SalesPrice) }}</td>
-       {% if  m.Product == 'OIL' %}
-	        <td align="center">{{ '{:>10,.6f}\n'.format(m.TransRate) }}</td>
-       {% endif %}
-	    {# <td align="center">{{ '{:>10,.6f}\n'.format(m.ProcessingRate) }}</td> #}
     </tr>
+
+    </TABLE>
+
+	<h3>Royalty Payor Data</h3>
+
+    {#
+        --- Royalty Payor Data
+    #}
+    <TABLE style="width:700" border="1">
+
+       <TR>
+           {% if m.Product == 'GAS' %}
+               <th>GCA Rate</th>
+           {% endif %}
+           <th>Sales Price</th>
+           {% if  m.Product == 'OIL' %}
+               <th>Trans Price</th>
+           {% endif %}
+           {# <th>Processing Price</th> #}
+       </TR>
+
+        <tr>
+           {% if m.Product == 'GAS' %}
+                <td align="center">
+                {% if m.GCARate %}
+                    {{ '{:.2f}'.format(m.GCARate) }}
+                {% else %}
+                    0.0
+                {% endif %}
+                </td>
+           {% endif %}
+            <td align="center">{{ '{:>10,.6f}\n'.format(m.SalesPrice) }}</td>
+           {% if  m.Product == 'OIL' %}
+                <td align="center">{{ '{:>10,.6f}\n'.format(m.TransRate) }}</td>
+           {% endif %}
+            {# <td align="center">{{ '{:>10,.6f}\n'.format(m.ProcessingRate) }}</td> #}
+        </tr>
 
     </TABLE>
 
@@ -275,9 +301,9 @@ table, th, td {
         <h3>SKProv Crown Oil</h3>
         <TABLE>
 
-            {% if calc.RoyaltyClassification == 'Fourth Tier' and m.ProdVol <= 25.0 %}
+            {% if calc.RoyaltyClassification == 'Fourth Tier' and calc.RoyaltyBasedOnVol <= 25.0 %}
                 <tr><td> {{ calc.Message }}<td><tr>
-            {% elif calc.RoyaltyClassification == 'Fourth Tier' and m.ProdVol <= 136.2 %}
+            {% elif calc.RoyaltyClassification == 'Fourth Tier' and calc.RoyaltyBasedOnVol <= 136.2 %}
                 <tr><td align="right">CR% =</td> <td align="center">(C * {{calc_sp.SaskProvBasedOn}}) - D</td></tr>
                 <tr><td align="right">CR% =</td> <td align="center">&nbsp;&nbsp;({{ '{:.4f}'.format(calc.C) }} * {{ '{:.2f}'.format(calc.RoyaltyBasedOnVol) }}) - {{'{:.2f}'.format(calc.D)}}</td></tr>
                 <tr><td align="right">CR% =</td> <td align="center"> {{'{:.6%}'.format(calc.BaseRoyaltyCalcRate) }}</td></tr>
@@ -312,38 +338,41 @@ table, th, td {
         <TABLE>
             <!--{% set well_type = 'Oil' %}-->
             {% if calc.RoyaltyClassification == 'Fourth Tier' and well.WellType == 'Gas' %}
-                {% if m.ProdVol <= 25.0 %}
+                {% if calc.RoyaltyBasedOnVol <= 25.0 %}
                     <tr><td>{{ calc.Message }}<td><tr>
-                {% elif m.ProdVol <= 115.4 %}
-                    <tr><td align="right">CR% =</td> <td align="center">$$(C_g * MGP) - D_g$$</td></tr>
-                    <tr><td align="right">CR% =</td> <td align="center">&nbsp;&nbsp;({{ '{:.4f}'.format(calc.C) }} * {{ '{:.2f}'.format(m.ProdVol) }}) - {{'{:.2f}'.format(calc.D)}}</td></tr>
+                {% elif calc.RoyaltyBasedOnVol <= 115.4 %}
+                    <tr><td align="right">CR% =</td> <td align="center">$$(C_g * {{calc_sp.SaskProvBasedOn}}) - D_g$$</td></tr>
+                    <tr><td align="right">CR% =</td> <td align="center">&nbsp;&nbsp;({{ '{:.4f}'.format(calc.C) }} * {{ '{:.2f}'.format(calc.RoyaltyBasedOnVol) }}) - {{'{:.2f}'.format(calc.D)}}</td></tr>
                     <tr><td align="right">CR% =</td> <td align="center"> {{'{:.6%}'.format(calc.BaseRoyaltyCalcRate) }}</td></tr>
                 {% else %}
-                    <tr><td align="left"> CR% = </td> <td>$$ (K_g - X_g / {MGP} ) $$ </td></tr>
+                    <tr><td align="left"> CR% = </td> <td>$$ (K_g - X_g / { {{calc_sp.SaskProvBasedOn}} } ) $$ </td></tr>
                     <tr><td align="left"> CR% = </td> <td>$$ ( {{'{:.2f}'.format(calc.K)}} -
-                        {{ calc.X }} / {{ '{:.2f}'.format(m.ProdVol) }} ) $$ </td></tr>
+                        {{ calc.X }} / {{ '{:.2f}'.format(calc.RoyaltyBasedOnVol) }} ) $$ </td></tr>
                     <tr><td align="left"> CR% = </td><td align="center"> {{ '{:.6%}'.format(calc.BaseRoyaltyCalcRate) }} </td></tr>
                 {% endif %}
             {% elif calc.RoyaltyClassification == 'Fourth Tier' and well.WellType == 'Oil' %}
-                {% if m.ProdVol <= 64.7 %}
+                {% if calc.RoyaltyBasedOnVol <= 64.7 %}
                     <tr><td> {{ calc.Message }}<td><tr>
                 {% else %}
-                    <tr><td align="left"> CR% = </td> <td>$$ (K_g - X_g / {MGP} ) $$ </td></tr>
-                    <tr><td align="left"> CR% = </td> <td>$$ ( {{'{:.2f}'.format(calc.K)}} - {{ calc.X }} / {{ '{:.2f}'.format(m.ProdVol) }} ) $$ </td></tr>
+                    <tr><td align="left"> CR% = </td> <td>$$ (K_g - X_g / { {{calc_sp.SaskProvBasedOn}} } ) $$ </td></tr>
+                    <tr><td align="left"> CR% = </td> <td>$$ ( {{'{:.2f}'.format(calc.K)}} - {{ calc.X }} / {{ '{:.2f}'.format(calc.RoyaltyBasedOnVol) }} ) $$ </td></tr>
                     <tr><td align="left"> CR% = </td><td align="center"> {{ '{:.6%}'.format(calc.BaseRoyaltyCalcRate) }} </td></tr>
                 {% endif %}
             {% elif calc.RoyaltyClassification == 'Third Tier' or calc.RoyaltyClassification == 'New' or calc.RoyaltyClassification == 'Old' %}
                 {% if m.ProdVol <= 115.4 %}
-                    <tr><td align="right">CR% =</td> <td align="center">$$(C_g * MGP) - SRC$$</td></tr>
-                    <tr><td align="right">CR% =</td> <td align="center">&nbsp;&nbsp;({{ '{:.4f}'.format(calc.C) }} * {{ '{:.2f}'.format(m.ProdVol) }}) - {{'{:.2f}'.format(well.SRC)}}</td></tr>
+                    <tr><td align="right">CR% =</td> <td align="center">$$(C_g * {{calc_sp.SaskProvBasedOn}}) - SRC$$</td></tr>
+                    <tr><td align="right">CR% =</td> <td align="center">&nbsp;&nbsp;({{ '{:.4f}'.format(calc.C) }} * {{ '{:.2f}'.format(calc.RoyaltyBasedOnVol) }}) - {{'{:.2f}'.format(well.SRC)}}</td></tr>
                     <tr><td align="right">CR% =</td> <td align="center"> {{'{:.6%}'.format(calc.BaseRoyaltyCalcRate) }}</td></tr>
                 {% else %}
-                    <tr><td align="left"> CR% = </td> <td>$$ ((K_g - X_g / {MGP} ) - SRС) $$ </td></tr>
+                    <tr><td align="left"> CR% = </td> <td>$$ ((K_g - X_g / { {{calc_sp.SaskProvBasedOn}} } ) - SRС) $$ </td></tr>
                     <tr><td align="left"> CR% = </td> <td>$$ ( ({{'{:.2f}'.format(calc.K)}} -
-                        {{ calc.X }} / {{ '{:.2f}'.format(m.ProdVol) }}) - SRC ) $$ </td></tr>
+                        {{ calc.X }} / {{ '{:.2f}'.format(calc.RoyaltyBasedOnVol) }}) - SRC ) $$ </td></tr>
                     <tr><td align="left"> CR% = </td><td align="center"> {{ '{:.6%}'.format(calc.BaseRoyaltyCalcRate) }} </td></tr>
                 {% endif %}
             {% endif %}
+            {% if rm.CrownModifier %}
+                <tr><td align="left"> Crown Modifier% = </td><td align="center"> {{ '{:.6%}'.format(rm.CrownModifier) }} </td></tr>
+            {%endif%}
 
         </TABLE>
     {% endif %}

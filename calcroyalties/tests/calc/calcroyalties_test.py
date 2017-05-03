@@ -314,40 +314,6 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
 
         pr.calc_sask_oil_prov_crown(monthly, well, royalty, calc, calc_specific)
 
-# ??? Larry
-    # todo delete me i think
-    def test_calc_sask_oil_prov_crown_deductions(self):
-
-        pr = ProcessRoyalties()
-        calc = DataStructure()
-        calc.TransBaseValue = 0
-        calc.BaseRoyaltyRate = .1
-        calc.RoyaltyBasedOnVol = 150
-
-        m = DataStructure()
-        m.TransRate = .123
-        # m.ProdVol = 150.0
-
-        lease_royalty_master = DataStructure()
-        lease_royalty_master.TransDeducted = 'All'
-        lease_royalty_master.CrownMultiplier = 1.0
-
-        fn_interest = 1.0
-        rp_interest = 1.0
-
-        # Note: this is a round even situation... it's questionable
-        # self.assertEqual(1.84,
-        #                  pr.calc_sask_oil_prov_crown_deductions(m, fn_interest, rp_interest,
-        #                                                         lease_royalty_master, calc))
-
-        lease_royalty_master.CrownMultiplier = .9
-
-        fn_interest = .8
-        rp_interest = .90
-
-        # self.assertEqual(1.2, pr.calc_sask_oil_prov_crown_deductions(m, fn_interest, rp_interest,
-        #                                                              lease_royalty_master, calc))
-
     def test_calc_sask_oil_iogr_subsection2(self):
         calc = DataStructure()
         calc_sp = DataStructure()
@@ -482,8 +448,8 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual("MOP < 80: RVol = 10% * MOP;"
                          "RVol = 10% * 70.00;"
                          "RVol = 7.00;;"
-                         "R$ = CrownMult * RVol * RVal;"
-                         "R$ = 1.2 * 7.00 * 221.123456;"
+                         "R$ = RVol * RVal;"
+                         "R$ = 7.00 * 221.123456;"
                          "R$ = $1,857.44;;"
                          "S = (T - B) * 0.50 * (P - R);"
                          "S = (70.00 - 7.00) * 0.5 * (221.123456 - 25);"
@@ -506,8 +472,8 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual("MOP 80 to 160: RVol = 8 + (MOP - 80) * 20%;"
                          "RVol = 8 + (100.00 - 80) * 20%;"
                          "RVol = 12.00;;"
-                         "R$ = CrownMult * RVol * RVal;"
-                         "R$ = 1.2 * 12.00 * 221.123456;"
+                         "R$ = RVol * RVal;"
+                         "R$ = 12.00 * 221.123456;"
                          "R$ = $3,184.18;;"
                          "S = (T - B) * 0.50 * (P - R);"
                          "S = (100.00 - 12.00) * 0.5 * (221.123456 - 25);"
@@ -530,8 +496,8 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual("MOP > 160: RVol = 24 + (MOP - 160) * 26%;"
                          "RVol = 24 + (170.00 - 160) * 26%;"
                          "RVol = 26.60;;"
-                         "R$ = CrownMult * RVol * RVal;"
-                         "R$ = 1.2 * 26.60 * 221.123456;"
+                         "R$ = RVol * RVal;"
+                         "R$ = 26.60 * 221.123456;"
                          "R$ = $7,058.26;;"
                          "S = (T - B) * 0.50 * (P - R);"
                          "S = (170.00 - 26.60) * 0.5 * (221.123456 - 25);"
@@ -554,8 +520,8 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual("MOP > 160: RVol = 24 + (MOP - 160) * 26%;"
                          "RVol = 24 + (1,000.00 - 160) * 26%;"
                          "RVol = 242.40;;"
-                         "R$ = CrownMult * RVol * RVal;"
-                         "R$ = 1.2 * 242.40 * 221.123456;"
+                         "R$ = RVol * RVal;"
+                         "R$ = 242.40 * 221.123456;"
                          "R$ = $64,320.39;;"
                          "S = (T - B) * 0.50 * (P - R);"
                          "S = (1,000.00 - 242.40) * 0.5 * (221.123456 - 25);"
@@ -580,8 +546,8 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual("MOP < 80: RVol = 10% * MOP;"
                          "RVol = 10% * 70.00;"
                          "RVol = 7.00;;"
-                         "R$ = CrownMult * RVol * RVal;"
-                         "R$ = 1.2 * 7.00 * 221.123456;"
+                         "R$ = RVol * RVal;"
+                         "R$ = 7.00 * 221.123456;"
                          "R$ = $1,857.44;;"
                          "S = (T - B) * (0.75 * (P - R - $12.58) + $6.29);"
                          "S = (70.00 - 7.00) * 0.75 * (221.123456 - 25-12.58) + 6.29);"
@@ -604,8 +570,8 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual("MOP 80 to 160: RVol = 8 + (MOP - 80) * 20%;"
                          "RVol = 8 + (100.00 - 80) * 20%;"
                          "RVol = 12.00;;"
-                         "R$ = CrownMult * RVol * RVal;"
-                         "R$ = 1.2 * 12.00 * 221.123456;"
+                         "R$ = RVol * RVal;"
+                         "R$ = 12.00 * 221.123456;"
                          "R$ = $3,184.18;;"
                          "S = (T - B) * (0.75 * (P - R - $12.58) + $6.29);"
                          "S = (100.00 - 12.00) * 0.75 * (221.123456 - 25-12.58) + 6.29);"
@@ -628,8 +594,8 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual("MOP 160 to 795: RVol = 24 + (MOP - 160) * 26%;"
                          "RVol = 24 + (170.00 - 160) * 26%;"
                          "RVol = 26.60;;"
-                         "R$ = CrownMult * RVol * RVal;"
-                         "R$ = 1.2 * 26.60 * 221.123456;"
+                         "R$ = RVol * RVal;"
+                         "R$ = 26.60 * 221.123456;"
                          "R$ = $7,058.26;;"
                          "S = (T - B) * (0.75 * (P - R - $12.58) + $6.29);"
                          "S = (170.00 - 26.60) * 0.75 * (221.123456 - 25-12.58) + 6.29);"
@@ -652,8 +618,8 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual("MOP > 795: RVol = 189 + (MOP - 795) * 40%;"
                          "RVol = 189 + (1,000.00 - 795) * 40%;"
                          "RVol = 271.00;;"
-                         "R$ = CrownMult * RVol * RVal;"
-                         "R$ = 1.2 * 271.00 * 221.123456;"
+                         "R$ = RVol * RVal;"
+                         "R$ = 271.00 * 221.123456;"
                          "R$ = $71,909.35;;"
                          "S = (T - B) * (0.75 * (P - R - $12.58) + $6.29);"
                          "S = (1,000.00 - 271.00) * 0.75 * (221.123456 - 25-12.58) + 6.29);"
@@ -693,8 +659,8 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual(calc.IogrSuppRoyaltyValue, 0)
         self.assertEqual(calc.IogrBaseRoyaltyValue, 87.5)
         self.assertEqual(calc.BaseRoyaltyValue, 87.5)
-        self.assertEqual('R$ = CrownMult * 0.25 * Sales Vol * Price;'
-                         'R$ = 1.0 * 0.25 * 70.00 * 5.000000;'
+        self.assertEqual('R$ = 0.25 * Sales Vol * Price;'
+                         'R$ = 0.25 * 70.00 * 5.000000;'
                          'R$ = $87.50;;'
                          'price < $10.65;S = $0.00;;'
                          'Royalty = (R$ + S$) * PE FN %	* RP %;'
@@ -706,8 +672,8 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual(calc.IogrSuppRoyaltyValue, 147.26)
         self.assertEqual(calc.IogrBaseRoyaltyValue, 350)
         self.assertEqual(calc.BaseRoyaltyValue, 497.26)
-        self.assertEqual('R$ = CrownMult * 0.25 * Sales Vol * Price;'
-                         'R$ = 1.0 * 0.25 * 70.00 * 20.000000;'
+        self.assertEqual('R$ = 0.25 * Sales Vol * Price;'
+                         'R$ = 0.25 * 70.00 * 20.000000;'
                          'R$ = $350.00;;'
                          'price <= $10.65);'
                          'S = (0.75 * Sales Vol * 30% * (price  - $10.65);'
@@ -722,8 +688,8 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual(calc.IogrSuppRoyaltyValue, 949.86)
         self.assertEqual(calc.IogrBaseRoyaltyValue, 875)
         self.assertEqual(calc.BaseRoyaltyValue, 1824.86)
-        self.assertEqual('R$ = CrownMult * 0.25 * Sales Vol * Price;'
-                         'R$ = 1.0 * 0.25 * 70.00 * 50.000000;'
+        self.assertEqual('R$ = 0.25 * Sales Vol * Price;'
+                         'R$ = 0.25 * 70.00 * 50.000000;'
                          'R$ = $875.00;;'
                          'price > $10.65);'
                          'S = (0.75 * Sales Vol * (4.26 + 0.55 * (price  - $24.85));'
@@ -735,21 +701,21 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
 
         calc.RTPInterest = .1
         calc.PEFNInterest = .2
-        lease_rm.CrownMultiplier = .9
         pr.calc_sask_gas_iogr1995(lease_rm, monthly, calc, calc_sp)
         # todo Crown Multiplier is not used on Supplemental royalty... Should it be?
         self.assertEqual(calc.IogrSuppRoyaltyValue, 949.86)
-        self.assertEqual(calc.IogrBaseRoyaltyValue, 787.5)
-        self.assertEqual(calc.BaseRoyaltyValue, 34.75)
-        self.assertEqual('R$ = CrownMult * 0.25 * Sales Vol * Price;'
-                         'R$ = 0.9 * 0.25 * 70.00 * 50.000000;'
-                         'R$ = $787.50;;'
+        self.assertEqual(calc.IogrBaseRoyaltyValue, 875.0)
+        self.assertEqual(calc.BaseRoyaltyValue, 36.5)
+        self.assertEqual('R$ = 0.25 * Sales Vol * Price;'
+                         'R$ = 0.25 * 70.00 * 50.000000;'
+                         'R$ = $875.00;;'
                          'price > $10.65);'
                          'S = (0.75 * Sales Vol * (4.26 + 0.55 * (price  - $24.85));'
                          'S = (0.75 * 70.00 * (4.26 + 0.55 * (50.000000 - $24.85));'
-                         'S = $949.86;;Royalty = (R$ + S$) * PE FN %	* RP %;'
-                         'Royalty = ($787.50 + $949.86) * 20.000000% * 10.000000%;'
-                         'Royalty = $34.75;', calc_sp.BaseRoyaltyMessage)
+                         'S = $949.86;;'
+                         'Royalty = (R$ + S$) * PE FN %	* RP %;'
+                         'Royalty = ($875.00 + $949.86) * 20.000000% * 10.000000%;'
+                         'Royalty = $36.50;', calc_sp.BaseRoyaltyMessage)
 
     def test_calcSaskPenIOGR1995(self):
 
@@ -1204,7 +1170,6 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         royalty.GasGorr = None
         calc.RoyaltyVolume = 10.5
         monthly.GCARate = 1.15
-        calc.RoyaltyDeductions = 0.0
         royalty.BaseGCA = ''
         well.WellType = 'Gas'
         well.RoyaltyClassification = 'New'
@@ -1339,16 +1304,29 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertRaises(AppError, pr.calc_deduction, "Base", "GCAs", "sales", 'CR %', .30, 1000, monthly, calc)
 
         monthly.GCARate = None
-        self.assertRaises(AppError, pr.calc_deduction, "Base", "GCA", "sales", 'CR %', .30, 1000, monthly, calc)
+        self.assertEqual((0.0, "Base GCA = Sales Vol * GCA Rate * CR % * PE FN% * RP %;"
+                               "Base GCA = 90.00 * 0.000000 * 30.000000% * 60.000000% * 90.000000%;"
+                               "Base GCA = $0.00;"),
+                         pr.calc_deduction("Base", "GCA", "sales", 'CR %', .30, 1000, monthly, calc))
 
         monthly.GCARate = ''
-        self.assertRaises(AppError, pr.calc_deduction, "Base", "GCA", "sales", 'CR %', .30, 1000, monthly, calc)
+        self.assertEqual((0.0, "Base GCA = Sales Vol * GCA Rate * CR % * PE FN% * RP %;"
+                               "Base GCA = 90.00 * 0.000000 * 30.000000% * 60.000000% * 90.000000%;"
+                               "Base GCA = $0.00;"),
+                         pr.calc_deduction("Base", "GCA", "sales", 'CR %', .30, 1000, monthly, calc))
 
         monthly.GCARate = 23.45
         self.assertEqual((0.0, ""), pr.calc_deduction("Base", "GCA", "     ", 'CR %', .30, 1000, monthly, calc))
 
         self.assertEqual((0.0, ""), pr.calc_deduction("Base", "GCA", None, 'CR %', .30, 1000, monthly, calc))
 
+        monthly.GCARate = 0.0
+        self.assertEqual((0.0, "Base GCA = Sales Vol * GCA Rate * CR % * PE FN% * RP %;"
+                               "Base GCA = 90.00 * 0.000000 * 30.000000% * 60.000000% * 90.000000%;"
+                               "Base GCA = $0.00;"),
+                         pr.calc_deduction("Base", "GCA", "sales", 'CR %', .30, 1000, monthly, calc))
+
+        monthly.GCARate = 23.45
         self.assertEqual((341.9, "Base GCA = Sales Vol * GCA Rate * CR % * PE FN% * RP %;"
                                  "Base GCA = 90.00 * 23.450000 * 30.000000% * 60.000000% * 90.000000%;"
                                  "Base GCA = $341.90;"),
