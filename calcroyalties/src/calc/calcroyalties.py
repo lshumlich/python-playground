@@ -169,9 +169,6 @@ class ProcessRoyalties(object):
 
     @staticmethod
     def determine_royalty_based_on(leaserm, monthly, calc):
-        calc.RoyaltyBasedOnVol = 0.0
-        calc.RoyaltyBasedOn = "WhatEver"
-        # based_on = 'WhatEver'
 
         if monthly.Product == "OIL":
             based_on = leaserm.OilRoyaltyBasedOn
@@ -180,18 +177,15 @@ class ProcessRoyalties(object):
         else:
             based_on = leaserm.ProductsRoyaltyBasedOn
 
-        if based_on == "prod":
-            calc.RoyaltyBasedOn = "Prod Vol"
-            calc.RoyaltyBasedOnVol = monthly.ProdVol
-        elif based_on == "sales":
+        if based_on == "sales":
             calc.RoyaltyBasedOn = "Sales Vol"
             calc.RoyaltyBasedOnVol = monthly.SalesVol
         elif based_on == "gj":
             calc.RoyaltyBasedOn = "GJs"
             calc.RoyaltyBasedOnVol = monthly.GJ
         else:
-            calc.RoyaltyBasedOn = "Unknown"
-            calc.RoyaltyBasedOnVol = 0.0
+            calc.RoyaltyBasedOn = "Prod Vol"
+            calc.RoyaltyBasedOnVol = monthly.ProdVol
 
     # @staticmethod
     def calc_gorr(self, leaserm, monthly, calc, calc_specific):
@@ -816,10 +810,10 @@ class ProcessRoyalties(object):
             calc.RoyaltyClassification = well.RoyaltyClassification
 
         # This seems like a duplicate but on the Worksheet we need these symbols for this royalty type
-        if royalty.OilRoyaltyBasedOn == "prod":
-            calc_specific.SaskProvBasedOn = "MOP"
-        elif royalty.OilRoyaltyBasedOn == "sales":
+        if royalty.OilRoyaltyBasedOn == "sales":
             calc_specific.SaskProvBasedOn = "Sales"
+        else:
+            calc_specific.SaskProvBasedOn = "MOP"
 
         self.calc_sask_oil_prov_crown_royalty_rate(calc, econ_oil_data, calc.RoyaltyClassification,
                                                    well.Classification, calc.RoyaltyBasedOnVol, well.SRC)
@@ -847,10 +841,12 @@ class ProcessRoyalties(object):
             royalty_classification = well.RoyaltyClassification
 
         # This seems like a duplicate but on the Worksheet we need these symbols for this royalty type
-        if royalty.GasRoyaltyBasedOn == "prod":
-            calc_specific.SaskProvBasedOn = "MGP"
-        elif royalty.GasRoyaltyBasedOn == "sales":
+        if royalty.GasRoyaltyBasedOn == "sales":
             calc_specific.SaskProvBasedOn = "Sales"
+        elif royalty.GasRoyaltyBasedOn == "gj":
+                calc_specific.SaskProvBasedOn = "GJ"
+        else:
+            calc_specific.SaskProvBasedOn = "MGP"
 
         self.calc_sask_gas_prov_crown_royalty_rate(calc, econ_gas_data, royalty_classification, calc.RoyaltyBasedOnVol,
                                                    well.SRC, well.WellType)

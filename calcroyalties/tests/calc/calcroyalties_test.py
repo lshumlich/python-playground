@@ -1245,7 +1245,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         db.delete("Monthly", 1)  # This should cause a No monthly data found exception
         self.assertRaises(AppError, pr.process_one, 1, 201501, 'OIL')
 
-    def test_royalty_based_on(self):
+    def test_determine_royalty_based_on(self):
 
         pr = ProcessRoyalties()
 
@@ -1256,6 +1256,14 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         monthly.ProdVol = 100.0
         monthly.SalesVol = 90.0
         monthly.GJ = 1000.0
+
+        leaserm.OilRoyaltyBasedOn = None
+        leaserm.GasRoyaltyBasedOn = None
+        leaserm.ProductsRoyaltyBasedOn = None
+        monthly.Product = "OIL"
+        pr.determine_royalty_based_on(leaserm, monthly, calc)
+        self.assertEqual("Prod Vol", calc.RoyaltyBasedOn)
+        self.assertEqual(100.0, calc.RoyaltyBasedOnVol)
 
         leaserm.OilRoyaltyBasedOn = "prod"
         leaserm.GasRoyaltyBasedOn = "sales"
@@ -1282,8 +1290,8 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         leaserm.ProductsRoyaltyBasedOn = "stuff"
         monthly.Product = "BUT"
         pr.determine_royalty_based_on(leaserm, monthly, calc)
-        self.assertEqual("Unknown", calc.RoyaltyBasedOn)
-        self.assertEqual(0.0, calc.RoyaltyBasedOnVol)
+        self.assertEqual("Prod Vol", calc.RoyaltyBasedOn)
+        self.assertEqual(100.0, calc.RoyaltyBasedOnVol)
 
     def test_calc_deduction(self):
 
