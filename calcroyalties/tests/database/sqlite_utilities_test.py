@@ -66,16 +66,16 @@ class DatabaseUtilities(object):
             
         statement = """
             INSERT INTO WellRoyaltyMaster VALUES(1, '2010-01-01 00:00:00', '9999-12-31 23:59:59.000005',
-                'SKWI111062705025W300','SK','Oil','res1','New', 'Heavy', 0, '2014-12-01 00:00:00',1.0,
+                'SKWI111062705025W300','SK', NULL, 'Oil','res1','New', 'Heavy', 0, '2014-12-01 00:00:00',1.0,
                 '9999-12-31 23:59:59.000005', 'HORIZONTAL','Some Note');
             INSERT INTO WellRoyaltyMaster VALUES(2, '2011-11-01 00:00:00', '9999-12-31 23:59:59.000005',
-                'SKWI112062705025W300','SK','Oil','res1','Third Tier', 'Southwest',0,'2014-12-01 00:00:00',1.0,
+                'SKWI112062705025W300','SK', NULL,'Oil','res1','Third Tier', 'Southwest',0,'2014-12-01 00:00:00',1.0,
                 '9999-12-31 23:59:59.000005', 'HORIZONTAL','Some Note');
             INSERT INTO WellRoyaltyMaster VALUES(3, '2004-10-01 00:00:00', '9999-12-31 23:59:59.000005',
-                'SKWI113062705025W300','SK','Oil','res1','Fourth Tier','Other', 0,'2014-12-01 00:00:00',1.0,
+                'SKWI113062705025W300','SK', NULL,'Oil','res1','Fourth Tier','Other', 0,'2014-12-01 00:00:00',1.0,
                 '9999-12-31 23:59:59.000005', 'VERTICAL','Some Note');
             INSERT INTO WellRoyaltyMaster VALUES(4, '2013-01-01 00:00:00', '2016-12-31 23:59:59.000005',
-                'SKWI114062705025W300','SK','Oil','res1','Old', 'Other', 0,'2014-12-01 00:00:00',1.0,
+                'SKWI114062705025W300','SK', NULL,'Oil','res1','Old', 'Other', 0,'2014-12-01 00:00:00',1.0,
                 '9999-12-31 23:59:59.000005', 'VERTICAL','Some Note');
         """
         
@@ -99,14 +99,14 @@ class DatabaseUtilities(object):
 
         self.db_instance.execute_statement(statement)
 
-    def create_some_test_well_lease_link(self):
+    def create_some_test_entity_lease_link(self):
         if 'WellLeaseLink' not in self.db_instance.get_table_names():
-            self.db_create.well_lease_link()
+            self.db_create.entity_lease_link()
         statement = """
-            INSERT INTO WellLeaseLink VALUES(1, '2001-01-08 00:00:00', '2016-01-07 00:00:00', 1, 1, 1.0);
-            INSERT INTO WellLeaseLink VALUES(2, '2001-01-08 00:00:00', '2016-01-07 00:00:00', 2, 1, 1.0);
-            INSERT INTO WellLeaseLink VALUES(3, '2001-01-08 00:00:00', '2016-01-07 00:00:00', 3, 1, 1.0);
-            INSERT INTO WellLeaseLink VALUES(4, '2001-01-08 00:00:00', '2015-01-01 00:00:00', 4, 1, 1.0);
+            INSERT INTO EntityLeaseLink VALUES(1, '2001-01-08 00:00:00', '2016-01-07 00:00:00', 'Well', 1, 1, 1.0);
+            INSERT INTO EntityLeaseLink VALUES(2, '2001-01-08 00:00:00', '2016-01-07 00:00:00', 'Well', 2, 1, 1.0);
+            INSERT INTO EntityLeaseLink VALUES(3, '2001-01-08 00:00:00', '2016-01-07 00:00:00', 'Well', 3, 1, 1.0);
+            INSERT INTO EntityLeaseLink VALUES(4, '2001-01-08 00:00:00', '2015-01-01 00:00:00', 'Well', 4, 1, 1.0);
 
         """
 
@@ -117,19 +117,19 @@ class DatabaseUtilities(object):
             self.db_create.monthly()
 
         statement = """
-            INSERT INTO Monthly Values(1, '2015-09-29 00:00:00', 201501, 1,
-                'OIL', 2, 740, 100, 90.0, 26.2, 0, "Payor1", 100.0, 221.123456, 2.123455, 0.123455, 0.0);
-            INSERT INTO Monthly Values(2, '2015-09-29 00:00:00', 201501, 4,
-                'OIL', 2, 740, 100, 90.0, 35.61, 0, "Payor1", 50.0, 221.123456, 2.123455, 0.123455, 0.0);
-            INSERT INTO Monthly Values(4, '2015-09-29 00:00:00', 201501, 4,
-                'OIL', 2, 740, 100, 90.0, 27.55, 0, "Payor1", 50.0, 221.123456, 2.123455, 0.123455, 0.0);
+            INSERT INTO Monthly Values(1, 20150929, 201501, 'Well', 1,
+                'OIL', "Payor1", 2, 740, 100, 90.0, 26.2, 0, 221.123456, 2.123455, 0.123455, 0.0);
+            INSERT INTO Monthly Values(2, 20150929, 201501, 'Well', 4,
+                'OIL', "Payor1", 2, 740, 100, 90.0, 35.61, 0, 221.123456, 2.123455, 0.123455, 0.0);
+            INSERT INTO Monthly Values(4, 20150929, 201501, 'Well', 4,
+                'OIL', "Payor1", 2, 740, 100, 90.0, 27.55, 0, 221.123456, 2.123455, 0.123455, 0.0);
         """
         self.db_instance.execute_statement(statement)
 
     def create_orphin_monthly(self):
         statement = """
-            INSERT INTO Monthly Values(37, '2015-09-29 00:00:00', 201501, 1,
-                'Stuff', 2, 740, 100, 0, "Payor1", 100.0, 221.123456, 2.123455, 0.123455, 0.0);
+            INSERT INTO Monthly Values(37, 20150929, 201501, 'Well', 1,
+                'Stuff', "Payor1", 2, 740, 100, 0, 221.123456, 2.123455, 0.123455, 0.0);
         """
         self.db_instance.execute_statement(statement)
 

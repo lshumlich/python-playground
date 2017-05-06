@@ -53,10 +53,10 @@ class ProcessRoyalties(object):
     """
 
     def process_all(self):
-        # errorCount = 0
+
         for monthlyData in self.db.select('Monthly'):
             try:
-                self.process_one(monthlyData.WellID, monthlyData.ProdMonth, monthlyData.Product)
+                self.process_one(monthlyData.Entity, monthlyData.EntityID, monthlyData.ProdMonth, monthlyData.Product)
 
             except AppError as e:
                 logging.error(str(e))
@@ -71,47 +71,39 @@ class ProcessRoyalties(object):
     Process a single royalty
     """
 
-    def process_one(self, well_id, prod_month, product):
-        # errorCount = 0
-        well = self.db.select1('WellRoyaltyMaster', ID=well_id)
+    def process_one(self, entity, entity_id, prod_month, product):
 
-        # todo Create a test to ensure there is a RTPInfo for the well. raise an apperror if not
-        # todo call the prod_month_to_date in the select and not everytime we use the select.
-        # rtp_info_array = self.db.select('RTPInfo', WellEvent=well.WellEvent, Product=product,
-        #                                 Date=prod_month_to_date(prod_month))
-        # if len(rtp_info_array) == 0:
-        #     raise AppError("Well not found in RTPInfo. Well ID: " + str(well_id) + " " + well.WellEvent +
-        #                    " Product:" + product)
-        #     print('--- Well not found in RTPInfo', well.ID, well.WellEvent)
-        # else:
-        #     print('--- Well found in RTPInfo Payer:', rtp_info_array[0].Payer)
+        if entity == 'Well':
+            well = self.db.select1('WellRoyaltyMaster', ID=entity_id)
+        else:
+            well = None
 
-        monthly_list = self.db.select('Monthly', WellID=well_id, ProdMonth=prod_month, Product=product)
+        monthly_list = self.db.select('Monthly', Entity=entity, EntityID=entity_id, ProdMonth=prod_month, Product=product)
         if len(monthly_list) == 0:
-            raise AppError("No monthly data found for WellID: " + str(well_id) + " ProdMonth:" + str(prod_month) +
+            raise AppError("No monthly data found for " + entity + ": " + str(entity_id) + " ProdMonth:" + str(prod_month) +
                            " Product:" + product)
 
-        calc_array = self.db.select('Calc', WellID=well_id, ProdMonth=prod_month, Product=product)
+        calc_array = self.db.select('Calc', Entity=entity, EntityID=entity_id, ProdMonth=prod_month, Product=product)
         for calc in calc_array:
             self.db.delete('Calc', calc.ID)
 
         for monthly in monthly_list:
 
-            well_lease_link_array = self.db.select('WellLeaseLink', WellID=well_id)
-            if len(well_lease_link_array) == 0:
-                raise AppError("There were no well_lease_link records for Well ID: " + str(well_id) +
+            entity_lease_link_array = self.db.select('EntityLeaseLink', Entity=entity, EntityID=entity_id)
+            if len(entity_lease_link_array) == 0:
+                raise AppError("There were no entity_lease_link records for " + entity + " ID: " + str(entity_id) +
                                " Prod Date: " + str(prod_month))
 
-            for well_lease_link in well_lease_link_array:
-                logging.info('**** Processing *** {0:06d} {1:06d} {2:04d} {3:}'.
-                             format(prod_month, well_id, well_lease_link.LeaseID, product))
+            for entity_lease_link in entity_lease_link_array:
+                logging.info('**** Processing *** {0:06d} {1:} {2:06d} {3:04d} {4:}'.
+                             format(prod_month, entity, entity_id, entity_lease_link.LeaseID, product))
 
-                royalty = self.db.select1('LeaseRoyaltymaster', ID=well_lease_link.LeaseID)
-                lease = self.db.select1('Lease', ID=well_lease_link.LeaseID)
+                royalty = self.db.select1('LeaseRoyaltymaster', ID=entity_lease_link.LeaseID)
+                lease = self.db.select1('Lease', ID=entity_lease_link.LeaseID)
 
-                calc, calc_specific = self.zero_royalty_calc(prod_month, well_id, product)
+                calc, calc_specific = self.zero_royalty_calc(prod_month, entity, entity_id, product)
 
-                calc.PEFNInterest = well_lease_link.PEFNInterest
+                calc.PEFNInterest = entity_lease_link.PEFNInterest
 
                 rtp_info = self.db.select1('RTPInfo', WellEvent=well.WellEvent, Product=product, Payer=monthly.RPBA,
                                            Date=prod_month_to_date(prod_month))
@@ -762,15 +754,22 @@ class ProcessRoyalties(object):
             if not calc_specific.ValueBasedOn[0:2] == '=(':
                 raise AppError('Value based on must be a formula starting with "=(" but found: ' + calc_specific.ValueBasedOn)
             value = round(self.expression.evaluate_expression(calc_specific.ValueBasedOn, monthly), 2)
-            explanation = 'Well Value ' + calc_specific.ValueBasedOn + "; Well Value " + \
+            explanation = 'Well Value ' + calc_specific.ValueBasedOn + ";Well Value " + \
                           self.expression.resolve_expression(calc_specific.ValueBasedOn, monthly) \
-                          + "; Well Value = " + self.fm_value(value) + ';'
+                          + ";Well Value = " + self.fm_value(value) + ';'
         else:
-            value = round(monthly.SalesPrice * monthly.SalesVol, 2)
-            calc_specific.ValueBasedOn = 'Sales'
-            explanation = 'Well Value = Sales Vol * Price;' + \
-                          'Well Value = ' + self.fm_vol(monthly.SalesVol) + " * " + self.fm_rate(monthly.SalesPrice) + \
-                          '; Well Value = ' + self.fm_value(value) + ';'
+            if monthly.Product == 'OIL':
+                value = round(monthly.SalesPrice * monthly.ProdVol, 2)
+                calc_specific.ValueBasedOn = 'Prod'
+                explanation = 'Well Value = Prod Vol * Price;' + \
+                              'Well Value = ' + self.fm_vol(monthly.ProdVol) + " * " + self.fm_rate(monthly.SalesPrice) + \
+                              ';Well Value = ' + self.fm_value(value) + ';'
+            else:
+                value = round(monthly.SalesPrice * monthly.SalesVol, 2)
+                calc_specific.ValueBasedOn = 'Sales'
+                explanation = 'Well Value = Sales Vol * Price;' + \
+                              'Well Value = ' + self.fm_vol(monthly.SalesVol) + " * " + self.fm_rate(monthly.SalesPrice) + \
+                              ';Well Value = ' + self.fm_value(value) + ';'
 
         calc_specific.WellValueForRoyalty = value
         calc_specific.WellValueForRoyaltyExplanation = explanation
@@ -1045,12 +1044,13 @@ class ProcessRoyalties(object):
     def fm_vol(num):
         return '{:0,.2f}'.format(num)
 
-    def zero_royalty_calc(self, month, well_id, product, rc=None):
+    def zero_royalty_calc(self, month, entity, entity_id, product, rc=None):
         if rc is None:
             rc = self.db.get_data_structure('Calc')
             #         rc.ID = 0
         rc.ProdMonth = month
-        rc.WellID = well_id
+        rc.Entity = entity
+        rc.EntityID = entity_id
         rc.Product = product
 
         setattr(rc, 'RTPInterest', 0.0)

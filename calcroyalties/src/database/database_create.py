@@ -115,6 +115,20 @@ Database Change Log: Must be maintained so we can keep the database in sink:
   change LeaseRoyaltyMaster.OilBasedOn to OilRoyaltyBasedOn
   change LeaseRoyaltyMaster.GasBasedOn to GasRoyaltyBasedOn
   change LeaseRoyaltyMaster.ProductsBasedOn to ProductsRoyaltyBasedOn
+2017-05-06
+  change Monthly.ExtractMonth to ExtractDate
+  add calc.ExtractMonth
+  add Monthly.Entity
+  change Monthly.WellID to EntityID
+  add calc.Entity
+  change calc.WellID to EntityID
+  Move Monthly.RPBA to after Product
+  Remove Monthly.RPVol
+  Rename WellLeaseLink to EntityLeaseLink
+  rename EntityLeaseLink.WellID to EntityID
+  add EntityLeaseLink.Entity
+  add WellRoyaltyMaster.UnitID
+
 """
 
 import datetime
@@ -139,8 +153,8 @@ class DatabaseCreate(object):
             self.lease_royalty_master()
         if 'Lease' not in tables:
             self.lease()
-        if 'WellLeaseLink' not in tables:
-            self.well_lease_link()
+        if 'EntityLeaseLink' not in tables:
+            self.entity_lease_link()
         if 'Monthly' not in tables:
             self.monthly()
         if 'Lookups' not in tables:
@@ -178,6 +192,7 @@ class DatabaseCreate(object):
              "EndDate" timestamp,
              'WellEvent' text,
              'Prov' text,
+             'UnitID' ID,
              'WellType' text,
              "PrimaryReserve" text,
              'RoyaltyClassification' text,
@@ -236,12 +251,13 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
         
-    def well_lease_link(self):
+    def entity_lease_link(self):
         statement = """
-            CREATE TABLE WellLeaseLink ('ID' integer primary key autoincrement,
+            CREATE TABLE EntityLeaseLink ('ID' integer primary key autoincrement,
              "StartDate" timestamp,
              "EndDate" timestamp,
-             "WellID" int,
+             "Entity" text,
+             "EntityID" int,
              "LeaseID" int,
              "PEFNInterest" float);
         """
@@ -250,18 +266,18 @@ class DatabaseCreate(object):
     def monthly(self):
         statement = """
             CREATE TABLE Monthly ('ID' integer primary key autoincrement, 
-            "ExtractMonth" timestamp,
+            "ExtractDate" int,
             "ProdMonth" int,
-            "WellID" int,
+            "Entity" text,
+            "EntityID" int,
             "Product" text,
+            "RPBA" text,
             "AmendNo" int,
             "ProdHours" int,
             "ProdVol" int,
             "SalesVol" int,
             "Heat" int,
             "GJ" int,
-            "RPBA" text,
-            "RPVol" float,
             "SalesPrice" float,
             "TransRate" float,
             "ProcessingRate" float,
@@ -281,13 +297,15 @@ class DatabaseCreate(object):
     def calc(self):
         statement = """
             CREATE TABLE Calc ('ID' integer primary key autoincrement,
+            "ExtractDate" int,
             "ProdMonth" int,
-            "WellID" int,
+            "LeaseID" int,
+            "Entity" int,
+            "EntityID" int,
             "Product" text,
             "RPBA" text,
             "FNBandID" text,
             "FNReserveID" text,
-            "LeaseID" int,
             "RoyaltyBasedOn" text,
             "RoyaltyBasedOnVol" float,
             "SalesPrice" float,

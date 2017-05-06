@@ -825,32 +825,60 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         monthly.ProdVol = 20.0
         monthly.GJ = 1000
 
-        # ensure default works
+        # ensure default works - oil is prod * price
         monthly.Product = "OIL"
         leaserm.OilValueBasedOn = None
         pr.determine_well_value_for_royalties(leaserm, monthly, calc, calc_sp)
-        self.assertEqual(1300, calc_sp.WellValueForRoyalty)
-        self.assertEqual('Well Value = Sales Vol * Price;Well Value = 10.00 * 130.000000; Well Value = $1,300.00;',
+        self.assertEqual(2600, calc_sp.WellValueForRoyalty)
+        self.assertEqual('Well Value = Prod Vol * Price;'
+                         'Well Value = 20.00 * 130.000000;'
+                         'Well Value = $2,600.00;',
                          calc_sp.WellValueForRoyaltyExplanation)
 
+        # ensure default works - gas is sales * price
+        monthly.Product = "GAS"
+        leaserm.GasValueBasedOn = None
+        pr.determine_well_value_for_royalties(leaserm, monthly, calc, calc_sp)
+        self.assertEqual(1300, calc_sp.WellValueForRoyalty)
+        self.assertEqual('Well Value = Sales Vol * Price;'
+                         'Well Value = 10.00 * 130.000000;'
+                         'Well Value = $1,300.00;',
+                         calc_sp.WellValueForRoyaltyExplanation)
+
+        monthly.Product = "OIL"
         leaserm.OilValueBasedOn = "=(price * sales)"
         pr.determine_well_value_for_royalties(leaserm, monthly, calc, calc_sp)
         self.assertEqual(1300, calc_sp.WellValueForRoyalty)
-        self.assertEqual('Well Value =(price * sales); Well Value =(130.0 * 10.0); Well Value = $1,300.00;',
+        self.assertEqual('Well Value =(price * sales);'
+                         'Well Value =(130.0 * 10.0);'
+                         'Well Value = $1,300.00;',
                          calc_sp.WellValueForRoyaltyExplanation)
 
         monthly.Product = "GAS"
         leaserm.GasValueBasedOn = "=(price * gj)"
         pr.determine_well_value_for_royalties(leaserm, monthly, calc, calc_sp)
-        self.assertEqual('Well Value =(price * gj); Well Value =(130.0 * 1000); Well Value = $130,000.00;',
+        self.assertEqual('Well Value =(price * gj);'
+                         'Well Value =(130.0 * 1000);'
+                         'Well Value = $130,000.00;',
                          calc_sp.WellValueForRoyaltyExplanation)
         self.assertEqual(130000.0, calc_sp.WellValueForRoyalty)
+
+        monthly.Product = "BUT"
+        leaserm.ProductsValueBasedOn = None
+        pr.determine_well_value_for_royalties(leaserm, monthly, calc, calc_sp)
+        self.assertEqual(1300.0, calc_sp.WellValueForRoyalty)
+        self.assertEqual('Well Value = Sales Vol * Price;'
+                         'Well Value = 10.00 * 130.000000;'
+                         'Well Value = $1,300.00;',
+                         calc_sp.WellValueForRoyaltyExplanation)
 
         monthly.Product = "BUT"
         leaserm.ProductsValueBasedOn = "=(price * prod)"
         pr.determine_well_value_for_royalties(leaserm, monthly, calc, calc_sp)
         self.assertEqual(2600.0, calc_sp.WellValueForRoyalty)
-        self.assertEqual('Well Value =(price * prod); Well Value =(130.0 * 20.0); Well Value = $2,600.00;',
+        self.assertEqual('Well Value =(price * prod);'
+                         'Well Value =(130.0 * 20.0);'
+                         'Well Value = $2,600.00;',
                          calc_sp.WellValueForRoyaltyExplanation)
 
         leaserm.ProductsValueBasedOn = "asdf"
@@ -1190,7 +1218,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         dbu.create_some_test_well_royalty_masters()
         dbu.create_some_test_lease_royalty_masters()
         dbu.create_some_test_leases()
-        dbu.create_some_test_well_lease_link()
+        dbu.create_some_test_entity_lease_link()
         dbu.create_some_test_monthly()
         dbu.create_some_test_econoil()
         dbu.create_some_test_econgas()
@@ -1198,7 +1226,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         dbu.create_calc()
 
         pr = ProcessRoyalties()
-        pr.process_one(4, 201501, 'OIL')
+        pr.process_one('Well', 4, 201501, 'OIL')
 
         # Check to see if calc records exist for both royalty payors
         self.assertEqual(2, db.count('calc'))
@@ -1223,23 +1251,23 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         dbu.create_some_test_well_royalty_masters()
         dbu.create_some_test_lease_royalty_masters()
         dbu.create_some_test_leases()
-        dbu.create_some_test_well_lease_link()
+        dbu.create_some_test_entity_lease_link()
         dbu.create_some_test_monthly()
         dbu.create_some_test_econoil()
         dbu.create_some_test_rtp_info()
         dbu.create_calc()
 
         pr = ProcessRoyalties()
-        pr.process_one(4, 201501, 'OIL')
+        pr.process_one('Well', 4, 201501, 'OIL')
 
-        db.delete("WellLeaseLink", 4)  # This should cause a well lease link not found exception
-        self.assertRaises(AppError, pr.process_one, 4, 201501, 'OIL')
+        db.delete("EntityLeaseLink", 4)  # This should cause a well lease link not found exception
+        self.assertRaises(AppError, pr.process_one, 'Well', 4, 201501, 'OIL')
 
         pr = ProcessRoyalties()
-        pr.process_one(1, 201501, 'OIL')
+        pr.process_one('Well', 1, 201501, 'OIL')
 
         db.delete("Monthly", 1)  # This should cause a No monthly data found exception
-        self.assertRaises(AppError, pr.process_one, 1, 201501, 'OIL')
+        self.assertRaises(AppError, pr.process_one, 'Well', 1, 201501, 'OIL')
 
     def test_determine_royalty_based_on(self):
 
