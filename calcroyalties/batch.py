@@ -59,19 +59,24 @@ def start_logging():
     import sys
     import config
 
-    logging.basicConfig(filename=config.get_temp_dir() + 'calc.log', filemode='w', level=logging.INFO)
     root = logging.getLogger()
-    root.setLevel(logging.INFO)
+    if len(root.handlers) > 0:
+        root.handlers[0].close()
 
-    log = logging.getLogger('werkzeug')
-    log.setLevel(logging.CRITICAL)
+    else:
 
-    ch = logging.StreamHandler(sys.stdout)
-    ch.setLevel(logging.DEBUG)
-    # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    formatter = logging.Formatter('%(levelname)s - %(message)s')
-    ch.setFormatter(formatter)
-    root.addHandler(ch)
+        logging.basicConfig(filename=config.get_temp_dir() + 'calc.log', filemode='w', level=logging.INFO)
+        root.setLevel(logging.INFO)
+
+        log = logging.getLogger('werkzeug')
+        log.setLevel(logging.CRITICAL)
+
+        ch = logging.StreamHandler(sys.stdout)
+        ch.setLevel(logging.DEBUG)
+        # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter('%(levelname)s - %(message)s')
+        ch.setFormatter(formatter)
+        root.addHandler(ch)
 
 
 def run_code_coverage():
