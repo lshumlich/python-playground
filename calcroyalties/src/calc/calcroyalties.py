@@ -436,6 +436,9 @@ class ProcessRoyalties(object):
 
         calc.BaseRoyaltyRate = calc.BaseRoyaltyCalcRate
         calc_specific.BaseRoyaltyRateDesc = 'CR %'  # SKProvCrownVar calculates an actual Royalty Rate
+        calc_specific.CrownMultiplier = lease_rm.CrownMultiplier
+        if not calc_specific.CrownMultiplier:
+            calc_specific.CrownMultiplier = 1.0
 
         if calc.BaseRoyaltyRate < 0:
             calc.BaseRoyaltyRate = 0
@@ -448,7 +451,7 @@ class ProcessRoyalties(object):
                 calc.BaseRoyaltyRate = lease_rm.MinRoyaltyRate
 
         calc.BaseRoyaltyValue = round(calc.BaseRoyaltyRate *
-                                      lease_rm.CrownMultiplier *
+                                      calc_specific.CrownMultiplier *
                                       calc.PEFNInterest *
                                       calc.RTPInterest *
                                       calc_specific.WellValueForRoyalty, 2)
@@ -592,8 +595,7 @@ class ProcessRoyalties(object):
         else:
             self.calc_sask_oil_iogr_subsection3(calc, calc_specific)
 
-        calc.IogrBaseRoyaltyValue = round(royalty.CrownMultiplier *
-                                          calc.BaseRoyaltyVolume *
+        calc.IogrBaseRoyaltyValue = round(calc.BaseRoyaltyVolume *
                                           calc.RoyaltyPrice, 2)
 
         calc_specific.BaseRoyaltyMessage += ';R$ = RVol * RVal;' + \

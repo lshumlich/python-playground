@@ -81,7 +81,7 @@ fmath {
                     <th align="right">Royalty Base:</th> <td>{{ rm.RoyaltyScheme }}</td>
                 </tr>
                 <tr>
-                    <th align="right">Crown Multiplier:</th> <td>{{ '{:.2f}'.format(rm.CrownMultiplier) }}</td>
+                    <th align="right">Crown Multiplier:</th> <td>{{ '{:.2f}'.format(calc_sp.CrownMultiplier) }}</td>
                 </tr>
                 <tr>
                     <th align="right">PE FN Interest:</th> <td>{{ '{:.6%}'.format(well_lease_link.PEFNInterest) }}</td>
@@ -405,7 +405,7 @@ table, th, td {
                 <td>Base Royalty =</td>
                 <td style="text-align:center"> {{ '{:.6%}'.format(calc.BaseRoyaltyRate) }}</td>
                 <td style="text-align:center">*</td>
-                <td style="text-align:center">{{ '{:.2f}'.format(rm.CrownMultiplier) }}</td>
+                <td style="text-align:center">{{ '{:.2f}'.format(calc_sp.CrownMultiplier) }}</td>
                 <td>*</td>
                 <td>{{ '{:.6%}'.format(calc.PEFNInterest) }}</td>
                 <td>*</td>
@@ -444,7 +444,7 @@ table, th, td {
                 <td>Base Royalty =</td>
                 <td style="text-align:center"> {{ '{:.6%}'.format(calc.BaseRoyaltyRate) }}</td>
                 <td style="text-align:center">*</td>
-                <td style="text-align:center">{{ rm.CrownMultiplier }}</td>
+                <td style="text-align:center">{{ calc_sp.CrownMultiplier }}</td>
                 <td style="text-align:center">*</td>
                 <td>{{ '{:.6%}'.format(well_lease_link.PEFNInterest) }}</td>
                 <td>*</td>

@@ -184,7 +184,8 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         lease_rm = DataStructure()
         lease_rm.MinRoyaltyRate = 0.0
         lease_rm.MinRoyaltyDollar = 0.0
-        lease_rm.CrownMultiplier = 1
+        lease_rm.CrownMultiplier = None
+        # lease_rm.CrownMultiplier = 1
         lease_rm.PriceBasedOn = 'ActSales'
         lease_rm.CrownModifier = None
 
@@ -259,12 +260,10 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual(calc.BaseRoyaltyVolume, 0.0)
         self.assertEqual(calc.BaseRoyaltyValue, 1396.06)
 
-    # Larry
     def test_calc_sask_oil_prov_crown(self):
         dbu = DatabaseUtilities()
         dbu.delete_all_tables()
         dbu.create_some_test_econoil()
-        # dbu.create_some_test_econgas()
 
         pr = ProcessRoyalties()
         royalty = DataStructure()
@@ -424,7 +423,6 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         calc.RTPInterest = .3
 
         royalty = DataStructure()
-        royalty.CrownMultiplier = 1.2
         royalty.BaseTrans = 'prod'
 
         calc_sp = DataStructure()
@@ -440,23 +438,23 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
                                   m, calc, calc_sp)
         self.assertEqual(calc.CommencementPeriod, 0)
         self.assertEqual(7.0, calc.BaseRoyaltyVolume)           # = 70 * 0.1
-        self.assertEqual(1857.44, calc.IogrBaseRoyaltyValue)    # = 7.0 * 1.2 * 221.123456
+        self.assertEqual(1547.86, calc.IogrBaseRoyaltyValue)    # = 7.0 * 221.123456
         self.assertEqual(6177.89, calc.IogrSuppRoyaltyValue)    # = (70 - 7) * 0.5 * (221.123456 - 25)
-        self.assertEqual(482.12, calc.BaseRoyaltyValue)         # = (1857.44 + 6177.89) * 0.2 * 0.3
-        self.assertEqual(0.51912371, calc.BaseRoyaltyRate)      # = (1857.44 + 6177.89) / (70 * 221.123456)
-        self.assertEqual(4.63, calc.BaseTransValue)             # = 70 * 0.51912371 * 2.123455 * 0.2 * 0.3
+        self.assertEqual(463.55, calc.BaseRoyaltyValue)         # = (1547.86 + 6177.89) * 0.2 * 0.3
+        self.assertEqual(0.49912325, calc.BaseRoyaltyRate)      # = (1547.86 + 6177.89) / (70 * 221.123456)
+        self.assertEqual(4.45, calc.BaseTransValue)             # = 70 * 0.49912325 * 2.123455 * 0.2 * 0.3
         self.assertEqual("MOP < 80: RVol = 10% * MOP;"
                          "RVol = 10% * 70.00;"
                          "RVol = 7.00;;"
                          "R$ = RVol * RVal;"
                          "R$ = 7.00 * 221.123456;"
-                         "R$ = $1,857.44;;"
+                         "R$ = $1,547.86;;"
                          "S = (T - B) * 0.50 * (P - R);"
                          "S = (70.00 - 7.00) * 0.5 * (221.123456 - 25);"
                          "S = $6,177.89;;"
                          "Royalty = (R$ + S$) * PE FN %	* RP %;"
-                         "Royalty = ($1,857.44 + $6,177.89) * 20.000000% * 30.000000%;"
-                         "Royalty = $482.12;", calc_sp.BaseRoyaltyMessage)
+                         "Royalty = ($1,547.86 + $6,177.89) * 20.000000% * 30.000000%;"
+                         "Royalty = $463.55;", calc_sp.BaseRoyaltyMessage)
 
         calc.RoyaltyBasedOnVol = 100
         m.ProdVol = 100
@@ -464,23 +462,23 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
                                   m, calc, calc_sp)
         self.assertEqual(calc.CommencementPeriod, 0)
         self.assertEqual(12.0, calc.BaseRoyaltyVolume)          # = 8 + ((100 - 80) * .2)
-        self.assertEqual(3184.18, calc.IogrBaseRoyaltyValue)    # = 12.0 * 1.2 * 221.123456
+        self.assertEqual(2653.48, calc.IogrBaseRoyaltyValue)    # = 12.0 * 221.123456
         self.assertEqual(8629.43, calc.IogrSuppRoyaltyValue)    # = (100 - 12) * 0.5 * (221.123456 - 25)
-        self.assertEqual(708.82, calc.BaseRoyaltyValue)         # = (3184.18 + 8629.43) * 0.2 * 0.3
-        self.assertEqual(0.53425404, calc.BaseRoyaltyRate)      # = (3184.18 + 8629.43) / (100 * 221.123456)
-        self.assertEqual(6.81, calc.BaseTransValue)             # = 100 * 0.53425404 * 2.123455 * 0.2 * 0.3
+        self.assertEqual(676.97, calc.BaseRoyaltyValue)         # = (2653.48 + 8629.43) * 0.2 * 0.3
+        self.assertEqual(0.51025387, calc.BaseRoyaltyRate)        # = (2653.48 + 8629.43) / (100 * 221.123456)
+        self.assertEqual(6.50, calc.BaseTransValue)             # = 100 * 0.51025387 * 2.123455 * 0.2 * 0.3
         self.assertEqual("MOP 80 to 160: RVol = 8 + (MOP - 80) * 20%;"
                          "RVol = 8 + (100.00 - 80) * 20%;"
                          "RVol = 12.00;;"
                          "R$ = RVol * RVal;"
                          "R$ = 12.00 * 221.123456;"
-                         "R$ = $3,184.18;;"
+                         "R$ = $2,653.48;;"
                          "S = (T - B) * 0.50 * (P - R);"
                          "S = (100.00 - 12.00) * 0.5 * (221.123456 - 25);"
                          "S = $8,629.43;;"
                          "Royalty = (R$ + S$) * PE FN %	* RP %;"
-                         "Royalty = ($3,184.18 + $8,629.43) * 20.000000% * 30.000000%;"
-                         "Royalty = $708.82;", calc_sp.BaseRoyaltyMessage)
+                         "Royalty = ($2,653.48 + $8,629.43) * 20.000000% * 30.000000%;"
+                         "Royalty = $676.97;", calc_sp.BaseRoyaltyMessage)
 
         calc.RoyaltyBasedOnVol = 170
         m.ProdVol = 170
@@ -488,23 +486,23 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
                                   m, calc, calc_sp)
         self.assertEqual(calc.CommencementPeriod, 0)
         self.assertEqual(26.6, calc.BaseRoyaltyVolume)          # = 24 + ((170 - 160) * .26)
-        self.assertEqual(7058.26, calc.IogrBaseRoyaltyValue)    # = 26.6 * 1.2 * 221.123456
+        self.assertEqual(5881.88, calc.IogrBaseRoyaltyValue)    # = 26.6 * 221.123456
         self.assertEqual(14062.05, calc.IogrSuppRoyaltyValue)   # = (170 - 26.6) * 0.5 * (221.123456 - 25)
-        self.assertEqual(1267.22, calc.BaseRoyaltyValue)        # = (7058.26 + 14062.05) * 0.2 * 0.3
-        self.assertEqual(0.56184504, calc.BaseRoyaltyRate)      # = (7058.26 + 14062.05) / (170 * 221.123456)
-        self.assertEqual(12.17, calc.BaseTransValue)            # = 170 * 0.56184504 * 2.123455 * 0.2 * 0.3
+        self.assertEqual(1196.64, calc.BaseRoyaltyValue)        # = (5881.88 + 14062.05) * 0.2 * 0.3
+        self.assertEqual(0.53055084, calc.BaseRoyaltyRate)       # = (5881.88 + 14062.05) / (170 * 221.123456)
+        self.assertEqual(11.49, calc.BaseTransValue)            # = 170 * 0.53055084 * 2.123455 * 0.2 * 0.3
         self.assertEqual("MOP > 160: RVol = 24 + (MOP - 160) * 26%;"
                          "RVol = 24 + (170.00 - 160) * 26%;"
                          "RVol = 26.60;;"
                          "R$ = RVol * RVal;"
                          "R$ = 26.60 * 221.123456;"
-                         "R$ = $7,058.26;;"
+                         "R$ = $5,881.88;;"
                          "S = (T - B) * 0.50 * (P - R);"
                          "S = (170.00 - 26.60) * 0.5 * (221.123456 - 25);"
                          "S = $14,062.05;;"
                          "Royalty = (R$ + S$) * PE FN %	* RP %;"
-                         "Royalty = ($7,058.26 + $14,062.05) * 20.000000% * 30.000000%;"
-                         "Royalty = $1,267.22;", calc_sp.BaseRoyaltyMessage)
+                         "Royalty = ($5,881.88 + $14,062.05) * 20.000000% * 30.000000%;"
+                         "Royalty = $1,196.64;", calc_sp.BaseRoyaltyMessage)
 
         calc.RoyaltyBasedOnVol = 1000
         m.ProdVol = 1000
@@ -512,23 +510,23 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
                                   m, calc, calc_sp)
         self.assertEqual(calc.CommencementPeriod, 0)
         self.assertEqual(242.4, calc.BaseRoyaltyVolume)         # = 24 + ((1000 - 160) * .26)
-        self.assertEqual(64320.39, calc.IogrBaseRoyaltyValue)   # = 242.4 * 1.2 * 221.123456
+        self.assertEqual(53600.33, calc.IogrBaseRoyaltyValue)   # = 242.4 * 221.123456
         self.assertEqual(74291.57, calc.IogrSuppRoyaltyValue)   # = (1000 - 242.4) * 0.5 * (221.123456 - 25)
-        self.assertEqual(8316.72, calc.BaseRoyaltyValue)        # = (64320.39 + 74291.57) * 0.2 * 0.3
-        self.assertEqual(0.62685326, calc.BaseRoyaltyRate)      # = ((64320.39 + 74291.57) / (1000 * 221.123456)
-        self.assertEqual(79.87, calc.BaseTransValue)            # = 1000 * 0.62685326 * 2.123455 * 0.2 * 0.3
+        self.assertEqual(7673.51, calc.BaseRoyaltyValue)        # = (53600.33 + 74291.57) * 0.2 * 0.3
+        self.assertEqual(0.57837329, calc.BaseRoyaltyRate)      # = ((53600.33 + 74291.57) / (1000 * 221.123456)
+        self.assertEqual(73.69, calc.BaseTransValue)            # = 1000 * 0.57837329 * 2.123455 * 0.2 * 0.3
         self.assertEqual("MOP > 160: RVol = 24 + (MOP - 160) * 26%;"
                          "RVol = 24 + (1,000.00 - 160) * 26%;"
                          "RVol = 242.40;;"
                          "R$ = RVol * RVal;"
                          "R$ = 242.40 * 221.123456;"
-                         "R$ = $64,320.39;;"
+                         "R$ = $53,600.33;;"
                          "S = (T - B) * 0.50 * (P - R);"
                          "S = (1,000.00 - 242.40) * 0.5 * (221.123456 - 25);"
                          "S = $74,291.57;;"
                          "Royalty = (R$ + S$) * PE FN %	* RP %;"
-                         "Royalty = ($64,320.39 + $74,291.57) * 20.000000% * 30.000000%;"
-                         "Royalty = $8,316.72;", calc_sp.BaseRoyaltyMessage)
+                         "Royalty = ($53,600.33 + $74,291.57) * 20.000000% * 30.000000%;"
+                         "Royalty = $7,673.51;", calc_sp.BaseRoyaltyMessage)
 
         # >= 5 year commencement period
 
@@ -538,23 +536,23 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
                                   m, calc, calc_sp)
         self.assertEqual(calc.CommencementPeriod, 5.09)
         self.assertEqual(7.0, calc.BaseRoyaltyVolume)           # = 70 * 0.1
-        self.assertEqual(1857.44, calc.IogrBaseRoyaltyValue)    # = 7.0 * 1.2 * 221.123456
+        self.assertEqual(1547.86, calc.IogrBaseRoyaltyValue)    # = 7.0 * 221.123456
         self.assertEqual(9068.70, calc.IogrSuppRoyaltyValue)    # = (70 - 7) * (0.75 * (221.123456 - 25 - 12.58) + 6.29)
-        self.assertEqual(655.57, calc.BaseRoyaltyValue)         # = (1857.44 + 9068.70) * 0.2 * 0.3
-        self.assertEqual(0.70588493, calc.BaseRoyaltyRate)      # = (1857.44 + 9068.70) / (70 * 221.123456)
-        self.assertEqual(6.30, calc.BaseTransValue)             # = 70 * 0.70588493 * 2.123455 * 0.2 * 0.3
+        self.assertEqual(636.99, calc.BaseRoyaltyValue)         # = (1547.86 + 9068.70) * 0.2 * 0.3
+        self.assertEqual(0.68588446, calc.BaseRoyaltyRate)      # = (1547.86 + 9068.70) / (70 * 221.123456)
+        self.assertEqual(6.12, calc.BaseTransValue)             # = 70 * 0.68588446 * 2.123455 * 0.2 * 0.3
         self.assertEqual("MOP < 80: RVol = 10% * MOP;"
                          "RVol = 10% * 70.00;"
                          "RVol = 7.00;;"
                          "R$ = RVol * RVal;"
                          "R$ = 7.00 * 221.123456;"
-                         "R$ = $1,857.44;;"
+                         "R$ = $1,547.86;;"
                          "S = (T - B) * (0.75 * (P - R - $12.58) + $6.29);"
                          "S = (70.00 - 7.00) * 0.75 * (221.123456 - 25-12.58) + 6.29);"
                          "S = $9,068.70;;"
                          "Royalty = (R$ + S$) * PE FN %	* RP %;"
-                         "Royalty = ($1,857.44 + $9,068.70) * 20.000000% * 30.000000%;"
-                         "Royalty = $655.57;", calc_sp.BaseRoyaltyMessage)
+                         "Royalty = ($1,547.86 + $9,068.70) * 20.000000% * 30.000000%;"
+                         "Royalty = $636.99;", calc_sp.BaseRoyaltyMessage)
 
         calc.RoyaltyBasedOnVol = 100
         m.ProdVol = 100
@@ -562,23 +560,23 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
                                   m, calc, calc_sp)
         self.assertEqual(calc.CommencementPeriod, 5.09)
         self.assertEqual(12.0, calc.BaseRoyaltyVolume)          # = 8 + ((100 - 80) * .2)
-        self.assertEqual(3184.18, calc.IogrBaseRoyaltyValue)    # = 12.0 * 1.2 * 221.123456
+        self.assertEqual(2653.48, calc.IogrBaseRoyaltyValue)    # = 12.0 * 221.123456
         self.assertEqual(12667.39, calc.IogrSuppRoyaltyValue)   # = (100 - 12) * (0.75 * (221.123456 - 25 - 12.58) + 6.29)
-        self.assertEqual(951.09, calc.BaseRoyaltyValue)         # = (3184.18 + 12667.39) * 0.2 * 0.3
-        self.assertEqual(0.71686515, calc.BaseRoyaltyRate)      # = (3184.18 + 12667.39) / (100 * 221.123456)
-        self.assertEqual(9.13, calc.BaseTransValue)             # = 100 * 0.71686515 * 2.123455 * 0.2 * 0.3
+        self.assertEqual(919.25, calc.BaseRoyaltyValue)         # = (2653.48 + 12667.39) * 0.2 * 0.3
+        self.assertEqual(0.69286498, calc.BaseRoyaltyRate)      # = (2653.48 + 12667.39) / (100 * 221.123456)
+        self.assertEqual(8.83, calc.BaseTransValue)             # = 100 * 0.69286499 * 2.123455 * 0.2 * 0.3
         self.assertEqual("MOP 80 to 160: RVol = 8 + (MOP - 80) * 20%;"
                          "RVol = 8 + (100.00 - 80) * 20%;"
                          "RVol = 12.00;;"
                          "R$ = RVol * RVal;"
                          "R$ = 12.00 * 221.123456;"
-                         "R$ = $3,184.18;;"
+                         "R$ = $2,653.48;;"
                          "S = (T - B) * (0.75 * (P - R - $12.58) + $6.29);"
                          "S = (100.00 - 12.00) * 0.75 * (221.123456 - 25-12.58) + 6.29);"
                          "S = $12,667.39;;"
                          "Royalty = (R$ + S$) * PE FN %	* RP %;"
-                         "Royalty = ($3,184.18 + $12,667.39) * 20.000000% * 30.000000%;"
-                         "Royalty = $951.09;", calc_sp.BaseRoyaltyMessage)
+                         "Royalty = ($2,653.48 + $12,667.39) * 20.000000% * 30.000000%;"
+                         "Royalty = $919.25;", calc_sp.BaseRoyaltyMessage)
 
         calc.RoyaltyBasedOnVol = 170
         m.ProdVol = 170
@@ -586,23 +584,23 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
                                   m, calc, calc_sp)
         self.assertEqual(calc.CommencementPeriod, 5.09)
         self.assertEqual(26.6, calc.BaseRoyaltyVolume)          # = 24 + ((170 - 160) * .26)
-        self.assertEqual(7058.26, calc.IogrBaseRoyaltyValue)    # = 26.6 * 1.2 * 221.123456
+        self.assertEqual(5881.88, calc.IogrBaseRoyaltyValue)    # = 26.6 * 221.123456
         self.assertEqual(20642.08, calc.IogrSuppRoyaltyValue)   # = (170 - 26.6) * (0.75 * (221.123456 - 25 - 12.58) + 6.29)
-        self.assertEqual(1662.02, calc.BaseRoyaltyValue)        # = (7058.26 + 20642.08) * 0.2 * 0.3
-        self.assertEqual(0.73688780, calc.BaseRoyaltyRate)      # = (7058.26 + 20642.08) / (170 * 221.123456)
-        self.assertEqual(15.96, calc.BaseTransValue)            # = 170 * 0.73688780 * 2.123455 * 0.2 * 0.3
+        self.assertEqual(1591.44, calc.BaseRoyaltyValue)        # = (5881.88 + 20642.08) * 0.2 * 0.3
+        self.assertEqual(0.70559359, calc.BaseRoyaltyRate)      # = (5881.88 + 20642.08) / (170 * 221.123456)
+        self.assertEqual(15.28, calc.BaseTransValue)            # = 170 * 0.70559359 * 2.123455 * 0.2 * 0.3
         self.assertEqual("MOP 160 to 795: RVol = 24 + (MOP - 160) * 26%;"
                          "RVol = 24 + (170.00 - 160) * 26%;"
                          "RVol = 26.60;;"
                          "R$ = RVol * RVal;"
                          "R$ = 26.60 * 221.123456;"
-                         "R$ = $7,058.26;;"
+                         "R$ = $5,881.88;;"
                          "S = (T - B) * (0.75 * (P - R - $12.58) + $6.29);"
                          "S = (170.00 - 26.60) * 0.75 * (221.123456 - 25-12.58) + 6.29);"
                          "S = $20,642.08;;"
                          "Royalty = (R$ + S$) * PE FN %	* RP %;"
-                         "Royalty = ($7,058.26 + $20,642.08) * 20.000000% * 30.000000%;"
-                         "Royalty = $1,662.02;", calc_sp.BaseRoyaltyMessage)
+                         "Royalty = ($5,881.88 + $20,642.08) * 20.000000% * 30.000000%;"
+                         "Royalty = $1,591.44;", calc_sp.BaseRoyaltyMessage)
 
         calc.RoyaltyBasedOnVol = 1000
         m.ProdVol = 1000
@@ -610,22 +608,22 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
                                   m, calc, calc_sp)
         self.assertEqual(calc.CommencementPeriod, 5.09)
         self.assertEqual(271.0, calc.BaseRoyaltyVolume)         # = 189 + ((1000 - 795) * .4)
-        self.assertEqual(71909.35, calc.IogrBaseRoyaltyValue)   # = 271.0 * 1.2 * 221.123456
+        self.assertEqual(59924.46, calc.IogrBaseRoyaltyValue)   # = 271.0 * 221.123456
         self.assertEqual(104937.79, calc.IogrSuppRoyaltyValue)  # = (1000 - 271.0) * (0.75 * (221.123456 - 25 - 12.58) + 6.29)
-        self.assertEqual(10610.83, calc.BaseRoyaltyValue)       # = (71909.35 + 104937.79) * 0.2 * 0.3
-        self.assertEqual(0.79976653, calc.BaseRoyaltyRate)      # = (71909.35 + 104937.79) / (1000 * 221.123456)
-        self.assertEqual(101.90, calc.BaseTransValue)           # = 1000 * 0.79976653 * 2.123455 * 0.2 * 0.3
+        self.assertEqual(9891.74, calc.BaseRoyaltyValue)       # = (59924.46 + 104937.79) * 0.2 * 0.3
+        self.assertEqual(0.74556654, calc.BaseRoyaltyRate)      # = (59924.46 + 104937.79) / (1000 * 221.123456)
+        self.assertEqual(94.99, calc.BaseTransValue)           # = 1000 * 0.74556654 * 2.123455 * 0.2 * 0.3
         self.assertEqual("MOP > 795: RVol = 189 + (MOP - 795) * 40%;"
                          "RVol = 189 + (1,000.00 - 795) * 40%;"
                          "RVol = 271.00;;"
                          "R$ = RVol * RVal;"
                          "R$ = 271.00 * 221.123456;"
-                         "R$ = $71,909.35;;"
+                         "R$ = $59,924.46;;"
                          "S = (T - B) * (0.75 * (P - R - $12.58) + $6.29);"
                          "S = (1,000.00 - 271.00) * 0.75 * (221.123456 - 25-12.58) + 6.29);"
                          "S = $104,937.79;;Royalty = (R$ + S$) * PE FN %	* RP %;"
-                         "Royalty = ($71,909.35 + $104,937.79) * 20.000000% * 30.000000%;"
-                         "Royalty = $10,610.83;", calc_sp.BaseRoyaltyMessage)
+                         "Royalty = ($59,924.46 + $104,937.79) * 20.000000% * 30.000000%;"
+                         "Royalty = $9,891.74;", calc_sp.BaseRoyaltyMessage)
 
     def test_calc_sask_gas_iogr1995(self):
 
@@ -634,7 +632,6 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         pr = ProcessRoyalties()
 
         lease_rm = DataStructure()
-        lease_rm.CrownMultiplier = 1.0
         lease_rm.BaseGCA = 'sales'
 
         monthly = DataStructure()
@@ -702,7 +699,6 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         calc.RTPInterest = .1
         calc.PEFNInterest = .2
         pr.calc_sask_gas_iogr1995(lease_rm, monthly, calc, calc_sp)
-        # todo Crown Multiplier is not used on Supplemental royalty... Should it be?
         self.assertEqual(calc.IogrSuppRoyaltyValue, 949.86)
         self.assertEqual(calc.IogrBaseRoyaltyValue, 875.0)
         self.assertEqual(calc.BaseRoyaltyValue, 36.5)
