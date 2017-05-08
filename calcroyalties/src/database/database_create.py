@@ -129,6 +129,8 @@ Database Change Log: Must be maintained so we can keep the database in sink:
   add EntityLeaseLink.Entity
   add WellRoyaltyMaster.UnitID
 
+2017-05-07
+  add calc.CalcTime
 """
 
 import datetime
@@ -338,6 +340,7 @@ class DatabaseCreate(object):
             "RoyaltyGCA" float,
             "RoyaltyDeductions" int,
             "CommencementPeriod" float,
+            "CalcTime" timestamp,
             "Message" text,
             "Gorr" text,
             "GorrMessage" text,

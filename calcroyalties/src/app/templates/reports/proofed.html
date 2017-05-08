@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<style>
+tr.border_bottom td {
+  border-bottom:1pt solid black;
+}
+</style>
+
+<table class="table-striped" style="width:100%">
+    <tr>
+        <th>Extract Date</th>
+        <th>Prod Month</th>
+        <th>Lease ID</th>
+        <th>Entity</th>
+        <th>ID</th>
+        <th>RPBA</th>
+        <th>Product</th>
+        <th>Base Royalty</th>
+        <th>GORR Royalty</th>
+        <th>Base Royalty</th>
+        <th>GORR Royalty</th>
+        <th>Message</th>
+    </tr>
+    {% for r in result %}
+    <tr>
+        <td>{{ r._format.ExtractDate }}</td>
+        <td>{{ r._format.ProdMonth }}</td>
+        <td>{{ r.LeaseID }}</td>
+        <td>{{ r.Entity }}</td>
+        <td>{{ r.EntityID }} </td>
+        <td>{{ r.RPBA }} </td>
+        <td>{{ r.Product }} </td>
+        <td align="right">{{ '{:>10,.2f}\n'.format(r.BaseRoyalty) }} </td>
+        <td align="right">{{ '{:>10,.2f}\n'.format(r.GorrRoyalty) }} </td>
+        <td align="right">
+            {% if r.BaseNetRoyaltyValue %}
+                {{ '{:>10,.2f}\n'.format(r.BaseNetRoyaltyValue) }}
+            {% endif %}
+        </td>
+        <td align="right">
+            {% if r.GorrNetRoyaltyValue %}
+                {{ '{:>10,.2f}\n'.format(r.GorrNetRoyaltyValue) }}
+            {% endif %}
+        </td>
+        <td>{{ r.Message }} </td>
+        <td>
+            <a  id="worksheet" href="{{ url_for('worksheet.calc_worksheet') }}?ExtractDate={{ r.ExtractDate }}&ProdMonth={{ r.ProdMonth }}&LeaseID={{ r.LeaseID }}&Entity={{ r.Entity }}&EntityID={{ r.EntityID }}&RPBA={{ r.RPBA }}" title="Worksheet" class="icon icon-text-document"></a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

@@ -1,7 +1,9 @@
 from flask import Blueprint, request, render_template, abort, flash, redirect, url_for, json
+import sys
+import traceback
 
 import config
-from .main import get_proddate, get_proddate_int
+from .main import get_proddate
 from src.database.data_structure import DataStructure
 
 wells = Blueprint('wells', __name__)
@@ -23,9 +25,10 @@ def search():
         for arg in kwargs:
             compound = argument_tables[arg] + '.' + arg + '=' + '"' + kwargs[arg] + '"'
             search_arguments += " AND " + compound
-        statement = """SELECT WellRoyaltyMaster.*, FNBand.FNBandName, Lease.FNBandID FROM WellRoyaltyMaster, FNBand, WellLeaseLink, Lease
-                       WHERE WellRoyaltyMaster.ID = WellLeaseLink.WellID
-                       AND WellLeaseLink.LeaseID = Lease.ID
+        statement = """SELECT WellRoyaltyMaster.*, FNBand.FNBandName, Lease.FNBandID FROM WellRoyaltyMaster, FNBand, EntityLeaseLink, Lease
+                       WHERE WellRoyaltyMaster.ID = EntityLeaseLink.EntityID
+                       AND EntityLeaseLink.Entity = 'Well'
+                       AND EntityLeaseLink.LeaseID = Lease.ID
                        AND Lease.FNBandID = FNBand.ID
                        AND DATE("{proddate}") BETWEEN WellRoyaltyMaster.StartDate and WellRoyaltyMaster.EndDate
                     """.format(proddate=get_proddate()) + search_arguments
@@ -76,7 +79,7 @@ def details(well_num):
                     setattr(ds, i, request.form[i])
             db.update(ds)
             flash('Successfully updated well ' + well_num)
-            return redirect(url_for('wells.details', well_num = well_num))
+            return redirect(url_for('wells.details', well_num=well_num))
         except Exception as e:
             flash('Couldn\'t update a well')
             print('Couldn\'t update a well: ', e)
@@ -85,16 +88,17 @@ def details(well_num):
         try:
             db = config.get_database()
             result = db.select1('WellRoyaltyMaster', ID=well_num)
-            return render_template('wells/details.html', new = False, well=result)
+            return render_template('wells/details.html', new=False, well=result)
         except Exception as e:
             print(e)
             abort(404)
+
 
 @wells.route('/wells/new', methods=['GET', 'POST'])
 def new():
     db = config.get_database()
     if request.method == 'GET':
-        return render_template('wells/details.html', new = True, well = None)
+        return render_template('wells/details.html', new=True, well=None)
     elif request.method == 'POST' and request.form['action'] == 'cancel':
         return redirect(url_for('wells.search'))
     elif request.method == 'POST' and request.form['action'] == 'add':
@@ -114,34 +118,44 @@ def new():
             print('Couldn\'t add a new well: ', e)
             return redirect(url_for('wells.search'))
 
+
 @wells.route('/wells/<lease_num>/leases.json', methods=['GET', 'POST'])
 def leases(lease_num):
     db = config.get_database()
     leases_statement = """SELECT LeaseRoyaltyMaster.* FROM LeaseRoyaltyMaster, WellLeaseLink
                WHERE WellLeaseLink.WellID="%s"
                AND LeaseRoyaltyMaster.ID=WellLeaseLink.LeaseID"""
-    leases = db.select_sql(leases_statement % lease_num)
+    lease_r = db.select_sql(leases_statement % lease_num)
     result = []
-    for l in leases:
+    for l in lease_r:
         result.append(l.json_dumps())
     return json.dumps(result)
+
 
 @wells.route('/well/calculate')
 def calculate():
     from src.calc.calcroyalties import ProcessRoyalties
     pr = ProcessRoyalties()
-    well_id = int(request.args.get('WellId'))
-    prod_date = int(request.args.get('ProdDate'))
-    print("We are in the calculate thing..... for ", well_id)
+
+    print("We are in the calculate thing..... for ", request.args)
     db = config.get_database()
-    for monthlyData in db.select('Monthly',WellId=well_id,ProdMonth=prod_date):
+    for monthly in db.select('Monthly', ExtractDate=int(request.args.get('ExtractDate')),
+                             ProdMonth=int(request.args.get('ProdMonth')),
+                             Entity=request.args.get('Entity'),
+                             EntityId=int(request.args.get('EntityID'))):
         try:
             print("about to calculate...")
-            pr.process_one(well_id, monthlyData.ProdMonth, monthlyData.Product)
+            pr.process_one(monthly.ExtractDate, monthly.Entity, monthly.EntityID, monthly.ProdMonth, monthly.Product)
         except Exception as e:
             print("We have an error")
-            print(e)
-            return 'Something went wrong during calculation for %s, %i, %s:<br />%s' % \
-                   (well_id, monthlyData.ProdMonth, monthlyData.Product, str(e))
+            traceback.print_exc(file=sys.stdout)
+            tb = traceback.format_exc()
+            return "<h2>Error displaying worksheet for " + monthly.Entity + " %s</h2><br>" % monthly.EntityID + \
+                   str(e) + '<plaintext>' + \
+                   tb + '</plaintext>'
 
-    return "Processing complete for well: %i %i" % (well_id, prod_date)
+            # print(e)
+            # return 'Something went wrong during calculation for %s, %s, %i, %s:<br />%s' % \
+            #        (monthly.Entity, monthly.EntityID, monthly.ProdMonth, monthly.Product, str(e))
+
+    return "Processing complete."

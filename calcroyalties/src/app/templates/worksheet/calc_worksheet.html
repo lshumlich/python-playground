@@ -49,8 +49,9 @@ fmath {
 </style>
 </head>
 <body>
-
-
+<div>
+Calc Time: {{ calc.CalcTime }}
+</div>
 <h1 align="center">Well: {{ well.ID }} Royalty Payor: {{ m.RPBA }} <br>
 	  {{ well.WellEvent }} - {{ ba.CorpShortName }}</h1>
 
@@ -207,6 +208,37 @@ table, th, td {
 
 <!--</head>-->
 
+    <div align="center">
+    {% if history %}
+        <h3>Historical Amendments</h3>
+        <table style="width:700" border="1">
+            <tr>
+                <th>Extract Date</th>
+                <th>Base Royalty</th>
+                <th>Gorr Royalty</th>
+                <th>Assessed Base</th>
+                <th>Assessed Gorr</th>
+                <th>Assessed</th>
+            </tr>
+                {% for h in history %}
+                <tr>
+                    <td align="center"><a  id="worksheet" href="{{ url_for('worksheet.calc_worksheet') }}?ID={{ h.ID }}" title="Worksheet">{{ h._format.ExtractDate }}</a></td>
+                    <td align="right">{{ '${:0,.2f}'.format(h.BaseNetRoyaltyValue) }}</td>
+                    <td align="right">{{ '${:0,.2f}'.format(h.GorrNetRoyaltyValue) }}</td>
+
+                    <td align="right">{{ '${:0,.2f}'.format(h.BookedBaseNetRoyaltyValue) }}</td>
+                    <td align="right">{{ '${:0,.2f}'.format(h.BookedGorrNetRoyaltyValue) }}</td>
+                    <td align="right">{{ '${:0,.2f}'.format(h.Booked) }}</td>
+                </tr>
+                {% endfor %}
+        </table>
+     {% endif %}
+
+    </div>
+
+
+
+
     <TABLE style="width:700" border="1">
         <colgroup>
             <col span="8" width="100" align="right">
@@ -232,7 +264,7 @@ table, th, td {
    </TR>
 
 	<tr>
-        <td align="center">{{ m._format.yyyy_mm_dd(m.ExtractMonth) }}</td>
+        <td align="center">{{ m._format.ExtractDate }}</td>
         <td align="center">{{ m._format.ProdMonth }}</td>
 	    <td align="center">{{ m.AmendNo }}</td>
 	    <td align="center">{{ m.Product }}</td>
@@ -555,9 +587,6 @@ table, th, td {
         <br>
         {*** Note: Handle Incentives} <br>
         {*** Note: Handle Previous Paid Amount?} <br>
-    </div>
-
-    <div align="center">
     </div>
 
     </body>

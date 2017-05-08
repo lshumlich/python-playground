@@ -56,7 +56,7 @@ class ProcessRoyalties(object):
 
         for monthlyData in self.db.select('Monthly'):
             try:
-                self.process_one(monthlyData.Entity, monthlyData.EntityID, monthlyData.ProdMonth, monthlyData.Product)
+                self.process_one(monthlyData.ExtractDate, monthlyData.Entity, monthlyData.EntityID, monthlyData.ProdMonth, monthlyData.Product)
 
             except AppError as e:
                 logging.error(str(e))
@@ -71,21 +71,22 @@ class ProcessRoyalties(object):
     Process a single royalty
     """
 
-    def process_one(self, entity, entity_id, prod_month, product):
+    def process_one(self, extract_date, entity, entity_id, prod_month, product):
 
         if entity == 'Well':
             well = self.db.select1('WellRoyaltyMaster', ID=entity_id)
         else:
             well = None
 
-        monthly_list = self.db.select('Monthly', Entity=entity, EntityID=entity_id, ProdMonth=prod_month, Product=product)
+        monthly_list = self.db.select('Monthly', ExtractDate=extract_date, Entity=entity, EntityID=entity_id, ProdMonth=prod_month, Product=product)
         if len(monthly_list) == 0:
             raise AppError("No monthly data found for " + entity + ": " + str(entity_id) + " ProdMonth:" + str(prod_month) +
                            " Product:" + product)
 
-        calc_array = self.db.select('Calc', Entity=entity, EntityID=entity_id, ProdMonth=prod_month, Product=product)
+        calc_array = self.db.select('Calc', ExtractDate=extract_date, Entity=entity, EntityID=entity_id, ProdMonth=prod_month, Product=product)
         for calc in calc_array:
             self.db.delete('Calc', calc.ID)
+            print('=== Deleted:', calc.ID)
 
         for monthly in monthly_list:
 
@@ -95,8 +96,8 @@ class ProcessRoyalties(object):
                                " Prod Date: " + str(prod_month))
 
             for entity_lease_link in entity_lease_link_array:
-                logging.info('**** Processing *** {0:06d} {1:} {2:06d} {3:04d} {4:}'.
-                             format(prod_month, entity, entity_id, entity_lease_link.LeaseID, product))
+                logging.info('**** Processing *** {0} {1:06d} {2:} {3:06d} {4:04d} {5:}'.
+                             format(monthly._format.ExtractDate, prod_month, entity, entity_id, entity_lease_link.LeaseID, product))
 
                 royalty = self.db.select1('LeaseRoyaltymaster', ID=entity_lease_link.LeaseID)
                 lease = self.db.select1('Lease', ID=entity_lease_link.LeaseID)
@@ -104,6 +105,9 @@ class ProcessRoyalties(object):
                 calc, calc_specific = self.zero_royalty_calc(prod_month, entity, entity_id, product)
 
                 calc.PEFNInterest = entity_lease_link.PEFNInterest
+                calc.ExtractDate = monthly.ExtractDate
+                # calc.CalcTime = datetime.now()
+                calc.CalcTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
                 rtp_info = self.db.select1('RTPInfo', WellEvent=well.WellEvent, Product=product, Payer=monthly.RPBA,
                                            Date=prod_month_to_date(prod_month))

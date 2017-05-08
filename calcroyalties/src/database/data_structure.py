@@ -66,7 +66,12 @@ class Formatter(object):
     @property
     def ProdMonth(self):
         dts = str(self.data_obj.ProdMonth)
-        return dts[0:4]+'-'+dts[4:6]
+        return dts[0:4] + '-' + dts[4:6]
+
+    @property
+    def ExtractDate(self):
+        dts = str(self.data_obj.ExtractDate)
+        return dts[0:4] + '-' + dts[4:6] + '-' + dts[6:8]
 
     def yyyy_mm_dd(self, dt):
         if dt:

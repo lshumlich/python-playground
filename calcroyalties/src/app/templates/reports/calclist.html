@@ -9,11 +9,13 @@ tr.border_bottom td {
 
 <table class="table-striped" style="width:100%">
     <tr>
-        <th>Date</th>
+        <th>Extract Date</th>
+        <th>Prod Date</th>
         <th>Band</th>
         <th>Reserve</th>
         <th>Lease</th>
-        <th>Well ID</th>
+        <th>Entity</th>
+        <th>ID</th>
         <th>Royalty Payor</th>
         <th>Product</th>
         <th>Well Event</th>
@@ -23,11 +25,13 @@ tr.border_bottom td {
     </tr>
     {% for r in result %}
     <tr>
+        <td>{{ r.ExtractDate }}</td>
         <td>{{ r.ProdMonth }}</td>
         <td>{{ r.FNBandID }}</td>
         <td>{{ r.FNReserveID }}</td>
         <td>{{ r.LeaseID }} </td>
-        <td>{{ r.WellID }} </td>
+        <td>{{ r.Entity }} </td>
+        <td>{{ r.EntityID }} </td>
         <td>{{ r.RPBA }} </td>
         <td>{{ r.Product }}</td>
         <td>{{ r.WellEvent }}</td>
@@ -36,7 +40,7 @@ tr.border_bottom td {
         <td>
             <a  id="worksheet" href="{{ url_for('worksheet.calc_worksheet') }}?ID={{ r.ID }}" title="Worksheet" class="icon icon-text-document"></a>
             &nbsp;
-            <a href="{{ url_for('wells.calculate') }}?WellId={{ r.WellID }}&ProdDate={{ r.ProdMonth }}" title="Recalculate" class="icon icon-reload"></a>
+            <a href="{{ url_for('wells.calculate') }}?ExtractDate={{r.ExtractDate}}&Entity={{r.Entity}}&EntityID={{ r.EntityID }}&ProdMonth={{ r.ProdMonth }}" title="Recalculate" class="icon icon-reload"></a>
         </td>
     </tr>
     {% endfor %}

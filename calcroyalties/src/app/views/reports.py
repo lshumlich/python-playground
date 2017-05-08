@@ -1,8 +1,10 @@
 import traceback
+import sys
+import math
 from flask import Blueprint, render_template, abort, request, json
 
 import config
-from .permission_handler import PermissionHandler
+# from .permission_handler import PermissionHandler
 from .main import get_proddate_int
 
 
@@ -10,7 +12,7 @@ reports = Blueprint('reports', __name__)
 
 
 @reports.route('/reports/royalties')
-#@PermissionHandler('well_view')
+# @PermissionHandler('well_view')
 def royalties():
     db = config.get_database()
     proddate = get_proddate_int()
@@ -24,14 +26,15 @@ def royalties():
 
 
 @reports.route('/reports/calclist')
-#@PermissionHandler('well_view')
+# @PermissionHandler('well_view')
 def calc_list():
     db = config.get_database()
-    statement = """SELECT calc.ID, calc.ProdMonth, calc.BaseNetRoyaltyValue, calc.GorrNetRoyaltyValue,
-        calc.FNBandID, calc.FNReserveID, calc.LeaseID, calc.Entity, calc.EntityID, calc.RPBA, calc.Product, wrm.WellEvent
+    statement = """SELECT calc.ID, calc.ExtractDate, calc.ProdMonth, calc.BaseNetRoyaltyValue,
+        calc.GorrNetRoyaltyValue, calc.FNBandID, calc.FNReserveID, calc.LeaseID, calc.Entity,
+        calc.EntityID, calc.RPBA, calc.Product, wrm.WellEvent
         from calc, wellroyaltymaster wrm
         where calc.EntityID = wrm.id
-        order by calc.prodMonth, calc.EntityID
+        order by calc.ExtractDate, calc.prodMonth, calc.EntityID
     """
     result = db.select_sql(statement)
     print('we have found: ', len(result))
@@ -67,10 +70,42 @@ def welleventinfomissing():
         traceback.print_exc(file=sys.stdout)
         abort(404)
 
+
 @reports.route('/reports/wellrange')
 def wellrange():
     return render_template('/reports/wellrange.html')
 
+
+@reports.route('/reports/proofed')
+def proofed():
+    try:
+        db = config.get_database()
+        results = db.select_sql("SELECT * FROM Proofed order by ExtractDate, ProdMonth, LeaseID, Entity, EntityID, "
+                                "Product, RPBA")
+        for r in results:
+            calc = db.select('Calc', ExtractDate=r.ExtractDate, ProdMonth=r.ProdMonth, LeaseID=r.LeaseID,
+                             Entity=r.Entity, EntityID=r.EntityID, RPBA=r.RPBA, Product=r.Product)
+            if len(calc) > 1:
+                r.Message = 'More than one calc record. We have a system problem.'
+            elif len(calc) == 0:
+                r.Message = "Can't find a calc record"
+            else:
+                r.BaseNetRoyaltyValue = calc[0].BaseNetRoyaltyValue
+                r.GorrNetRoyaltyValue = calc[0].GorrNetRoyaltyValue
+
+                r.Message = 'Proofed.'
+                if abs(r.BaseRoyalty - calc[0].BaseNetRoyaltyValue) > .001:
+                    print("----",r.BaseRoyalty,calc[0].BaseNetRoyaltyValue)
+                    r.Message = 'Royalty is not the Same'
+                if abs(r.GorrRoyalty - calc[0].GorrNetRoyaltyValue) > 1:
+                    print("----",r.GorrRoyalty,calc[0].GorrNetRoyaltyValue)
+                    r.Message = 'Royalty is not the Same'
+
+        return render_template('/reports/proofed.html', result=results)
+    except Exception as e:
+        print(e)
+        traceback.print_exc(file=sys.stdout)
+        abort(404)
 
 @reports.route('/reports/battdiagram')
 def battdiagram():
@@ -90,8 +125,8 @@ def lfs():
 
     print('--lfs()', request.args["batt"])
     db = config.get_database()
-    proddate = get_proddate_int()
-    results = db.select("VolumetricInfo", Facility = request.args["batt"])
+    # proddate = get_proddate_int()
+    results = db.select("VolumetricInfo", Facility=request.args["batt"])
 
     data = {}
     facilities = []
@@ -115,9 +150,9 @@ def lfs():
         if r.FromTo and r.FromTo not in unique:
             unique[r.FromTo] = 0
             if len(r.FromTo) > 12:
-                wells.append({"name":r.FromTo})
+                wells.append({"name": r.FromTo})
             else:
-                disps.append({"name":r.FromTo})
+                disps.append({"name": r.FromTo})
 
     facilities.sort(key=faclsort)
     results.sort(key=lambda r: r.Key)
@@ -125,11 +160,10 @@ def lfs():
     html = render_template('/reports/battdiagramvolinout.html', result=results, facility=request.args["batt"])
     data['html'] = html
 
-
     data['facilities'] = facilities
     data['wells'] = wells
     data['disps'] = disps
-    data['batt'] = [{"name":request.args["batt"]}]
+    data['batt'] = [{"name": request.args["batt"]}]
     data['count'] = len(results)
     print('---lfs()--', wells)
     # print('---lfs()--->', len(results))
@@ -139,7 +173,8 @@ def lfs():
 
 def faclsort(facl):
     f = facl['FromTo']
-    if not f : f = ''
+    if not f:
+        f = ''
     if facl['InorOut'] == '+':
         order = 1
     elif facl['InorOut'] == '?':

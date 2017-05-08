@@ -14,74 +14,123 @@ worksheet = Blueprint('worksheet', __name__)
 
 @worksheet.route('/worksheet')
 def calc_worksheet():
-    if "ID" in request.args:
-        id = int(request.args["ID"])
-        return(generate_worksheet_from_id(id))
+    args = request.args.to_dict()
+    print(args)
+    db = config.get_database()
+    calcs = db.select('Calc', **args)
+    result = ""
+    for calc in calcs:
+        result += generate_worksheet_from_calc(calc)
+        result += "<hr>"
 
-    if "ProdDate" in request.args:
-        prod_month = int(request.args["ProdDate"])
-    else:
-        prod_month = get_proddate_int()
+    return result
 
-    if "RPBA" in request.args:
-        rpba = request.args["RPBA"]
-    else:
-        rpba = None
 
-    if "Product" in request.args:
-        product = request.args["Product"]
-    else:
-        product = None
+    # print(request.args)
+    # for r in request.args
+    # vars = {}
+    # vars['id'] = 'whatever'
+    # print(vars)
+    #
+    # db = config.get_database()
+    # calcs = db.select('Calc', **request.args)
+    # print(len(calcs))
 
-    if "WellId" in request.args:
-        well_id = int(request.args["WellId"])
-        return generate_worksheet('Well', well_id, prod_month, rpba, product)
-    elif "WellStart" in request.args and "WellEnd" in request.args and "WellId" not in request.args:
-        well_start = int(request.args["WellStart"])
-        well_end = int(request.args["WellEnd"])
-        result = ""
-        for w in range(well_start, well_end + 1):
-            result += generate_worksheet(w, prod_month, rpba, product)
-            result += "<hr>"
-        return result
-    else:
-        return "worksheet.calc_worksheet Something wasn't right"
+    return( 'Just Playing')
+    #
+    # vars = {}
+    # if "ID" in request.args:
+    #     vars['ID'] = int(request.args["ID"])
+    #
+    # if "ProdDate" in request.args:
+    #     vars['ProdMonth'] = int(request.args["ProdDate"])
+    #
+    # if "ProdDate" in request.args:
+    #     vars['ProdMonth'] = int(request.args["ProdDate"])
+    #
+    #     prod_month = int(request.args["ProdDate"])
+    #
+    #     id = int(request.args["ID"])
+    #     return generate_worksheet_from_id(id)
+    #
+    # if "ProdDate" in request.args:
+    #     prod_month = int(request.args["ProdDate"])
+    # else:
+    #     prod_month = get_proddate_int()
+    #
+    # if "RPBA" in request.args:
+    #     rpba = request.args["RPBA"]
+    # else:
+    #     rpba = None
+    #
+    # if "Product" in request.args:
+    #     product = request.args["Product"]
+    # else:
+    #     product = None
+    #
+    # if "ExtractDate" in request.args:
+    #     extract_date = request.args["ExtractDate"]
+    # else:
+    #     extract_date = None
+    #
+    #
+    # if "WellId" in request.args:
+    #     well_id = int(request.args["WellId"])
+    #     return generate_worksheet(extract_date, 'Well', well_id, prod_month, rpba, product)
+    # elif "WellStart" in request.args and "WellEnd" in request.args and "WellId" not in request.args:
+    #     well_start = int(request.args["WellStart"])
+    #     well_end = int(request.args["WellEnd"])
+    #     result = ""
+    #     for w in range(well_start, well_end + 1):
+    #         result += generate_worksheet(w, prod_month, rpba, product)
+    #         result += "<hr>"
+    #     return result
+    # else:
+    #     return "worksheet.calc_worksheet Something wasn't right"
 
-# todo delete me when the other generate works
-def generate_worksheet(entity, entity_id, prod_month, rpba, product):
+
+def generate_worksheet(extract_date, entity, entity_id, prod_month, rpba, product):
     try:
         db = config.get_database()
-        # product = "SUL"
-        if entity == 'Well':
-            well = db.select1('WellRoyaltyMaster', ID=entity_id)
-        else:
-            well = None
-        entity_lease_link_array = db.select('EntityLeaseLink', Entity=entity, EntityID=entity_id)
-        if len(entity_lease_link_array) == 0:
-            raise AppError("There were no EntityLeaseLink records for " + entity + ' ' + str(entity_id) + str(prod_month))
-        entity_lease_link = entity_lease_link_array[0]
-        royalty = db.select1('LeaseRoyaltyMaster', ID=entity_lease_link.LeaseID)
-        lease = db.select1('Lease', ID=entity_lease_link.LeaseID)
 
         if rpba:
-            monthly_array = db.select('Monthly', Entity=entity, EntityID=entity_id, prodMonth=prod_month, product=product, RPBA=rpba)
+            calc = db.select1('Calc', ExtractDate=extract_date, Entity=entity, EntityID=entity_id, ProdMonth=prod_month,
+                              Product=product)
         else:
-            monthly_array = db.select('Monthly', Enriry=entity, EntityID=entity_id, prodMonth=prod_month, product=product)
-        if len(monthly_array) == 0:
-            raise AppError("There were no monthly records for " + entity + ": " + str(entity_id) + " ProdDate: " +
-                           str(prod_month) + " Product: " + product)
-        monthly = monthly_array[0]  # if there are multiple pick the first one
+            calc = db.select1('Calc', ExtractDate=extract_date, Entity=entity, EntityID=entity_id, ProdMonth=prod_month,
+                              RPBA=rpba, Product=product)
+        return generate_worksheet_from_calc(calc)
 
-        ba = db.select1('BAInfo', BAid=monthly.RPBA, BAType='RTP')
-        calc = db.select1('Calc', Entity=entity, EntityID=entity_id, ProdMonth=prod_month, RPBA=monthly.RPBA, Product=product)
-        calc_specific = DataStructure(calc.RoyaltySpecific)
-        rtp_info = db.select1('RTPInfo', WellEvent=well.WellEvent, Product=product, Payer=monthly.RPBA,
-                              Date=prod_month_to_date(prod_month))
-        royalty.format_gorr = format_gorr(calc.Gorr)
-        return render_template('worksheet/calc_worksheet.html',
-                               well=well, rm=royalty, m=monthly, lease=lease,
-                               calc=calc, calc_sp=calc_specific, entity_lease_link=entity_lease_link,
-                               ba=ba, rtp_info=rtp_info)
+        # if entity == 'Well':
+        #     well = db.select1('WellRoyaltyMaster', ID=entity_id)
+        # else:
+        #     well = None
+        # entity_lease_link_array = db.select('EntityLeaseLink', Entity=entity, EntityID=entity_id)
+        # if len(entity_lease_link_array) == 0:
+        #     raise AppError("There were no EntityLeaseLink records for " + entity + ' ' + str(entity_id) + str(prod_month))
+        # entity_lease_link = entity_lease_link_array[0]
+        # royalty = db.select1('LeaseRoyaltyMaster', ID=entity_lease_link.LeaseID)
+        # lease = db.select1('Lease', ID=entity_lease_link.LeaseID)
+        #
+        # if rpba:
+        #     monthly_array = db.select('Monthly', ExtractDate=extract_date, Entity=entity, EntityID=entity_id, prodMonth=prod_month, product=product, RPBA=rpba)
+        # else:
+        #     monthly_array = db.select('Monthly', ExtractDate=extract_date, Entity=entity, EntityID=entity_id, prodMonth=prod_month, product=product)
+        #
+        # if len(monthly_array) == 0:
+        #     raise AppError("There were no monthly records for " + entity + ": " + str(entity_id) + " ProdDate: " +
+        #                    str(prod_month) + " Product: " + product)
+        # monthly = monthly_array[0]  # if there are multiple pick the first one
+        #
+        # ba = db.select1('BAInfo', BAid=monthly.RPBA, BAType='RTP')
+        # calc_specific = DataStructure(calc.RoyaltySpecific)
+        # rtp_info = db.select1('RTPInfo', WellEvent=well.WellEvent, Product=product, Payer=monthly.RPBA,
+        #                       Date=prod_month_to_date(prod_month))
+        # royalty.format_gorr = format_gorr(calc.Gorr)
+        # return render_template('worksheet/calc_worksheet.html',
+        #                        well=well, rm=royalty, m=monthly, lease=lease,
+        #                        calc=calc, calc_sp=calc_specific, entity_lease_link=entity_lease_link,
+        #                        ba=ba, rtp_info=rtp_info)
     except Exception as e:
         print('views.worksheet: ***Error:', e)
         traceback.print_exc(file=sys.stdout)
@@ -117,7 +166,23 @@ def generate_worksheet_from_calc(calc):
         royalty = db.select1('LeaseRoyaltyMaster', ID=calc.LeaseID)
         lease = db.select1('Lease', ID=calc.LeaseID)
 
-        monthly_array = db.select('Monthly', Entity=calc.Entity, EntityID=calc.EntityID, prodMonth=calc.ProdMonth, product=calc.Product, RPBA=calc.RPBA)
+        history = db.select_sql("""SELECT ID, ExtractDate, BaseNetRoyaltyValue, GorrNetRoyaltyValue
+                   from Calc
+                   WHERE ProdMonth = "{}" and LeaseID = "{}" and Entity = "{}" and EntityID = "{}"
+                   and Product = "{}" and RPBA = "{}"
+                   order by ExtractDate""".format(calc.ProdMonth, calc.LeaseID, calc.Entity, calc.EntityID,
+                                                  calc.Product, calc.RPBA))
+
+        prev_BaseNetRoyaltyValue = 0.0
+        prev_GorrNetRoyaltyValue = 0.0
+        for h in history:
+            h.BookedBaseNetRoyaltyValue = h.BaseNetRoyaltyValue - prev_BaseNetRoyaltyValue
+            h.BookedGorrNetRoyaltyValue = h.GorrNetRoyaltyValue - prev_GorrNetRoyaltyValue
+            h.Booked = h.BookedBaseNetRoyaltyValue + h.BookedGorrNetRoyaltyValue
+            prev_BaseNetRoyaltyValue = h.BaseNetRoyaltyValue
+            prev_GorrNetRoyaltyValue = h.GorrNetRoyaltyValue
+
+        monthly_array = db.select('Monthly', ExtractDate=calc.ExtractDate, Entity=calc.Entity, EntityID=calc.EntityID, prodMonth=calc.ProdMonth, product=calc.Product, RPBA=calc.RPBA)
         if len(monthly_array) == 0:
             raise AppError("There were no monthly records for well: " + str(calc.WellID) + " ProdDate: " +
                            str(calc.ProdMonth) + " Product: " + calc.Product)
@@ -128,11 +193,13 @@ def generate_worksheet_from_calc(calc):
         calc_specific = DataStructure(calc.RoyaltySpecific)
         rtp_info = db.select1('RTPInfo', WellEvent=well.WellEvent, Product=calc.Product, Payer=monthly.RPBA,
                               Date=prod_month_to_date(calc.ProdMonth))
+
         royalty.format_gorr = format_gorr(calc.Gorr)
+
         return render_template('worksheet/calc_worksheet.html',
                                well=well, rm=royalty, m=monthly, lease=lease,
                                calc=calc, calc_sp=calc_specific, entity_lease_link=entity_lease_link,
-                               ba=ba, rtp_info=rtp_info)
+                               ba=ba, rtp_info=rtp_info,history=history)
     except Exception as e:
         print('views.worksheet: ***Error:', e)
         traceback.print_exc(file=sys.stdout)

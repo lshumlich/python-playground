@@ -57,8 +57,13 @@ class Test(unittest.TestCase):
         well = DataStructure()
         well.ProdMonth = 201602
         
-        # If there is no attribute in the object called 'LeaseID' use the ID attribute to format the lease string
         self.assertEqual(well._format.ProdMonth, '2016-02')
+
+    def test_formatter_extract_date(self):
+        monthly = DataStructure()
+        monthly.ExtractDate = 20170507
+
+        self.assertEqual(monthly._format.ExtractDate, '2017-05-07')
 
     def test_html_lf(self):
         well = DataStructure()
