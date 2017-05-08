@@ -95,10 +95,8 @@ def proofed():
 
                 r.Message = 'Proofed.'
                 if abs(r.BaseRoyalty - calc[0].BaseNetRoyaltyValue) > .001:
-                    print("----",r.BaseRoyalty,calc[0].BaseNetRoyaltyValue)
                     r.Message = 'Royalty is not the Same'
-                if abs(r.GorrRoyalty - calc[0].GorrNetRoyaltyValue) > 1:
-                    print("----",r.GorrRoyalty,calc[0].GorrNetRoyaltyValue)
+                if abs(r.GorrRoyalty - calc[0].GorrNetRoyaltyValue) > .001:
                     r.Message = 'Royalty is not the Same'
 
         return render_template('/reports/proofed.html', result=results)
