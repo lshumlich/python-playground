@@ -210,15 +210,15 @@ table, th, td {
 
     <div align="center">
     {% if history %}
-        <h3>Historical Amendments</h3>
+        <br>
         <table style="width:700" border="1">
             <tr>
                 <th>Extract Date</th>
                 <th>Base Royalty</th>
                 <th>Gorr Royalty</th>
-                <th>Assessed Base</th>
-                <th>Assessed Gorr</th>
-                <th>Assessed</th>
+                <th>Adjusted Base</th>
+                <th>Adjusted Gorr</th>
+                <th>Total</th>
             </tr>
                 {% for h in history %}
                 <tr>
@@ -235,8 +235,6 @@ table, th, td {
      {% endif %}
 
     </div>
-
-
 
 
     <TABLE style="width:700" border="1">
