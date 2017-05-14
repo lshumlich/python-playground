@@ -15,8 +15,9 @@ class Test(unittest.TestCase):
         
         # This returns a dictionary object for the attributes in an object
         dd = vars(well)
-        self.assertEqual(len(dd), 3)
+        self.assertEqual(len(dd), 4)
         self.assertIn('_format', dd)  # The format attribute is used for formatting.
+        self.assertIn('_original', dd)  # Used for comparing differences.
         self.assertEqual(dd['ID'], 123)
         self.assertEqual(dd['Name'], 'WellName')
         
@@ -68,10 +69,10 @@ class Test(unittest.TestCase):
     def test_html_lf(self):
         well = DataStructure()
         well.Msg = 'abc;def;geh;'
-        self.assertEqual('abc<br>def<br>geh<br>',well._format.html_lf(well.Msg))
+        self.assertEqual('abc<br>def<br>geh<br>', well._format.html_lf(well.Msg))
 
         well.Msg = '$abc;$def;$geh;'
-        self.assertEqual('\$abc<br>\$def<br>\$geh<br>',well._format.html_lf(well.Msg))
+        self.assertEqual('\$abc<br>\$def<br>\$geh<br>', well._format.html_lf(well.Msg))
 
     def test_json(self):
         well = DataStructure(json_string='{"ID": 123, "LeaseType": "OL"}')
@@ -85,3 +86,18 @@ class Test(unittest.TestCase):
         s = str(well)
         s = well.headers()
         s = well.data()
+
+    def test_diff(self):
+        calc1 = DataStructure()
+        self.assertEqual('', calc1.diff('SomeValue'))
+
+        calc2 = DataStructure()
+        calc2.original(calc1)
+        self.assertRaises(AttributeError, calc2.diff, 'SomeValue')
+
+        calc1.SomeValue = 123
+        calc2.SomeValue = 123
+        self.assertEqual('', calc1.diff('SomeValue'))
+
+        calc2.SomeValue = 1234
+        self.assertEqual('class="diff"', calc2.diff('SomeValue'))

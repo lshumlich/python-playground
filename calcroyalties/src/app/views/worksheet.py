@@ -65,21 +65,33 @@ def generate_worksheet_from_calc(calc):
         royalty = db.select1('LeaseRoyaltyMaster', ID=calc.LeaseID)
         lease = db.select1('Lease', ID=calc.LeaseID)
 
-        history = db.select_sql("""SELECT ID, ExtractDate, BaseNetRoyaltyValue, GorrNetRoyaltyValue
+        history = db.select_sql("""SELECT *
                    from Calc
                    WHERE ProdMonth = "{}" and LeaseID = "{}" and Entity = "{}" and EntityID = "{}"
                    and Product = "{}" and RPBA = "{}"
                    order by ExtractDate""".format(calc.ProdMonth, calc.LeaseID, calc.Entity, calc.EntityID,
                                                   calc.Product, calc.RPBA))
+        # history = db.select_sql("""SELECT ID, ExtractDate, BaseNetRoyaltyValue, GorrNetRoyaltyValue
+        #            from Calc
+        #            WHERE ProdMonth = "{}" and LeaseID = "{}" and Entity = "{}" and EntityID = "{}"
+        #            and Product = "{}" and RPBA = "{}"
+        #            order by ExtractDate""".format(calc.ProdMonth, calc.LeaseID, calc.Entity, calc.EntityID,
+        #                                           calc.Product, calc.RPBA))
 
         prev_BaseNetRoyaltyValue = 0.0
         prev_GorrNetRoyaltyValue = 0.0
+        i = 0
         for h in history:
             h.BookedBaseNetRoyaltyValue = h.BaseNetRoyaltyValue - prev_BaseNetRoyaltyValue
             h.BookedGorrNetRoyaltyValue = h.GorrNetRoyaltyValue - prev_GorrNetRoyaltyValue
             h.Booked = h.BookedBaseNetRoyaltyValue + h.BookedGorrNetRoyaltyValue
             prev_BaseNetRoyaltyValue = h.BaseNetRoyaltyValue
             prev_GorrNetRoyaltyValue = h.GorrNetRoyaltyValue
+            # Set the original calc record to the history record the one before this one
+            if h.ExtractDate == calc.ExtractDate and i > 0:
+                calc.original(history[i-1])
+
+            i += 1
 
         monthly_array = db.select('Monthly', ExtractDate=calc.ExtractDate, Entity=calc.Entity, EntityID=calc.EntityID,
                                   prodMonth=calc.ProdMonth, product=calc.Product, RPBA=calc.RPBA)

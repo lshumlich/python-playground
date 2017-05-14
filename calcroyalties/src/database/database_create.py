@@ -128,9 +128,20 @@ Database Change Log: Must be maintained so we can keep the database in sink:
   rename EntityLeaseLink.WellID to EntityID
   add EntityLeaseLink.Entity
   add WellRoyaltyMaster.UnitID
-
 2017-05-07
   add calc.CalcTime
+2017-05-13
+  add calc.AmendNo
+  add calc.ProdHours
+  add calc.ProdVol
+  add calc.SalesVol
+  add calc.Heat
+  add calc.GJ
+  add calc.SalesPrice
+  add calc.TransRate
+  add calc.ProcessingRate
+  add calc.GCARate
+
 """
 
 import datetime
@@ -308,9 +319,18 @@ class DatabaseCreate(object):
             "RPBA" text,
             "FNBandID" text,
             "FNReserveID" text,
+            "AmendNo" int,
+            "ProdHours" int,
+            "ProdVol" int,
+            "SalesVol" int,
+            "Heat" int,
+            "GJ" int,
+            "SalesPrice" float,
+            "TransRate" float,
+            "ProcessingRate" float,
+            "GCARate" float,
             "RoyaltyBasedOn" text,
             "RoyaltyBasedOnVol" float,
-            "SalesPrice" float,
             "RTPInterest" int,
             "PEFNInterest" float,
             "K" int,

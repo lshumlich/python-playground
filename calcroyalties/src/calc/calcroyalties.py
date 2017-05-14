@@ -86,7 +86,7 @@ class ProcessRoyalties(object):
         calc_array = self.db.select('Calc', ExtractDate=extract_date, Entity=entity, EntityID=entity_id, ProdMonth=prod_month, Product=product)
         for calc in calc_array:
             self.db.delete('Calc', calc.ID)
-            print('=== Deleted:', calc.ID)
+            # print('=== Deleted:', calc.ID)
 
         for monthly in monthly_list:
 
@@ -124,8 +124,18 @@ class ProcessRoyalties(object):
 
     def calc_royalties(self, well, royalty, monthly, calc, calc_specific):
 
-        self.determine_royalty_based_on(royalty, monthly, calc)
+        calc.AmendNo = monthly.AmendNo
+        calc.ProdHours = monthly.ProdHours
+        calc.ProdVol = monthly.ProdVol
+        calc.SalesVol = monthly.SalesVol
+        calc.Heat = monthly.Heat
+        calc.GJ = monthly.GJ
         calc.SalesPrice = monthly.SalesPrice
+        calc.TransRate = monthly.TransRate
+        calc.ProcessingRate = monthly.ProcessingRate
+        calc.GCARate = monthly.GCARate
+
+        self.determine_royalty_based_on(royalty, monthly, calc)
 
         # todo: If there is no sales. Use last months sales value... Not included in this code
         # todo: I think I can get rid of this next line. I do it different now

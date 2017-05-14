@@ -46,6 +46,12 @@ fmath {
     line-height: inherit;
 }
 
+.diff {
+ background-color: #FFFF00;
+}
+
+.highlightme { background-color:#FFFF00; }
+
 </style>
 </head>
 <body>
@@ -262,21 +268,21 @@ table, th, td {
    </TR>
 
 	<tr>
-        <td align="center">{{ m._format.ExtractDate }}</td>
-        <td align="center">{{ m._format.ProdMonth }}</td>
-	    <td align="center">{{ m.AmendNo }}</td>
-	    <td align="center">{{ m.Product }}</td>
-	    <td align="center">{{ '{:.2f}'.format(m.ProdVol) }}</td>
-	    <td align="center">{{ '{:.2f}'.format(m.SalesVol) }}</td>
+        <td {{ calc.diff('ExtractDate') | safe }} align="center">{{ m._format.ExtractDate }}</td>
+        <td {{ calc.diff('ProdMonth') | safe }}  align="center">{{ m._format.ProdMonth }}</td>
+	    <td {{ calc.diff('AmendNo') | safe }}  align="center">{{ m.AmendNo }}</td>
+	    <td {{ calc.diff('Product') | safe }}  align="center">{{ m.Product }}</td>
+	    <td {{ calc.diff('ProdVol') | safe }}  align="center">{{ '{:.2f}'.format(m.ProdVol) }}</td>
+	    <td {{ calc.diff('SalesVol') | safe }}  align="center">{{ '{:.2f}'.format(m.SalesVol) }}</td>
        {% if m.Product == 'GAS' %}
-            <td align="center">
+            <td {{ calc.diff('Heat') | safe }}  align="center">
             {% if m.Heat %}
                 {{ '{:.2f}'.format(m.Heat) }}
             {% else %}
                 0.0
             {% endif %}
             </td>
-            <td align="center">
+            <td  {{ calc.diff('GJ') | safe }} align="center">
             {% if m.GJ %}
                 {{ '{:.2f}'.format(m.GJ) }}
             {% else %}
@@ -308,7 +314,7 @@ table, th, td {
 
         <tr>
            {% if m.Product == 'GAS' %}
-                <td align="center">
+                <td {{ calc.diff('GCARate') | safe }} align="center">
                 {% if m.GCARate %}
                     {{ '{:.2f}'.format(m.GCARate) }}
                 {% else %}
@@ -316,11 +322,11 @@ table, th, td {
                 {% endif %}
                 </td>
            {% endif %}
-            <td align="center">{{ '{:>10,.6f}\n'.format(m.SalesPrice) }}</td>
+            <td {{ calc.diff('SalesPrice') | safe }} align="center">{{ '{:>10,.6f}\n'.format(m.SalesPrice) }}</td>
            {% if  m.Product == 'OIL' %}
-                <td align="center">{{ '{:>10,.6f}\n'.format(m.TransRate) }}</td>
+                <td {{ calc.diff('TransRate') | safe }} align="center">{{ '{:>10,.6f}\n'.format(m.TransRate) }}</td>
            {% endif %}
-            {# <td align="center">{{ '{:>10,.6f}\n'.format(m.ProcessingRate) }}</td> #}
+            {# <td {{ calc.diff('ProcessingRate') | safe }} align="center">{{ '{:>10,.6f}\n'.format(m.ProcessingRate) }}</td> #}
         </tr>
 
     </TABLE>
@@ -584,7 +590,6 @@ table, th, td {
 
         <br>
         {*** Note: Handle Incentives} <br>
-        {*** Note: Handle Previous Paid Amount?} <br>
     </div>
 
     </body>

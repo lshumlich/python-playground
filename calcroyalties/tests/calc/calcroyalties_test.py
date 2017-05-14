@@ -1137,8 +1137,12 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
 
         monthly.Product = 'OIL'
         monthly.ProdMonth = 201501
+        monthly.AmendNo = 00
         monthly.ProdVol = 100
         monthly.SalesVol = 90
+        monthly.Heat = 65.0
+        monthly.TransRate = 0.0
+        monthly.ProcessingRate = 0.0
         monthly.GJ = 1000
         monthly.ProdHours = 744
         monthly.SalesPrice = 210.0
@@ -1226,7 +1230,7 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         dbu.create_calc()
 
         pr = ProcessRoyalties()
-        pr.process_one('Well', 4, 201501, 'OIL')
+        pr.process_one(20150929, 'Well', 4, 201501, 'OIL')
 
         # Check to see if calc records exist for both royalty payors
         self.assertEqual(2, db.count('calc'))
@@ -1258,16 +1262,16 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         dbu.create_calc()
 
         pr = ProcessRoyalties()
-        pr.process_one('Well', 4, 201501, 'OIL')
+        pr.process_one(20150929, 'Well', 4, 201501, 'OIL')
 
         db.delete("EntityLeaseLink", 4)  # This should cause a well lease link not found exception
-        self.assertRaises(AppError, pr.process_one, 'Well', 4, 201501, 'OIL')
+        self.assertRaises(AppError, pr.process_one, 20150929, 'Well', 4, 201501, 'OIL')
 
         pr = ProcessRoyalties()
-        pr.process_one('Well', 1, 201501, 'OIL')
+        pr.process_one(20150929, 'Well', 1, 201501, 'OIL')
 
         db.delete("Monthly", 1)  # This should cause a No monthly data found exception
-        self.assertRaises(AppError, pr.process_one, 'Well', 1, 201501, 'OIL')
+        self.assertRaises(AppError, pr.process_one, 20150929, 'Well', 1, 201501, 'OIL')
 
     def test_determine_royalty_based_on(self):
 

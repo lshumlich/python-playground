@@ -12,6 +12,7 @@ class DataStructure(object):
     
     def __init__(self, json_string=None):
         self._format = Formatter(self)
+        self._original = None
         if json_string:
             json.loads(json_string, object_hook=self.json_decode)
         
@@ -33,10 +34,24 @@ class DataStructure(object):
     def json_dumps(self):
         d = dict(self.__dict__)
         del d['_format']
+        del d['_original']
         for i in d:
             if isinstance(d[i], datetime):
                 d[i] = d[i].isoformat()
         return json.dumps(d, sort_keys=True)
+
+    def original(self, original):
+        self._original = original
+
+    def diff(self, attribute):
+
+        if not self._original:
+            return ''
+        # print('diff --- ', self.ExtractDate, self._original.ExtractDate)
+        # print('diff --- ', self.ExtractDate, self._original.ExtractDate)
+        if not getattr(self, attribute) == getattr(self._original, attribute):
+            return 'class="diff"'
+        return 'WhatEver:' + str(getattr(self, attribute)) + '-' + str(getattr(self._original, attribute))
 
     @property
     def Lease(self):
