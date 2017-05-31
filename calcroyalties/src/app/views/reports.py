@@ -105,6 +105,10 @@ def proofed():
         traceback.print_exc(file=sys.stdout)
         abort(404)
 
+@reports.route('/reports/adrienne')
+def adrienne():
+    return render_template('/reports/adrienne.html')
+
 @reports.route('/reports/battdiagram')
 def battdiagram():
     # try:

@@ -14,16 +14,12 @@ div.float {
             <tr>
                 <td><label for="LeaseType">Lease Type</label> <sup><i data-help="LeaseRoyaltyMaster.LeaseType" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="LeaseType" value="{{ lease.LeaseType }}" /></td>
-                <td><label for="ID">ID</label><sup><i data-help="LeaseRoyaltyMaster.ID" class="fa fa-question-circle help"></i></sup></td>
-                <td><input type="text" name="ID" value="{{ lease.ID }}" readonly /></td>
-            </tr>
-            <tr>
                 <td><label for="Province">Province</label></td>
                 <td><input type="text" name="Prov" value="{{ lease.Prov }}" /></td>
-                <td><label for="FNReserve">FNReserve</label></td>
-                <td><input type="text" name="FNReserveID" value="{{ lease.FNReserveID }}" /></td>
             </tr>
             <tr>
+                <td><label for="FNReserve">FNReserve</label></td>
+                <td><input type="text" name="FNReserveID" value="{{ lease.FNReserveID }}" /></td>
                 <td><label for="FNBandID">FNBandID</label></td>
                 <td><input type="text" name="FNBandID" value="{{ lease.FNBandID }}" /></td>
             </tr>
@@ -31,22 +27,9 @@ div.float {
                 <td><label for="Notes">Notes</label></td>
                 <td colspan="3"><input style="width:100%" type="text" name="Notes" value="{{ lease.Notes }}" /></td>
             </tr>
-            {% if royaltymaster %}
+
             <tr>
-                <td><label for="RightsGranted">Rights Granted</label> <sup><i data-help="LeaseRoyaltyMaster.RightsGranted" class="fa fa-question-circle help"></i></sup></td>
-                <td><input type="text" name="RightsGranted" value="{{ royaltymaster.RightsGranted }}" /></td>
-                <td><label for="RoyaltyScheme">Royalty Scheme</label><sup><i data-help="LeaseRoyaltyMaster.RoyaltyScheme" class="fa fa-question-circle help"></i></sup></td>
-                <td><input type="text" name="RoyaltyScheme" value="{{ royaltymaster.RoyaltyScheme }}" /></td>
-            </tr>
-            <tr>
-                <td><label for="CrownMultiplier">Crown Multiplier</label></td>
-                <td><input type="text" name="CrownMultiplier" value="{{ royaltymaster.CrownMultiplier }}" /></td>
-                <td><label for="ValuationMethod">Valuation Method</label></td>
-                <td><input type="text" name="ValuationMethod" value="{{ royaltymaster.ValuationMethod }}" /></td>
-            </tr>
-            {% endif %}
-            <tr>
-                <td colspan="2">&nbsp;</td>
+                <td colspan="4">&nbsp;</td>
                 {% if new == False %}
                 <td><button type="submit" name="action" value="delete">Delete</button></td>
                 <td><button type="submit" name="action" value="update">Update</button></td>
@@ -59,14 +42,14 @@ div.float {
             <tr>
                 <td><label for="ID">ID</label> <sup><i data-help="LeaseRoyaltyMaster.ID" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="ID" value="{{ royaltymaster.ID }}" /></td>
+                <td><label for="ValuationMethod">Valuation Method</label></td>
+                <td><input type="text" name="ValuationMethod" value="{{ royaltymaster.ValuationMethod }}" /></td>
+
             </tr>
 
             <tr>
                 <td><label for="StartDate">StartDate</label> <sup><i data-help="LeaseRoyaltyMaster.StartDate" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="StartDate" value="{{ royaltymaster.StartDate }}" /></td>
-            </tr>
-
-            <tr>
                 <td><label for="EndDate">EndDate</label> <sup><i data-help="LeaseRoyaltyMaster.EndDate" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="EndDate" value="{{ royaltymaster.EndDate }}" /></td>
             </tr>
@@ -74,49 +57,30 @@ div.float {
             <tr>
                 <td><label for="RightsGranted">RightsGranted</label> <sup><i data-help="LeaseRoyaltyMaster.RightsGranted" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="RightsGranted" value="{{ royaltymaster.RightsGranted }}" /></td>
-            </tr>
-
-            <tr>
                 <td><label for="RoyaltyScheme">RoyaltyScheme</label> <sup><i data-help="LeaseRoyaltyMaster.RoyaltyScheme" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="RoyaltyScheme" value="{{ royaltymaster.RoyaltyScheme }}" /></td>
             </tr>
-
             <tr>
                 <td><label for="CrownMultiplier">CrownMultiplier</label> <sup><i data-help="LeaseRoyaltyMaster.CrownMultiplier" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="CrownMultiplier" value="{{ royaltymaster.CrownMultiplier }}" /></td>
-            </tr>
-
-            <tr>
                 <td><label for="CrownModifier">CrownModifier</label> <sup><i data-help="LeaseRoyaltyMaster.CrownModifier" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="CrownModifier" value="{{ royaltymaster.CrownModifier }}" /></td>
             </tr>
-
             <tr>
                 <td><label for="OilPriceBasedOn">OilPriceBasedOn</label> <sup><i data-help="LeaseRoyaltyMaster.OilPriceBasedOn" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="OilPriceBasedOn" value="{{ royaltymaster.OilPriceBasedOn }}" /></td>
-            </tr>
-
-            <tr>
                 <td><label for="GasPriceBasedOn">GasPriceBasedOn</label> <sup><i data-help="LeaseRoyaltyMaster.GasPriceBasedOn" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="GasPriceBasedOn" value="{{ royaltymaster.GasPriceBasedOn }}" /></td>
             </tr>
-
             <tr>
                 <td><label for="ProductsPriceBasedOn">ProductsPriceBasedOn</label> <sup><i data-help="LeaseRoyaltyMaster.ProductsPriceBasedOn" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="ProductsPriceBasedOn" value="{{ royaltymaster.ProductsPriceBasedOn }}" /></td>
-            </tr>
-
-            <tr>
                 <td><label for="OilValueBasedOn">OilValueBasedOn</label> <sup><i data-help="LeaseRoyaltyMaster.OilValueBasedOn" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="OilValueBasedOn" value="{{ royaltymaster.OilValueBasedOn }}" /></td>
             </tr>
-
             <tr>
                 <td><label for="GasValueBasedOn">GasValueBasedOn</label> <sup><i data-help="LeaseRoyaltyMaster.GasValueBasedOn" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="GasValueBasedOn" value="{{ royaltymaster.GasValueBasedOn }}" /></td>
-            </tr>
-
-            <tr>
                 <td><label for="ProductsValueBasedOn">ProductsValueBasedOn</label> <sup><i data-help="LeaseRoyaltyMaster.ProductsValueBasedOn" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="ProductsValueBasedOn" value="{{ royaltymaster.ProductsValueBasedOn }}" /></td>
             </tr>
@@ -124,62 +88,40 @@ div.float {
             <tr>
                 <td><label for="OilRoyaltyBasedOn">OilRoyaltyBasedOn</label> <sup><i data-help="LeaseRoyaltyMaster.OilRoyaltyBasedOn" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="OilRoyaltyBasedOn" value="{{ royaltymaster.OilRoyaltyBasedOn }}" /></td>
-            </tr>
-
-            <tr>
                 <td><label for="GasRoyaltyBasedOn">GasRoyaltyBasedOn</label> <sup><i data-help="LeaseRoyaltyMaster.GasRoyaltyBasedOn" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="GasRoyaltyBasedOn" value="{{ royaltymaster.GasRoyaltyBasedOn }}" /></td>
             </tr>
-
             <tr>
                 <td><label for="ProductsRoyaltyBasedOn">ProductsRoyaltyBasedOn</label> <sup><i data-help="LeaseRoyaltyMaster.ProductsRoyaltyBasedOn" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="ProductsRoyaltyBasedOn" value="{{ royaltymaster.ProductsRoyaltyBasedOn }}" /></td>
-            </tr>
-
-            <tr>
                 <td><label for="TransDeducted">TransDeducted</label> <sup><i data-help="LeaseRoyaltyMaster.TransDeducted" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="TransDeducted" value="{{ royaltymaster.TransDeducted }}" /></td>
             </tr>
-
             <tr>
                 <td><label for="ProcessingDeducted">ProcessingDeducted</label> <sup><i data-help="LeaseRoyaltyMaster.ProcessingDeducted" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="ProcessingDeducted" value="{{ royaltymaster.ProcessingDeducted }}" /></td>
-            </tr>
-
-            <tr>
                 <td><label for="GCADeducted">GCADeducted</label> <sup><i data-help="LeaseRoyaltyMaster.GCADeducted" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="GCADeducted" value="{{ royaltymaster.GCADeducted }}" /></td>
             </tr>
-
             <tr>
                 <td><label for="Gorr">Gorr</label> <sup><i data-help="LeaseRoyaltyMaster.Gorr" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="Gorr" value="{{ royaltymaster.Gorr }}" /></td>
-            </tr>
-
-            <tr>
                 <td><label for="OverrideRoyaltyClassification">OverrideRoyaltyClassification</label> <sup><i data-help="LeaseRoyaltyMaster.OverrideRoyaltyClassification" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="OverrideRoyaltyClassification" value="{{ royaltymaster.OverrideRoyaltyClassification }}" /></td>
             </tr>
-
             <tr>
                 <td><label for="MinRoyaltyRate">MinRoyaltyRate</label> <sup><i data-help="LeaseRoyaltyMaster.MinRoyaltyRate" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="MinRoyaltyRate" value="{{ royaltymaster.MinRoyaltyRate }}" /></td>
-            </tr>
-
-            <tr>
                 <td><label for="MaxRoyaltyRate">MaxRoyaltyRate</label> <sup><i data-help="LeaseRoyaltyMaster.MaxRoyaltyRate" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="MaxRoyaltyRate" value="{{ royaltymaster.MaxRoyaltyRate }}" /></td>
             </tr>
-
             <tr>
                 <td><label for="MinRoyaltyDollar">MinRoyaltyDollar</label> <sup><i data-help="LeaseRoyaltyMaster.MinRoyaltyDollar" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="MinRoyaltyDollar" value="{{ royaltymaster.MinRoyaltyDollar }}" /></td>
-            </tr>
-
-            <tr>
                 <td><label for="Notes">Notes</label> <sup><i data-help="LeaseRoyaltyMaster.Notes" class="fa fa-question-circle help"></i></sup></td>
                 <td><input type="text" name="Notes" value="{{ royaltymaster.Notes }}" /></td>
             </tr>
+
         </table>
     </fieldset>
 </form>
