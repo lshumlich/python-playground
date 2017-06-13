@@ -57,7 +57,9 @@ class ProcessRoyalties(object):
         for monthlyData in self.db.select('Monthly'):
             try:
                 self.process_one(monthlyData.ExtractDate, monthlyData.Entity, monthlyData.EntityID, monthlyData.ProdMonth, monthlyData.Product)
-
+                import traceback
+                tb = traceback.format_exc()
+                logging.error(tb)
             except AppError as e:
                 logging.error(str(e))
             except Exception as e:
