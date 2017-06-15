@@ -147,6 +147,9 @@ class ProcessRoyalties(object):
         if monthly.Product == 'OIL' and 'SKProvCrownVar' in royalty.RoyaltyScheme:
             self.calc_sask_oil_prov_crown(monthly, well, royalty, calc, calc_specific)
 
+        elif monthly.Product == 'OIL' and 'ABProvCrownVar' in royalty.RoyaltyScheme:
+            self.calc_ab_oil_prov_crown(monthly, well, royalty, calc, calc_specific)
+
         elif monthly.Product == 'OIL' and 'IOGR1995' in royalty.RoyaltyScheme:
             self.calc_sask_oil_iogr1995(royalty, well.CommencementDate,
                                         monthly, calc, calc_specific)
@@ -806,6 +809,47 @@ class ProcessRoyalties(object):
             prod_date = date(year, month, 1)
             diff = prod_date - cd
             return round(diff.days / 365, 2)
+    '''
+    AB Oil Royalty Calculation
+
+    These calculations are fully documented in a document included in this project
+    under the doc Folder:
+      ABOilFactors2010.pdf
+    '''
+
+    def calc_ab_oil_prov_crown(self, monthly, pp, rp, q, rq, r):
+        ProdMonth = monthly.ProdMonth
+        if ProdMonth <= 201612 and ProdMonth >= 201101:
+            if pp <= 250:
+                rp = ((pp - 190) * 0.0006) * 100
+            elif pp <= 400:
+                rp = (((pp - 250) * 0.0010) + 0.0360) * 100
+            elif pp <= 535:
+                rp = (((pp - 400) * 0.0005) + 0.1860) * 100
+            else:
+                rp = (((pp - 535) * 0.0003) + 0.2535) * 100
+            if rp > 0.35:
+                rp = 0.35
+
+            if q <= 106.4:
+                rq = ((q - 106.4) * 0.0026) * 100
+            elif q <= 197.6:
+                rq = ((q - 106.4) * 0.0010) * 100
+            elif q <= 304.0:
+                rq = (((q - 197.6) * 0.0007) + 0.0912) * 100
+            else:
+                rq = 0.3
+            if rq > .3:
+                rq = 0.3
+
+            r = rp + rq
+            if r < 0:
+                r = 0
+            if r > 0.4:
+                r = 0.4
+
+            #net_royalty_volume =  r * q
+            #net_royalty_price = net_royalty_volume * p?
 
     '''
     Sask Oil Royalty Calculation
