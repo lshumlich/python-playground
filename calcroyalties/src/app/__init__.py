@@ -15,6 +15,7 @@ from src.app.views.worksheet import worksheet
 from src.app.views.lookups import lookups
 from src.app.views.reports import reports
 from src.app.views.process import process
+from src.app.views.play import play
 
 app.register_blueprint(main)
 app.register_blueprint(wellevents)
@@ -26,3 +27,4 @@ app.register_blueprint(worksheet)
 app.register_blueprint(lookups)
 app.register_blueprint(reports)
 app.register_blueprint(process)
+app.register_blueprint(play)

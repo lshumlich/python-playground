@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
+    {% if with_js == 'y' %}
 
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=UnifrakturMaguntia">
-	<link rel="stylesheet" href={{url_for("static", filename="css/jqmath-0.4.3.css", _external=True)}}>
+        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=UnifrakturMaguntia">
+	    <link rel="stylesheet" href={{url_for("static", filename="css/jqmath-0.4.3.css", _external=True)}}>
 
-	<script src={{url_for("static", filename="js/jquery-2.1.4.min.js", _external=True)}}></script>
-	<script src={{url_for("static", filename="js/jqmath-etc-0.4.3.min.js", _external=True)}}></script>
+	    <script src={{url_for("static", filename="js/jquery-2.1.4.min.js", _external=True)}}></script>
+	    <script src={{url_for("static", filename="js/jqmath-etc-0.4.3.min.js", _external=True)}}></script>
+    {% endif %}
 <style>
 
 h1 {
@@ -242,13 +244,12 @@ table, th, td {
 
     </div>
 
+	<h3>Well Data</h3>
 
     <TABLE style="width:700" border="1">
         <colgroup>
             <col span="8" width="100" align="right">
         </colgroup>
-
-	<h3>Well Data</h3>
 
     {#
         --- Monthly Data
@@ -594,4 +595,3 @@ table, th, td {
 
     </body>
 </html>
-

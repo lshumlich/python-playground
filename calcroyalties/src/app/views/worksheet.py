@@ -15,13 +15,13 @@ worksheet = Blueprint('worksheet', __name__)
 @worksheet.route('/worksheet')
 def calc_worksheet():
     args = request.args.to_dict()
-    print(args)
+    print("calc_worksheet---The Args Are---", args)
     db = config.get_database()
     calcs = db.select('Calc', **args)
     result = ""
     for calc in calcs:
         result += generate_worksheet_from_calc(calc)
-        result += "<hr>"
+        # result += "<hr>"
 
     return result
 
@@ -35,14 +35,23 @@ def calc_worksheettopdf():
         calcs = db.select('Calc', **args)
         result = ""
         for calc in calcs:
-            result += generate_pdfworksheet_from_calc(calc)
+            result += generate_worksheet_from_calc(calc, 'n')
             result += "<hr>"
 
+        # text_file = open("out.html", "w", encoding="utf-8")
+        # text_file.write(result)
+        # text_file.write(result. .encode("UTF-8"))
+        # text_file.close()
+
+        print("about to set path")
         path_wkthmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'
+        print("about to set config")
         configpdf = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
+        print("about to pdfkit")
         pdfkit.from_string(result, 'out.pdf', configuration=configpdf)
 
         return "pdf should have been created"
+
     except Exception as e:
         print('PDF worksheet: ***Error:', e)
         traceback.print_exc(file=sys.stdout)
@@ -51,7 +60,14 @@ def calc_worksheettopdf():
                '<plaintext>' + tb + '</plaintext>'
 
 
-def generate_worksheet_from_calc(calc):
+def generate_worksheet_from_calc(calc, with_js='y'):
+    """
+    Generate html for the calc row that is passed
+    :param calc: a full calc record
+    :param with_js: default is 'y' only other option is 'n' and should only be used to work around a
+                    pdf generation issue
+    :return: html of the worksheet for the calc record
+    """
     try:
         db = config.get_database()
         if calc.Entity == 'Well':
@@ -109,6 +125,7 @@ def generate_worksheet_from_calc(calc):
         royalty.format_gorr = format_gorr(calc.Gorr)
 
         return render_template('worksheet/calc_worksheet.html',
+                               with_js=with_js,
                                well=well, rm=royalty, m=monthly, lease=lease,
                                calc=calc, calc_sp=calc_specific, entity_lease_link=entity_lease_link,
                                ba=ba, rtp_info=rtp_info, history=history)
