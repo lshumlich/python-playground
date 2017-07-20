@@ -323,8 +323,14 @@ table, th, td {
                 {% endif %}
                 </td>
            {% endif %}
-            <td {{ calc.diff('SalesPrice') | safe }} align="center">{{ '{:>10,.6f}\n'.format(m.SalesPrice) }}</td>
-           {% if  m.Product == 'OIL' %}
+            <td {{ calc.diff('SalesPrice') | safe }} align="center">
+            {%if m.SalesPrice %}
+            {{ '{:>10,.6f}\n'.format(m.SalesPrice) }}
+            {% else %}
+                0.0
+            {% endif %}
+            </td>
+            {% if  m.Product == 'OIL' %}
                 <td {{ calc.diff('TransRate') | safe }} align="center">{{ '{:>10,.6f}\n'.format(m.TransRate) }}</td>
            {% endif %}
             {# <td {{ calc.diff('ProcessingRate') | safe }} align="center">{{ '{:>10,.6f}\n'.format(m.ProcessingRate) }}</td> #}
