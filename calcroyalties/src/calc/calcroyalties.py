@@ -809,46 +809,6 @@ class ProcessRoyalties(object):
             prod_date = date(year, month, 1)
             diff = prod_date - cd
             return round(diff.days / 365, 2)
-    '''
-    AB Oil Royalty Calculation
-
-    These calculations are fully documented in a document included in this project
-    under the doc Folder:
-      ABOilFactors2010.pdf
-    '''
-
-    def calc_ab_oil_prov_crown(self, monthly, pp, rp, q, rq, r):
-        ProdMonth = monthly.ProdMonth
-        if ProdMonth <= 201612 and ProdMonth >= 201101:
-            if pp <= 250:
-                rp = ((pp - 190) * 0.0006) * 100
-            elif pp <= 400:
-                rp = (((pp - 250) * 0.0010) + 0.0360) * 100
-            elif pp <= 535:
-                rp = (((pp - 400) * 0.0005) + 0.1860) * 100
-            else:
-                rp = (((pp - 535) * 0.0003) + 0.2535) * 100
-            if rp > 0.35:
-                rp = 0.35
-            if q <= 106.4:
-                rq = ((q - 106.4) * 0.0026) * 100
-            elif q <= 197.6:
-                rq = ((q - 106.4) * 0.0010) * 100
-            elif q <= 304.0:
-                rq = (((q - 197.6) * 0.0007) + 0.0912) * 100
-            else:
-                rq = 0.3
-            if rq > .3:
-                rq = 0.3
-
-            r = rp + rq
-            if r < 0:
-                r = 0
-            if r > 0.4:
-                r = 0.4
-
-            #net_royalty_volume =  r * q
-            #net_royalty_price = net_royalty_volume * p?
 
     '''
     Sask Oil Royalty Calculation
@@ -1152,3 +1112,62 @@ class ProcessRoyalties(object):
         return rc, calc_specific
 
 # Note: to run the royalties in batch use batch.py
+
+
+    '''
+    AB Oil Royalty Calculation
+    
+    These calculations are fully documented in a document included in this project
+    under the doc Folder:
+      ABOilFactors2010.pdf
+    '''
+
+
+    def calc_ab_oil_prov_crown(self, monthly, pp, q, calc, calc_specific):
+
+        monthly.ProdMonth = 201101
+        if monthly.ProdMonth <= 201612 and monthly.ProdMonth >= 201101:
+            if pp <= 250:
+                calc_specific.rp = ((pp - 190) * 0.0006) * 100
+            elif pp <= 400:
+                calc_specific.rp = (((pp - 250) * 0.0010) + 0.0360) * 100
+            elif pp <= 535:
+                calc_specific.rp = (((pp - 400) * 0.0005) + 0.1860) * 100
+            else:
+                calc_specific.rp = (((pp - 535) * 0.0003) + 0.2535) * 100
+            if calc_specific.rp > 0.35:
+                calc_specific.rp = 0.35
+            if q <= 106.4:
+                calc_specific.rq = ((q - 106.4) * 0.0026) * 100
+            elif q <= 197.6:
+                calc_specific.rq = ((q - 106.4) * 0.0010) * 100
+            elif q <= 304.0:
+                calc_specific.rq = (((q - 197.6) * 0.0007) + 0.0912) * 100
+            else:
+                calc_specific.rq = 0.3
+            if calc_specific.rq > .3:
+                calc_specific.rq = 0.3
+            calc_specific.r = calc_specific.rp + calc_specific.rq
+            if calc_specific.r < 0:
+                calc_specific.r = 0
+            if calc_specific.r > 0.4:
+                calc_specific.r = 0.4
+
+            calc_specific.net_royalty_volume = calc_specific.r * q
+            calc_specific.net_royalty_price = calc_specific.net_royalty_volume * pp
+
+
+
+def test_calc_ab_oil_prov_crown():
+    monthly = DataStructure()
+    calc = DataStructure()
+    calc_specific = DataStructure()
+    pr = ProcessRoyalties()
+    monthly.ProdMonth = 201101
+    pp = 250
+    q = 100
+    pr.calc_ab_oil_prov_crown(monthly, pp, q, calc, calc_specific)
+    print("rq =",  (calc_specific.rq), " and rp = ", (calc_specific.rp), " and r = ", (calc_specific.r),
+    " and net_royalty_volume = ", (calc_specific.net_royalty_volume), " and net_royalty_price = ", (calc_specific.net_royalty_price))
+
+test_calc_ab_oil_prov_crown()
