@@ -830,7 +830,6 @@ class ProcessRoyalties(object):
                 rp = (((pp - 535) * 0.0003) + 0.2535) * 100
             if rp > 0.35:
                 rp = 0.35
-
             if q <= 106.4:
                 rq = ((q - 106.4) * 0.0026) * 100
             elif q <= 197.6:
