@@ -324,10 +324,10 @@ table, th, td {
                 </td>
            {% endif %}
             <td {{ calc.diff('SalesPrice') | safe }} align="center">
-            {%if m.SalesPrice %}
+            {% if m.SalesPrice %}
             {{ '{:>10,.6f}\n'.format(m.SalesPrice) }}
             {% else %}
-                0.0
+
             {% endif %}
             </td>
             {% if  m.Product == 'OIL' %}
