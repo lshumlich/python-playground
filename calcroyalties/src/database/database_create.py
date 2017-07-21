@@ -401,6 +401,27 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
 
+    def ab_oil(self):
+        statement = """
+            CREATE TABLE ABOil ('ID' integer primary key autoincrement,
+            "CharMonth" text,
+            "ProdMonth" int,
+            "HOP" int,
+            "SOP" int,
+            "NOP" int,
+            "H4T_C" float, "H4T_D" float, "H4T_K" float, "H4T_X" int, 
+            "H3T_K" float, "H3T_X" int, 
+            "HNEW_K" float, "HNEW_X" int, 
+            "SW4T_C" float, "SW4T_D" float, "SW4T_K" float, "SW4T_X" int,
+            "SW3T_K" float, "SW3T_X" int,
+            "SWNEW_K" float, "SWNEW_X" int, 
+            "O4T_C" float, "O4T_D" float, "O4T_K" float, "O4T_X" int, 
+            "O3T_K" float, "O3T_X" int, 
+            "ONEW_K" float, "ONEW_X" int, 
+            "OOLD_K" float, "OOLD_X" int);
+        """
+        self.dbi.execute_statement(statement)
+
     def linktab(self):
         statement = """
             create table LinkTab ('ID' integer primary key autoincrement,

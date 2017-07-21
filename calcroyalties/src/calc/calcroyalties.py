@@ -443,7 +443,7 @@ class ProcessRoyalties(object):
         return calc.BaseRoyaltyCalcRate
 
     @staticmethod
-    def calc_sask_prov_crown_royalty_volume_value(m, lease_rm, calc, calc_specific):
+    def calc_prov_crown_royalty_volume_value(m, lease_rm, calc, calc_specific):
 
         calc.BaseRoyaltyRate = calc.BaseRoyaltyCalcRate
         calc_specific.BaseRoyaltyRateDesc = 'CR %'  # SKProvCrownVar calculates an actual Royalty Rate
@@ -838,10 +838,10 @@ class ProcessRoyalties(object):
         self.calc_sask_oil_prov_crown_royalty_rate(calc, econ_oil_data, calc.RoyaltyClassification,
                                                    well.Classification, calc.RoyaltyBasedOnVol, well.SRC)
 
-        self.calc_sask_prov_crown_royalty_volume_value(monthly,
-                                                       royalty,
-                                                       calc,
-                                                       calc_specific)
+        self.calc_prov_crown_royalty_volume_value(monthly,
+                                                  royalty,
+                                                  calc,
+                                                  calc_specific)
 
         calc.BaseTransValue, calc_specific.BaseTransMessage = \
             self.calc_deduction("Base", "Trans", royalty.BaseTrans, 'CR %', calc.BaseRoyaltyRate, calc.BaseRoyaltyValue,
@@ -871,10 +871,10 @@ class ProcessRoyalties(object):
         self.calc_sask_gas_prov_crown_royalty_rate(calc, econ_gas_data, royalty_classification, calc.RoyaltyBasedOnVol,
                                                    well.SRC, well.WellType)
 
-        self.calc_sask_prov_crown_royalty_volume_value(monthly,
-                                                       royalty,
-                                                       calc,
-                                                       calc_specific)
+        self.calc_prov_crown_royalty_volume_value(monthly,
+                                                  royalty,
+                                                  calc,
+                                                  calc_specific)
 
         calc.BaseGCAValue, calc_specific.BaseGCAMessage = \
             self.calc_deduction("Base", "GCA", royalty.BaseGCA, 'CR %', calc.BaseRoyaltyRate, calc.BaseRoyaltyValue,
@@ -1123,12 +1123,20 @@ class ProcessRoyalties(object):
       ABOilFactors2010.pdf
     '''
 
+    def ab_oil_prov_crown_royalty_rate(self, monthly, well_classification,  ab_oil_data, q, calc, calc_specific):
 
-    def calc_ab_oil_prov_crown(self, monthly, pp, q, calc, calc_specific):
-
-        monthly.ProdMonth = 201101
         if monthly.ProdMonth <= 201612 and monthly.ProdMonth >= 201101:
-            if pp <= 250:
+
+            if well_classification == 'Light':
+                calc.pp = ab_oil_data.Light
+            elif well_classification == 'Medium':
+                calc.pp = ab_oil_data.Medium
+            elif well_classification == 'Heavy':
+                calc.pp = ab_oil_data.Heavy
+            else:
+                raise AppError("AB classification not known")
+
+            if calc.pp <= 250:
                 calc_specific.rp = ((pp - 190) * 0.0006) * 100
             elif pp <= 400:
                 calc_specific.rp = (((pp - 250) * 0.0010) + 0.0360) * 100
@@ -1136,8 +1144,10 @@ class ProcessRoyalties(object):
                 calc_specific.rp = (((pp - 400) * 0.0005) + 0.1860) * 100
             else:
                 calc_specific.rp = (((pp - 535) * 0.0003) + 0.2535) * 100
+
             if calc_specific.rp > 0.35:
                 calc_specific.rp = 0.35
+
             if q <= 106.4:
                 calc_specific.rq = ((q - 106.4) * 0.0026) * 100
             elif q <= 197.6:
@@ -1146,13 +1156,45 @@ class ProcessRoyalties(object):
                 calc_specific.rq = (((q - 197.6) * 0.0007) + 0.0912) * 100
             else:
                 calc_specific.rq = 0.3
+
             if calc_specific.rq > .3:
                 calc_specific.rq = 0.3
-            calc_specific.r = calc_specific.rp + calc_specific.rq
-            if calc_specific.r < 0:
-                calc_specific.r = 0
-            if calc_specific.r > 0.4:
-                calc_specific.r = 0.4
 
-            calc_specific.net_royalty_volume = calc_specific.r * q
-            calc_specific.net_royalty_price = calc_specific.net_royalty_volume * pp
+            calc.BaseRoyaltyCalcRate = calc_specific.rp + calc_specific.rq
+
+            if calc.BaseRoyaltyCalcRate < 0:
+                calc.BaseRoyaltyCalcRate = 0
+            if calc.BaseRoyaltyCalcRate > 0.4:
+                calc.BaseRoyaltyCalcRate = 0.4
+
+            return calc.BaseRoyaltyCalcRate
+
+        else:
+            raise AppError("AB royalty not calculated yet")
+
+
+    def calc_ab_oil_prov_crown(self, monthly, well, royalty, calc, calc_specific):
+
+        if royalty.OverrideRoyaltyClassification is not None:
+            calc.RoyaltyClassification = royalty.OverrideRoyaltyClassification
+        else:
+            calc.RoyaltyClassification = well.RoyaltyClassification
+            # calc.CommencementPeriod = self.determine_commencement_period(monthly.ProdMonth, well.CommencementDate)
+            econ_gas_data = self.db.select1("ABOil", ProdMonth=monthly.ProdMonth)
+        if royalty.OverrideRoyaltyClassification:
+            royalty_classification = royalty.OverrideRoyaltyClassification
+        else:
+            royalty_classification = well.RoyaltyClassification
+
+        self.calc_ab_oil_prov_crown_royalty_rate(calc, econ_oil_data, calc.RoyaltyClassification,
+                                                       well.Classification, calc.RoyaltyBasedOnVol, well.SRC)
+
+        self.calc_prov_crown_royalty_volume_value(monthly,
+                                                      royalty,
+                                                      calc,
+                                                      calc_specific)
+
+        calc.BaseTransValue, calc_specific.BaseTransMessage = \
+            self.calc_deduction("Base", "Trans", royalty.BaseTrans, 'CR %', calc.BaseRoyaltyRate,
+                                    calc.BaseRoyaltyValue,
+                                    monthly, calc)
