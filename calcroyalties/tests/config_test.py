@@ -45,7 +45,7 @@ class Test(unittest.TestCase):
         config.set_database_name(':memory:')
         self.assertEqual(config.get_environment(), '????')
         
-        # test that if we the database name we have an unknown environmentwe
+        # test that if we the database name we have an unknown environment
         config.reset()
         config.set_enviornment('test')
         self.assertTrue(config.get_database_name())
@@ -56,6 +56,12 @@ class Test(unittest.TestCase):
         self.assertTrue(config.get_database_name())
         self.assertTrue(config.get_database_instance())
         self.assertTrue(config.get_database())
+
+        # test that the default pdf location is the temp directory
+        config.reset()
+        self.assertTrue(config.get_pdf_location())
+        self.assertEqual(config.get_pdf_location(),config.get_temp_dir())
+
         
         # Test that the config file works. This is commented out because it can not resonably be tested
 #         config.reset()
