@@ -25,6 +25,7 @@ class TestSaskRoyaltyCalc(unittest.TestCase):
     def setUp(self):
         # Destructive Tests must run in unittest environment
         self.assertEqual('unittest', config.get_environment())
+        # print('Don"t forget to add setup back in????????????????')
 
 
 #     def xtest_determineRoyaltyPrice (self):
@@ -1443,3 +1444,15 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual('1.000000', pr.fm_rate(1.))
         self.assertEqual('0.123457', pr.fm_rate(.12345678))
         self.assertEqual('10.111000', pr.fm_rate(10.111))
+
+    def test_calc_ab_oil_prov_crown(self):
+        monthly = DataStructure()
+        calc = DataStructure()
+        calc_specific = DataStructure()
+        pr = ProcessRoyalties()
+        monthly.ProdMonth = 201101
+        pp = 250
+        q = 100
+        pr.calc_ab_oil_prov_crown(monthly, pp, q, calc, calc_specific)
+        print("rq =",  (calc_specific.rq), " and rp = ", (calc_specific.rp), " and r = ", (calc_specific.r),
+        " and net_royalty_volume = ", (calc_specific.net_royalty_volume), " and net_royalty_price = ", (calc_specific.net_royalty_price))

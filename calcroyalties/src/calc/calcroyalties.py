@@ -57,7 +57,8 @@ class ProcessRoyalties(object):
 
         for monthlyData in self.db.select('Monthly'):
             try:
-                self.process_one(monthlyData.ExtractDate, monthlyData.Entity, monthlyData.EntityID, monthlyData.ProdMonth, monthlyData.Product)
+                self.process_one(monthlyData.ExtractDate, monthlyData.Entity, monthlyData.EntityID,
+                                 monthlyData.ProdMonth, monthlyData.Product)
             except AppError as e:
                 logging.error(str(e))
             except Exception as e:
@@ -1155,19 +1156,3 @@ class ProcessRoyalties(object):
 
             calc_specific.net_royalty_volume = calc_specific.r * q
             calc_specific.net_royalty_price = calc_specific.net_royalty_volume * pp
-
-
-
-def test_calc_ab_oil_prov_crown():
-    monthly = DataStructure()
-    calc = DataStructure()
-    calc_specific = DataStructure()
-    pr = ProcessRoyalties()
-    monthly.ProdMonth = 201101
-    pp = 250
-    q = 100
-    pr.calc_ab_oil_prov_crown(monthly, pp, q, calc, calc_specific)
-    print("rq =",  (calc_specific.rq), " and rp = ", (calc_specific.rp), " and r = ", (calc_specific.r),
-    " and net_royalty_volume = ", (calc_specific.net_royalty_volume), " and net_royalty_price = ", (calc_specific.net_royalty_price))
-
-test_calc_ab_oil_prov_crown()
