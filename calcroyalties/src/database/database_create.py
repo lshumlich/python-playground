@@ -422,6 +422,17 @@ class DatabaseCreate(object):
         """
         self.dbi.execute_statement(statement)
 
+    def ab_energy_oil(self):
+        statement = """
+            CREATE TABLE ABEnergyOil ('ID' integer primary key autoincrement,
+            "CharMonth" text, "ProdMonth" int,
+            "Light" int,
+            "Medium" int,
+            "Heavy" int,
+            "UltraHeavy" int);
+        """
+        self.dbi.execute_statement(statement)
+
     def linktab(self):
         statement = """
             create table LinkTab ('ID' integer primary key autoincrement,

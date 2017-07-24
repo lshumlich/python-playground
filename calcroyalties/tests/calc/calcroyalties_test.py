@@ -1445,14 +1445,66 @@ Sept.,201509,162,210,276,0.0841,2.1,20.81,1561,20.46,472,26.48,611,0.1045,2.61,2
         self.assertEqual('0.123457', pr.fm_rate(.12345678))
         self.assertEqual('10.111000', pr.fm_rate(10.111))
 
-    def test_calc_ab_oil_prov_crown(self):
-        monthly = DataStructure()
+    def test_calc_ab_oil_prov_crown_royalty_rate(self):
+
+        """
+        Adrienne ??? Write all the tests to ensure the calculations work properly.
+        This method only calculates the Royalty Rate.
+
+        :return:
+        """
+        pr = ProcessRoyalties()
+
         calc = DataStructure()
         calc_specific = DataStructure()
+        ab_energy_oil_data = DataStructure()
+
+        ab_energy_oil_data.Light = 100
+        ab_energy_oil_data.Medium = 200
+        ab_energy_oil_data.Heavy = 300
+
+        pr.calc_ab_oil_prov_crown_royalty_rate(ab_energy_oil_data, 201101, 'Light', 100, calc, calc_specific)
+
+        print("rq =",  (calc_specific.rq), " and rp = ", (calc_specific.rp), " and BaseRoyaltyCalcRate = ", (calc.BaseRoyaltyCalcRate))
+        print('***' + calc_specific.BaseRoyaltyRateMessage)
+
+        #   Adrienne ??? This is just an example of what to test.
+        #  self.assertEqual('R$ = 0.25 * Sales Vol * Price;'
+        #                  'R$ = 0.25 * 70.00 * 50.000000;'
+        #                  'R$ = $875.00;;'
+        #                  'price > $10.65);'
+        #                  'S = (0.75 * Sales Vol * (4.26 + 0.55 * (price  - $24.85));'
+        #                  'S = (0.75 * 70.00 * (4.26 + 0.55 * (50.000000 - $24.85));'
+        #                  'S = $949.86;;'
+        #                  'Royalty = (R$ + S$) * PE FN %	* RP %;'
+        #                  'Royalty = ($875.00 + $949.86) * 20.000000% * 10.000000%;'
+        #                  'Royalty = $36.50;', calc_sp.BaseRoyaltyRateMessage)
+
+    def test_calc_ab_oil_prov_crown(self):
+        dbu = DatabaseUtilities()
+        dbu.delete_all_tables()
+        dbu.create_some_test_ab_energy_oil()
+
         pr = ProcessRoyalties()
-        monthly.ProdMonth = 201101
-        pp = 250
-        q = 100
-        pr.calc_ab_oil_prov_crown(monthly, pp, q, calc, calc_specific)
-        print("rq =",  (calc_specific.rq), " and rp = ", (calc_specific.rp), " and r = ", (calc_specific.r),
-        " and net_royalty_volume = ", (calc_specific.net_royalty_volume), " and net_royalty_price = ", (calc_specific.net_royalty_price))
+
+        pr = ProcessRoyalties()
+
+        monthly = DataStructure()
+        well = DataStructure()
+        royalty = DataStructure()
+        calc = DataStructure()
+        calc_specific = DataStructure()
+
+        royalty.OverrideRoyaltyClassification = None
+        royalty.CrownMultiplier = None
+
+        well.RoyaltyClassification = 'Light'
+        monthly.ProdMonth = 201609
+        monthly.ProdVol = 100
+
+        pr.calc_ab_oil_prov_crown(monthly, well, royalty, calc, calc_specific)
+
+        # Adrienne ??? The tests will follow. See the example for Sask...
+        #
+
+        # " and net_royalty_volume = ", (calc_specific.net_royalty_volume), " and net_royalty_price = ", (calc_specific.net_royalty_price))

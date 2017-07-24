@@ -1112,38 +1112,66 @@ class ProcessRoyalties(object):
 
         return rc, calc_specific
 
-# Note: to run the royalties in batch use batch.py
+    def calc_ab_oil_prov_crown(self, monthly, well, royalty, calc, calc_specific):
 
+        if royalty.OverrideRoyaltyClassification:
+            calc.RoyaltyClassification = royalty.OverrideRoyaltyClassification
+        else:
+            calc.RoyaltyClassification = well.RoyaltyClassification
+
+        ab_energy_oil_data = self.db.select1("ABEnergyOil", ProdMonth=monthly.ProdMonth)
+
+        self.calc_ab_oil_prov_crown_royalty_rate(ab_energy_oil_data, monthly.ProdMonth, calc.RoyaltyClassification,
+                                                 monthly.ProdVol, calc, calc_specific)
+
+        self.calc_prov_crown_royalty_volume_value(monthly,
+                                                      royalty,
+                                                      calc,
+                                                      calc_specific)
+
+        calc.BaseTransValue, calc_specific.BaseTransMessage = \
+            self.calc_deduction("Base", "Trans", royalty.BaseTrans, 'CR %', calc.BaseRoyaltyRate,
+                                    calc.BaseRoyaltyValue,
+                                    monthly, calc)
 
     '''
-    AB Oil Royalty Calculation
-    
+    AB Oil Royalty Rate Calculation
+
     These calculations are fully documented in a document included in this project
     under the doc Folder:
       ABOilFactors2010.pdf
     '''
 
-    def ab_oil_prov_crown_royalty_rate(self, monthly, well_classification,  ab_oil_data, q, calc, calc_specific):
+    def calc_ab_oil_prov_crown_royalty_rate(self, ab_energy_oil_data, prod_month, well_classification, q,
+                                            calc, calc_specific):
 
-        if monthly.ProdMonth <= 201612 and monthly.ProdMonth >= 201101:
+        if prod_month >= 201101 and prod_month <= 201612:
 
             if well_classification == 'Light':
-                calc.pp = ab_oil_data.Light
+                calc_specific.pp = ab_energy_oil_data.Light
             elif well_classification == 'Medium':
-                calc.pp = ab_oil_data.Medium
+                calc_specific.pp = ab_energy_oil_data.Medium
             elif well_classification == 'Heavy':
-                calc.pp = ab_oil_data.Heavy
+                calc_specific.pp = ab_energy_oil_data.Heavy
             else:
                 raise AppError("AB classification not known")
 
-            if calc.pp <= 250:
-                calc_specific.rp = ((pp - 190) * 0.0006) * 100
-            elif pp <= 400:
-                calc_specific.rp = (((pp - 250) * 0.0010) + 0.0360) * 100
-            elif pp <= 535:
-                calc_specific.rp = (((pp - 400) * 0.0005) + 0.1860) * 100
+            if calc_specific.pp <= 250:
+                calc_specific.rp = ((calc_specific.pp - 190) * 0.0006) * 100
+                # Adrienne ??? This is an example only showing the concept I've started using...
+                # It makes the logic much easier. The worksheet became very hard to maintain. The
+                # concept being to put the calc messages together here and not in the worksheet. We can then test them
+                # in the tests and use excel to help...
+                calc_specific.BaseRoyaltyRateMessage \
+                    = 'rp = ((pp - 190) * 0.0006) * 100;' + \
+                      'rp = ((' + self.fm_vol(calc_specific.pp) + ' - 190) * 0.0006) * 100;' +\
+                      'rp = ' + self.fm_percent(calc_specific.rp) + ';;'
+            elif calc_specific.pp <= 400:
+                calc_specific.rp = (((calc_specific.pp - 250) * 0.0010) + 0.0360) * 100
+            elif calc_specific.pp <= 535:
+                calc_specific.rp = (((calc_specific.pp - 400) * 0.0005) + 0.1860) * 100
             else:
-                calc_specific.rp = (((pp - 535) * 0.0003) + 0.2535) * 100
+                calc_specific.rp = (((calc_specific.pp - 535) * 0.0003) + 0.2535) * 100
 
             if calc_specific.rp > 0.35:
                 calc_specific.rp = 0.35
@@ -1167,34 +1195,6 @@ class ProcessRoyalties(object):
             if calc.BaseRoyaltyCalcRate > 0.4:
                 calc.BaseRoyaltyCalcRate = 0.4
 
-            return calc.BaseRoyaltyCalcRate
-
         else:
             raise AppError("AB royalty not calculated yet")
 
-
-    def calc_ab_oil_prov_crown(self, monthly, well, royalty, calc, calc_specific):
-
-        if royalty.OverrideRoyaltyClassification is not None:
-            calc.RoyaltyClassification = royalty.OverrideRoyaltyClassification
-        else:
-            calc.RoyaltyClassification = well.RoyaltyClassification
-            # calc.CommencementPeriod = self.determine_commencement_period(monthly.ProdMonth, well.CommencementDate)
-            econ_gas_data = self.db.select1("ABOil", ProdMonth=monthly.ProdMonth)
-        if royalty.OverrideRoyaltyClassification:
-            royalty_classification = royalty.OverrideRoyaltyClassification
-        else:
-            royalty_classification = well.RoyaltyClassification
-
-        self.calc_ab_oil_prov_crown_royalty_rate(calc, econ_oil_data, calc.RoyaltyClassification,
-                                                       well.Classification, calc.RoyaltyBasedOnVol, well.SRC)
-
-        self.calc_prov_crown_royalty_volume_value(monthly,
-                                                      royalty,
-                                                      calc,
-                                                      calc_specific)
-
-        calc.BaseTransValue, calc_specific.BaseTransMessage = \
-            self.calc_deduction("Base", "Trans", royalty.BaseTrans, 'CR %', calc.BaseRoyaltyRate,
-                                    calc.BaseRoyaltyValue,
-                                    monthly, calc)

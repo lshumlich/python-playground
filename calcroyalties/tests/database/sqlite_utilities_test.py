@@ -159,11 +159,19 @@ class DatabaseUtilities(object):
         self.db_instance.execute_statement(statement)
 
     def create_some_test_econgas(self):
-        if 'ECONGas' not in self.db_instance.get_table_names():
+        if 'ABEnergyOil' not in self.db_instance.get_table_names():
             self.db_create.econ_gas()
         statement = """
             INSERT INTO ECONGas VALUES(13,'Jan.',201501,0.1199,3,24.67,1596,0.1443,33.31,1922,0.16,36.92,2130,
                 0.2071,47.78,2756);
+        """
+        self.db_instance.execute_statement(statement)
+
+    def create_some_test_ab_energy_oil(self):
+        if 'ECONGas' not in self.db_instance.get_table_names():
+            self.db_create.ab_energy_oil()
+        statement = """
+            INSERT INTO ABEnergyOil VALUES(1,'Sept.',201609,100,200,300,400);
         """
         self.db_instance.execute_statement(statement)
 
