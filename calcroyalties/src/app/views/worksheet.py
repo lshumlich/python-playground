@@ -15,7 +15,6 @@ worksheet = Blueprint('worksheet', __name__)
 @worksheet.route('/worksheet')
 def calc_worksheet():
     args = request.args.to_dict()
-    print("calc_worksheet---The Args Are---", args)
     db = config.get_database()
     calcs = db.select('Calc', **args)
     result = ""

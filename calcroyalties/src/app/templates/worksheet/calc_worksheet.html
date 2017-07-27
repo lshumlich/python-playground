@@ -124,7 +124,7 @@ Calc Time: {{ calc.CalcTime }}
             <table align="center">
                 {% if well.SRC != None and 'SKProvCrownVar' in rm.RoyaltyScheme %}
                     <tr>
-                        <th align="right">SRC:</th> <td> {{ well.SRC }} </td>
+                        <th align="right">SRC:</th> <td> {{ '{:.2%}'.format(well.SRC) }} </td>
                     </tr>
                 {% endif %}
                 {% if well.Classification != None and 'SKProvCrownVar' in rm.RoyaltyScheme %}
@@ -360,7 +360,7 @@ table, th, td {
             {% else %}
                 <tr><td align="left"> CR% = </td> <td>$$ (K - X / { {{calc_sp.SaskProvBasedOn}} } ) - SRC $$ </td></tr>
                 <tr><td align="left"> CR% = </td> <td>$$ ( {{'{:.2f}'.format(calc.K)}} -
-                    {{ calc.X }} / {{ '{:.2f}'.format(calc.RoyaltyBasedOnVol) }} ) - {{ well.SRC }} $$ </td></tr>
+                    {{ calc.X }} / {{ '{:.2f}'.format(calc.RoyaltyBasedOnVol) }} ) - {{ '{:.2%}'.format(well.SRC) }} $$ </td></tr>
                 <tr><td align="left"> CR% = </td><td align="center"> {{ '{:.6%}'.format(calc.BaseRoyaltyCalcRate) }} </td></tr>
             {% endif %}
             {% if rm.CrownModifier %}
@@ -406,12 +406,12 @@ table, th, td {
             {% elif calc.RoyaltyClassification == 'Third Tier' or calc.RoyaltyClassification == 'New' or calc.RoyaltyClassification == 'Old' %}
                 {% if m.ProdVol <= 115.4 %}
                     <tr><td align="right">CR% =</td> <td align="center">$$(C_g * {{calc_sp.SaskProvBasedOn}}) - SRC$$</td></tr>
-                    <tr><td align="right">CR% =</td> <td align="center">&nbsp;&nbsp;({{ '{:.4f}'.format(calc.C) }} * {{ '{:.2f}'.format(calc.RoyaltyBasedOnVol) }}) - {{'{:.2f}'.format(well.SRC)}}</td></tr>
+                    <tr><td align="right">CR% =</td> <td align="center">&nbsp;&nbsp;({{ '{:.4f}'.format(calc.C) }} * {{ '{:.2f}'.format(calc.RoyaltyBasedOnVol) }}) - {{'{:.2%}'.format(well.SRC)}}</td></tr>
                     <tr><td align="right">CR% =</td> <td align="center"> {{'{:.6%}'.format(calc.BaseRoyaltyCalcRate) }}</td></tr>
                 {% else %}
-                    <tr><td align="left"> CR% = </td> <td>$$ ((K_g - X_g / { {{calc_sp.SaskProvBasedOn}} } ) - SRС) $$ </td></tr>
-                    <tr><td align="left"> CR% = </td> <td>$$ ( ({{'{:.2f}'.format(calc.K)}} -
-                        {{ calc.X }} / {{ '{:.2f}'.format(calc.RoyaltyBasedOnVol) }}) - SRC ) $$ </td></tr>
+                    <tr><td align="left"> CR% = </td> <td>$$ (K_g - X_g / { {{calc_sp.SaskProvBasedOn}} } ) - SRC $$ </td></tr>
+                    <tr><td align="left"> CR% = </td> <td>$$  ({{'{:.2f}'.format(calc.K)}} -
+                        {{ calc.X }} / {{ '{:.2f}'.format(calc.RoyaltyBasedOnVol) }}) - {{'{:.2%}'.format(well.SRC)}}  $$ </td></tr>
                     <tr><td align="left"> CR% = </td><td align="center"> {{ '{:.6%}'.format(calc.BaseRoyaltyCalcRate) }} </td></tr>
                 {% endif %}
             {% endif %}
