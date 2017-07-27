@@ -1,6 +1,6 @@
 import traceback
 import sys
-import math
+# import math
 from flask import Blueprint, render_template, abort, request, json
 
 import config
@@ -37,7 +37,7 @@ def calc_list():
         order by calc.ExtractDate, calc.prodMonth, calc.EntityID
     """
     result = db.select_sql(statement)
-    print('we have found: ', len(result))
+    # print('we have found: ', len(result))
     if result:
         return render_template('reports/calclist.html', result=result)
     else:
@@ -82,7 +82,10 @@ def proofed():
         db = config.get_database()
         results = db.select_sql("SELECT * FROM Proofed order by ExtractDate, ProdMonth, LeaseID, Entity, EntityID, "
                                 "Product, RPBA")
+        error_no = 0
+        proofed_no = 0
         for r in results:
+            r.Message = None
             calc = db.select('Calc', ExtractDate=r.ExtractDate, ProdMonth=r.ProdMonth, LeaseID=r.LeaseID,
                              Entity=r.Entity, EntityID=r.EntityID, RPBA=r.RPBA, Product=r.Product)
             if len(calc) > 1:
@@ -93,21 +96,32 @@ def proofed():
                 r.BaseNetRoyaltyValue = calc[0].BaseNetRoyaltyValue
                 r.GorrNetRoyaltyValue = calc[0].GorrNetRoyaltyValue
 
-                r.Message = 'Proofed.'
+                # r.Message = 'Proofed.'
                 if abs(r.BaseRoyalty - calc[0].BaseNetRoyaltyValue) > .001:
                     r.Message = 'Royalty is not the Same'
                 if abs(r.GorrRoyalty - calc[0].GorrNetRoyaltyValue) > .001:
                     r.Message = 'Royalty is not the Same'
-
-        return render_template('/reports/proofed.html', result=results)
+            if r.Message:
+                error_no += 1
+            else:
+                r.Message = 'Proofed'
+                proofed_no += 1
+        return render_template('/reports/proofed.html', result=results, errors=error_no, proofed=proofed_no)
     except Exception as e:
-        print(e)
+        print('***Error:', e)
         traceback.print_exc(file=sys.stdout)
-        abort(404)
+        tb = traceback.format_exc()
+        return "<h2>Error generating" + \
+               '<plaintext>' + tb + '</plaintext>'
+        # print(e)
+        # traceback.print_exc(file=sys.stdout)
+        # abort(404)
+
 
 @reports.route('/reports/adrienne')
 def adrienne():
     return render_template('/reports/adrienne.html')
+
 
 @reports.route('/reports/battdiagram')
 def battdiagram():
@@ -125,7 +139,7 @@ def battdiagram():
 @reports.route('/reports/lfs')
 def lfs():
 
-    print('--lfs()', request.args["batt"])
+    # print('--lfs()', request.args["batt"])
     db = config.get_database()
     # proddate = get_proddate_int()
     results = db.select("VolumetricInfo", Facility=request.args["batt"])
@@ -157,7 +171,8 @@ def lfs():
                 disps.append({"name": r.FromTo})
 
     facilities.sort(key=faclsort)
-    results.sort(key=lambda r: r.Key)
+    # results.sort(key=lambda r: r.Key)
+    results.sort(key=lambda x: x.Key)
 
     html = render_template('/reports/battdiagramvolinout.html', result=results, facility=request.args["batt"])
     data['html'] = html
@@ -167,7 +182,7 @@ def lfs():
     data['disps'] = disps
     data['batt'] = [{"name": request.args["batt"]}]
     data['count'] = len(results)
-    print('---lfs()--', wells)
+    # print('---lfs()--', wells)
     # print('---lfs()--->', len(results))
     # print(json.dumps(data))
     return json.dumps(data)

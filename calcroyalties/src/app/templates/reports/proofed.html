@@ -7,6 +7,16 @@ tr.border_bottom td {
 }
 </style>
 
+<div align="right">
+<table>
+    <tr>
+        <th>Proofed</th>
+        <td><b>{{proofed}}</b></td>
+        <th>Errors</th>
+        <td><b>{{errors}}</b></td>
+    </tr>
+</table>
+</div>
 <table class="table-striped" style="width:100%">
     <tr>
         <th>Extract Date</th>
@@ -50,5 +60,4 @@ tr.border_bottom td {
     </tr>
     {% endfor %}
 </table>
-
 {% endblock %}
